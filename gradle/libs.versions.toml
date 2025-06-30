@@ -1,0 +1,48 @@
+[versions]
+# libraries
+core = "1.16.0"
+activity = "1.10.1"
+navigation = "2.9.0"
+coroutines = "1.10.2"
+lifecycleRuntime = "2.9.1"
+material3 = "1.4.0-alpha16"
+composeUi = "1.8.3"
+composeBom = "2025.06.01"
+materialIconsExtended = "1.7.8"
+uiTextGoogleFonts = "1.8.3"
+accompanistPermissions = "0.37.3"
+
+# plugins
+agp = "8.11.0"
+kotlin = "2.2.0"
+
+[libraries]
+androidx-core-ktx = { group = "androidx.core", name = "core-ktx", version.ref = "core" }
+androidx-activity = { group = "androidx.activity", name = "activity-compose", version.ref = "activity" }
+
+androidx-navigation = { module = "androidx.navigation:navigation-compose", version.ref = "navigation" }
+
+kotlinx-coroutines = { module = "org.jetbrains.kotlinx:kotlinx-coroutines-android", version.ref = "coroutines" }
+
+androidx-lifecycle-runtime-ktx = { group = "androidx.lifecycle", name = "lifecycle-runtime-ktx", version.ref = "lifecycleRuntime" }
+androidx-lifecycle-runtime = { module = "androidx.lifecycle:lifecycle-runtime-compose", version.ref = "lifecycleRuntime" }
+androidx-lifecycle-viewmodel = { module = "androidx.lifecycle:lifecycle-viewmodel-compose", version.ref = "lifecycleRuntime" }
+
+material3 = { module = "androidx.compose.material3:material3", version.ref = "material3" }
+
+ui = { module = "androidx.compose.ui:ui", version.ref = "composeUi" }
+ui-preview = { module = "androidx.compose.ui:ui-tooling-preview", version.ref = "composeUi" }
+androidx-compose-bom = { group = "androidx.compose", name = "compose-bom", version.ref = "composeBom" }
+androidx-ui-base = { group = "androidx.compose.ui", name = "ui" }
+androidx-ui-graphics = { group = "androidx.compose.ui", name = "ui-graphics" }
+androidx-ui-tooling = { group = "androidx.compose.ui", name = "ui-tooling" }
+
+# Tools
+androidx-material-icons-extended = { module = "androidx.compose.material:material-icons-extended", version.ref = "materialIconsExtended" }
+androidx-ui-text-google-fonts = { module = "androidx.compose.ui:ui-text-google-fonts", version.ref = "uiTextGoogleFonts" }
+accompanist-permissions = { module = "com.google.accompanist:accompanist-permissions", version.ref = "accompanistPermissions" }
+
+[plugins]
+android-application = { id = "com.android.application", version.ref = "agp" }
+kotlin-android = { id = "org.jetbrains.kotlin.android", version.ref = "kotlin" }
+kotlin-compose = { id = "org.jetbrains.kotlin.plugin.compose", version.ref = "kotlin" }
