@@ -1,20 +1,21 @@
 [versions]
 # libraries
-core = "1.16.0"
-activity = "1.10.1"
-navigation = "2.9.0"
+core = "1.17.0"
+activity = "1.11.0"
+navigation = "2.9.4"
 coroutines = "1.10.2"
-lifecycleRuntime = "2.9.1"
-material3 = "1.4.0-alpha16"
-composeUi = "1.8.3"
-composeBom = "2025.06.01"
+lifecycleRuntime = "2.9.3"
+material3 = "1.4.0-rc01"
+composeUi = "1.9.1"
+composeBom = "2025.09.00"
 materialIconsExtended = "1.7.8"
-uiTextGoogleFonts = "1.8.3"
+uiTextGoogleFonts = "1.9.1"
 accompanistPermissions = "0.37.3"
 
 # plugins
-agp = "8.11.0"
-kotlin = "2.2.0"
+agp = "8.13.0-rc02"
+kotlin = "2.2.20"
+versionsCheck = "0.52.0"
 
 [libraries]
 androidx-core-ktx = { group = "androidx.core", name = "core-ktx", version.ref = "core" }
@@ -46,3 +47,5 @@ accompanist-permissions = { module = "com.google.accompanist:accompanist-permiss
 android-application = { id = "com.android.application", version.ref = "agp" }
 kotlin-android = { id = "org.jetbrains.kotlin.android", version.ref = "kotlin" }
 kotlin-compose = { id = "org.jetbrains.kotlin.plugin.compose", version.ref = "kotlin" }
+versionsCheck = { id = "com.github.ben-manes.versions", version.ref = "versionsCheck" }
+
