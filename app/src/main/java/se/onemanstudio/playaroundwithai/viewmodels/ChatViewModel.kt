@@ -4,10 +4,14 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.SharingStarted
+import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import se.onemanstudio.playaroundwithai.data.gemini.GeminiRepository
+import se.onemanstudio.playaroundwithai.data.local.PromptEntity
 import javax.inject.Inject
 
 sealed interface ChatUiState {
@@ -25,8 +29,25 @@ class ChatViewModel @Inject constructor(
     private val _uiState = MutableStateFlow<ChatUiState>(ChatUiState.Initial)
     val uiState = _uiState.asStateFlow()
 
+    // State for the bottom sheet visibility
+    private val _isSheetOpen = MutableStateFlow(false)
+    val isSheetOpen = _isSheetOpen.asStateFlow()
+
+    // State for the prompt history
+    val promptHistory: StateFlow<List<PromptEntity>> = repository.getPromptHistory()
+        .stateIn(
+            scope = viewModelScope,
+            started = SharingStarted.WhileSubscribed(5000),
+            initialValue = emptyList()
+        )
+
     fun generateContent(prompt: String) {
         if (prompt.isBlank()) return
+
+        // Save the prompt before making the API call
+        viewModelScope.launch {
+            repository.savePrompt(prompt)
+        }
 
         _uiState.update { ChatUiState.Loading }
 
@@ -42,5 +63,13 @@ class ChatViewModel @Inject constructor(
                 }
             }
         }
+    }
+
+    fun openHistorySheet() {
+        _isSheetOpen.value = true
+    }
+
+    fun closeHistorySheet() {
+        _isSheetOpen.value = false
     }
 }
