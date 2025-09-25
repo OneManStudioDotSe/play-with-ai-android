@@ -1,8 +1,13 @@
 package se.onemanstudio.playaroundwithai.viewmodels
 
+import android.content.Context
+import android.graphics.Bitmap
+import android.graphics.ImageDecoder
+import android.net.Uri
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import dagger.hilt.android.lifecycle.HiltViewModel
+import dagger.hilt.android.qualifiers.ApplicationContext
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
@@ -10,7 +15,7 @@ import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
-import se.onemanstudio.playaroundwithai.data.gemini.GeminiRepository
+import se.onemanstudio.playaroundwithai.data.remote.gemini.GeminiRepository
 import se.onemanstudio.playaroundwithai.data.local.PromptEntity
 import javax.inject.Inject
 
@@ -23,7 +28,8 @@ sealed interface ChatUiState {
 
 @HiltViewModel
 class ChatViewModel @Inject constructor(
-    private val repository: GeminiRepository
+    private val repository: GeminiRepository,
+    @ApplicationContext private val context: Context // Inject context
 ) : ViewModel() {
 
     private val _uiState = MutableStateFlow<ChatUiState>(ChatUiState.Initial)
@@ -41,18 +47,15 @@ class ChatViewModel @Inject constructor(
             initialValue = emptyList()
         )
 
-    fun generateContent(prompt: String) {
-        if (prompt.isBlank()) return
+    fun generateContent(prompt: String, imageUri: Uri?) {
+        if (prompt.isBlank() && imageUri == null) return
 
-        // Save the prompt before making the API call
-        viewModelScope.launch {
-            repository.savePrompt(prompt)
-        }
-
+        viewModelScope.launch { repository.savePrompt(prompt) }
         _uiState.update { ChatUiState.Loading }
 
         viewModelScope.launch {
-            repository.generateContent(prompt).onSuccess { response ->
+            val bitmap = imageUri?.toBitmap()
+            repository.generateContent(prompt, bitmap).onSuccess { response ->
                 _uiState.update {
                     val text = response.extractText() ?: "No response text found."
                     ChatUiState.Success(text)
@@ -62,6 +65,16 @@ class ChatViewModel @Inject constructor(
                     ChatUiState.Error(exception.localizedMessage ?: "An unknown error occurred")
                 }
             }
+        }
+    }
+
+    // Helper to convert Uri to Bitmap
+    private fun Uri.toBitmap(): Bitmap? {
+        return try {
+            ImageDecoder.decodeBitmap(ImageDecoder.createSource(context.contentResolver, this))
+        } catch (e: Exception) {
+            e.printStackTrace()
+            null
         }
     }
 
