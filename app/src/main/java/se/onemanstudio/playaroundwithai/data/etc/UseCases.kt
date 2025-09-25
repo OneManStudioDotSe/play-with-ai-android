@@ -1,4 +1,4 @@
-package se.onemanstudio.playaroundwithai.data
+package se.onemanstudio.playaroundwithai.data.etc
 
 
 class DoUseCase(private val repository: ActionRepository = ActionRepository()) {
