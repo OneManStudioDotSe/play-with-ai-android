@@ -129,6 +129,8 @@ dependencies {
     kapt(libs.room.compiler)
     implementation(libs.room.ktx)
 
+    implementation(libs.coil.compose)
+
     // Coroutines
     implementation(libs.kotlinx.coroutines.core)
     implementation(libs.kotlinx.coroutines.android)

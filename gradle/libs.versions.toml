@@ -17,6 +17,8 @@ okhttp = "5.1.0"
 
 room = "2.8.1"
 
+coil = "2.6.0"
+
 # plugins
 agp = "8.13.0-rc02"
 kotlin = "2.2.20"
@@ -67,6 +69,8 @@ androidx-material-icons-extended = { module = "androidx.compose.material:materia
 androidx-ui-text-google-fonts = { module = "androidx.compose.ui:ui-text-google-fonts", version.ref = "uiTextGoogleFonts" }
 accompanist-permissions = { module = "com.google.accompanist:accompanist-permissions", version.ref = "accompanistPermissions" }
 androidx-material3 = { group = "androidx.xr.compose.material3", name = "material3", version.ref = "material3Version" }
+
+coil-compose = { module = "io.coil-kt:coil-compose", version.ref = "coil" }
 
 [plugins]
 android-application = { id = "com.android.application", version.ref = "agp" }
