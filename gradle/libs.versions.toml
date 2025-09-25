@@ -5,17 +5,24 @@ activity = "1.11.0"
 navigation = "2.9.4"
 coroutines = "1.10.2"
 lifecycleRuntime = "2.9.3"
-material3 = "1.4.0-rc01"
+material3 = "1.4.0-alpha16"
 composeUi = "1.9.1"
 composeBom = "2025.09.00"
 materialIconsExtended = "1.7.8"
 uiTextGoogleFonts = "1.9.1"
 accompanistPermissions = "0.37.3"
 
+activityCompose = "1.9.0"
+hiltNavigationCompose = "1.2.0"
+retrofit = "2.9.0"
+okhttp = "4.12.0"
+
 # plugins
 agp = "8.13.0-rc02"
 kotlin = "2.2.20"
 versionsCheck = "0.52.0"
+hilt = "2.51.1"
+
 
 [libraries]
 androidx-core-ktx = { group = "androidx.core", name = "core-ktx", version.ref = "core" }
@@ -32,11 +39,31 @@ androidx-lifecycle-viewmodel = { module = "androidx.lifecycle:lifecycle-viewmode
 material3 = { module = "androidx.compose.material3:material3", version.ref = "material3" }
 
 ui = { module = "androidx.compose.ui:ui", version.ref = "composeUi" }
+ui-graphics = { group = "androidx.compose.ui", name = "ui-graphics" }
+ui-tooling = { group = "androidx.compose.ui", name = "ui-tooling" }
 ui-preview = { module = "androidx.compose.ui:ui-tooling-preview", version.ref = "composeUi" }
 androidx-compose-bom = { group = "androidx.compose", name = "compose-bom", version.ref = "composeBom" }
 androidx-ui-base = { group = "androidx.compose.ui", name = "ui" }
 androidx-ui-graphics = { group = "androidx.compose.ui", name = "ui-graphics" }
 androidx-ui-tooling = { group = "androidx.compose.ui", name = "ui-tooling" }
+
+
+# Hilt
+hilt-android = { module = "com.google.dagger:hilt-android", version.ref = "hilt" }
+hilt-compiler = { module = "com.google.dagger:hilt-android-compiler", version.ref = "hilt" }
+hilt-navigation-compose = { module = "androidx.hilt:hilt-navigation-compose", version.ref = "hiltNavigationCompose" }
+
+# Retrofit & OkHttp
+retrofit = { module = "com.squareup.retrofit2:retrofit", version.ref = "retrofit" }
+retrofit-converter-gson = { module = "com.squareup.retrofit2:converter-gson", version.ref = "retrofit" }
+okhttp = { module = "com.squareup.okhttp3:okhttp", version.ref = "okhttp" }
+okhttp-logging-interceptor = { module = "com.squareup.okhttp3:logging-interceptor", version.ref = "okhttp" }
+
+# Coroutines
+kotlinx-coroutines-core = { module = "org.jetbrains.kotlinx:kotlinx-coroutines-core", version.ref = "coroutines" }
+kotlinx-coroutines-android = { module = "org.jetbrains.kotlinx:kotlinx-coroutines-android", version.ref = "coroutines" }
+
+
 
 # Tools
 androidx-material-icons-extended = { module = "androidx.compose.material:material-icons-extended", version.ref = "materialIconsExtended" }
@@ -48,4 +75,5 @@ android-application = { id = "com.android.application", version.ref = "agp" }
 kotlin-android = { id = "org.jetbrains.kotlin.android", version.ref = "kotlin" }
 kotlin-compose = { id = "org.jetbrains.kotlin.plugin.compose", version.ref = "kotlin" }
 versionsCheck = { id = "com.github.ben-manes.versions", version.ref = "versionsCheck" }
+hilt = { id = "com.google.dagger.hilt.android", version.ref = "hilt" }
 
