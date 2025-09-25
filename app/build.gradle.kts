@@ -27,6 +27,13 @@ android {
         targetSdk = 36
         versionCode = 1
         versionName = "1.0"
+
+        // Expose the API key as a BuildConfig field
+        buildConfigField(
+            type = "String",
+            name = "GEMINI_API_KEY",
+            value = "\"${localProperties.getProperty("GEMINI_API_KEY")}\""
+        )
     }
 
     buildTypes {
@@ -70,7 +77,6 @@ android {
     kapt {
         correctErrorTypes = true
     }
-
 }
 
 dependencies {
@@ -79,21 +85,21 @@ dependencies {
     // Core stuff
     implementation(platform(libs.androidx.compose.bom))
     implementation(libs.androidx.activity)
-    implementation(libs.androidx.ui.base)
-    implementation(libs.androidx.ui.graphics)
-
+    implementation(libs.ui.base)
+    implementation(libs.ui.graphics)
+    implementation(libs.ui.preview)
     // Navigation
     implementation(libs.androidx.navigation)
 
     // ViewModels + coroutines
-    implementation(libs.kotlinx.coroutines)
+    implementation(libs.kotlinx.coroutines.core)
+    implementation(libs.kotlinx.coroutines.android)
     implementation(libs.androidx.lifecycle.viewmodel)
     implementation(libs.androidx.lifecycle.runtime)
     implementation(libs.androidx.lifecycle.runtime.ktx)
 
     // Compose UI
-    implementation(libs.ui)
-    implementation(libs.ui.preview)
+
 
     // Material 3 + friends
     implementation(libs.material3)
@@ -104,12 +110,11 @@ dependencies {
     // Permissions
     implementation(libs.accompanist.permissions)
 
-    implementation(libs.ui)
-    implementation(libs.ui.graphics)
     implementation(libs.material3)
 
     // Hilt
     implementation(libs.hilt.android)
+    implementation(libs.androidx.material3)
     kapt(libs.hilt.compiler)
     implementation(libs.hilt.navigation.compose)
 
@@ -123,6 +128,6 @@ dependencies {
     implementation(libs.kotlinx.coroutines.core)
     implementation(libs.kotlinx.coroutines.android)
 
-
-    debugImplementation(libs.androidx.ui.tooling)
+    // Testing
+    debugImplementation(libs.ui.tooling)
 }
