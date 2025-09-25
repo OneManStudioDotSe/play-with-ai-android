@@ -23,10 +23,10 @@ import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
 import dagger.hilt.android.AndroidEntryPoint
 import se.onemanstudio.playaroundwithai.ui.screens.ChatScreen
-import se.onemanstudio.playaroundwithai.ui.screens.DoScreen
-import se.onemanstudio.playaroundwithai.ui.screens.EatScreen
-import se.onemanstudio.playaroundwithai.ui.screens.M3ComponentsShowcaseScreen
-import se.onemanstudio.playaroundwithai.ui.screens.SeeScreen
+import se.onemanstudio.playaroundwithai.ui.screens.etc.DoScreen
+import se.onemanstudio.playaroundwithai.ui.screens.etc.EatScreen
+import se.onemanstudio.playaroundwithai.ui.screens.etc.M3ComponentsShowcaseScreen
+import se.onemanstudio.playaroundwithai.ui.screens.etc.SeeScreen
 import se.onemanstudio.playaroundwithai.ui.theme.AIAITheme
 import se.onemanstudio.playaroundwithai.viewmodels.ChatViewModel
 

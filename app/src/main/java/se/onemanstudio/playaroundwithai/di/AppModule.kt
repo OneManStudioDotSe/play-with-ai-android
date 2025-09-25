@@ -12,7 +12,7 @@ import okhttp3.logging.HttpLoggingInterceptor
 import retrofit2.Retrofit
 import retrofit2.converter.gson.GsonConverterFactory
 import se.onemanstudio.playaroundwithai.BuildConfig
-import se.onemanstudio.playaroundwithai.data.gemini.network.GeminiApiService
+import se.onemanstudio.playaroundwithai.data.remote.gemini.network.GeminiApiService
 import se.onemanstudio.playaroundwithai.data.local.AppDatabase
 import javax.inject.Singleton
 
