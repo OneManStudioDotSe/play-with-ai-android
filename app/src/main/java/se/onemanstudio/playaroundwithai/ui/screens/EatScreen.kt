@@ -32,9 +32,11 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.viewmodel.compose.viewModel
+import androidx.xr.compose.material3.ExperimentalMaterial3XrApi
+import androidx.xr.compose.material3.HorizontalFloatingToolbar
 import se.onemanstudio.playaroundwithai.viewmodels.EatViewModel
 
-@OptIn(ExperimentalMaterial3ExpressiveApi::class)
+@OptIn(ExperimentalMaterial3ExpressiveApi::class, ExperimentalMaterial3XrApi::class)
 @Composable
 fun EatScreen(viewModel: EatViewModel = viewModel()) {
     val state by viewModel.state.collectAsStateWithLifecycle()
@@ -63,7 +65,7 @@ fun EatScreen(viewModel: EatViewModel = viewModel()) {
                     modifier = Modifier
                         .align(Alignment.BottomCenter)
                         .offset(y = -ScreenOffset),
-                    expanded = true,
+                    expanded = false,
                     leadingContent = {  },
                     trailingContent = {
                         AppBarRow(
@@ -113,26 +115,6 @@ fun EatScreen(viewModel: EatViewModel = viewModel()) {
                                     )
                                 },
                                 label = "Add",
-                            )
-                            clickableItem(
-                                onClick = { /* doSomething() */ },
-                                icon = {
-                                    Icon(
-                                        Icons.Filled.Person,
-                                        contentDescription = "Localized description",
-                                    )
-                                },
-                                label = "Person",
-                            )
-                            clickableItem(
-                                onClick = { /* doSomething() */ },
-                                icon = {
-                                    Icon(
-                                        Icons.Filled.ArrowUpward,
-                                        contentDescription = "Localized description",
-                                    )
-                                },
-                                label = "ArrowUpward",
                             )
                         }
                     },

@@ -33,7 +33,6 @@ import se.onemanstudio.playaroundwithai.viewmodels.SeeViewModel
 @OptIn(ExperimentalMaterial3Api::class, ExperimentalMaterial3ExpressiveApi::class)
 @Composable
 fun SeeScreen(viewModel: SeeViewModel = viewModel()) {
-    val state by viewModel.state.collectAsStateWithLifecycle()
 
     val scrollBehavior = TopAppBarDefaults.exitUntilCollapsedScrollBehavior()
     Scaffold(
@@ -104,21 +103,4 @@ fun SeeScreen(viewModel: SeeViewModel = viewModel()) {
             }
         },
     )
-
-
-//    Column(
-//        modifier = Modifier
-//            .fillMaxSize()
-//            .padding(24.dp),
-//        verticalArrangement = Arrangement.Center,
-//        horizontalAlignment = Alignment.CenterHorizontally
-//    ) {
-//        Text("SEE SCREEN", style = MaterialTheme.typography.headlineLarge)
-//        Spacer(modifier = Modifier.height(16.dp))
-//        Button(onClick = { viewModel.performSeeAction() }) {
-//            Text("Identify Plant")
-//        }
-//        Spacer(modifier = Modifier.height(16.dp))
-//        if (state.isLoading) CircularProgressIndicator() else state.result?.let { Text(it) }
-//    }
 }
