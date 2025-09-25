@@ -1,4 +1,4 @@
-package se.onemanstudio.playaroundwithai.viewmodels
+package se.onemanstudio.playaroundwithai.viewmodels.etc
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
@@ -7,7 +7,7 @@ import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
 import se.onemanstudio.playaroundwithai.states.ScreenState
-import se.onemanstudio.playaroundwithai.data.SeeUseCase
+import se.onemanstudio.playaroundwithai.data.etc.SeeUseCase
 
 class SeeViewModel : ViewModel() {
     private val useCase = SeeUseCase()

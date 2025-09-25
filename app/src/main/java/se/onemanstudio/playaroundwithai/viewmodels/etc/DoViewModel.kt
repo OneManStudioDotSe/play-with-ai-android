@@ -1,4 +1,4 @@
-package se.onemanstudio.playaroundwithai.viewmodels
+package se.onemanstudio.playaroundwithai.viewmodels.etc
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
@@ -7,15 +7,15 @@ import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
 import se.onemanstudio.playaroundwithai.states.ScreenState
-import se.onemanstudio.playaroundwithai.data.EatUseCase
+import se.onemanstudio.playaroundwithai.data.etc.DoUseCase
 
-class EatViewModel : ViewModel() {
-    private val useCase = EatUseCase()
+class DoViewModel : ViewModel() {
+    private val useCase = DoUseCase()
 
     private val _state = MutableStateFlow(ScreenState())
     val state: StateFlow<ScreenState> = _state.asStateFlow()
 
-    fun performEatAction() {
+    fun performDoAction() {
         viewModelScope.launch {
             _state.value = ScreenState(isLoading = true)
             val result = useCase.execute()
