@@ -3,13 +3,17 @@ package se.onemanstudio.playaroundwithai
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
+import androidx.activity.viewModels
+import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Info
 import androidx.compose.material3.Icon
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.NavigationBar
 import androidx.compose.material3.NavigationBarItem
 import androidx.compose.material3.Scaffold
+import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
@@ -17,18 +21,34 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
+import dagger.hilt.android.AndroidEntryPoint
+import se.onemanstudio.playaroundwithai.ui.screens.ChatScreen
 import se.onemanstudio.playaroundwithai.ui.screens.DoScreen
 import se.onemanstudio.playaroundwithai.ui.screens.EatScreen
 import se.onemanstudio.playaroundwithai.ui.screens.M3ComponentsShowcaseScreen
 import se.onemanstudio.playaroundwithai.ui.screens.SeeScreen
 import se.onemanstudio.playaroundwithai.ui.theme.AIAITheme
+import se.onemanstudio.playaroundwithai.viewmodels.ChatViewModel
 
+@AndroidEntryPoint
 class MainActivity : ComponentActivity() {
+    private val viewModel: ChatViewModel by viewModels()
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+//        setContent {
+//            AIAITheme {
+//                MainScreen()
+//            }
+//        }
         setContent {
             AIAITheme {
-                MainScreen()
+                Surface(
+                    modifier = Modifier.fillMaxSize(),
+                    color = MaterialTheme.colorScheme.background
+                ) {
+                    ChatScreen(viewModel = viewModel)
+                }
             }
         }
     }
