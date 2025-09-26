@@ -2,14 +2,12 @@ package se.onemanstudio.playaroundwithai.ui.theme
 
 import androidx.compose.ui.graphics.Color
 
-// Core Palette
-val OrangeAccent = Color(0xFFFF6F00) // A vibrant, attention-grabbing orange
-val GreenAccent = Color(0xFF00E676) // A bright, energetic green
-val PureWhite = Color(0xFFFFFFFF)
-val PureBlack = Color(0xFF000000)
-val LightGray = Color(0xFFF0F0F0) // Off-white background for light theme
-val DarkGray = Color(0xFF1E1E1E)  // Off-black surface for dark theme
+// New Vibrant Neo-Brutalist Palette
+val PrimaryYellow = Color(0xFFFEE600) // Your main accent color
+val PrimaryBlack = Color(0xFF1E1E1E) // Dark background for contrast
+val PrimaryWhite = Color(0xFFFFFFFF) // Clean white for text/surfaces
+val AccentRed = Color(0xFFEC255A)     // A strong secondary accent
+val AccentBlue = Color(0xFF007BFF)    // Another vibrant accent
+val MidGray = Color(0xFF888888)      // For outlines where yellow isn't suitable
 
-// You can add more accent colors if needed
-val BlueAccent = Color(0xFF00B0FF)
-val PinkAccent = Color(0xFFFF4081)
+// Use these new colors throughout your theme

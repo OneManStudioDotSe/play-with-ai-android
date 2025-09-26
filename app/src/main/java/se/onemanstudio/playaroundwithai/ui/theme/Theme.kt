@@ -8,62 +8,58 @@ import androidx.compose.material3.dynamicDarkColorScheme
 import androidx.compose.material3.dynamicLightColorScheme
 import androidx.compose.material3.lightColorScheme
 import androidx.compose.runtime.Composable
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 
-// Dark color scheme with high contrast
-private val NeoBrutalistDarkScheme = darkColorScheme(
-    primary = OrangeAccent,
-    onPrimary = PureBlack,
-    secondary = GreenAccent,
-    onSecondary = PureBlack,
-    background = PureBlack,
-    onBackground = PureWhite,
-    surface = DarkGray,
-    onSurface = PureWhite,
-    tertiary = BlueAccent,
-    onTertiary = PureBlack,
-    error = PinkAccent,
-    onError = PureBlack
+// Dark Mode - High contrast with Yellow accents on Black/White
+private val BrutalistDarkScheme = darkColorScheme(
+    primary = PrimaryYellow,      // Yellow for key elements and accents
+    onPrimary = PrimaryBlack,     // Black text on yellow
+    secondary = AccentRed,        // Secondary accent
+    onSecondary = PrimaryWhite,
+    background = PrimaryBlack,    // Dark background for screens
+    onBackground = PrimaryWhite,  // White text on dark background
+    surface = PrimaryBlack,       // Surface elements like cards, dialogs
+    onSurface = PrimaryWhite,     // White text on surface
+    error = AccentRed,
+    onError = PrimaryWhite,
+    outline = PrimaryYellow       // Crucial for outlining components in yellow
 )
 
-// Light color scheme with high contrast
-private val NeoBrutalistLightScheme = lightColorScheme(
-    primary = OrangeAccent,
-    onPrimary = PureBlack,
-    secondary = GreenAccent,
-    onSecondary = PureBlack,
-    background = LightGray,
-    onBackground = PureBlack,
-    surface = PureWhite,
-    onSurface = PureBlack,
-    tertiary = BlueAccent,
-    onTertiary = PureBlack,
-    error = PinkAccent,
-    onError = PureBlack
+// Light Mode - High contrast with Yellow accents on White/Black
+private val BrutalistLightScheme = lightColorScheme(
+    primary = PrimaryYellow,      // Yellow for key elements and accents
+    onPrimary = PrimaryBlack,     // Black text on yellow
+    secondary = AccentRed,        // Secondary accent
+    onSecondary = PrimaryWhite,
+    background = PrimaryWhite,    // White background for screens
+    onBackground = PrimaryBlack,  // Black text on white background
+    surface = PrimaryWhite,       // Surface elements like cards, dialogs
+    onSurface = PrimaryBlack,     // Black text on surface
+    error = AccentRed,
+    onError = PrimaryWhite,
+    outline = PrimaryBlack        // Crucial for outlining components in black
 )
 
 @Composable
 fun AIAITheme(
     darkTheme: Boolean = isSystemInDarkTheme(),
-    // Dynamic color is less common in brutalist design, so we default it to false.
-    dynamicColor: Boolean = false,
+    dynamicColor: Boolean = false, // Brutalism generally avoids dynamic colors
     content: @Composable () -> Unit
 ) {
-//    val colorScheme = when {
-//        dynamicColor -> {
-//            val context = LocalContext.current
-//            if (darkTheme) dynamicDarkColorScheme(context) else dynamicLightColorScheme(context)
-//        }
-//        darkTheme -> NeoBrutalistDarkScheme
-//        else -> NeoBrutalistLightScheme
-//    }
-    val context = LocalContext.current
-    val colorScheme = dynamicLightColorScheme(context)
+    val colorScheme = when {
+        dynamicColor && Build.VERSION.SDK_INT >= Build.VERSION_CODES.S -> {
+            val context = LocalContext.current
+            if (darkTheme) dynamicDarkColorScheme(context) else dynamicLightColorScheme(context)
+        }
+        darkTheme -> BrutalistDarkScheme
+        else -> BrutalistLightScheme
+    }
 
     MaterialTheme(
         colorScheme = colorScheme,
         typography = AppTypography,
-        shapes = AppShapes, // Apply our new sharp shapes
+        shapes = AppShapes,
         content = content
     )
 }

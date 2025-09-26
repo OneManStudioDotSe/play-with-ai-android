@@ -2,29 +2,30 @@ package se.onemanstudio.playaroundwithai.ui.theme
 
 import androidx.compose.material3.Typography
 import androidx.compose.ui.text.font.FontFamily
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.googlefonts.Font
 import androidx.compose.ui.text.googlefonts.GoogleFont
 import se.onemanstudio.playaroundwithai.R
 
-// Define the font provider (remains the same)
 val provider = GoogleFont.Provider(
     providerAuthority = "com.google.android.gms.fonts",
     providerPackage = "com.google.android.gms",
     certificates = R.array.com_google_android_gms_fonts_certs
 )
 
-// Use Archivo Black for strong, impactful display text
+// Poppins is a modern and stylish geometric sans-serif for headings
 val displayFontFamily = FontFamily(
     Font(
-        googleFont = GoogleFont("Archivo Black"),
+        googleFont = GoogleFont("Poppins"),
         fontProvider = provider,
+        weight = FontWeight.Bold,
     )
 )
 
-// Use Roboto Mono for a clean, functional, and slightly techy body text
+// Inter is a highly-readable and clean sans-serif for body text
 val bodyFontFamily = FontFamily(
     Font(
-        googleFont = GoogleFont("Roboto Mono"),
+        googleFont = GoogleFont("Inter"),
         fontProvider = provider,
     )
 )
