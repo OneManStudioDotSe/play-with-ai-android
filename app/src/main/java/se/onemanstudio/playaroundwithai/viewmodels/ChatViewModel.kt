@@ -15,6 +15,7 @@ import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
+import se.onemanstudio.playaroundwithai.data.AnalysisType
 import se.onemanstudio.playaroundwithai.data.remote.gemini.GeminiRepository
 import se.onemanstudio.playaroundwithai.data.local.PromptEntity
 import javax.inject.Inject
@@ -26,11 +27,19 @@ sealed interface ChatUiState {
     data class Error(val errorMessage: String) : ChatUiState
 }
 
+// Update the interface first
+interface ChatViewModelInterface {
+    // ... other properties
+    fun generateContent(prompt: String, imageUri: Uri?, analysisType: AnalysisType)
+    fun clearResponse()
+    // ... other functions
+}
+
 @HiltViewModel
 class ChatViewModel @Inject constructor(
     private val repository: GeminiRepository,
     @ApplicationContext private val context: Context // Inject context
-) : ViewModel() {
+) : ViewModel(), ChatViewModelInterface {
 
     private val _uiState = MutableStateFlow<ChatUiState>(ChatUiState.Initial)
     val uiState = _uiState.asStateFlow()
@@ -47,7 +56,7 @@ class ChatViewModel @Inject constructor(
             initialValue = emptyList()
         )
 
-    fun generateContent(prompt: String, imageUri: Uri?) {
+    override fun generateContent(prompt: String, imageUri: Uri?, analysisType: AnalysisType) {
         if (prompt.isBlank() && imageUri == null) return
 
         viewModelScope.launch { repository.savePrompt(prompt) }
@@ -55,7 +64,8 @@ class ChatViewModel @Inject constructor(
 
         viewModelScope.launch {
             val bitmap = imageUri?.toBitmap()
-            repository.generateContent(prompt, bitmap).onSuccess { response ->
+            repository.generateContent(prompt, bitmap, analysisType).onSuccess { response ->
+
                 _uiState.update {
                     val text = response.extractText() ?: "No response text found."
                     ChatUiState.Success(text)
@@ -76,6 +86,10 @@ class ChatViewModel @Inject constructor(
             e.printStackTrace()
             null
         }
+    }
+
+    override fun clearResponse() {
+        _uiState.update { ChatUiState.Initial }
     }
 
     fun openHistorySheet() {

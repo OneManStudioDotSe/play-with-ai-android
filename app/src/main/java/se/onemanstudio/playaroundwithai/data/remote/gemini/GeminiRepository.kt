@@ -11,35 +11,54 @@ import java.io.ByteArrayOutputStream
 import javax.inject.Inject
 import javax.inject.Singleton
 import androidx.core.graphics.scale
+import se.onemanstudio.playaroundwithai.data.AnalysisType
 
 // 1. Define your fixed context here
 private const val SYSTEM_INSTRUCTION = """
     You are a fun and slightly sarcastic AI assistant named 'Chip'.
     Your goal is to provide helpful, but witty and concise answers.
-    Always keep your response under 50 words and never break character.
+    Always keep your response under 100 words and never break character.
 """
 
 @Singleton
 class GeminiRepository @Inject constructor(
     private val apiService: GeminiApiService,
-    private val promptDao: PromptDao // Inject the DAO
+    private val promptDao: PromptDao,
 ) {
-    suspend fun generateContent(prompt: String, image: Bitmap?): Result<GeminiResponse> {
+    suspend fun generateContent(
+        prompt: String,
+        imageBitmap: Bitmap?,
+        analysisType: AnalysisType
+    ): Result<GeminiResponse> {
         return try {
             val parts = mutableListOf<Part>()
-
-            // 2. Combine the system instruction with the user's prompt
-            val fullPrompt = "$SYSTEM_INSTRUCTION\n\nUser prompt: $prompt"
+            val systemInstruction = getSystemInstruction(analysisType)
+            val fullPrompt = "$systemInstruction\n\nUser prompt: $prompt"
             parts.add(Part(text = fullPrompt))
 
-            // Add the image part if an image is provided
-            image?.let { parts.add(Part(inlineData = it.toImageData())) }
+            // Use a simple 'let' block for the single image
+            imageBitmap?.let {
+                parts.add(Part(inlineData = it.toImageData()))
+            }
 
             val request = GeminiRequest(contents = listOf(Content(parts = parts)))
             val response = apiService.generateContent(BuildConfig.GEMINI_API_KEY, request)
             Result.success(response)
         } catch (e: Exception) {
             Result.failure(e)
+        }
+    }
+
+    // This function provides the correct context based on the dropdown selection
+    private fun getSystemInstruction(analysisType: AnalysisType): String {
+        return when (analysisType) {
+            AnalysisType.LOCATION -> "You are an expert location identifier. Analyze the attached screenshot(s) to identify the geographical location (city, landmark, country). Be specific and concise."
+            AnalysisType.RECIPE -> "You are a culinary expert. Analyze the attached screenshot(s) to identify the dish and provide a simple recipe for it. Be concise."
+            AnalysisType.MOVIE -> "You are a film expert. Analyze the attached screenshot(s) to identify the movie or TV show. Provide the title and year. Be concise."
+            AnalysisType.SONG -> "You are a music expert. Analyze the attached screenshot(s) to identify the song mentioned or displayed. Provide the song title and artist. Be concise."
+            AnalysisType.PERSONALITY -> "You are a pop culture expert. Analyze the attached screenshot(s) to identify the famous personality (actor, musician, influencer). Provide their name and what they are known for. Be concise."
+            AnalysisType.PRODUCT -> "You are a product identification specialist. Analyze the attached screenshot(s) to identify the commercial product shown. Provide the brand and product name. Be concise."
+            AnalysisType.TREND -> "You are a social media trend analyst. Analyze the attached screenshot(s) to identify the TikTok trend being shown. Describe the trend briefly and concisely."
         }
     }
 
