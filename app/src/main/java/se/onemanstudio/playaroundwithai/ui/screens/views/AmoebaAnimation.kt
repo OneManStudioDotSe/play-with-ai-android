@@ -1,12 +1,20 @@
 package se.onemanstudio.playaroundwithai.ui.screens.views
 
-import androidx.compose.animation.core.*
+import androidx.compose.animation.core.Animatable
+import androidx.compose.animation.core.AnimationVector1D
+import androidx.compose.animation.core.CubicBezierEasing
+import androidx.compose.animation.core.RepeatMode
+import androidx.compose.animation.core.infiniteRepeatable
+import androidx.compose.animation.core.tween
 import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.size
 import androidx.compose.material3.MaterialTheme
-import androidx.compose.runtime.*
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.mutableStateListOf
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.geometry.Offset
@@ -29,7 +37,7 @@ fun AmoebaShapeAnimation() {
 
     LaunchedEffect(Unit) {
         if (points.isEmpty()) {
-            for (i in 0 until NUM_POINTS * 2) {
+            (0 until NUM_POINTS * 2).forEach { i ->
                 points.add(Animatable(1.0f))
             }
         }
@@ -108,7 +116,6 @@ fun AmoebaShapeAnimation() {
 }
 
 private operator fun Float.times(p: Offset) = Offset(this * p.x, this * p.y)
-private operator fun Offset.plus(p: Offset) = Offset(this.x + p.x, this.y + p.y)
 
 @Preview(showBackground = true)
 @Composable
