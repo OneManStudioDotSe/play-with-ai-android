@@ -1,4 +1,4 @@
-package se.onemanstudio.playaroundwithai.ui.screens.etc
+package se.onemanstudio.playaroundwithai.ui.screens.unused
 
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
@@ -17,7 +17,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.viewmodel.compose.viewModel
-import se.onemanstudio.playaroundwithai.viewmodels.etc.DoViewModel
+import se.onemanstudio.playaroundwithai.viewmodels.unused.DoViewModel
 
 @Composable
 fun DoScreen(viewModel: DoViewModel = viewModel()) {

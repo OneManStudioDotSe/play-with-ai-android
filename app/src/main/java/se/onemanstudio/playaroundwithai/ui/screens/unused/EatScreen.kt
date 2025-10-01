@@ -1,4 +1,4 @@
-package se.onemanstudio.playaroundwithai.ui.screens.etc
+package se.onemanstudio.playaroundwithai.ui.screens.unused
 
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -31,7 +31,7 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.xr.compose.material3.ExperimentalMaterial3XrApi
 import androidx.xr.compose.material3.HorizontalFloatingToolbar
-import se.onemanstudio.playaroundwithai.viewmodels.etc.EatViewModel
+import se.onemanstudio.playaroundwithai.viewmodels.unused.EatViewModel
 
 @OptIn(ExperimentalMaterial3ExpressiveApi::class, ExperimentalMaterial3XrApi::class)
 @Composable

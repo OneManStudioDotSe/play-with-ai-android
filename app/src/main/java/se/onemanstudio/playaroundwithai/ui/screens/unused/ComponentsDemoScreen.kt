@@ -1,4 +1,4 @@
-package se.onemanstudio.playaroundwithai.ui.screens.etc
+package se.onemanstudio.playaroundwithai.ui.screens.unused
 
 import androidx.annotation.DrawableRes
 import androidx.compose.animation.core.Spring

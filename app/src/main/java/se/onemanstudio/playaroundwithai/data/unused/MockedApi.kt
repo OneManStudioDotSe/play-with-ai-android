@@ -1,4 +1,4 @@
-package se.onemanstudio.playaroundwithai.data.etc
+package se.onemanstudio.playaroundwithai.data.unused
 
 import kotlinx.coroutines.delay
 
