@@ -1,6 +1,8 @@
 package se.onemanstudio.playaroundwithai.ui.screens
 
+import android.content.Context
 import android.net.Uri
+import android.provider.OpenableColumns
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.PickVisualMediaRequest
 import androidx.activity.result.contract.ActivityResultContracts
@@ -38,37 +40,46 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalSoftwareKeyboardController
 import androidx.compose.ui.text.input.TextFieldValue
 import androidx.compose.ui.unit.dp
 import se.onemanstudio.playaroundwithai.data.AnalysisType
+import se.onemanstudio.playaroundwithai.data.InputMode
 import se.onemanstudio.playaroundwithai.ui.screens.views.AmoebaShapeAnimation
 import se.onemanstudio.playaroundwithai.ui.screens.views.AnalysisHeader
+import se.onemanstudio.playaroundwithai.ui.screens.views.FilePreviewHeader
 import se.onemanstudio.playaroundwithai.ui.screens.views.PromptInputSection
 import se.onemanstudio.playaroundwithai.ui.screens.views.TypewriterText
+import se.onemanstudio.playaroundwithai.viewmodels.Attachment
 import se.onemanstudio.playaroundwithai.viewmodels.ChatUiState
 import se.onemanstudio.playaroundwithai.viewmodels.ChatViewModel
 
-@OptIn(ExperimentalMaterial3Api::class) // Needed for TopAppBar
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun ChatScreen(viewModel: ChatViewModel) {
     val uiState by viewModel.uiState.collectAsState()
     var textState by remember { mutableStateOf(TextFieldValue("")) }
-    val keyboardController = LocalSoftwareKeyboardController.current // 1. Get the keyboard controller
+    val keyboardController = LocalSoftwareKeyboardController.current
 
     val isSheetOpen by viewModel.isSheetOpen.collectAsState()
     val history by viewModel.promptHistory.collectAsState()
 
-    // --- UPDATED STATE MANAGEMENT ---
-    // 1. Revert to a single nullable Uri
+    var inputMode by remember { mutableStateOf(InputMode.TEXT) }
     var selectedImageUri by remember { mutableStateOf<Uri?>(null) }
-    // 2. State for the dropdown (unchanged)
+    var selectedFileUri by remember { mutableStateOf<Uri?>(null) }
     var analysisType by remember { mutableStateOf(AnalysisType.PRODUCT) }
 
-    // 3. Revert launcher to single-image picker
-    val photoPickerLauncher = rememberLauncherForActivityResult(
+    val context = LocalContext.current
+    val selectedFileName = remember(selectedFileUri) { selectedFileUri?.let { getFileName(context, it) } }
+
+    val imagePickerLauncher = rememberLauncherForActivityResult(
         contract = ActivityResultContracts.PickVisualMedia(),
         onResult = { uri -> selectedImageUri = uri }
+    )
+    val documentPickerLauncher = rememberLauncherForActivityResult(
+        contract = ActivityResultContracts.OpenDocument(),
+        onResult = { uri -> selectedFileUri = uri }
     )
 
     if (isSheetOpen) {
@@ -91,7 +102,6 @@ fun ChatScreen(viewModel: ChatViewModel) {
                         headlineContent = { Text(prompt.text) },
                         modifier = Modifier.clickable {
                             textState = TextFieldValue(prompt.text)
-                            viewModel.generateContent(prompt.text, selectedImageUri, analysisType)
                             viewModel.closeHistorySheet()
                             keyboardController?.hide()
                         }
@@ -103,11 +113,9 @@ fun ChatScreen(viewModel: ChatViewModel) {
 
     Scaffold(
         topBar = {
-            // Request 1: Add a top bar
             TopAppBar(
                 title = { Text("Let's talk") },
                 actions = {
-                    // Add history icon button
                     IconButton(onClick = { viewModel.openHistorySheet() }) {
                         Icon(
                             imageVector = Icons.Default.History,
@@ -124,29 +132,55 @@ fun ChatScreen(viewModel: ChatViewModel) {
         },
         bottomBar = {
             Column {
-                AnalysisHeader(
-                    selectedImageUri = selectedImageUri,
-                    analysisType = analysisType,
-                    onAnalysisTypeChange = { analysisType = it },
-                    onClearImage = { selectedImageUri = null }
-                )
+                when (inputMode) {
+                    InputMode.IMAGE -> AnalysisHeader(
+                        selectedImageUri = selectedImageUri,
+                        analysisType = analysisType,
+                        onAnalysisTypeChange = { analysisType = it },
+                        onClearImage = { selectedImageUri = null }
+                    )
+
+                    InputMode.DOCUMENT -> FilePreviewHeader(
+                        fileName = selectedFileName,
+                        onClearFile = { selectedFileUri = null }
+                    )
+
+                    InputMode.TEXT -> {}
+                }
 
                 PromptInputSection(
                     textState = textState,
-                    onTextChanged = { textState = it },
-                    onSendClicked = {
-                        viewModel.generateContent(textState.text, selectedImageUri, analysisType)
-                        keyboardController?.hide()
-                        textState = TextFieldValue("")
+                    inputMode = inputMode,
+                    onModeChange = { newMode ->
+                        inputMode = newMode
                         selectedImageUri = null
+                        selectedFileUri = null
                     },
+                    onTextChanged = { textState = it },
                     onChipClicked = { prompt -> textState = TextFieldValue(prompt) },
                     onClearClicked = { textState = TextFieldValue("") },
                     onAttachClicked = {
-                        photoPickerLauncher.launch(
-                            PickVisualMediaRequest(ActivityResultContracts.PickVisualMedia.ImageOnly)
-                        )
-                    }
+                        when (inputMode) {
+                            InputMode.IMAGE -> imagePickerLauncher.launch(
+                                PickVisualMediaRequest(ActivityResultContracts.PickVisualMedia.ImageOnly)
+                            )
+
+                            InputMode.DOCUMENT -> documentPickerLauncher.launch(arrayOf("*/*"))
+                            InputMode.TEXT -> {}
+                        }
+                    },
+                    onSendClicked = {
+                        val attachment = when (inputMode) {
+                            InputMode.IMAGE -> selectedImageUri?.let { Attachment.Image(it, analysisType) }
+                            InputMode.DOCUMENT -> selectedFileUri?.let { Attachment.Document(it) }
+                            InputMode.TEXT -> null
+                        }
+                        viewModel.generateContent(textState.text, attachment)
+                        keyboardController?.hide()
+                        textState = TextFieldValue("")
+                        selectedImageUri = null
+                        selectedFileUri = null
+                    },
                 )
             }
         }
@@ -155,22 +189,13 @@ fun ChatScreen(viewModel: ChatViewModel) {
             modifier = Modifier
                 .fillMaxSize()
                 .padding(paddingValues),
-            contentAlignment = Alignment.Center // Center content by default
+            contentAlignment = Alignment.Center
         ) {
             when (val state = uiState) {
-                is ChatUiState.Initial -> {
-                    // When the state is initial, the Amoeba is centered perfectly by the parent Box.
-                    AmoebaShapeAnimation()
-                }
-
-                is ChatUiState.Loading -> {
-                    // The loading indicator is also centered perfectly.
-                    CircularProgressIndicator()
-                }
+                is ChatUiState.Initial -> AmoebaShapeAnimation()
+                is ChatUiState.Loading -> CircularProgressIndicator()
 
                 else -> {
-                    // For Success or Error, we use the original scrollable Column.
-                    // This Column now lives inside the Box but fills it.
                     Column(
                         modifier = Modifier
                             .fillMaxSize()
@@ -183,16 +208,14 @@ fun ChatScreen(viewModel: ChatViewModel) {
                                 .fillMaxWidth()
                                 .padding(16.dp)
                                 .weight(1f),
-                            contentAlignment = Alignment.TopStart // Align text to the top-start
+                            contentAlignment = Alignment.TopStart
                         ) {
                             if (state is ChatUiState.Success) {
                                 TypewriterText(text = state.outputText)
                                 IconButton(
                                     onClick = { viewModel.clearResponse() },
-                                    modifier = Modifier.align(Alignment.TopStart)
-                                ) {
-                                    Icon(Icons.Default.Clear, "Clear response")
-                                }
+                                    modifier = Modifier.align(Alignment.TopEnd)
+                                ) { Icon(Icons.Default.Clear, "Clear response") }
                             } else if (state is ChatUiState.Error) {
                                 Text(
                                     text = state.errorMessage,
@@ -203,9 +226,7 @@ fun ChatScreen(viewModel: ChatViewModel) {
                                 IconButton(
                                     onClick = { viewModel.clearResponse() },
                                     modifier = Modifier.align(Alignment.TopStart)
-                                ) {
-                                    Icon(Icons.Default.Clear, "Clear response")
-                                }
+                                ) { Icon(Icons.Default.Clear, "Clear response") }
                             }
                         }
                     }
@@ -215,4 +236,17 @@ fun ChatScreen(viewModel: ChatViewModel) {
     }
 }
 
-
+fun getFileName(context: Context, uri: Uri): String? {
+    var fileName: String? = null
+    // Use a content resolver to query the file name from the URI
+    val cursor = context.contentResolver.query(uri, null, null, null, null)
+    cursor?.use {
+        if (it.moveToFirst()) {
+            val nameIndex = it.getColumnIndex(OpenableColumns.DISPLAY_NAME)
+            if (nameIndex != -1) {
+                fileName = it.getString(nameIndex)
+            }
+        }
+    }
+    return fileName
+}

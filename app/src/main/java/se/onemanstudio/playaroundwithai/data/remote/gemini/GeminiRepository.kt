@@ -13,7 +13,6 @@ import javax.inject.Singleton
 import androidx.core.graphics.scale
 import se.onemanstudio.playaroundwithai.data.AnalysisType
 
-// 1. Define your fixed context here
 private const val SYSTEM_INSTRUCTION = """
     You are a fun and slightly sarcastic AI assistant named 'Chip'.
     Your goal is to provide helpful, but witty and concise answers.
@@ -28,15 +27,26 @@ class GeminiRepository @Inject constructor(
     suspend fun generateContent(
         prompt: String,
         imageBitmap: Bitmap?,
-        analysisType: AnalysisType
+        fileText: String?,
+        analysisType: AnalysisType?
     ): Result<GeminiResponse> {
         return try {
             val parts = mutableListOf<Part>()
-            val systemInstruction = getSystemInstruction(analysisType)
-            val fullPrompt = "$systemInstruction\n\nUser prompt: $prompt"
+            var fullPrompt = prompt
+
+            // Add system instruction if it's an image analysis
+            if (analysisType != null) {
+                fullPrompt = "${getSystemInstruction(analysisType)}\n\nUser prompt: $prompt"
+            }
+
+            // Append document text if it exists
+            if (!fileText.isNullOrBlank()) {
+                fullPrompt += "\n\n--- DOCUMENT CONTEXT ---\n$fileText"
+            }
+
             parts.add(Part(text = fullPrompt))
 
-            // Use a simple 'let' block for the single image
+            // Add image data if it exists
             imageBitmap?.let {
                 parts.add(Part(inlineData = it.toImageData()))
             }
@@ -94,11 +104,9 @@ class GeminiRepository @Inject constructor(
         return this.scale(resizedWidth, resizedHeight, false)
     }
 
-    // New function to save a prompt
     suspend fun savePrompt(promptText: String) {
         promptDao.insertPrompt(PromptEntity(text = promptText))
     }
 
-    // New function to get the history
     fun getPromptHistory(): Flow<List<PromptEntity>> = promptDao.getPromptHistory()
 }
