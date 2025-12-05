@@ -11,7 +11,7 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.tooling.preview.Preview
 import kotlinx.coroutines.delay
-import se.onemanstudio.playaroundwithai.ui.theme.AIAITheme
+import se.onemanstudio.playaroundwithai.core.ui.theme.AIAITheme
 
 const val typingDelay = 20L
 

@@ -6,8 +6,8 @@ import android.provider.OpenableColumns
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.PickVisualMediaRequest
 import androidx.activity.result.contract.ActivityResultContracts
+import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
-import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
@@ -40,6 +40,7 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalSoftwareKeyboardController
 import androidx.compose.ui.text.input.TextFieldValue
@@ -50,7 +51,6 @@ import se.onemanstudio.playaroundwithai.ui.screens.views.AmoebaShapeAnimation
 import se.onemanstudio.playaroundwithai.ui.screens.views.AnalysisHeader
 import se.onemanstudio.playaroundwithai.ui.screens.views.FilePreviewHeader
 import se.onemanstudio.playaroundwithai.ui.screens.views.PromptInputSection
-import se.onemanstudio.playaroundwithai.ui.screens.views.TypewriterText
 import se.onemanstudio.playaroundwithai.viewmodels.Attachment
 import se.onemanstudio.playaroundwithai.viewmodels.ChatUiState
 import se.onemanstudio.playaroundwithai.viewmodels.ChatViewModel
@@ -77,6 +77,7 @@ fun ChatScreen(viewModel: ChatViewModel) {
         contract = ActivityResultContracts.PickVisualMedia(),
         onResult = { uri -> selectedImageUri = uri }
     )
+
     val documentPickerLauncher = rememberLauncherForActivityResult(
         contract = ActivityResultContracts.OpenDocument(),
         onResult = { uri -> selectedFileUri = uri }
@@ -196,36 +197,31 @@ fun ChatScreen(viewModel: ChatViewModel) {
                 is ChatUiState.Loading -> CircularProgressIndicator()
 
                 else -> {
-                    Column(
+                    Box(
                         modifier = Modifier
                             .fillMaxSize()
-                            .verticalScroll(rememberScrollState()),
-                        verticalArrangement = Arrangement.Top,
-                        horizontalAlignment = Alignment.CenterHorizontally
+                            .background(Color.Red)
                     ) {
-                        Box(
+                        Column(
                             modifier = Modifier
-                                .fillMaxWidth()
+                                .fillMaxSize()
+                                .verticalScroll(rememberScrollState())
                                 .padding(16.dp)
-                                .weight(1f),
-                            contentAlignment = Alignment.TopStart
                         ) {
                             if (state is ChatUiState.Success) {
-                                TypewriterText(text = state.outputText)
+                                //TypewriterText(text = state.outputText)
+                                Text(text = state.outputText)
                                 IconButton(
                                     onClick = { viewModel.clearResponse() },
-                                    modifier = Modifier.align(Alignment.TopEnd)
                                 ) { Icon(Icons.Default.Clear, "Clear response") }
                             } else if (state is ChatUiState.Error) {
                                 Text(
                                     text = state.errorMessage,
                                     color = MaterialTheme.colorScheme.error,
                                     style = MaterialTheme.typography.bodyLarge,
-                                    modifier = Modifier.align(Alignment.Center)
                                 )
                                 IconButton(
                                     onClick = { viewModel.clearResponse() },
-                                    modifier = Modifier.align(Alignment.TopStart)
                                 ) { Icon(Icons.Default.Clear, "Clear response") }
                             }
                         }

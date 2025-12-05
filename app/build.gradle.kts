@@ -80,6 +80,9 @@ android {
 }
 
 dependencies {
+    implementation(project(":core-ui"))
+    implementation(project(":core-data"))
+
     implementation(libs.androidx.core.ktx)
 
     // Core stuff
@@ -110,11 +113,9 @@ dependencies {
     // Permissions
     implementation(libs.accompanist.permissions)
 
-    implementation(libs.material3)
-
     // Hilt
     implementation(libs.hilt.android)
-    implementation(libs.androidx.material3)
+    //implementation(libs.androidx.material3)
     kapt(libs.hilt.compiler)
     implementation(libs.hilt.navigation.compose)
 

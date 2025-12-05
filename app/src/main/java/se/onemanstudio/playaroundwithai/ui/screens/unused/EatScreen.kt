@@ -17,6 +17,7 @@ import androidx.compose.material3.AppBarRow
 import androidx.compose.material3.ExperimentalMaterial3ExpressiveApi
 import androidx.compose.material3.FilledIconButton
 import androidx.compose.material3.FloatingToolbarDefaults.ScreenOffset
+import androidx.compose.material3.HorizontalFloatingToolbar
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
@@ -29,11 +30,9 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.viewmodel.compose.viewModel
-import androidx.xr.compose.material3.ExperimentalMaterial3XrApi
-import androidx.xr.compose.material3.HorizontalFloatingToolbar
 import se.onemanstudio.playaroundwithai.viewmodels.unused.EatViewModel
 
-@OptIn(ExperimentalMaterial3ExpressiveApi::class, ExperimentalMaterial3XrApi::class)
+@OptIn(ExperimentalMaterial3ExpressiveApi::class)
 @Composable
 fun EatScreen(viewModel: EatViewModel = viewModel()) {
     val state by viewModel.state.collectAsStateWithLifecycle()

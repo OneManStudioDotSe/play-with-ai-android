@@ -37,8 +37,8 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import coil.compose.AsyncImage
 import se.onemanstudio.playaroundwithai.R
+import se.onemanstudio.playaroundwithai.core.ui.theme.AIAITheme
 import se.onemanstudio.playaroundwithai.data.AnalysisType
-import se.onemanstudio.playaroundwithai.ui.theme.AIAITheme
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable

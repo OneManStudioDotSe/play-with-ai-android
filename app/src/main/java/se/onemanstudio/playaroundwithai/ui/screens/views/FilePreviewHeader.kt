@@ -21,7 +21,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import se.onemanstudio.playaroundwithai.ui.theme.AIAITheme
+import se.onemanstudio.playaroundwithai.core.ui.theme.AIAITheme
 
 @Composable
 fun FilePreviewHeader(
