@@ -29,12 +29,8 @@ import androidx.compose.foundation.layout.wrapContentWidth
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.selection.selectable
 import androidx.compose.foundation.selection.selectableGroup
-import androidx.compose.foundation.text.input.TextFieldLineLimits
-import androidx.compose.foundation.text.input.clearText
-import androidx.compose.foundation.text.input.rememberTextFieldState
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Check
-import androidx.compose.material.icons.filled.Clear
 import androidx.compose.material.icons.filled.Close
 import androidx.compose.material.icons.filled.Done
 import androidx.compose.material.icons.filled.Edit
@@ -84,8 +80,6 @@ import androidx.compose.material3.Switch
 import androidx.compose.material3.SwitchDefaults
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
-import androidx.compose.material3.TextField
-import androidx.compose.material3.TextFieldLabelPosition
 import androidx.compose.material3.VerticalDivider
 import androidx.compose.material3.carousel.HorizontalMultiBrowseCarousel
 import androidx.compose.material3.carousel.HorizontalUncontainedCarousel
@@ -157,35 +151,6 @@ fun M3ComponentsShowcaseScreen() {
         verticalArrangement = Arrangement.spacedBy(24.dp)
     ) {
         item {
-            SectionTitle("Text field")
-            val state = rememberTextFieldState()
-
-            var alwaysMinimizeLabel by remember { mutableStateOf(false) }
-            Column {
-                Row {
-                    Checkbox(checked = alwaysMinimizeLabel, onCheckedChange = { alwaysMinimizeLabel = it })
-                    Text("Show placeholder even when unfocused")
-                }
-                Spacer(Modifier.height(16.dp))
-                TextField(
-                    state = state,
-                    lineLimits = TextFieldLineLimits.SingleLine,
-                    label = { Text("Label") },
-                    labelPosition = TextFieldLabelPosition.Attached(alwaysMinimize = alwaysMinimizeLabel),
-                    prefix = { Text("www.") },
-                    suffix = { Text(".com") },
-                    placeholder = { Text("google") },
-                    leadingIcon = { Icon(Icons.Filled.Favorite, contentDescription = null) },
-                    trailingIcon = {
-                        IconButton(onClick = { state.clearText() }) {
-                            Icon(Icons.Filled.Clear, contentDescription = "Clear text")
-                        }
-                    },
-                )
-            }
-        }
-
-        item {
             SectionTitle("Carousel #1")
             CarouselExample_MultiBrowse()
         }
@@ -199,11 +164,7 @@ fun M3ComponentsShowcaseScreen() {
             SectionTitle("Split buttons")
             var checked by remember { mutableStateOf(false) }
 
-            Box(
-                modifier = Modifier
-                    .fillMaxSize()
-                    .wrapContentSize()
-            ) {
+            Box(modifier = Modifier.wrapContentSize()) {
                 SplitButtonLayout(
                     leadingButton = {
                         SplitButtonDefaults.LeadingButton(onClick = { /* Do Nothing */ }) {
@@ -288,7 +249,10 @@ fun M3ComponentsShowcaseScreen() {
 
         item {
             SectionTitle("Loaders")
-            Column(horizontalAlignment = Alignment.CenterHorizontally) { LoadingIndicator() }
+
+            Column(horizontalAlignment = Alignment.CenterHorizontally) {
+                LoadingIndicator()
+            }
 
             HorizontalDivider(
                 modifier = Modifier
@@ -296,6 +260,22 @@ fun M3ComponentsShowcaseScreen() {
                     .wrapContentWidth()
                     .padding(vertical = 16.dp),
                 thickness = 1.dp
+            )
+
+            HorizontalDivider(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .wrapContentWidth()
+                    .padding(vertical = 16.dp),
+                thickness = 4.dp
+            )
+
+            HorizontalDivider(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .wrapContentWidth()
+                    .padding(vertical = 16.dp),
+                thickness = 8.dp
             )
 
             Column(horizontalAlignment = Alignment.CenterHorizontally) {
@@ -310,23 +290,11 @@ fun M3ComponentsShowcaseScreen() {
                 )
             }
 
-            HorizontalDivider(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .wrapContentWidth()
-                    .padding(vertical = 16.dp),
-                thickness = 1.dp
-            )
+            Spacer(Modifier.requiredHeight(30.dp))
 
             Column(horizontalAlignment = Alignment.CenterHorizontally) { LinearWavyProgressIndicator() }
 
-            HorizontalDivider(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .wrapContentWidth()
-                    .padding(vertical = 16.dp),
-                thickness = 1.dp
-            )
+            Spacer(Modifier.requiredHeight(30.dp))
 
             Column(horizontalAlignment = Alignment.CenterHorizontally) {
                 LinearWavyProgressIndicator(
@@ -360,11 +328,11 @@ fun M3ComponentsShowcaseScreen() {
                 ) {
                     DropdownMenuItem(
                         text = { Text("Option 1") },
-                        onClick = { /* Do something... */ }
+                        onClick = { }
                     )
                     DropdownMenuItem(
                         text = { Text("Option 2") },
-                        onClick = { /* Do something... */ }
+                        onClick = { }
                     )
                 }
             }
@@ -389,7 +357,7 @@ fun M3ComponentsShowcaseScreen() {
                     ) {
                         RadioButton(
                             selected = (text == selectedOption),
-                            onClick = null // null recommended for accessibility with screen readers
+                            onClick = null
                         )
                         Text(
                             text = text,
@@ -403,7 +371,8 @@ fun M3ComponentsShowcaseScreen() {
 
         item {
             SectionTitle("Slider")
-            var sliderPositionSimple by rememberSaveable { mutableStateOf(0f) }
+
+            var sliderPositionSimple by rememberSaveable { mutableFloatStateOf(0f) }
             Column(modifier = Modifier.padding(horizontal = 16.dp)) {
                 Text(text = "%.2f".format(sliderPositionSimple))
                 Slider(value = sliderPositionSimple, onValueChange = { sliderPositionSimple = it })
@@ -418,10 +387,7 @@ fun M3ComponentsShowcaseScreen() {
                     // there are 9 steps (10, 20, ..., 90).
                     steps = 9,
                     valueRange = 0f..100f,
-                    onValueChangeFinished = {
-                        // launch some business logic update with the state you hold
-                        // viewModel.updateSelectedSliderValue(sliderPosition)
-                    },
+                    onValueChangeFinished = { },
                 )
             Column(modifier = Modifier.padding(horizontal = 16.dp)) {
                 Text(text = "%.2f".format(sliderState.value))
@@ -431,7 +397,8 @@ fun M3ComponentsShowcaseScreen() {
 
         item {
             SectionTitle("Slider customised")
-            var sliderPosition by rememberSaveable { mutableStateOf(0f) }
+
+            var sliderPosition by rememberSaveable { mutableFloatStateOf(0f) }
             val interactionSource: MutableInteractionSource = remember { MutableInteractionSource() }
             Column(modifier = Modifier.padding(horizontal = 16.dp)) {
                 Slider(
@@ -439,10 +406,7 @@ fun M3ComponentsShowcaseScreen() {
                     onValueChange = { sliderPosition = it },
                     valueRange = 0f..100f,
                     interactionSource = interactionSource,
-                    onValueChangeFinished = {
-                        // launch some business logic update with the state you hold
-                        // viewModel.updateSelectedSliderValue(sliderPosition)
-                    },
+                    onValueChangeFinished = { },
                     thumb = {
                         Label(
                             label = {
@@ -472,6 +436,7 @@ fun M3ComponentsShowcaseScreen() {
 
         item {
             SectionTitle("Switch")
+
             Row(
                 modifier = Modifier
                     .fillMaxWidth()
@@ -519,6 +484,7 @@ fun M3ComponentsShowcaseScreen() {
 
         item {
             SectionTitle("Checkboxes")
+
             Row(verticalAlignment = Alignment.CenterVertically) {
                 Text("Minimal checkbox")
 
@@ -533,6 +499,7 @@ fun M3ComponentsShowcaseScreen() {
 
         item {
             SectionTitle("Buttons")
+
             Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
                 Button(onClick = {}) { Text("Filled Button") }
                 OutlinedButton(onClick = {}) { Text("Outlined Button") }
@@ -563,10 +530,7 @@ fun M3ComponentsShowcaseScreen() {
                 )
 
                 InputChip(
-                    onClick = {
-                        //onDismiss()
-                        isChipEnabled = !isChipEnabled
-                    },
+                    onClick = { isChipEnabled = !isChipEnabled },
                     label = { Text("Some text") },
                     selected = isChipEnabled,
                     avatar = {
@@ -587,9 +551,7 @@ fun M3ComponentsShowcaseScreen() {
 
                 FilterChip(
                     onClick = { isChipSelected = !isChipSelected },
-                    label = {
-                        Text("Filter chip")
-                    },
+                    label = { Text("Filter chip") },
                     selected = isChipSelected,
                     leadingIcon = if (isChipSelected) {
                         {
@@ -608,37 +570,23 @@ fun M3ComponentsShowcaseScreen() {
 
         item {
             SectionTitle("Cards")
+
             Column(verticalArrangement = Arrangement.spacedBy(16.dp)) {
                 ElevatedCard(
-                    elevation = CardDefaults.cardElevation(
-                        defaultElevation = 6.dp
-                    ),
-                    modifier = Modifier
-                        .size(width = 240.dp, height = 100.dp)
-                ) {
-                    CardContent("ElevatedCard")
-                }
+                    elevation = CardDefaults.cardElevation(defaultElevation = 6.dp),
+                    modifier = Modifier.size(width = 240.dp, height = 100.dp)
+                ) { CardContent("ElevatedCard") }
 
                 OutlinedCard(
-                    colors = CardDefaults.cardColors(
-                        containerColor = MaterialTheme.colorScheme.surface,
-                    ),
+                    colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface),
                     border = BorderStroke(1.dp, Color.Black),
-                    modifier = Modifier
-                        .size(width = 240.dp, height = 100.dp)
-                ) {
-                    CardContent("OutlinedCard")
-                }
+                    modifier = Modifier.size(width = 240.dp, height = 100.dp)
+                ) { CardContent("OutlinedCard") }
 
                 Card(
-                    colors = CardDefaults.cardColors(
-                        containerColor = MaterialTheme.colorScheme.surfaceVariant,
-                    ),
-                    modifier = Modifier
-                        .size(width = 240.dp, height = 100.dp)
-                ) {
-                    CardContent("FilledCard")
-                }
+                    colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surfaceVariant),
+                    modifier = Modifier.size(width = 240.dp, height = 100.dp)
+                ) { CardContent("FilledCard") }
             }
         }
     }

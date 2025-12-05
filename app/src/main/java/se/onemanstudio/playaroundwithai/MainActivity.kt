@@ -8,10 +8,9 @@ import androidx.compose.foundation.layout.consumeWindowInsets
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Chat
+import androidx.compose.material.icons.filled.Chair
 import androidx.compose.material.icons.filled.FoodBank
 import androidx.compose.material.icons.filled.NewReleases
-import androidx.compose.material.icons.filled.RemoveRedEye
 import androidx.compose.material3.Icon
 import androidx.compose.material3.NavigationBar
 import androidx.compose.material3.NavigationBarItem
@@ -32,9 +31,7 @@ import se.onemanstudio.playaroundwithai.core.ui.theme.SofaAiTheme
 import se.onemanstudio.playaroundwithai.feature.chat.ChatScreen
 import se.onemanstudio.playaroundwithai.ui.screens.unused.EatScreen
 import se.onemanstudio.playaroundwithai.ui.screens.unused.M3ComponentsShowcaseScreen
-import se.onemanstudio.playaroundwithai.ui.screens.unused.SeeScreen
 
-// A data class to represent a navigation item
 data class NavItem(
     val route: String,
     val label: String,
@@ -49,16 +46,13 @@ class MainActivity : ComponentActivity() {
 
         // Define your navigation items
         val navItems = listOf(
-            NavItem("chat", "Chat", Icons.Default.Chat),
+            NavItem("chat", "Chat", Icons.Default.Chair),
             NavItem("showcase", "Showcase", Icons.Default.NewReleases),
             NavItem("eat", "Eat", Icons.Default.FoodBank),
-            NavItem("see", "See", Icons.Default.RemoveRedEye),
         )
 
         setContent {
             SofaAiTheme {
-                // Surface is no longer the root, Scaffold is.
-                // You can keep the Surface inside if you need its specific properties.
                 val navController = rememberNavController()
 
                 Scaffold(
@@ -72,16 +66,8 @@ class MainActivity : ComponentActivity() {
                                     selected = currentDestination?.hierarchy?.any { it.route == screen.route } == true,
                                     onClick = {
                                         navController.navigate(screen.route) {
-                                            // Pop up to the start destination of the graph to
-                                            // avoid building up a large stack of destinations
-                                            // on the back stack as users select items
-                                            popUpTo(navController.graph.findStartDestination().id) {
-                                                saveState = true
-                                            }
-                                            // Avoid multiple copies of the same destination when
-                                            // re-selecting the same item
+                                            popUpTo(navController.graph.findStartDestination().id) { saveState = true }
                                             launchSingleTop = true
-                                            // Restore state when re-selecting a previously selected item
                                             restoreState = true
                                         }
                                     },
@@ -94,17 +80,15 @@ class MainActivity : ComponentActivity() {
                 ) { innerPadding ->
                     NavHost(
                         navController,
-                        startDestination = "chat", // Your initial screen
+                        startDestination = "chat",
                         Modifier
                             .fillMaxSize()
-                            .padding(innerPadding) // 1. Apply the padding from Scaffold
-                            .consumeWindowInsets(innerPadding) // 2.
+                            .padding(innerPadding)
+                            .consumeWindowInsets(innerPadding)
                     ) {
-                        // Your existing ChatScreen
                         composable("chat") { ChatScreen(viewModel = hiltViewModel()) }
                         composable("showcase") { M3ComponentsShowcaseScreen() }
                         composable("eat") { EatScreen() }
-                        composable("see") { SeeScreen() }
                     }
                 }
             }
