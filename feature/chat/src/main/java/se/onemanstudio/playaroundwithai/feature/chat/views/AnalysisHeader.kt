@@ -40,6 +40,7 @@ import se.onemanstudio.playaroundwithai.core.data.AnalysisType
 import se.onemanstudio.playaroundwithai.core.ui.theme.SofaAiTheme
 import se.onemanstudio.playaroundwithai.feature.chat.R
 
+@Suppress("MagicNumber")
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun AnalysisHeader(
@@ -124,7 +125,7 @@ fun AnalysisHeader(
 
 @Preview(showBackground = true)
 @Composable
-private fun AnalysisHeaderPreview() {
+internal fun AnalysisHeaderPreview() {
     SofaAiTheme {
         AnalysisHeader(
             selectedImageUri = Uri.EMPTY,
@@ -137,7 +138,7 @@ private fun AnalysisHeaderPreview() {
 
 @Preview(showBackground = true, name = "Light Mode - Product")
 @Composable
-private fun AnalysisHeaderPreview_Light_Product() {
+internal fun AnalysisHeaderPreview_Light_Product() {
     SofaAiTheme {
         AnalysisHeader(
             selectedImageUri = Uri.EMPTY,
@@ -150,7 +151,7 @@ private fun AnalysisHeaderPreview_Light_Product() {
 
 @Preview(showBackground = true, name = "Dark Mode - Location", uiMode = Configuration.UI_MODE_NIGHT_YES)
 @Composable
-private fun AnalysisHeaderPreview_Dark_Location() {
+internal fun AnalysisHeaderPreview_Dark_Location() {
     SofaAiTheme(darkTheme = true) {
         AnalysisHeader(
             selectedImageUri = Uri.EMPTY,
@@ -164,7 +165,7 @@ private fun AnalysisHeaderPreview_Dark_Location() {
 @OptIn(ExperimentalMaterial3Api::class)
 @Preview(showBackground = true, name = "Dropdown Expanded")
 @Composable
-private fun AnalysisHeaderPreview_DropdownExpanded() {
+internal fun AnalysisHeaderPreview_DropdownExpanded() {
     SofaAiTheme {
         Box(modifier = Modifier.padding(bottom = 200.dp)) {
             Column {

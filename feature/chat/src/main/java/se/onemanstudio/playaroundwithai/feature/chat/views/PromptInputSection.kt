@@ -137,7 +137,9 @@ fun PromptInputSection(
 
                 IconButton(
                     onClick = onAttachClicked,
-                    modifier = Modifier.padding(top = 10.dp).border(1.dp, outlineColor, MaterialTheme.shapes.small)
+                    modifier = Modifier
+                        .padding(top = 10.dp)
+                        .border(1.dp, outlineColor, MaterialTheme.shapes.small)
                 ) {
                     if (inputMode == InputMode.IMAGE) {
                         Icon(
@@ -197,7 +199,7 @@ private fun ModeButton(
 
 @Preview(showBackground = true, name = "Text Mode")
 @Composable
-private fun PromptInputSection_Preview_TextMode() {
+internal fun PromptInputSection_Preview_TextMode() {
     SofaAiTheme {
         PromptInputSection(
             textState = TextFieldValue("A text-only prompt..."),
@@ -214,7 +216,7 @@ private fun PromptInputSection_Preview_TextMode() {
 
 @Preview(showBackground = true, name = "Image Mode")
 @Composable
-private fun PromptInputSection_Preview_ImageMode() {
+internal fun PromptInputSection_Preview_ImageMode() {
     SofaAiTheme {
         PromptInputSection(
             textState = TextFieldValue("What's in this image?"),
@@ -231,7 +233,7 @@ private fun PromptInputSection_Preview_ImageMode() {
 
 @Preview(showBackground = true, name = "Document Mode")
 @Composable
-private fun PromptInputSection_Preview_DocumentMode() {
+internal fun PromptInputSection_Preview_DocumentMode() {
     SofaAiTheme {
         PromptInputSection(
             textState = TextFieldValue("Summarize this document"),

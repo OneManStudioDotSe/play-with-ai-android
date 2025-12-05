@@ -1,9 +1,11 @@
+import org.jetbrains.kotlin.gradle.dsl.JvmTarget
+
 plugins {
     alias(libs.plugins.android.library)
     alias(libs.plugins.kotlin.android)
     alias(libs.plugins.kotlin.compose)
     alias(libs.plugins.hilt)
-    kotlin("kapt")
+    id("com.google.devtools.ksp")
 }
 
 android {
@@ -17,7 +19,18 @@ android {
     buildTypes {
         release {
             isMinifyEnabled = false
+            proguardFiles(getDefaultProguardFile("proguard-android-optimize.txt"), "proguard-rules.pro")
         }
+    }
+
+    packaging {
+        resources {
+            excludes += "/META-INF/{AL2.0,LGPL2.1}"
+        }
+    }
+
+    buildFeatures {
+        compose = true
     }
 
     composeOptions {
@@ -31,17 +44,10 @@ android {
 
     kotlin {
         compilerOptions {
-            jvmTarget = org.jetbrains.kotlin.gradle.dsl.JvmTarget.fromTarget("17")
+            jvmTarget = JvmTarget.fromTarget("17")
         }
     }
 
-    buildFeatures {
-        compose = true
-    }
-
-    kapt {
-        correctErrorTypes = true
-    }
 }
 
 dependencies {
@@ -49,22 +55,27 @@ dependencies {
     implementation(project(":core-data"))
 
     implementation(libs.androidx.core.ktx)
+
     implementation(platform(libs.androidx.compose.bom))
     implementation(libs.androidx.activity)
     implementation(libs.ui.base)
     implementation(libs.ui.graphics)
     implementation(libs.ui.preview)
+
     implementation(libs.androidx.navigation)
+
     implementation(libs.androidx.lifecycle.viewmodel)
     implementation(libs.androidx.lifecycle.runtime)
     implementation(libs.androidx.lifecycle.runtime.ktx)
+
     implementation(libs.material3)
     implementation(libs.androidx.material.icons.extended)
+
     implementation(libs.coil.compose)
 
     // Hilt
     implementation(libs.hilt.android)
-    kapt(libs.hilt.compiler)
+    ksp(libs.hilt.compiler)
     implementation(libs.hilt.navigation.compose)
 
     debugImplementation(libs.ui.tooling)

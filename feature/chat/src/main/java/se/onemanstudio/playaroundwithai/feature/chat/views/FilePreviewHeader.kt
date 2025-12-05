@@ -63,7 +63,7 @@ fun FilePreviewHeader(
 
 @Preview(showBackground = true, name = "Light Mode - Normal Name")
 @Composable
-private fun FilePreviewHeaderPreview_Normal() {
+internal fun FilePreviewHeaderPreview_Normal() {
     SofaAiTheme {
         FilePreviewHeader(
             fileName = "my_document.pdf",
@@ -74,7 +74,7 @@ private fun FilePreviewHeaderPreview_Normal() {
 
 @Preview(showBackground = true, name = "Light Mode - Long Name")
 @Composable
-private fun FilePreviewHeaderPreview_LongName() {
+internal fun FilePreviewHeaderPreview_LongName() {
     SofaAiTheme {
         FilePreviewHeader(
             fileName = "this_is_a_very_long_document_name_that_should_be_truncated.docx",
@@ -85,7 +85,7 @@ private fun FilePreviewHeaderPreview_LongName() {
 
 @Preview(showBackground = true, name = "Dark Mode", uiMode = Configuration.UI_MODE_NIGHT_YES)
 @Composable
-private fun FilePreviewHeaderPreview_Dark() {
+internal fun FilePreviewHeaderPreview_Dark() {
     SofaAiTheme(darkTheme = true) {
         FilePreviewHeader(
             fileName = "report_q3_final.txt",

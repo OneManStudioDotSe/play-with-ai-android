@@ -95,7 +95,6 @@ class ChatViewModel @Inject constructor(
                 }
             }
         } catch (e: Exception) {
-            e.printStackTrace()
             return "Error reading file content."
         }
         return stringBuilder.toString()
@@ -106,7 +105,6 @@ class ChatViewModel @Inject constructor(
         return try {
             ImageDecoder.decodeBitmap(ImageDecoder.createSource(application.contentResolver, this))
         } catch (e: Exception) {
-            e.printStackTrace()
             null
         }
     }

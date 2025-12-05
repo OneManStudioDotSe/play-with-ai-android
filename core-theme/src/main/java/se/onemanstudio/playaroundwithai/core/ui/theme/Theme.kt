@@ -40,6 +40,7 @@ private val BrutalistLightScheme = lightColorScheme(
     outline = PrimaryBlack        // Crucial for outlining components in black
 )
 
+@Suppress("FunctionNaming")
 @Composable
 fun SofaAiTheme(
     darkTheme: Boolean = isSystemInDarkTheme(),

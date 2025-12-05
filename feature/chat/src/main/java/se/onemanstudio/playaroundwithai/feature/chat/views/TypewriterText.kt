@@ -40,7 +40,7 @@ fun TypewriterText(text: String) {
  */
 @Preview(showBackground = true, name = "Static Style Preview")
 @Composable
-private fun TypewriterText_StaticPreview() {
+internal fun TypewriterText_StaticPreview() {
     SofaAiTheme {
         Surface {
             Text(
@@ -58,7 +58,7 @@ private fun TypewriterText_StaticPreview() {
  */
 @Preview(showBackground = true, name = "Interactive Animation Preview")
 @Composable
-private fun TypewriterText_InteractivePreview() {
+internal fun TypewriterText_InteractivePreview() {
     SofaAiTheme {
         Surface {
             TypewriterText(text = "Hello, this text will type out one letter at a time...")

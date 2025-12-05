@@ -5,7 +5,7 @@ plugins {
     alias(libs.plugins.kotlin.android)
     alias(libs.plugins.kotlin.compose)
     alias(libs.plugins.hilt)
-    kotlin("kapt")
+    id("com.google.devtools.ksp")
 }
 
 android {
@@ -16,6 +16,7 @@ android {
         applicationId = "se.onemanstudio.playaroundwithai"
         minSdk = 31
         targetSdk = 36
+
         versionCode = 1
         versionName = "1.0"
     }
@@ -32,6 +33,17 @@ android {
         }
     }
 
+    packaging {
+        resources {
+            excludes += "/META-INF/{AL2.0,LGPL2.1}"
+        }
+    }
+
+    buildFeatures {
+        compose = true
+        //buildConfig = true // Enable BuildConfig generation
+    }
+
     composeOptions {
         kotlinCompilerExtensionVersion = "1.5.3"
     }
@@ -45,21 +57,6 @@ android {
         compilerOptions {
             jvmTarget = JvmTarget.fromTarget("17")
         }
-    }
-
-    buildFeatures {
-        compose = true
-        buildConfig = true // Enable BuildConfig generation
-    }
-
-    packaging {
-        resources {
-            excludes += "/META-INF/{AL2.0,LGPL2.1}"
-        }
-    }
-
-    kapt {
-        correctErrorTypes = true
     }
 
     detekt {
@@ -86,5 +83,5 @@ dependencies {
     // Hilt
     implementation(libs.hilt.android)
     implementation(libs.hilt.navigation.compose)
-    kapt(libs.hilt.compiler)
+    ksp(libs.hilt.compiler)
 }

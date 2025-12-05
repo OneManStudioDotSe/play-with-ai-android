@@ -30,6 +30,7 @@ import kotlin.random.Random
 
 private const val NUM_POINTS = 12
 
+@Suppress("MagicNumber")
 @Composable
 fun AmoebaShapeAnimation() {
     val points = remember { mutableStateListOf<Animatable<Float, AnimationVector1D>>() }
@@ -118,6 +119,6 @@ private operator fun Float.times(p: Offset) = Offset(this * p.x, this * p.y)
 
 @Preview(showBackground = true)
 @Composable
-private fun AmoebaAnimationPreview() {
+internal fun AmoebaAnimationPreview() {
     AmoebaShapeAnimation()
 }
