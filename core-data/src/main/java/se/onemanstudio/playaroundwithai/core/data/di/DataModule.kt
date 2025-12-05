@@ -1,4 +1,4 @@
-package se.onemanstudio.playaroundwithai.di
+package se.onemanstudio.playaroundwithai.core.data.di
 
 import android.content.Context
 import androidx.room.Room
@@ -11,7 +11,7 @@ import okhttp3.OkHttpClient
 import okhttp3.logging.HttpLoggingInterceptor
 import retrofit2.Retrofit
 import retrofit2.converter.gson.GsonConverterFactory
-import se.onemanstudio.playaroundwithai.BuildConfig
+import se.onemanstudio.playaroundwithai.core.data.BuildConfig
 import se.onemanstudio.playaroundwithai.core.data.di.GeminiApiKey
 import se.onemanstudio.playaroundwithai.core.data.local.AppDatabase
 import se.onemanstudio.playaroundwithai.core.data.remote.gemini.network.GeminiApiService
@@ -19,7 +19,7 @@ import javax.inject.Singleton
 
 @Module
 @InstallIn(SingletonComponent::class)
-object AppModule {
+object DataModule {
 
     private const val BASE_URL = "https://generativelanguage.googleapis.com/"
 

@@ -199,9 +199,11 @@ fun M3ComponentsShowcaseScreen() {
             SectionTitle("Split buttons")
             var checked by remember { mutableStateOf(false) }
 
-            Box(modifier = Modifier
-                .fillMaxSize()
-                .wrapContentSize()) {
+            Box(
+                modifier = Modifier
+                    .fillMaxSize()
+                    .wrapContentSize()
+            ) {
                 SplitButtonLayout(
                     leadingButton = {
                         SplitButtonDefaults.LeadingButton(onClick = { /* Do Nothing */ }) {

@@ -39,6 +39,7 @@ Here is a list of tasks to improve this project and showcase advanced Android de
 *   **Loading States:** Show loading indicators.
 *   **Error States:** Implement a clear error handling strategy.
 *   **Input Validation:** Handle invalid user input.
+*   **Add support for detekt
 
 ### Step 5: Tackle Advanced Technical Challenges
 *   **Streaming AI Responses:** Stream the AI response to the UI.
