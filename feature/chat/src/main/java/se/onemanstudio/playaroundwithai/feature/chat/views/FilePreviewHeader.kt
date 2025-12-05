@@ -21,7 +21,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import se.onemanstudio.playaroundwithai.core.ui.theme.AIAITheme
+import se.onemanstudio.playaroundwithai.core.ui.theme.SofaAiTheme
 
 @Composable
 fun FilePreviewHeader(
@@ -64,7 +64,7 @@ fun FilePreviewHeader(
 @Preview(showBackground = true, name = "Light Mode - Normal Name")
 @Composable
 private fun FilePreviewHeaderPreview_Normal() {
-    AIAITheme {
+    SofaAiTheme {
         FilePreviewHeader(
             fileName = "my_document.pdf",
             onClearFile = {}
@@ -75,7 +75,7 @@ private fun FilePreviewHeaderPreview_Normal() {
 @Preview(showBackground = true, name = "Light Mode - Long Name")
 @Composable
 private fun FilePreviewHeaderPreview_LongName() {
-    AIAITheme {
+    SofaAiTheme {
         FilePreviewHeader(
             fileName = "this_is_a_very_long_document_name_that_should_be_truncated.docx",
             onClearFile = {}
@@ -86,7 +86,7 @@ private fun FilePreviewHeaderPreview_LongName() {
 @Preview(showBackground = true, name = "Dark Mode", uiMode = Configuration.UI_MODE_NIGHT_YES)
 @Composable
 private fun FilePreviewHeaderPreview_Dark() {
-    AIAITheme(darkTheme = true) {
+    SofaAiTheme(darkTheme = true) {
         FilePreviewHeader(
             fileName = "report_q3_final.txt",
             onClearFile = {}

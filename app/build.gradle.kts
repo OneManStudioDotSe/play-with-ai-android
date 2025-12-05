@@ -61,6 +61,10 @@ android {
     kapt {
         correctErrorTypes = true
     }
+
+    detekt {
+        config.setFrom(files("../detekt.yml"))
+    }
 }
 
 dependencies {

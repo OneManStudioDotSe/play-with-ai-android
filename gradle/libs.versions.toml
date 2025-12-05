@@ -23,6 +23,7 @@ coil = "2.7.0"
 agp = "8.13.1"
 kotlin = "2.2.21"
 versionsCheck = "0.53.0"
+detekt = "1.23.8"
 hilt = "2.57.2"
 
 [libraries]
@@ -77,5 +78,6 @@ android-library = { id = "com.android.library", version.ref = "agp" }
 kotlin-android = { id = "org.jetbrains.kotlin.android", version.ref = "kotlin" }
 kotlin-compose = { id = "org.jetbrains.kotlin.plugin.compose", version.ref = "kotlin" }
 versionsCheck = { id = "com.github.ben-manes.versions", version.ref = "versionsCheck" }
+detekt = { id = "io.gitlab.arturbosch.detekt", version.ref = "detekt" }
 hilt = { id = "com.google.dagger.hilt.android", version.ref = "hilt" }
 

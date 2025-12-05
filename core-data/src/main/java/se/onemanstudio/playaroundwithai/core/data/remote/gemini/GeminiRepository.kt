@@ -13,12 +13,17 @@ import java.io.ByteArrayOutputStream
 import javax.inject.Inject
 import javax.inject.Singleton
 
-private const val SYSTEM_INSTRUCTION = """
-    You are a fun and slightly sarcastic AI assistant named 'Chip'.
-    Your goal is to provide helpful, but witty and concise answers.
-    Always keep your response under 100 words and never break character.
-"""
+//private const val SYSTEM_INSTRUCTION = """
+//    You are a fun and slightly sarcastic AI assistant named 'Chip'.
+//    Your goal is to provide helpful, but witty and concise answers.
+//    Always keep your response under 100 words and never break character.
+//"""
 
+private const val MAX_SIZE = 768
+
+private const val COMPESSION_QUALITY = 75
+
+@Suppress("MaxLineLength", "TooGenericExceptionCaught")
 @Singleton
 class GeminiRepository @Inject constructor(
     @GeminiApiKey private val apiKey: String,
@@ -76,11 +81,11 @@ class GeminiRepository @Inject constructor(
     // Helper function to process the image
     private fun Bitmap.toImageData(): ImageData {
         // 1. Scale the bitmap
-        val scaledBitmap = this.scaleBitmap(768) // Max dimension of 768px
+        val scaledBitmap = this.scaleBitmap(MAX_SIZE) // Max dimension of 768px
 
         // 2. Compress the scaled bitmap
         val byteArrayOutputStream = ByteArrayOutputStream()
-        scaledBitmap.compress(Bitmap.CompressFormat.JPEG, 75, byteArrayOutputStream) // 75% quality
+        scaledBitmap.compress(Bitmap.CompressFormat.JPEG, COMPESSION_QUALITY, byteArrayOutputStream) // 75% quality
         val byteArray = byteArrayOutputStream.toByteArray()
 
         // 3. Encode with NO_WRAP flag

@@ -37,7 +37,7 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import coil.compose.AsyncImage
 import se.onemanstudio.playaroundwithai.core.data.AnalysisType
-import se.onemanstudio.playaroundwithai.core.ui.theme.AIAITheme
+import se.onemanstudio.playaroundwithai.core.ui.theme.SofaAiTheme
 import se.onemanstudio.playaroundwithai.feature.chat.R
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -125,7 +125,7 @@ fun AnalysisHeader(
 @Preview(showBackground = true)
 @Composable
 private fun AnalysisHeaderPreview() {
-    AIAITheme {
+    SofaAiTheme {
         AnalysisHeader(
             selectedImageUri = Uri.EMPTY,
             analysisType = AnalysisType.PRODUCT,
@@ -138,7 +138,7 @@ private fun AnalysisHeaderPreview() {
 @Preview(showBackground = true, name = "Light Mode - Product")
 @Composable
 private fun AnalysisHeaderPreview_Light_Product() {
-    AIAITheme {
+    SofaAiTheme {
         AnalysisHeader(
             selectedImageUri = Uri.EMPTY,
             analysisType = AnalysisType.PRODUCT,
@@ -151,7 +151,7 @@ private fun AnalysisHeaderPreview_Light_Product() {
 @Preview(showBackground = true, name = "Dark Mode - Location", uiMode = Configuration.UI_MODE_NIGHT_YES)
 @Composable
 private fun AnalysisHeaderPreview_Dark_Location() {
-    AIAITheme(darkTheme = true) {
+    SofaAiTheme(darkTheme = true) {
         AnalysisHeader(
             selectedImageUri = Uri.EMPTY,
             analysisType = AnalysisType.LOCATION,
@@ -165,7 +165,7 @@ private fun AnalysisHeaderPreview_Dark_Location() {
 @Preview(showBackground = true, name = "Dropdown Expanded")
 @Composable
 private fun AnalysisHeaderPreview_DropdownExpanded() {
-    AIAITheme {
+    SofaAiTheme {
         Box(modifier = Modifier.padding(bottom = 200.dp)) {
             Column {
                 ExposedDropdownMenuBox(

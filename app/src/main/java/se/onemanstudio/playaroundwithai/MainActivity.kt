@@ -28,7 +28,7 @@ import androidx.navigation.compose.composable
 import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
 import dagger.hilt.android.AndroidEntryPoint
-import se.onemanstudio.playaroundwithai.core.ui.theme.AIAITheme
+import se.onemanstudio.playaroundwithai.core.ui.theme.SofaAiTheme
 import se.onemanstudio.playaroundwithai.feature.chat.ChatScreen
 import se.onemanstudio.playaroundwithai.ui.screens.unused.EatScreen
 import se.onemanstudio.playaroundwithai.ui.screens.unused.M3ComponentsShowcaseScreen
@@ -56,7 +56,7 @@ class MainActivity : ComponentActivity() {
         )
 
         setContent {
-            AIAITheme {
+            SofaAiTheme {
                 // Surface is no longer the root, Scaffold is.
                 // You can keep the Surface inside if you need its specific properties.
                 val navController = rememberNavController()

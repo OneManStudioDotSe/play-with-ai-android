@@ -11,7 +11,7 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.tooling.preview.Preview
 import kotlinx.coroutines.delay
-import se.onemanstudio.playaroundwithai.core.ui.theme.AIAITheme
+import se.onemanstudio.playaroundwithai.core.ui.theme.SofaAiTheme
 
 const val typingDelay = 20L
 
@@ -41,7 +41,7 @@ fun TypewriterText(text: String) {
 @Preview(showBackground = true, name = "Static Style Preview")
 @Composable
 private fun TypewriterText_StaticPreview() {
-    AIAITheme {
+    SofaAiTheme {
         Surface {
             Text(
                 text = "This is what the final text will look like after the animation is complete.",
@@ -59,7 +59,7 @@ private fun TypewriterText_StaticPreview() {
 @Preview(showBackground = true, name = "Interactive Animation Preview")
 @Composable
 private fun TypewriterText_InteractivePreview() {
-    AIAITheme {
+    SofaAiTheme {
         Surface {
             TypewriterText(text = "Hello, this text will type out one letter at a time...")
         }

@@ -1,0 +1,19 @@
+build:
+  maxIssues: 0
+
+style:
+  MagicNumber:
+    active: false
+    ignoreAnnotated:
+      - "Composable"
+      - "Preview"
+
+  UnusedPrivateMember:
+    active: true
+    ignoreAnnotated:
+      - "Composable"
+      - "Preview"
+
+  MaxLineLength:
+    active: true
+    maxLineLength: 180

@@ -8,7 +8,6 @@ import androidx.compose.material3.dynamicDarkColorScheme
 import androidx.compose.material3.dynamicLightColorScheme
 import androidx.compose.material3.lightColorScheme
 import androidx.compose.runtime.Composable
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 
 // Dark Mode - High contrast with Yellow accents on Black/White
@@ -42,7 +41,7 @@ private val BrutalistLightScheme = lightColorScheme(
 )
 
 @Composable
-fun AIAITheme(
+fun SofaAiTheme(
     darkTheme: Boolean = isSystemInDarkTheme(),
     dynamicColor: Boolean = false, // Brutalism generally avoids dynamic colors
     content: @Composable () -> Unit

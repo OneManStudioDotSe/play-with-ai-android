@@ -36,7 +36,7 @@ import androidx.compose.ui.text.input.TextFieldValue
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import se.onemanstudio.playaroundwithai.core.data.InputMode
-import se.onemanstudio.playaroundwithai.core.ui.theme.AIAITheme
+import se.onemanstudio.playaroundwithai.core.ui.theme.SofaAiTheme
 
 @Composable
 fun PromptInputSection(
@@ -198,7 +198,7 @@ private fun ModeButton(
 @Preview(showBackground = true, name = "Text Mode")
 @Composable
 private fun PromptInputSection_Preview_TextMode() {
-    AIAITheme {
+    SofaAiTheme {
         PromptInputSection(
             textState = TextFieldValue("A text-only prompt..."),
             onTextChanged = {},
@@ -215,7 +215,7 @@ private fun PromptInputSection_Preview_TextMode() {
 @Preview(showBackground = true, name = "Image Mode")
 @Composable
 private fun PromptInputSection_Preview_ImageMode() {
-    AIAITheme {
+    SofaAiTheme {
         PromptInputSection(
             textState = TextFieldValue("What's in this image?"),
             onTextChanged = {},
@@ -232,7 +232,7 @@ private fun PromptInputSection_Preview_ImageMode() {
 @Preview(showBackground = true, name = "Document Mode")
 @Composable
 private fun PromptInputSection_Preview_DocumentMode() {
-    AIAITheme {
+    SofaAiTheme {
         PromptInputSection(
             textState = TextFieldValue("Summarize this document"),
             onTextChanged = {},
