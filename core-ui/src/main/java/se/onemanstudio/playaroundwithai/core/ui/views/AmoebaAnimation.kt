@@ -1,4 +1,4 @@
-package se.onemanstudio.playaroundwithai.feature.chat.views
+package se.onemanstudio.playaroundwithai.core.ui.views
 
 import androidx.compose.animation.core.Animatable
 import androidx.compose.animation.core.AnimationVector1D

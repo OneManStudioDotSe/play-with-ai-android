@@ -1,4 +1,4 @@
-package se.onemanstudio.playaroundwithai.feature.chat.views
+package se.onemanstudio.playaroundwithai.core.ui.views
 
 import android.content.res.Configuration
 import android.net.Uri
@@ -38,7 +38,6 @@ import androidx.compose.ui.unit.dp
 import coil.compose.AsyncImage
 import se.onemanstudio.playaroundwithai.core.data.AnalysisType
 import se.onemanstudio.playaroundwithai.core.ui.theme.SofaAiTheme
-import se.onemanstudio.playaroundwithai.feature.chat.R
 
 @Suppress("MagicNumber")
 @OptIn(ExperimentalMaterial3Api::class)
@@ -125,7 +124,7 @@ fun AnalysisHeader(
 
 @Preview(showBackground = true)
 @Composable
-internal fun AnalysisHeaderPreview() {
+internal fun AnalysisHeaderPreview_Default() {
     SofaAiTheme {
         AnalysisHeader(
             selectedImageUri = Uri.EMPTY,

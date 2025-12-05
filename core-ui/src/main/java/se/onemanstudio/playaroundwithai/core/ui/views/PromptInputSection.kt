@@ -1,33 +1,31 @@
-package se.onemanstudio.playaroundwithai.feature.chat.views
+package se.onemanstudio.playaroundwithai.core.ui.views
 
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.navigationBarsPadding
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.text.BasicTextField
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.Send
 import androidx.compose.material.icons.filled.AddAPhoto
-import androidx.compose.material.icons.filled.Clear
 import androidx.compose.material.icons.filled.UploadFile
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.SuggestionChip
 import androidx.compose.material3.Text
-import androidx.compose.material3.TextFieldDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -36,6 +34,8 @@ import androidx.compose.ui.text.input.TextFieldValue
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import se.onemanstudio.playaroundwithai.core.data.InputMode
+import se.onemanstudio.playaroundwithai.core.ui.sofa.NeoBrutalIconButton
+import se.onemanstudio.playaroundwithai.core.ui.sofa.neoBrutalism
 import se.onemanstudio.playaroundwithai.core.ui.theme.SofaAiTheme
 
 @Composable
@@ -107,30 +107,28 @@ fun PromptInputSection(
                 .padding(horizontal = 16.dp),
             verticalAlignment = Alignment.Top
         ) {
-            OutlinedTextField(
-                value = textState,
-                onValueChange = onTextChanged,
-                modifier = Modifier
-                    .weight(1f)
-                    .heightIn(min = 56.dp, max = 160.dp),
-                label = { Text("Enter your prompt") },
-                trailingIcon = {
-                    if (textState.text.isNotEmpty()) {
-                        IconButton(onClick = onClearClicked) {
-                            Icon(
-                                imageVector = Icons.Default.Clear,
-                                contentDescription = "Clear text"
-                            )
-                        }
-                    }
-                },
-                colors = TextFieldDefaults.colors(
-                    focusedLabelColor = MaterialTheme.colorScheme.primary,
-                    cursorColor = MaterialTheme.colorScheme.primary,
-                    focusedContainerColor = MaterialTheme.colorScheme.surface,
-                    unfocusedContainerColor = MaterialTheme.colorScheme.surface
+            // Custom TextField
+            Box(modifier = Modifier
+                .weight(1f)
+                .padding(horizontal = 8.dp)
+            ) {
+                BasicTextField(
+                    value = textState,
+                    onValueChange = onTextChanged,
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .neoBrutalism( // Apply modifier here!
+                            backgroundColor = MaterialTheme.colorScheme.surface,
+                            borderColor = MaterialTheme.colorScheme.onSurface,
+                            shadowOffset = 4.dp,
+                            borderWidth = 2.dp
+                        )
+                        .padding(12.dp),
+                    textStyle = MaterialTheme.typography.bodyLarge.copy(
+                        color = MaterialTheme.colorScheme.onSurface
+                    )
                 )
-            )
+            }
 
             if (inputMode != InputMode.TEXT) {
                 Spacer(modifier = Modifier.width(8.dp))
@@ -159,19 +157,12 @@ fun PromptInputSection(
                 }
             }
 
-            IconButton(
+            NeoBrutalIconButton(
                 onClick = onSendClicked,
-                enabled = textState.text.isNotBlank(),
-                modifier = Modifier
-                    .padding(start = 8.dp, top = 10.dp)
-                    .border(1.dp, outlineColor, MaterialTheme.shapes.small)
-            ) {
-                Icon(
-                    imageVector = Icons.AutoMirrored.Filled.Send,
-                    contentDescription = "Send",
-                    tint = outlineColor
-                )
-            }
+                imageVector = Icons.AutoMirrored.Filled.Send,
+                contentDescription = "Send prompt",
+                backgroundColor = MaterialTheme.colorScheme.primary
+            )
         }
     }
 }

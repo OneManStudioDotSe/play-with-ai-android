@@ -1,0 +1,80 @@
+package se.onemanstudio.playaroundwithai.core.ui.sofa
+
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.padding
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Text
+import androidx.compose.runtime.Composable
+import androidx.compose.ui.Modifier
+import androidx.compose.ui.tooling.preview.Preview
+import androidx.compose.ui.unit.dp
+import se.onemanstudio.playaroundwithai.core.ui.theme.SofaAiTheme
+
+@Composable
+fun NeoBrutalCard(modifier: Modifier = Modifier, content: @Composable () -> Unit) {
+    Box(
+        modifier = modifier.neoBrutalism(
+            backgroundColor = MaterialTheme.colorScheme.surface,
+            borderColor = MaterialTheme.colorScheme.onSurface,
+            shadowOffset = 10.dp
+        )
+    ) {
+        content()
+    }
+}
+
+@Preview(name = "Light Theme", showBackground = true, backgroundColor = 0xFFF8F8F8)
+@Composable
+private fun NeoBrutalCardPreview_Light() {
+    SofaAiTheme {
+        NeoBrutalCard(
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(16.dp)
+        ) {
+            Column(modifier = Modifier.padding(16.dp)) {
+                Text(
+                    text = "Card Title",
+                    style = MaterialTheme.typography.titleLarge,
+                    color = MaterialTheme.colorScheme.onSurface
+                )
+                Spacer(Modifier.height(8.dp))
+                Text(
+                    text = "This is a card. It uses the neoBrutalism modifier to get a background, border, and shadow.",
+                    style = MaterialTheme.typography.bodyLarge,
+                    color = MaterialTheme.colorScheme.onSurface
+                )
+            }
+        }
+    }
+}
+
+@Preview(name = "Dark Theme", showBackground = true, backgroundColor = 0xFF000000)
+@Composable
+private fun NeoBrutalCardPreview_Dark() {
+    SofaAiTheme(darkTheme = true) {
+        NeoBrutalCard(
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(16.dp)
+        ) {
+            Column(modifier = Modifier.padding(16.dp)) {
+                Text(
+                    text = "Card Title",
+                    style = MaterialTheme.typography.titleLarge,
+                    color = MaterialTheme.colorScheme.onSurface
+                )
+                Spacer(Modifier.height(8.dp))
+                Text(
+                    text = "This is a card. It uses the neoBrutalism modifier to get a background, border, and shadow.",
+                    style = MaterialTheme.typography.bodyLarge,
+                    color = MaterialTheme.colorScheme.onSurface
+                )
+            }
+        }
+    }
+}

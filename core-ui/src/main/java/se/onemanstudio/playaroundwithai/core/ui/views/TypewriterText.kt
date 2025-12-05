@@ -1,4 +1,4 @@
-package se.onemanstudio.playaroundwithai.feature.chat.views
+package se.onemanstudio.playaroundwithai.core.ui.views
 
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface

@@ -24,5 +24,6 @@ rootProject.name = "Play With AI"
 
 include(":app")
 include(":core-theme")
+include(":core-ui")
 include(":core-data")
 include(":feature:chat")

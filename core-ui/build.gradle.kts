@@ -1,32 +1,20 @@
 import org.jetbrains.kotlin.gradle.dsl.JvmTarget
 
 plugins {
-    alias(libs.plugins.android.application)
+    alias(libs.plugins.android.library)
     alias(libs.plugins.kotlin.android)
     alias(libs.plugins.kotlin.compose)
-    alias(libs.plugins.hilt)
-    id("com.google.devtools.ksp")
 }
 
 android {
-    namespace = "se.onemanstudio.playaroundwithai"
+    namespace = "se.onemanstudio.playaroundwithai.core.ui.views"
     compileSdk = 36
 
     defaultConfig {
-        applicationId = "se.onemanstudio.playaroundwithai"
         minSdk = 31
-        targetSdk = 36
-
-        versionCode = 1
-        versionName = "1.0"
     }
 
     buildTypes {
-        debug {
-            isMinifyEnabled = false
-            isDebuggable = true
-        }
-
         release {
             isMinifyEnabled = false
             proguardFiles(getDefaultProguardFile("proguard-android-optimize.txt"), "proguard-rules.pro")
@@ -41,7 +29,6 @@ android {
 
     buildFeatures {
         compose = true
-        //buildConfig = true // Enable BuildConfig generation
     }
 
     composeOptions {
@@ -58,31 +45,24 @@ android {
             jvmTarget = JvmTarget.fromTarget("17")
         }
     }
-
-    detekt {
-        config.setFrom(files("../detekt.yml"))
-    }
 }
 
 dependencies {
-//    implementation(project(":core-theme"))
-//    implementation(project(":core-data"))
-    implementation(project(":core-ui"))
-    implementation(project(":feature:chat"))
+    implementation(project(":core-data"))
+    implementation(project(":core-theme"))
 
+    implementation(libs.androidx.core.ktx)
+
+    implementation(platform(libs.androidx.compose.bom))
     implementation(libs.ui.base)
     implementation(libs.ui.graphics)
     implementation(libs.ui.preview)
     implementation(libs.material3)
-    implementation(libs.androidx.material.icons.extended)
-    implementation(libs.coil.compose)
-    implementation(libs.androidx.core.ktx)
-    implementation(platform(libs.androidx.compose.bom))
-    implementation(libs.androidx.activity)
-    implementation(libs.androidx.navigation)
 
-    // Hilt
-    implementation(libs.hilt.android)
-    implementation(libs.hilt.navigation.compose)
-    ksp(libs.hilt.compiler)
+    implementation(libs.coil.compose)
+
+    implementation(libs.androidx.ui.text.google.fonts)
+    implementation(libs.androidx.material.icons.extended)
+
+    debugImplementation(libs.ui.tooling)
 }

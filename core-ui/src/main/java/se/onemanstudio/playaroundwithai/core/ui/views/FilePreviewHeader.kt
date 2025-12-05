@@ -1,4 +1,4 @@
-package se.onemanstudio.playaroundwithai.feature.chat.views
+package se.onemanstudio.playaroundwithai.core.ui.views
 
 import android.content.res.Configuration
 import androidx.compose.foundation.BorderStroke

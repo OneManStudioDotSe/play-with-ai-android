@@ -7,7 +7,7 @@ plugins {
 }
 
 android {
-    namespace = "se.onemanstudio.playaroundwithai.core.ui"
+    namespace = "se.onemanstudio.playaroundwithai.core.ui.theme"
     compileSdk = 36
 
     defaultConfig {
