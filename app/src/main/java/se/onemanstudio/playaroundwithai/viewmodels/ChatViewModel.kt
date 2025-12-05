@@ -14,8 +14,8 @@ import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
-import se.onemanstudio.playaroundwithai.data.local.PromptEntity
-import se.onemanstudio.playaroundwithai.data.remote.gemini.GeminiRepository
+import se.onemanstudio.playaroundwithai.core.data.local.PromptEntity
+import se.onemanstudio.playaroundwithai.core.data.remote.gemini.GeminiRepository
 import java.io.BufferedReader
 import java.io.InputStreamReader
 import javax.inject.Inject

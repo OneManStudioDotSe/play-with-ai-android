@@ -1,17 +1,17 @@
-package se.onemanstudio.playaroundwithai.data.remote.gemini
+package se.onemanstudio.playaroundwithai.core.data.remote.gemini
 
 import android.graphics.Bitmap
 import android.util.Base64
+import androidx.core.graphics.scale
 import kotlinx.coroutines.flow.Flow
-import se.onemanstudio.playaroundwithai.BuildConfig
-import se.onemanstudio.playaroundwithai.data.remote.gemini.network.GeminiApiService
-import se.onemanstudio.playaroundwithai.data.local.PromptDao
-import se.onemanstudio.playaroundwithai.data.local.PromptEntity
+import se.onemanstudio.playaroundwithai.core.data.AnalysisType
+import se.onemanstudio.playaroundwithai.core.data.di.GeminiApiKey
+import se.onemanstudio.playaroundwithai.core.data.local.PromptDao
+import se.onemanstudio.playaroundwithai.core.data.local.PromptEntity
+import se.onemanstudio.playaroundwithai.core.data.remote.gemini.network.GeminiApiService
 import java.io.ByteArrayOutputStream
 import javax.inject.Inject
 import javax.inject.Singleton
-import androidx.core.graphics.scale
-import se.onemanstudio.playaroundwithai.data.AnalysisType
 
 private const val SYSTEM_INSTRUCTION = """
     You are a fun and slightly sarcastic AI assistant named 'Chip'.
@@ -21,6 +21,7 @@ private const val SYSTEM_INSTRUCTION = """
 
 @Singleton
 class GeminiRepository @Inject constructor(
+    @GeminiApiKey private val apiKey: String,
     private val apiService: GeminiApiService,
     private val promptDao: PromptDao,
 ) {
@@ -52,7 +53,7 @@ class GeminiRepository @Inject constructor(
             }
 
             val request = GeminiRequest(contents = listOf(Content(parts = parts)))
-            val response = apiService.generateContent(BuildConfig.GEMINI_API_KEY, request)
+            val response = apiService.generateContent(apiKey, request)
             Result.success(response)
         } catch (e: Exception) {
             Result.failure(e)

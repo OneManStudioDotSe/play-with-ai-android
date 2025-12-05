@@ -1,4 +1,4 @@
-package se.onemanstudio.playaroundwithai.data.remote.gemini
+package se.onemanstudio.playaroundwithai.core.data.remote.gemini
 
 import com.google.gson.annotations.SerializedName
 

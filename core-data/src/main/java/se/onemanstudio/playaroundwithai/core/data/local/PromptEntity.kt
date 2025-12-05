@@ -1,4 +1,4 @@
-package se.onemanstudio.playaroundwithai.data.local
+package se.onemanstudio.playaroundwithai.core.data.local
 
 import androidx.room.Entity
 import androidx.room.PrimaryKey

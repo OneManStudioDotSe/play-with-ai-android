@@ -1,4 +1,4 @@
-package se.onemanstudio.playaroundwithai.data
+package se.onemanstudio.playaroundwithai.core.data
 
 enum class AnalysisType(val displayName: String) {
     LOCATION("Location"),

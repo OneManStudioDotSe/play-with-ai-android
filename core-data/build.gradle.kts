@@ -1,11 +1,12 @@
 plugins {
     alias(libs.plugins.android.library)
     alias(libs.plugins.kotlin.android)
-    alias(libs.plugins.kotlin.compose)
+    alias(libs.plugins.hilt)
+    kotlin("kapt")
 }
 
 android {
-    namespace = "se.onemanstudio.playaroundwithai.core.ui"
+    namespace = "se.onemanstudio.playaroundwithai.core.data"
     compileSdk = 36
 
     defaultConfig {
@@ -16,10 +17,6 @@ android {
         release {
             isMinifyEnabled = false
         }
-    }
-
-    composeOptions {
-        kotlinCompilerExtensionVersion = "1.5.3"
     }
 
     compileOptions {
@@ -33,22 +30,27 @@ android {
         }
     }
 
-    buildFeatures {
-        compose = true
+    kapt {
+        correctErrorTypes = true
     }
 }
 
 dependencies {
     implementation(libs.androidx.core.ktx)
+    implementation(libs.kotlinx.coroutines.core)
 
-    implementation(platform(libs.androidx.compose.bom))
-    implementation(libs.ui.base)
-    implementation(libs.ui.graphics)
-    implementation(libs.ui.preview)
-    implementation(libs.material3)
+    // Hilt
+    implementation(libs.hilt.android)
+    kapt(libs.hilt.compiler)
 
-    implementation(libs.androidx.ui.text.google.fonts)
-    implementation(libs.androidx.material.icons.extended)
+    // Retrofit & OkHttp
+    implementation(libs.retrofit)
+    implementation(libs.retrofit.converter.gson)
+    implementation(libs.okhttp)
+    implementation(libs.okhttp.logging.interceptor)
 
-    debugImplementation(libs.ui.tooling)
+    // Room
+    implementation(libs.room.runtime)
+    kapt(libs.room.compiler)
+    implementation(libs.room.ktx)
 }

@@ -12,8 +12,9 @@ import okhttp3.logging.HttpLoggingInterceptor
 import retrofit2.Retrofit
 import retrofit2.converter.gson.GsonConverterFactory
 import se.onemanstudio.playaroundwithai.BuildConfig
-import se.onemanstudio.playaroundwithai.data.remote.gemini.network.GeminiApiService
-import se.onemanstudio.playaroundwithai.data.local.AppDatabase
+import se.onemanstudio.playaroundwithai.core.data.di.GeminiApiKey
+import se.onemanstudio.playaroundwithai.core.data.local.AppDatabase
+import se.onemanstudio.playaroundwithai.core.data.remote.gemini.network.GeminiApiService
 import javax.inject.Singleton
 
 @Module
@@ -21,6 +22,11 @@ import javax.inject.Singleton
 object AppModule {
 
     private const val BASE_URL = "https://generativelanguage.googleapis.com/"
+
+    @Provides
+    @Singleton
+    @GeminiApiKey
+    fun provideGeminiApiKey(): String = BuildConfig.GEMINI_API_KEY
 
     @Provides
     @Singleton

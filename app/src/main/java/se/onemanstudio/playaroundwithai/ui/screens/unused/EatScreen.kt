@@ -30,13 +30,10 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.viewmodel.compose.viewModel
-import se.onemanstudio.playaroundwithai.viewmodels.unused.EatViewModel
 
 @OptIn(ExperimentalMaterial3ExpressiveApi::class)
 @Composable
-fun EatScreen(viewModel: EatViewModel = viewModel()) {
-    val state by viewModel.state.collectAsStateWithLifecycle()
-
+fun EatScreen() {
     Scaffold(
         content = { innerPadding ->
             Box(Modifier.padding(innerPadding)) {

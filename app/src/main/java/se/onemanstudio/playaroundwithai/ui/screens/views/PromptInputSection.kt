@@ -35,8 +35,8 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.input.TextFieldValue
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import se.onemanstudio.playaroundwithai.core.data.InputMode
 import se.onemanstudio.playaroundwithai.core.ui.theme.AIAITheme
-import se.onemanstudio.playaroundwithai.data.InputMode
 
 @Composable
 fun PromptInputSection(

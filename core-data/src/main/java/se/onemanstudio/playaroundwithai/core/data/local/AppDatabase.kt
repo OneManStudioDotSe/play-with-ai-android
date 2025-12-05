@@ -1,4 +1,4 @@
-package se.onemanstudio.playaroundwithai.data.local
+package se.onemanstudio.playaroundwithai.core.data.local
 
 import androidx.room.Database
 import androidx.room.RoomDatabase

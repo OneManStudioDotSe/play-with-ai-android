@@ -45,8 +45,8 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalSoftwareKeyboardController
 import androidx.compose.ui.text.input.TextFieldValue
 import androidx.compose.ui.unit.dp
-import se.onemanstudio.playaroundwithai.data.AnalysisType
-import se.onemanstudio.playaroundwithai.data.InputMode
+import se.onemanstudio.playaroundwithai.core.data.AnalysisType
+import se.onemanstudio.playaroundwithai.core.data.InputMode
 import se.onemanstudio.playaroundwithai.ui.screens.views.AmoebaShapeAnimation
 import se.onemanstudio.playaroundwithai.ui.screens.views.AnalysisHeader
 import se.onemanstudio.playaroundwithai.ui.screens.views.FilePreviewHeader
@@ -197,11 +197,7 @@ fun ChatScreen(viewModel: ChatViewModel) {
                 is ChatUiState.Loading -> CircularProgressIndicator()
 
                 else -> {
-                    Box(
-                        modifier = Modifier
-                            .fillMaxSize()
-                            .background(Color.Red)
-                    ) {
+                    Box(modifier = Modifier.fillMaxSize()) {
                         Column(
                             modifier = Modifier
                                 .fillMaxSize()

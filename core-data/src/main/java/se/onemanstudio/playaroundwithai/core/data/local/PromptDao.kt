@@ -1,4 +1,4 @@
-package se.onemanstudio.playaroundwithai.data.local
+package se.onemanstudio.playaroundwithai.core.data.local
 
 import androidx.room.Dao
 import androidx.room.Insert
