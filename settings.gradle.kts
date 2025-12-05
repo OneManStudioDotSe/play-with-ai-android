@@ -23,6 +23,6 @@ dependencyResolutionManagement {
 rootProject.name = "Play With AI"
 
 include(":app")
-include(":core-ui")
+include(":core-theme")
 include(":core-data")
 include(":feature:chat")

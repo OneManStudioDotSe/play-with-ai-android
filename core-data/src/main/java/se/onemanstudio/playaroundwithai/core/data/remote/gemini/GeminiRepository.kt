@@ -8,16 +8,21 @@ import se.onemanstudio.playaroundwithai.core.data.AnalysisType
 import se.onemanstudio.playaroundwithai.core.data.di.GeminiApiKey
 import se.onemanstudio.playaroundwithai.core.data.local.PromptDao
 import se.onemanstudio.playaroundwithai.core.data.local.PromptEntity
+import se.onemanstudio.playaroundwithai.core.data.remote.gemini.model.Content
+import se.onemanstudio.playaroundwithai.core.data.remote.gemini.model.GeminiRequest
+import se.onemanstudio.playaroundwithai.core.data.remote.gemini.model.GeminiResponse
+import se.onemanstudio.playaroundwithai.core.data.remote.gemini.model.ImageData
+import se.onemanstudio.playaroundwithai.core.data.remote.gemini.model.Part
 import se.onemanstudio.playaroundwithai.core.data.remote.gemini.network.GeminiApiService
 import java.io.ByteArrayOutputStream
 import javax.inject.Inject
 import javax.inject.Singleton
 
-//private const val SYSTEM_INSTRUCTION = """
-//    You are a fun and slightly sarcastic AI assistant named 'Chip'.
-//    Your goal is to provide helpful, but witty and concise answers.
-//    Always keep your response under 100 words and never break character.
-//"""
+private const val SYSTEM_INSTRUCTION = """
+    You are a fun and slightly sarcastic AI assistant named 'bAbIs'.
+    Your goal is to provide helpful, but witty and concise answers.
+    Always keep your response playful and never break character.
+"""
 
 private const val MAX_SIZE = 768
 
@@ -26,7 +31,7 @@ private const val COMPESSION_QUALITY = 75
 @Suppress("MaxLineLength", "TooGenericExceptionCaught")
 @Singleton
 class GeminiRepository @Inject constructor(
-    @GeminiApiKey private val apiKey: String,
+    @param:GeminiApiKey private val apiKey: String,
     private val apiService: GeminiApiService,
     private val promptDao: PromptDao,
 ) {
@@ -38,11 +43,11 @@ class GeminiRepository @Inject constructor(
     ): Result<GeminiResponse> {
         return try {
             val parts = mutableListOf<Part>()
-            var fullPrompt = prompt
+            var fullPrompt = SYSTEM_INSTRUCTION + prompt
 
             // Add system instruction if it's an image analysis
             if (analysisType != null) {
-                fullPrompt = "${getSystemInstruction(analysisType)}\n\nUser prompt: $prompt"
+                fullPrompt = SYSTEM_INSTRUCTION + "${getSystemInstruction(analysisType)}\n\nUser prompt: $prompt"
             }
 
             // Append document text if it exists
@@ -52,7 +57,6 @@ class GeminiRepository @Inject constructor(
 
             parts.add(Part(text = fullPrompt))
 
-            // Add image data if it exists
             imageBitmap?.let {
                 parts.add(Part(inlineData = it.toImageData()))
             }
@@ -78,23 +82,18 @@ class GeminiRepository @Inject constructor(
         }
     }
 
-    // Helper function to process the image
     private fun Bitmap.toImageData(): ImageData {
-        // 1. Scale the bitmap
         val scaledBitmap = this.scaleBitmap(MAX_SIZE) // Max dimension of 768px
 
-        // 2. Compress the scaled bitmap
         val byteArrayOutputStream = ByteArrayOutputStream()
         scaledBitmap.compress(Bitmap.CompressFormat.JPEG, COMPESSION_QUALITY, byteArrayOutputStream) // 75% quality
         val byteArray = byteArrayOutputStream.toByteArray()
 
-        // 3. Encode with NO_WRAP flag
-        val base64String = Base64.encodeToString(byteArray, Base64.NO_WRAP) // <-- THE FIX
+        val base64String = Base64.encodeToString(byteArray, Base64.NO_WRAP)
 
         return ImageData(mimeType = "image/jpeg", data = base64String)
     }
 
-    // New helper function to resize the bitmap while maintaining aspect ratio
     private fun Bitmap.scaleBitmap(maxDimension: Int): Bitmap {
         val originalWidth = this.width
         val originalHeight = this.height

@@ -7,7 +7,7 @@ plugins {
     alias(libs.plugins.kotlin.android)
     alias(libs.plugins.kotlin.compose)
     alias(libs.plugins.hilt)
-    kotlin("kapt")
+    id("com.google.devtools.ksp")
 }
 
 // Read the API key from local.properties
@@ -38,6 +38,17 @@ android {
         }
     }
 
+    packaging {
+        resources {
+            excludes += "/META-INF/{AL2.0,LGPL2.1}"
+        }
+    }
+
+    buildFeatures {
+        compose = true
+        buildConfig = true // Enable BuildConfig generation
+    }
+
     composeOptions {
         kotlinCompilerExtensionVersion = "1.5.3"
     }
@@ -52,25 +63,9 @@ android {
             jvmTarget = JvmTarget.fromTarget("17")
         }
     }
-
-    buildFeatures {
-        compose = true
-        buildConfig = true // Enable BuildConfig generation
-    }
-
-    packaging {
-        resources {
-            excludes += "/META-INF/{AL2.0,LGPL2.1}"
-        }
-    }
-
-    kapt {
-        correctErrorTypes = true
-    }
 }
 
 dependencies {
-    // Add this line to include the Compose Runtime
     implementation(libs.androidx.lifecycle.runtime)
 
     implementation(libs.androidx.core.ktx)
@@ -78,7 +73,7 @@ dependencies {
 
     // Hilt
     implementation(libs.hilt.android)
-    kapt(libs.hilt.compiler)
+    ksp(libs.hilt.compiler)
 
     // Retrofit & OkHttp
     implementation(libs.retrofit)
@@ -88,6 +83,10 @@ dependencies {
 
     // Room
     implementation(libs.room.runtime)
-    kapt(libs.room.compiler)
+    ksp(libs.room.compiler)
     implementation(libs.room.ktx)
+
+    testImplementation(libs.junit)
+    testImplementation(libs.kotlinx.coroutines.test)
+    testImplementation(libs.mockito.kotlin)
 }

@@ -12,7 +12,6 @@ import okhttp3.logging.HttpLoggingInterceptor
 import retrofit2.Retrofit
 import retrofit2.converter.gson.GsonConverterFactory
 import se.onemanstudio.playaroundwithai.core.data.BuildConfig
-import se.onemanstudio.playaroundwithai.core.data.di.GeminiApiKey
 import se.onemanstudio.playaroundwithai.core.data.local.AppDatabase
 import se.onemanstudio.playaroundwithai.core.data.remote.gemini.network.GeminiApiService
 import javax.inject.Singleton
@@ -20,7 +19,6 @@ import javax.inject.Singleton
 @Module
 @InstallIn(SingletonComponent::class)
 object DataModule {
-
     private const val BASE_URL = "https://generativelanguage.googleapis.com/"
 
     @Provides
@@ -62,11 +60,7 @@ object DataModule {
     @Provides
     @Singleton
     fun provideAppDatabase(@ApplicationContext context: Context): AppDatabase {
-        return Room.databaseBuilder(
-            context,
-            AppDatabase::class.java,
-            "gemini-wrapper-db"
-        ).build()
+        return Room.databaseBuilder(context, AppDatabase::class.java, "sofa-play-with-ai-db").build()
     }
 
     @Provides
