@@ -5,7 +5,6 @@ import android.util.Base64
 import androidx.core.graphics.scale
 import kotlinx.coroutines.flow.Flow
 import se.onemanstudio.playaroundwithai.core.data.AnalysisType
-import se.onemanstudio.playaroundwithai.core.data.di.GeminiApiKey
 import se.onemanstudio.playaroundwithai.core.data.local.PromptDao
 import se.onemanstudio.playaroundwithai.core.data.local.PromptEntity
 import se.onemanstudio.playaroundwithai.core.data.remote.gemini.model.Content
@@ -26,12 +25,11 @@ private const val SYSTEM_INSTRUCTION = """
 
 private const val MAX_SIZE = 768
 
-private const val COMPESSION_QUALITY = 75
+private const val COMPRESSION_QUALITY = 75
 
 @Suppress("MaxLineLength", "TooGenericExceptionCaught")
 @Singleton
 class GeminiRepository @Inject constructor(
-    @param:GeminiApiKey private val apiKey: String,
     private val apiService: GeminiApiService,
     private val promptDao: PromptDao,
 ) {
@@ -62,7 +60,7 @@ class GeminiRepository @Inject constructor(
             }
 
             val request = GeminiRequest(contents = listOf(Content(parts = parts)))
-            val response = apiService.generateContent(apiKey, request)
+            val response = apiService.generateContent(request)
             Result.success(response)
         } catch (e: Exception) {
             Result.failure(e)
@@ -86,7 +84,7 @@ class GeminiRepository @Inject constructor(
         val scaledBitmap = this.scaleBitmap(MAX_SIZE) // Max dimension of 768px
 
         val byteArrayOutputStream = ByteArrayOutputStream()
-        scaledBitmap.compress(Bitmap.CompressFormat.JPEG, COMPESSION_QUALITY, byteArrayOutputStream) // 75% quality
+        scaledBitmap.compress(Bitmap.CompressFormat.JPEG, COMPRESSION_QUALITY, byteArrayOutputStream) // 75% quality
         val byteArray = byteArrayOutputStream.toByteArray()
 
         val base64String = Base64.encodeToString(byteArray, Base64.NO_WRAP)

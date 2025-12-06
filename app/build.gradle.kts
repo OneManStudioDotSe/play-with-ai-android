@@ -65,8 +65,7 @@ android {
 }
 
 dependencies {
-//    implementation(project(":core-theme"))
-//    implementation(project(":core-data"))
+    implementation(project(":core-theme"))
     implementation(project(":core-ui"))
     implementation(project(":feature:chat"))
 
