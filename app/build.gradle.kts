@@ -39,14 +39,14 @@ android {
             isMinifyEnabled = false
             isDebuggable = true
             buildConfigField("String", "GEMINI_API_KEY", "\"${localProperties.getProperty("GEMINI_API_KEY_DEBUG")}\"")
-            buildConfigField("String", "BASE_URL", "\"https://generativelanguage.googleapis.com/\"")
+            buildConfigField("String", "BASE_URL", "\"https://api-dev.someservice.com/\"")
         }
 
         release {
             isMinifyEnabled = false
             proguardFiles(getDefaultProguardFile("proguard-android-optimize.txt"), "proguard-rules.pro")
             buildConfigField("String", "GEMINI_API_KEY", "\"${localProperties.getProperty("GEMINI_API_KEY_RELEASE")}\"")
-            buildConfigField("String", "BASE_URL", "\"https://generativelanguage.googleapis.com/\"")
+            buildConfigField("String", "BASE_URL", "\"https://api-prod.someservice.com/\"")
         }
     }
 

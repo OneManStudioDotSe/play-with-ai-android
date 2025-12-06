@@ -6,7 +6,7 @@ import se.onemanstudio.playaroundwithai.core.data.di.GeminiApiKey
 import javax.inject.Inject
 
 class AuthenticationInterceptor @Inject constructor(
-    @GeminiApiKey private val apiKey: String
+    @param:GeminiApiKey private val apiKey: String
 ) : Interceptor {
 
     override fun intercept(chain: Interceptor.Chain): Response {
