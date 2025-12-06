@@ -1,4 +1,4 @@
-package se.onemanstudio.playaroundwithai.core.ui.sofa
+package se.onemanstudio.playaroundwithai.core.ui.views
 
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Column
@@ -19,6 +19,7 @@ import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import se.onemanstudio.playaroundwithai.core.data.domain.model.Prompt
+import se.onemanstudio.playaroundwithai.core.ui.sofa.NeoBrutalCard
 import se.onemanstudio.playaroundwithai.core.ui.theme.Dimensions
 import se.onemanstudio.playaroundwithai.core.ui.theme.SofaAiTheme
 import java.text.SimpleDateFormat
@@ -27,9 +28,9 @@ import java.util.Locale
 
 @Composable
 fun HistoryItemCard(
-    prompt: Prompt,
-    onClick: (String) -> Unit,
     modifier: Modifier = Modifier,
+    prompt: Prompt,
+    onClick: (String) -> Unit
 ) {
     // A memoized formatter to avoid recreating it on every recomposition
     val dateFormatter = remember {

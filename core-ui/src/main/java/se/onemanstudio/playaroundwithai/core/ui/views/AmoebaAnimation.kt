@@ -20,7 +20,6 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.Path
 import androidx.compose.ui.graphics.drawscope.Stroke
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import kotlinx.coroutines.launch
 import se.onemanstudio.playaroundwithai.core.ui.theme.Dimensions
@@ -117,9 +116,3 @@ fun AmoebaShapeAnimation() {
 }
 
 private operator fun Float.times(p: Offset) = Offset(this * p.x, this * p.y)
-
-@Preview(showBackground = true)
-@Composable
-internal fun AmoebaAnimationPreview() {
-    AmoebaShapeAnimation()
-}

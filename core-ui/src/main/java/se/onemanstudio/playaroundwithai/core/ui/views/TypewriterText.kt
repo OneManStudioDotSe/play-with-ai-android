@@ -34,10 +34,6 @@ fun TypewriterText(text: String) {
     )
 }
 
-/**
- * Static preview to check the final style, font, and color of the text.
- * The animation itself won't play here.
- */
 @Preview(showBackground = true, name = "Static Style Preview")
 @Composable
 internal fun TypewriterText_StaticPreview() {

@@ -41,7 +41,7 @@ import androidx.compose.ui.platform.LocalSoftwareKeyboardController
 import androidx.compose.ui.text.input.TextFieldValue
 import se.onemanstudio.playaroundwithai.core.data.AnalysisType
 import se.onemanstudio.playaroundwithai.core.data.InputMode
-import se.onemanstudio.playaroundwithai.core.ui.sofa.HistoryItemCard
+import se.onemanstudio.playaroundwithai.core.ui.views.HistoryItemCard
 import se.onemanstudio.playaroundwithai.core.ui.sofa.NeoBrutalCard
 import se.onemanstudio.playaroundwithai.core.ui.sofa.NeoBrutalIconButton
 import se.onemanstudio.playaroundwithai.core.ui.sofa.NeoBrutalTopAppBar
@@ -166,7 +166,6 @@ fun ChatScreen(viewModel: ChatViewModel) {
                         },
                         onTextChanged = { textState = it },
                         onChipClicked = { prompt -> textState = TextFieldValue(prompt) },
-                        onClearClicked = { textState = TextFieldValue("") },
                         onAttachClicked = {
                             when (inputMode) {
                                 InputMode.IMAGE -> imagePickerLauncher.launch(

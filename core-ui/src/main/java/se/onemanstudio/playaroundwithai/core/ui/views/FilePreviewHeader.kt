@@ -33,7 +33,7 @@ fun FilePreviewHeader(
     Surface(
         modifier = Modifier
             .fillMaxWidth()
-            .padding(horizontal = Dimensions.paddingLarge, vertical = Dimensions.paddingMedium),
+            .padding(all = Dimensions.paddingLarge),
         shape = MaterialTheme.shapes.medium,
         border = BorderStroke(Dimensions.borderStrokeSmall, MaterialTheme.colorScheme.outline)
     ) {

@@ -29,13 +29,13 @@ import se.onemanstudio.playaroundwithai.core.ui.theme.SofaAiTheme
 
 @Composable
 fun NeoBrutalIconButton(
-    onClick: () -> Unit,
+    modifier: Modifier = Modifier,
     imageVector: ImageVector,
     contentDescription: String,
-    modifier: Modifier = Modifier,
     size: Dp = Dimensions.iconSizeLarge,
     backgroundColor: Color = MaterialTheme.colorScheme.surface,
     shadowColor: Color = MaterialTheme.colorScheme.onSurface,
+    onClick: () -> Unit,
 ) {
     val interactionSource = remember { MutableInteractionSource() }
     val isPressed by interactionSource.collectIsPressedAsState()

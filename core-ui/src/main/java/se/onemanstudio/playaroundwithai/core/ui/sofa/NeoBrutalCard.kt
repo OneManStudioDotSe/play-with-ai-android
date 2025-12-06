@@ -15,7 +15,10 @@ import se.onemanstudio.playaroundwithai.core.ui.theme.Dimensions
 import se.onemanstudio.playaroundwithai.core.ui.theme.SofaAiTheme
 
 @Composable
-fun NeoBrutalCard(modifier: Modifier = Modifier, content: @Composable () -> Unit) {
+fun NeoBrutalCard(
+    modifier: Modifier = Modifier,
+    content: @Composable () -> Unit
+) {
     Box(
         modifier = modifier.neoBrutalism(
             backgroundColor = MaterialTheme.colorScheme.surface,

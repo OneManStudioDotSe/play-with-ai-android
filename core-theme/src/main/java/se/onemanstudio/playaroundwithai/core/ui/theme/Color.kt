@@ -14,4 +14,3 @@ val ZestyLime = Color(0xFF9EFF00)
 
 // Functional Colors
 val ErrorRed = Color(0xFFD32F2F)
-val SuccessGreen = Color(0xFF388E3C)

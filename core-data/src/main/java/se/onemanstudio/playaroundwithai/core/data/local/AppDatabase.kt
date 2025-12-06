@@ -5,5 +5,5 @@ import androidx.room.RoomDatabase
 
 @Database(entities = [PromptEntity::class], version = 1, exportSchema = false)
 abstract class AppDatabase : RoomDatabase() {
-    abstract fun promptDao(): PromptDao
+    abstract fun promptDao(): PromptsHistoryDao
 }

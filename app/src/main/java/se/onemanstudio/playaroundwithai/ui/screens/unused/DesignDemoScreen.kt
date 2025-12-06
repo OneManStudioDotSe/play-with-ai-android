@@ -1,5 +1,6 @@
 package se.onemanstudio.playaroundwithai.ui.screens.unused
 
+import android.content.res.Configuration
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
@@ -14,10 +15,12 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import se.onemanstudio.playaroundwithai.core.ui.sofa.NeoBrutalButton
 import se.onemanstudio.playaroundwithai.core.ui.sofa.NeoBrutalCard
+import se.onemanstudio.playaroundwithai.core.ui.theme.SofaAiTheme
 
 @Composable
 fun DesignDemoScreen() {
@@ -72,5 +75,21 @@ private fun ComponentGroup(title: String, content: @Composable ColumnScope.() ->
         )
         Spacer(Modifier.height(8.dp))
         content()
+    }
+}
+
+@Preview(name = "Light Mode", showBackground = true)
+@Composable
+private fun DesignDemoScreenPreview_Light() {
+    SofaAiTheme {
+        DesignDemoScreen()
+    }
+}
+
+@Preview(name = "Dark Mode", showBackground = true, uiMode = Configuration.UI_MODE_NIGHT_YES)
+@Composable
+private fun DesignDemoScreenPreview_Dark() {
+    SofaAiTheme(darkTheme = true) {
+        DesignDemoScreen()
     }
 }

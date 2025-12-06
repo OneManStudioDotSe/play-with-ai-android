@@ -8,7 +8,7 @@ import kotlinx.coroutines.flow.map
 import se.onemanstudio.playaroundwithai.core.data.AnalysisType
 import se.onemanstudio.playaroundwithai.core.data.domain.mapper.toDomain
 import se.onemanstudio.playaroundwithai.core.data.domain.model.Prompt
-import se.onemanstudio.playaroundwithai.core.data.local.PromptDao
+import se.onemanstudio.playaroundwithai.core.data.local.PromptsHistoryDao
 import se.onemanstudio.playaroundwithai.core.data.local.PromptEntity
 import se.onemanstudio.playaroundwithai.core.data.remote.gemini.model.Content
 import se.onemanstudio.playaroundwithai.core.data.remote.gemini.model.GeminiRequest
@@ -34,7 +34,7 @@ private const val COMPRESSION_QUALITY = 75
 @Singleton
 class GeminiRepository @Inject constructor(
     private val apiService: GeminiApiService,
-    private val promptDao: PromptDao,
+    private val promptsHistoryDao: PromptsHistoryDao,
 ) {
     suspend fun generateContent(
         prompt: String,
@@ -111,8 +111,8 @@ class GeminiRepository @Inject constructor(
     }
 
     suspend fun savePrompt(promptText: String) {
-        promptDao.insertPrompt(PromptEntity(text = promptText))
+        promptsHistoryDao.insertPrompt(PromptEntity(text = promptText))
     }
 
-    fun getPromptHistory(): Flow<List<Prompt>> = promptDao.getPromptHistory().map { list -> list.map { it.toDomain() } }
+    fun getPromptHistory(): Flow<List<Prompt>> = promptsHistoryDao.getPromptHistory().map { list -> list.map { it.toDomain() } }
 }

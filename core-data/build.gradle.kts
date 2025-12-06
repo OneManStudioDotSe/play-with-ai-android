@@ -41,11 +41,6 @@ android {
 }
 
 dependencies {
-    implementation(libs.androidx.lifecycle.runtime)
-
-    implementation(libs.androidx.core.ktx)
-    implementation(libs.kotlinx.coroutines.core)
-
     // Hilt
     implementation(libs.hilt.android)
     ksp(libs.hilt.compiler)
@@ -60,9 +55,4 @@ dependencies {
     implementation(libs.room.runtime)
     ksp(libs.room.compiler)
     implementation(libs.room.ktx)
-
-    // Testing
-    testImplementation(libs.junit4)
-    testImplementation(libs.mockk)
-    testImplementation(libs.kotlinx.coroutines.test)
 }

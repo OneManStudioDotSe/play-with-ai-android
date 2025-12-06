@@ -41,12 +41,11 @@ import se.onemanstudio.playaroundwithai.core.ui.theme.SofaAiTheme
 @Composable
 fun PromptInputSection(
     textState: TextFieldValue,
+    inputMode: InputMode,
     onTextChanged: (TextFieldValue) -> Unit,
     onSendClicked: () -> Unit,
     onChipClicked: (String) -> Unit,
-    onClearClicked: () -> Unit,
     onAttachClicked: () -> Unit,
-    inputMode: InputMode,
     onModeChange: (InputMode) -> Unit
 ) {
     val samplePrompts = listOf("Explain Quantum Computing", "Recipe for a cake", "Write a poem about rain")
@@ -108,9 +107,10 @@ fun PromptInputSection(
             verticalAlignment = Alignment.Top
         ) {
             // Custom TextField
-            Box(modifier = Modifier
-                .weight(1f)
-                .padding(horizontal = Dimensions.paddingMedium)
+            Box(
+                modifier = Modifier
+                    .weight(1f)
+                    .padding(horizontal = Dimensions.paddingMedium)
             ) {
                 BasicTextField(
                     value = textState,
@@ -197,7 +197,6 @@ internal fun PromptInputSection_Preview_TextMode() {
             onTextChanged = {},
             onSendClicked = {},
             onChipClicked = {},
-            onClearClicked = {},
             onAttachClicked = {},
             inputMode = InputMode.TEXT, // Set to Text mode
             onModeChange = {}
@@ -214,7 +213,6 @@ internal fun PromptInputSection_Preview_ImageMode() {
             onTextChanged = {},
             onSendClicked = {},
             onChipClicked = {},
-            onClearClicked = {},
             onAttachClicked = {},
             inputMode = InputMode.IMAGE,
             onModeChange = {}
@@ -231,7 +229,6 @@ internal fun PromptInputSection_Preview_DocumentMode() {
             onTextChanged = {},
             onSendClicked = {},
             onChipClicked = {},
-            onClearClicked = {},
             onAttachClicked = {},
             inputMode = InputMode.DOCUMENT,
             onModeChange = {}

@@ -30,7 +30,7 @@ import dagger.hilt.android.AndroidEntryPoint
 import se.onemanstudio.playaroundwithai.core.ui.theme.SofaAiTheme
 import se.onemanstudio.playaroundwithai.feature.chat.screen.ChatScreen
 import se.onemanstudio.playaroundwithai.ui.screens.unused.DesignDemoScreen
-import se.onemanstudio.playaroundwithai.ui.screens.unused.EatScreen
+import se.onemanstudio.playaroundwithai.ui.screens.unused.M3ComponentsShowcaseScreen
 
 data class NavItem(
     val route: String,
@@ -87,11 +87,8 @@ class MainActivity : ComponentActivity() {
                             .consumeWindowInsets(innerPadding)
                     ) {
                         composable("chat") { ChatScreen(viewModel = hiltViewModel()) }
-                        composable("showcase") {
-                            //M3ComponentsShowcaseScreen()
-                            DesignDemoScreen()
-                        }
-                        composable("eat") { EatScreen() }
+                        composable("showcase") { DesignDemoScreen() }
+                        composable("eat") { M3ComponentsShowcaseScreen() }
                     }
                 }
             }

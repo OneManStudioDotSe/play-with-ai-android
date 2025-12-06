@@ -41,7 +41,6 @@ private val NeoBrutalistLightColorScheme = lightColorScheme(
 @Composable
 fun SofaAiTheme(
     darkTheme: Boolean = isSystemInDarkTheme(),
-    dynamicColor: Boolean = false, // Brutalism generally avoids dynamic colors
     content: @Composable () -> Unit
 ) {
     val colorScheme = if (darkTheme) {
@@ -64,4 +63,3 @@ fun SofaAiTheme(
         content = content
     )
 }
-

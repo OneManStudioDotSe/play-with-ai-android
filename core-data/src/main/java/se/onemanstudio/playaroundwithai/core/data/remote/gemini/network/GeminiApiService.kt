@@ -6,6 +6,6 @@ import se.onemanstudio.playaroundwithai.core.data.remote.gemini.model.GeminiRequ
 import se.onemanstudio.playaroundwithai.core.data.remote.gemini.model.GeminiResponse
 
 interface GeminiApiService {
-    @POST("v1beta/models/gemini-pro:generateContent")
+    @POST("v1beta/models/gemini-2.5-flash-lite:generateContent")
     suspend fun generateContent(@Body request: GeminiRequest): GeminiResponse
 }

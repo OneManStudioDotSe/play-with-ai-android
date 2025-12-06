@@ -24,8 +24,8 @@ import se.onemanstudio.playaroundwithai.core.ui.theme.SofaAiTheme
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun NeoBrutalTopAppBar(
-    title: String,
     modifier: Modifier = Modifier,
+    title: String,
     actions: @Composable RowScope.() -> Unit = {}
 ) {
     NeoBrutalCard(

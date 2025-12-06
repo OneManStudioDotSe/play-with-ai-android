@@ -51,28 +51,12 @@ android {
 }
 
 dependencies {
+    implementation(project(":core-data"))
     implementation(project(":core-theme"))
     implementation(project(":core-ui"))
-    implementation(project(":core-data"))
-
-    implementation(libs.androidx.core.ktx)
-
-    implementation(platform(libs.androidx.compose.bom))
-    implementation(libs.androidx.activity)
-    implementation(libs.ui.base)
-    implementation(libs.ui.graphics)
-    implementation(libs.ui.preview)
-
-    implementation(libs.androidx.navigation)
-
-    implementation(libs.androidx.lifecycle.viewmodel)
-    implementation(libs.androidx.lifecycle.runtime)
-    implementation(libs.androidx.lifecycle.runtime.ktx)
 
     implementation(libs.material3)
     implementation(libs.androidx.material.icons.extended)
-
-    implementation(libs.coil.compose)
 
     // Hilt
     implementation(libs.hilt.android)

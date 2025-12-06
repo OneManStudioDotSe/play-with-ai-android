@@ -51,18 +51,10 @@ dependencies {
     implementation(project(":core-data"))
     implementation(project(":core-theme"))
 
-    implementation(libs.androidx.core.ktx)
-
-    implementation(platform(libs.androidx.compose.bom))
-    implementation(libs.ui.base)
-    implementation(libs.ui.graphics)
-    implementation(libs.ui.preview)
     implementation(libs.material3)
+    implementation(libs.androidx.material.icons.extended)
 
     implementation(libs.coil.compose)
-
-    implementation(libs.androidx.ui.text.google.fonts)
-    implementation(libs.androidx.material.icons.extended)
 
     debugImplementation(libs.ui.tooling)
 }

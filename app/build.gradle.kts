@@ -87,19 +87,15 @@ dependencies {
     implementation(project(":core-ui"))
     implementation(project(":feature:chat"))
 
-    implementation(libs.ui.base)
-    implementation(libs.ui.graphics)
-    implementation(libs.ui.preview)
     implementation(libs.material3)
     implementation(libs.androidx.material.icons.extended)
-    implementation(libs.coil.compose)
-    implementation(libs.androidx.core.ktx)
-    implementation(platform(libs.androidx.compose.bom))
-    implementation(libs.androidx.activity)
-    implementation(libs.androidx.navigation)
+
+    implementation(libs.okhttp.logging.interceptor)
 
     // Hilt
     implementation(libs.hilt.android)
     implementation(libs.hilt.navigation.compose)
     ksp(libs.hilt.compiler)
+
+    debugImplementation(libs.ui.tooling)
 }
