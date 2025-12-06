@@ -8,7 +8,6 @@ import okhttp3.OkHttpClient
 import okhttp3.logging.HttpLoggingInterceptor
 import retrofit2.Retrofit
 import retrofit2.converter.gson.GsonConverterFactory
-import se.onemanstudio.playaroundwithai.core.data.BuildConfig
 import se.onemanstudio.playaroundwithai.core.data.remote.gemini.network.AuthenticationInterceptor
 import se.onemanstudio.playaroundwithai.core.data.remote.gemini.network.GeminiApiService
 import javax.inject.Singleton
@@ -19,13 +18,12 @@ object NetworkModule {
 
     @Provides
     @Singleton
-    fun provideOkHttpClient(authInterceptor: AuthenticationInterceptor): OkHttpClient {
+    fun provideOkHttpClient(
+        authInterceptor: AuthenticationInterceptor,
+        @LoggingLevel loggingLevel: HttpLoggingInterceptor.Level
+    ): OkHttpClient {
         val loggingInterceptor = HttpLoggingInterceptor().apply {
-            level = if (BuildConfig.DEBUG) {
-                HttpLoggingInterceptor.Level.BODY
-            } else {
-                HttpLoggingInterceptor.Level.NONE
-            }
+            level = loggingLevel
         }
         return OkHttpClient.Builder()
             .addInterceptor(loggingInterceptor)

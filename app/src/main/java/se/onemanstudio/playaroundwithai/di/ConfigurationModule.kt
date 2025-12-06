@@ -4,9 +4,11 @@ import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
 import dagger.hilt.components.SingletonComponent
+import okhttp3.logging.HttpLoggingInterceptor
 import se.onemanstudio.playaroundwithai.BuildConfig
 import se.onemanstudio.playaroundwithai.core.data.di.BaseUrl
 import se.onemanstudio.playaroundwithai.core.data.di.GeminiApiKey
+import se.onemanstudio.playaroundwithai.core.data.di.LoggingLevel
 import javax.inject.Singleton
 
 @Module
@@ -22,4 +24,15 @@ object ConfigurationModule {
     @Singleton
     @BaseUrl
     fun provideBaseUrl(): String = BuildConfig.BASE_URL
+
+    @Provides
+    @Singleton
+    @LoggingLevel
+    fun provideLoggingLevel(): HttpLoggingInterceptor.Level {
+        return if (BuildConfig.DEBUG) {
+            HttpLoggingInterceptor.Level.BODY
+        } else {
+            HttpLoggingInterceptor.Level.NONE
+        }
+    }
 }

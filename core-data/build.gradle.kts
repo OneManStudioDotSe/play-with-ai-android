@@ -1,20 +1,10 @@
 import org.jetbrains.kotlin.gradle.dsl.JvmTarget
-import java.io.FileInputStream
-import java.util.Properties
 
 plugins {
     alias(libs.plugins.android.library)
     alias(libs.plugins.kotlin.android)
-    alias(libs.plugins.kotlin.compose)
     alias(libs.plugins.hilt)
-    id("com.google.devtools.ksp")
-}
-
-// Read the API key from local.properties
-val localProperties = Properties()
-val localPropertiesFile = rootProject.file("local.properties")
-if (localPropertiesFile.exists()) {
-    localProperties.load(FileInputStream(localPropertiesFile))
+    alias(libs.plugins.ksp)
 }
 
 android {
@@ -23,12 +13,6 @@ android {
 
     defaultConfig {
         minSdk = 31
-
-        buildConfigField(
-            type = "String",
-            name = "GEMINI_API_KEY",
-            value = "\"${localProperties.getProperty("GEMINI_API_KEY")}\""
-        )
     }
 
     buildTypes {
@@ -42,15 +26,6 @@ android {
         resources {
             excludes += "/META-INF/{AL2.0,LGPL2.1}"
         }
-    }
-
-    buildFeatures {
-        compose = true
-        buildConfig = true // Enable BuildConfig generation
-    }
-
-    composeOptions {
-        kotlinCompilerExtensionVersion = "1.5.3"
     }
 
     compileOptions {
@@ -86,7 +61,8 @@ dependencies {
     ksp(libs.room.compiler)
     implementation(libs.room.ktx)
 
-    testImplementation(libs.junit)
+    // Testing
+    testImplementation(libs.junit4)
+    testImplementation(libs.mockk)
     testImplementation(libs.kotlinx.coroutines.test)
-    testImplementation(libs.mockito.kotlin)
 }

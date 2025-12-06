@@ -11,11 +11,12 @@ plugins {
     alias(libs.plugins.android.library) apply false
     alias(libs.plugins.kotlin.android) apply false
     alias(libs.plugins.kotlin.compose) apply false
-    alias(libs.plugins.ksp) apply false
     alias(libs.plugins.versionsCheck) apply false
     alias(libs.plugins.hilt) apply false
     alias(libs.plugins.detekt) apply false
+    alias(libs.plugins.ksp) apply false
 }
+
 
 fun isNonStable(version: String): Boolean {
     val stableKeyword = listOf("RELEASE", "FINAL", "GA").any { version.uppercase().contains(it) }
@@ -34,4 +35,3 @@ tasks.withType<DependencyUpdatesTask> {
 allprojects {
     apply(plugin = "io.gitlab.arturbosch.detekt")
 }
-
