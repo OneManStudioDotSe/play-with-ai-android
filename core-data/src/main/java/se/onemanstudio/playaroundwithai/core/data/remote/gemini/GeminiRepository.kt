@@ -4,7 +4,10 @@ import android.graphics.Bitmap
 import android.util.Base64
 import androidx.core.graphics.scale
 import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.map
 import se.onemanstudio.playaroundwithai.core.data.AnalysisType
+import se.onemanstudio.playaroundwithai.core.data.domain.mapper.toDomain
+import se.onemanstudio.playaroundwithai.core.data.domain.model.Prompt
 import se.onemanstudio.playaroundwithai.core.data.local.PromptDao
 import se.onemanstudio.playaroundwithai.core.data.local.PromptEntity
 import se.onemanstudio.playaroundwithai.core.data.remote.gemini.model.Content
@@ -111,5 +114,5 @@ class GeminiRepository @Inject constructor(
         promptDao.insertPrompt(PromptEntity(text = promptText))
     }
 
-    fun getPromptHistory(): Flow<List<PromptEntity>> = promptDao.getPromptHistory()
+    fun getPromptHistory(): Flow<List<Prompt>> = promptDao.getPromptHistory().map { list -> list.map { it.toDomain() } }
 }

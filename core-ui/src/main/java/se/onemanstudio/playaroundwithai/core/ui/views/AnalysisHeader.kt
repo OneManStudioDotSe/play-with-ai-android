@@ -11,7 +11,7 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.wrapContentSize
-import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Close
 import androidx.compose.material3.DropdownMenuItem
@@ -34,9 +34,10 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.tooling.preview.Preview
-import androidx.compose.ui.unit.dp
 import coil.compose.AsyncImage
 import se.onemanstudio.playaroundwithai.core.data.AnalysisType
+import se.onemanstudio.playaroundwithai.core.ui.R
+import se.onemanstudio.playaroundwithai.core.ui.theme.Dimensions
 import se.onemanstudio.playaroundwithai.core.ui.theme.SofaAiTheme
 
 @Suppress("MagicNumber")
@@ -53,7 +54,7 @@ fun AnalysisHeader(
     Column(
         modifier = Modifier
             .fillMaxWidth()
-            .padding(horizontal = 16.dp, vertical = 8.dp)
+            .padding(horizontal = Dimensions.paddingLarge, vertical = Dimensions.paddingMedium)
     ) {
         var isDropdownExpanded by remember { mutableStateOf(false) }
 
@@ -87,15 +88,15 @@ fun AnalysisHeader(
             }
         }
 
-        Spacer(modifier = Modifier.height(16.dp))
+        Spacer(modifier = Modifier.height(Dimensions.paddingLarge))
 
         Box(modifier = Modifier.wrapContentSize()) {
             AsyncImage(
                 model = selectedImageUri,
                 contentDescription = "Selected image",
                 modifier = Modifier
-                    .size(96.dp)
-                    .padding(all = 2.dp)
+                    .size(Dimensions.imagePreviewSize)
+                    .padding(all = Dimensions.paddingExtraSmall)
                     .clip(MaterialTheme.shapes.medium),
                 contentScale = ContentScale.Crop,
                 placeholder = painterResource(id = R.drawable.ic_image_placeholder),
@@ -105,17 +106,17 @@ fun AnalysisHeader(
                 onClick = onClearImage,
                 modifier = Modifier
                     .align(Alignment.TopEnd)
-                    .padding(4.dp)
-                    .size(32.dp)
+                    .padding(Dimensions.paddingSmall)
+                    .size(Dimensions.iconSizeLarge)
                     .background(
                         color = MaterialTheme.colorScheme.primary.copy(alpha = 0.7f),
-                        shape = RoundedCornerShape(50)
+                        shape = CircleShape
                     )
             ) {
                 Icon(
                     imageVector = Icons.Default.Close,
                     contentDescription = "Remove image",
-                    modifier = Modifier.size(12.dp)
+                    modifier = Modifier.size(Dimensions.iconSizeSmall)
                 )
             }
         }
@@ -166,7 +167,7 @@ internal fun AnalysisHeaderPreview_Dark_Location() {
 @Composable
 internal fun AnalysisHeaderPreview_DropdownExpanded() {
     SofaAiTheme {
-        Box(modifier = Modifier.padding(bottom = 200.dp)) {
+        Box(modifier = Modifier.padding(bottom = Dimensions.paddingExtraLarge)) {
             Column {
                 ExposedDropdownMenuBox(
                     expanded = true,
@@ -181,7 +182,7 @@ internal fun AnalysisHeaderPreview_DropdownExpanded() {
                         modifier = Modifier
                             .fillMaxWidth()
                             .menuAnchor()
-                            .padding(horizontal = 16.dp)
+                            .padding(horizontal = Dimensions.paddingLarge)
                     )
                     ExposedDropdownMenu(
                         expanded = true,

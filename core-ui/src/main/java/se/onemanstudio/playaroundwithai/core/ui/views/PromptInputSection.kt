@@ -32,10 +32,10 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.input.TextFieldValue
 import androidx.compose.ui.tooling.preview.Preview
-import androidx.compose.ui.unit.dp
 import se.onemanstudio.playaroundwithai.core.data.InputMode
 import se.onemanstudio.playaroundwithai.core.ui.sofa.NeoBrutalIconButton
 import se.onemanstudio.playaroundwithai.core.ui.sofa.neoBrutalism
+import se.onemanstudio.playaroundwithai.core.ui.theme.Dimensions
 import se.onemanstudio.playaroundwithai.core.ui.theme.SofaAiTheme
 
 @Composable
@@ -56,18 +56,18 @@ fun PromptInputSection(
         modifier = Modifier
             .fillMaxWidth()
             .navigationBarsPadding()
-            .padding(vertical = 8.dp),
-        verticalArrangement = Arrangement.spacedBy(8.dp)
+            .padding(vertical = Dimensions.paddingMedium),
+        verticalArrangement = Arrangement.spacedBy(Dimensions.paddingMedium)
     ) {
         if (inputMode == InputMode.TEXT) {
             LazyRow(
                 modifier = Modifier.fillMaxWidth(),
-                contentPadding = PaddingValues(horizontal = 16.dp),
-                horizontalArrangement = Arrangement.spacedBy(8.dp)
+                contentPadding = PaddingValues(horizontal = Dimensions.paddingLarge),
+                horizontalArrangement = Arrangement.spacedBy(Dimensions.paddingMedium)
             ) {
                 items(samplePrompts) { prompt ->
                     SuggestionChip(
-                        border = BorderStroke(1.dp, outlineColor),
+                        border = BorderStroke(Dimensions.borderStrokeSmall, outlineColor),
                         onClick = { onChipClicked(prompt) },
                         label = { Text(prompt) }
                     )
@@ -78,8 +78,8 @@ fun PromptInputSection(
         Row(
             modifier = Modifier
                 .fillMaxWidth()
-                .padding(horizontal = 16.dp),
-            horizontalArrangement = Arrangement.spacedBy(8.dp)
+                .padding(horizontal = Dimensions.paddingLarge),
+            horizontalArrangement = Arrangement.spacedBy(Dimensions.paddingMedium)
         ) {
             ModeButton(
                 text = "Text",
@@ -104,13 +104,13 @@ fun PromptInputSection(
         Row(
             modifier = Modifier
                 .fillMaxWidth()
-                .padding(horizontal = 16.dp),
+                .padding(horizontal = Dimensions.paddingLarge),
             verticalAlignment = Alignment.Top
         ) {
             // Custom TextField
             Box(modifier = Modifier
                 .weight(1f)
-                .padding(horizontal = 8.dp)
+                .padding(horizontal = Dimensions.paddingMedium)
             ) {
                 BasicTextField(
                     value = textState,
@@ -120,10 +120,10 @@ fun PromptInputSection(
                         .neoBrutalism( // Apply modifier here!
                             backgroundColor = MaterialTheme.colorScheme.surface,
                             borderColor = MaterialTheme.colorScheme.onSurface,
-                            shadowOffset = 4.dp,
-                            borderWidth = 2.dp
+                            shadowOffset = Dimensions.neoBrutalCardShadowOffset,
+                            borderWidth = Dimensions.neoBrutalCardStrokeWidth
                         )
-                        .padding(12.dp),
+                        .padding(Dimensions.paddingLarge),
                     textStyle = MaterialTheme.typography.bodyLarge.copy(
                         color = MaterialTheme.colorScheme.onSurface
                     )
@@ -131,13 +131,13 @@ fun PromptInputSection(
             }
 
             if (inputMode != InputMode.TEXT) {
-                Spacer(modifier = Modifier.width(8.dp))
+                Spacer(modifier = Modifier.width(Dimensions.paddingMedium))
 
                 IconButton(
                     onClick = onAttachClicked,
                     modifier = Modifier
-                        .padding(top = 10.dp)
-                        .border(1.dp, outlineColor, MaterialTheme.shapes.small)
+                        .padding(top = Dimensions.paddingMedium)
+                        .border(Dimensions.borderStrokeSmall, outlineColor, MaterialTheme.shapes.small)
                 ) {
                     if (inputMode == InputMode.IMAGE) {
                         Icon(
@@ -178,7 +178,7 @@ private fun ModeButton(
         onClick = onClick,
         modifier = modifier,
         shape = MaterialTheme.shapes.small,
-        border = if (!isSelected) BorderStroke(1.dp, MaterialTheme.colorScheme.outline) else null,
+        border = if (!isSelected) BorderStroke(Dimensions.borderStrokeSmall, MaterialTheme.colorScheme.outline) else null,
         colors = ButtonDefaults.buttonColors(
             containerColor = if (isSelected) MaterialTheme.colorScheme.primary else Color.Transparent,
             contentColor = if (isSelected) MaterialTheme.colorScheme.onPrimary else MaterialTheme.colorScheme.onSurface

@@ -18,7 +18,8 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import se.onemanstudio.playaroundwithai.core.data.local.PromptEntity
+import se.onemanstudio.playaroundwithai.core.data.domain.model.Prompt
+import se.onemanstudio.playaroundwithai.core.ui.theme.Dimensions
 import se.onemanstudio.playaroundwithai.core.ui.theme.SofaAiTheme
 import java.text.SimpleDateFormat
 import java.util.Date
@@ -26,7 +27,7 @@ import java.util.Locale
 
 @Composable
 fun HistoryItemCard(
-    prompt: PromptEntity,
+    prompt: Prompt,
     onClick: (String) -> Unit,
     modifier: Modifier = Modifier,
 ) {
@@ -41,7 +42,7 @@ fun HistoryItemCard(
             .clickable { onClick(prompt.text) }
     ) {
         Column(
-            modifier = Modifier.padding(horizontal = 16.dp, vertical = 12.dp)
+            modifier = Modifier.padding(horizontal = Dimensions.paddingLarge, vertical = Dimensions.paddingLarge)
         ) {
             // Main prompt text
             Text(
@@ -52,7 +53,7 @@ fun HistoryItemCard(
                 overflow = TextOverflow.Ellipsis
             )
 
-            Spacer(Modifier.height(8.dp))
+            Spacer(Modifier.height(Dimensions.paddingMedium))
 
             // Timestamp
             Row(verticalAlignment = Alignment.CenterVertically) {
@@ -79,13 +80,13 @@ fun HistoryItemCard(
 private fun HistoryItemCardPreview_ShortText() {
     SofaAiTheme {
         HistoryItemCard(
-            prompt = PromptEntity(
+            prompt = Prompt(
                 id = 1,
                 text = "What is neo-brutalism?",
                 timestamp = System.currentTimeMillis() - 1000 * 60 * 5 // 5 minutes ago
             ),
             onClick = {},
-            modifier = Modifier.padding(16.dp)
+            modifier = Modifier.padding(Dimensions.paddingLarge)
         )
     }
 }
@@ -95,13 +96,13 @@ private fun HistoryItemCardPreview_ShortText() {
 private fun HistoryItemCardPreview_LongText() {
     SofaAiTheme(darkTheme = true) {
         HistoryItemCard(
-            prompt = PromptEntity(
+            prompt = Prompt(
                 id = 2,
                 text = "Can you please give me a very detailed and long explanation of how Jetpack Compose recomposition works under the hood, including implementation details?",
                 timestamp = System.currentTimeMillis() - 1000 * 60 * 60 * 24 * 3 // 3 days ago
             ),
             onClick = {},
-            modifier = Modifier.padding(16.dp)
+            modifier = Modifier.padding(Dimensions.paddingLarge)
         )
     }
 }
@@ -111,14 +112,14 @@ private fun HistoryItemCardPreview_LongText() {
 private fun HistoryItemCardPreview_Constrained() {
     SofaAiTheme {
         HistoryItemCard(
-            prompt = PromptEntity(
+            prompt = Prompt(
                 id = 3,
                 text = "This is a prompt that should be long enough to wrap or truncate when the width is constrained.",
                 timestamp = System.currentTimeMillis() - 1000 * 60 * 60 // 1 hour ago
             ),
             onClick = {},
             modifier = Modifier
-                .padding(16.dp)
+                .padding(Dimensions.paddingLarge)
                 .width(250.dp) // Simulate a narrow screen
         )
     }

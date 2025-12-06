@@ -24,7 +24,7 @@ import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.Dp
-import androidx.compose.ui.unit.dp
+import se.onemanstudio.playaroundwithai.core.ui.theme.Dimensions
 import se.onemanstudio.playaroundwithai.core.ui.theme.SofaAiTheme
 
 @Composable
@@ -33,15 +33,15 @@ fun NeoBrutalIconButton(
     imageVector: ImageVector,
     contentDescription: String,
     modifier: Modifier = Modifier,
-    size: Dp = 48.dp,
+    size: Dp = Dimensions.iconSizeLarge,
     backgroundColor: Color = MaterialTheme.colorScheme.surface,
     shadowColor: Color = MaterialTheme.colorScheme.onSurface,
 ) {
     val interactionSource = remember { MutableInteractionSource() }
     val isPressed by interactionSource.collectIsPressedAsState()
 
-    val shadowOffset = 4.dp
-    val pressOffset = 2.dp
+    val shadowOffset = Dimensions.paddingSmall
+    val pressOffset = Dimensions.paddingExtraSmall
 
     Box(
         modifier = modifier
@@ -53,7 +53,7 @@ fun NeoBrutalIconButton(
             .neoBrutalism( // Using our custom modifier
                 backgroundColor = backgroundColor,
                 borderColor = shadowColor,
-                borderWidth = 2.dp, // Thinner border for icons
+                borderWidth = Dimensions.neoBrutalCardStrokeWidth,
                 shadowOffset = shadowOffset
             )
             .clickable(
@@ -67,7 +67,7 @@ fun NeoBrutalIconButton(
             imageVector = imageVector,
             contentDescription = contentDescription,
             tint = shadowColor,
-            modifier = Modifier.padding(8.dp)
+            modifier = Modifier.padding(Dimensions.paddingMedium)
         )
     }
 }
@@ -83,8 +83,8 @@ fun NeoBrutalButton(
     val interactionSource = remember { MutableInteractionSource() }
     val isPressed by interactionSource.collectIsPressedAsState()
 
-    val shadowOffset = 8.dp
-    val pressOffset = 4.dp
+    val shadowOffset = Dimensions.paddingMedium
+    val pressOffset = Dimensions.paddingSmall
 
     Box(
         modifier = modifier
@@ -103,7 +103,7 @@ fun NeoBrutalButton(
                 indication = null, // No ripple effect
                 onClick = onClick
             )
-            .padding(horizontal = 24.dp, vertical = 16.dp),
+            .padding(horizontal = Dimensions.paddingLarge, vertical = Dimensions.paddingLarge),
         contentAlignment = Alignment.Center
     ) {
         Text(
@@ -121,9 +121,9 @@ private fun NeoBrutalButtonPreview_Light() {
         Column(
             modifier = Modifier
                 .fillMaxSize()
-                .padding(16.dp),
+                .padding(Dimensions.paddingLarge),
             horizontalAlignment = Alignment.CenterHorizontally,
-            verticalArrangement = Arrangement.spacedBy(16.dp)
+            verticalArrangement = Arrangement.spacedBy(Dimensions.paddingLarge)
         ) {
             NeoBrutalButton(
                 onClick = {},
@@ -152,9 +152,9 @@ private fun NeoBrutalButtonPreview_Dark() {
         Column(
             modifier = Modifier
                 .fillMaxSize()
-                .padding(16.dp),
+                .padding(Dimensions.paddingLarge),
             horizontalAlignment = Alignment.CenterHorizontally,
-            verticalArrangement = Arrangement.spacedBy(16.dp)
+            verticalArrangement = Arrangement.spacedBy(Dimensions.paddingLarge)
         ) {
             NeoBrutalButton(
                 onClick = {},

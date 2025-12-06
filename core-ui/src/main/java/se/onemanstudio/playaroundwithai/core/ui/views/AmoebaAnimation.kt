@@ -23,6 +23,7 @@ import androidx.compose.ui.graphics.drawscope.Stroke
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import kotlinx.coroutines.launch
+import se.onemanstudio.playaroundwithai.core.ui.theme.Dimensions
 import kotlin.math.PI
 import kotlin.math.cos
 import kotlin.math.sin
@@ -108,7 +109,7 @@ fun AmoebaShapeAnimation() {
                 drawPath(
                     path = path,
                     color = color,
-                    style = Stroke(width = 4.dp.toPx())
+                    style = Stroke(width = Dimensions.paddingSmall.toPx())
                 )
             }
         }

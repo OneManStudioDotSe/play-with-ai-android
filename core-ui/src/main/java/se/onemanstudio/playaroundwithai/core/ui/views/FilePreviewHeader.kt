@@ -20,7 +20,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
-import androidx.compose.ui.unit.dp
+import se.onemanstudio.playaroundwithai.core.ui.theme.Dimensions
 import se.onemanstudio.playaroundwithai.core.ui.theme.SofaAiTheme
 
 @Composable
@@ -33,12 +33,12 @@ fun FilePreviewHeader(
     Surface(
         modifier = Modifier
             .fillMaxWidth()
-            .padding(horizontal = 16.dp, vertical = 8.dp),
+            .padding(horizontal = Dimensions.paddingLarge, vertical = Dimensions.paddingMedium),
         shape = MaterialTheme.shapes.medium,
-        border = BorderStroke(1.dp, MaterialTheme.colorScheme.outline)
+        border = BorderStroke(Dimensions.borderStrokeSmall, MaterialTheme.colorScheme.outline)
     ) {
         Row(
-            modifier = Modifier.padding(horizontal = 12.dp, vertical = 8.dp),
+            modifier = Modifier.padding(horizontal = Dimensions.paddingLarge, vertical = Dimensions.paddingMedium),
             verticalAlignment = Alignment.CenterVertically
         ) {
             Icon(
@@ -46,7 +46,7 @@ fun FilePreviewHeader(
                 contentDescription = "File Icon",
                 tint = MaterialTheme.colorScheme.primary
             )
-            Spacer(modifier = Modifier.width(8.dp))
+            Spacer(modifier = Modifier.width(Dimensions.paddingMedium))
             Text(
                 text = fileName,
                 style = MaterialTheme.typography.bodyMedium,

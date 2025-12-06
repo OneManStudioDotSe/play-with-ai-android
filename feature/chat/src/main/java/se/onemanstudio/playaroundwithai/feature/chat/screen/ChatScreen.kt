@@ -39,20 +39,20 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalSoftwareKeyboardController
 import androidx.compose.ui.text.input.TextFieldValue
-import androidx.compose.ui.unit.dp
 import se.onemanstudio.playaroundwithai.core.data.AnalysisType
 import se.onemanstudio.playaroundwithai.core.data.InputMode
-import se.onemanstudio.playaroundwithai.feature.chat.Attachment
-import se.onemanstudio.playaroundwithai.feature.chat.ChatUiState
-import se.onemanstudio.playaroundwithai.feature.chat.ChatViewModel
-import se.onemanstudio.playaroundwithai.core.ui.views.AmoebaShapeAnimation
-import se.onemanstudio.playaroundwithai.core.ui.views.AnalysisHeader
-import se.onemanstudio.playaroundwithai.core.ui.views.FilePreviewHeader
 import se.onemanstudio.playaroundwithai.core.ui.sofa.HistoryItemCard
 import se.onemanstudio.playaroundwithai.core.ui.sofa.NeoBrutalCard
 import se.onemanstudio.playaroundwithai.core.ui.sofa.NeoBrutalIconButton
 import se.onemanstudio.playaroundwithai.core.ui.sofa.NeoBrutalTopAppBar
+import se.onemanstudio.playaroundwithai.core.ui.theme.Dimensions
+import se.onemanstudio.playaroundwithai.core.ui.views.AmoebaShapeAnimation
+import se.onemanstudio.playaroundwithai.core.ui.views.AnalysisHeader
+import se.onemanstudio.playaroundwithai.core.ui.views.FilePreviewHeader
 import se.onemanstudio.playaroundwithai.core.ui.views.PromptInputSection
+import se.onemanstudio.playaroundwithai.feature.chat.Attachment
+import se.onemanstudio.playaroundwithai.feature.chat.ChatUiState
+import se.onemanstudio.playaroundwithai.feature.chat.ChatViewModel
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -85,7 +85,7 @@ fun ChatScreen(viewModel: ChatViewModel) {
     if (isSheetOpen) {
         ModalBottomSheet(
             onDismissRequest = { viewModel.closeHistorySheet() },
-            shape = RoundedCornerShape(0.dp),
+            shape = RoundedCornerShape(Dimensions.paddingMedium),
             containerColor = Color.Transparent,
         ) {
             // Our own custom-styled sheet content
@@ -93,16 +93,16 @@ fun ChatScreen(viewModel: ChatViewModel) {
                 LazyColumn(
                     modifier = Modifier
                         .fillMaxWidth()
-                        .padding(horizontal = 16.dp),
-                    contentPadding = PaddingValues(top = 16.dp, bottom = 32.dp),
-                    verticalArrangement = Arrangement.spacedBy(16.dp)
+                        .padding(horizontal = Dimensions.paddingLarge),
+                    contentPadding = PaddingValues(top = Dimensions.paddingLarge, bottom = Dimensions.paddingExtraLarge),
+                    verticalArrangement = Arrangement.spacedBy(Dimensions.paddingLarge)
                 ) {
                     item {
                         Text(
                             text = "Prompt history",
                             style = MaterialTheme.typography.headlineLarge,
                             color = MaterialTheme.colorScheme.onBackground,
-                            modifier = Modifier.padding(bottom = 8.dp)
+                            modifier = Modifier.padding(bottom = Dimensions.paddingMedium)
                         )
                     }
                     items(history) { prompt ->
@@ -139,7 +139,7 @@ fun ChatScreen(viewModel: ChatViewModel) {
         },
         bottomBar = {
             NeoBrutalCard(modifier = Modifier.fillMaxWidth()) {
-                Column(modifier = Modifier.padding(top = 8.dp)) {
+                Column(modifier = Modifier.padding(top = Dimensions.paddingMedium)) {
                     when (inputMode) {
                         InputMode.IMAGE -> AnalysisHeader(
                             selectedImageUri = selectedImageUri,
@@ -205,7 +205,7 @@ fun ChatScreen(viewModel: ChatViewModel) {
                 is ChatUiState.Loading -> CircularProgressIndicator(
                     // Style the indicator
                     color = MaterialTheme.colorScheme.primary,
-                    strokeWidth = 4.dp
+                    strokeWidth = Dimensions.paddingSmall
                 )
 
                 else -> {
@@ -213,12 +213,12 @@ fun ChatScreen(viewModel: ChatViewModel) {
                     NeoBrutalCard(
                         modifier = Modifier
                             .fillMaxSize()
-                            .padding(16.dp)
+                            .padding(Dimensions.paddingLarge)
                     ) {
                         Column(
                             modifier = Modifier
                                 .verticalScroll(rememberScrollState())
-                                .padding(16.dp)
+                                .padding(Dimensions.paddingLarge)
                         ) {
                             if (state is ChatUiState.Success) {
                                 //TypewriterText(text = state.outputText)
@@ -236,11 +236,11 @@ fun ChatScreen(viewModel: ChatViewModel) {
                                 NeoBrutalCard(
                                     modifier = Modifier
                                         .fillMaxSize()
-                                        .padding(16.dp),
+                                        .padding(Dimensions.paddingLarge),
                                 ) {
                                     Column(
                                         modifier = Modifier
-                                            .padding(16.dp),
+                                            .padding(Dimensions.paddingLarge),
                                         horizontalAlignment = Alignment.CenterHorizontally
                                     ) {
                                         Text(

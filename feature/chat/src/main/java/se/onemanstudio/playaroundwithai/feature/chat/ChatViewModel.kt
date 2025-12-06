@@ -14,7 +14,7 @@ import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
-import se.onemanstudio.playaroundwithai.core.data.local.PromptEntity
+import se.onemanstudio.playaroundwithai.core.data.domain.model.Prompt
 import se.onemanstudio.playaroundwithai.core.data.remote.gemini.GeminiRepository
 import java.io.BufferedReader
 import java.io.InputStreamReader
@@ -34,7 +34,7 @@ class ChatViewModel @Inject constructor(
     val isSheetOpen = _isSheetOpen.asStateFlow()
 
     // State for the prompt history
-    val promptHistory: StateFlow<List<PromptEntity>> = repository.getPromptHistory()
+    val promptHistory: StateFlow<List<Prompt>> = repository.getPromptHistory()
         .stateIn(
             scope = viewModelScope,
             started = SharingStarted.WhileSubscribed(5000),

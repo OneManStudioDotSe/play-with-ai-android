@@ -8,13 +8,13 @@ import androidx.compose.ui.draw.drawBehind
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.drawscope.drawIntoCanvas
 import androidx.compose.ui.unit.Dp
-import androidx.compose.ui.unit.dp
+import se.onemanstudio.playaroundwithai.core.ui.theme.Dimensions
 
 fun Modifier.neoBrutalism(
     backgroundColor: Color,
     borderColor: Color = Color.Black,
-    borderWidth: Dp = 4.dp,
-    shadowOffset: Dp = 8.dp
+    borderWidth: Dp = Dimensions.neoBrutalCardStrokeWidth,
+    shadowOffset: Dp = Dimensions.neoBrutalCardShadowOffset
 ): Modifier = this.then(
     drawBehind {
         drawIntoCanvas {

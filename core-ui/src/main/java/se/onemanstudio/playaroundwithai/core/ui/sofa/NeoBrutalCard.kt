@@ -11,7 +11,7 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
-import androidx.compose.ui.unit.dp
+import se.onemanstudio.playaroundwithai.core.ui.theme.Dimensions
 import se.onemanstudio.playaroundwithai.core.ui.theme.SofaAiTheme
 
 @Composable
@@ -20,7 +20,7 @@ fun NeoBrutalCard(modifier: Modifier = Modifier, content: @Composable () -> Unit
         modifier = modifier.neoBrutalism(
             backgroundColor = MaterialTheme.colorScheme.surface,
             borderColor = MaterialTheme.colorScheme.onSurface,
-            shadowOffset = 10.dp
+            shadowOffset = Dimensions.paddingMedium
         )
     ) {
         content()
@@ -34,15 +34,15 @@ private fun NeoBrutalCardPreview_Light() {
         NeoBrutalCard(
             modifier = Modifier
                 .fillMaxWidth()
-                .padding(16.dp)
+                .padding(Dimensions.paddingLarge)
         ) {
-            Column(modifier = Modifier.padding(16.dp)) {
+            Column(modifier = Modifier.padding(Dimensions.paddingLarge)) {
                 Text(
                     text = "Card Title",
                     style = MaterialTheme.typography.titleLarge,
                     color = MaterialTheme.colorScheme.onSurface
                 )
-                Spacer(Modifier.height(8.dp))
+                Spacer(Modifier.height(Dimensions.paddingMedium))
                 Text(
                     text = "This is a card. It uses the neoBrutalism modifier to get a background, border, and shadow.",
                     style = MaterialTheme.typography.bodyLarge,
@@ -60,15 +60,15 @@ private fun NeoBrutalCardPreview_Dark() {
         NeoBrutalCard(
             modifier = Modifier
                 .fillMaxWidth()
-                .padding(16.dp)
+                .padding(Dimensions.paddingLarge)
         ) {
-            Column(modifier = Modifier.padding(16.dp)) {
+            Column(modifier = Modifier.padding(Dimensions.paddingLarge)) {
                 Text(
                     text = "Card Title",
                     style = MaterialTheme.typography.titleLarge,
                     color = MaterialTheme.colorScheme.onSurface
                 )
-                Spacer(Modifier.height(8.dp))
+                Spacer(Modifier.height(Dimensions.paddingMedium))
                 Text(
                     text = "This is a card. It uses the neoBrutalism modifier to get a background, border, and shadow.",
                     style = MaterialTheme.typography.bodyLarge,
