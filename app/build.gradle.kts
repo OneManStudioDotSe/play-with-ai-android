@@ -1,4 +1,6 @@
 import org.jetbrains.kotlin.gradle.dsl.JvmTarget
+import java.util.Properties
+import java.io.FileInputStream
 
 plugins {
     alias(libs.plugins.android.application)
@@ -6,6 +8,17 @@ plugins {
     alias(libs.plugins.kotlin.compose)
     alias(libs.plugins.hilt)
     id("com.google.devtools.ksp")
+}
+
+// Read the API key from local.properties
+val localProperties = Properties()
+val localPropertiesFile = rootProject.file("local.properties")
+if (localPropertiesFile.exists()) {
+    localProperties.load(FileInputStream(localPropertiesFile))
+} else {
+    // Create a placeholder for CI environments
+    localProperties.setProperty("GEMINI_API_KEY_DEBUG", "")
+    localProperties.setProperty("GEMINI_API_KEY_RELEASE", "")
 }
 
 android {
@@ -25,11 +38,15 @@ android {
         debug {
             isMinifyEnabled = false
             isDebuggable = true
+            buildConfigField("String", "GEMINI_API_KEY", "\"${localProperties.getProperty("GEMINI_API_KEY_DEBUG")}\"")
+            buildConfigField("String", "BASE_URL", "\"https://generativelanguage.googleapis.com/\"")
         }
 
         release {
             isMinifyEnabled = false
             proguardFiles(getDefaultProguardFile("proguard-android-optimize.txt"), "proguard-rules.pro")
+            buildConfigField("String", "GEMINI_API_KEY", "\"${localProperties.getProperty("GEMINI_API_KEY_RELEASE")}\"")
+            buildConfigField("String", "BASE_URL", "\"https://generativelanguage.googleapis.com/\"")
         }
     }
 
@@ -41,7 +58,7 @@ android {
 
     buildFeatures {
         compose = true
-        //buildConfig = true // Enable BuildConfig generation
+        buildConfig = true
     }
 
     composeOptions {
@@ -65,6 +82,7 @@ android {
 }
 
 dependencies {
+    implementation(project(":core-data"))
     implementation(project(":core-theme"))
     implementation(project(":core-ui"))
     implementation(project(":feature:chat"))
