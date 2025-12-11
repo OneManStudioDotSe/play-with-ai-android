@@ -43,6 +43,13 @@ complexity:
     ignoreAnnotated: ['Composable']
     functionThreshold: 12 # Increases default threshold for non-composables if needed (default is 6)
 
+  CyclomaticComplexMethod:
+    active: true
+    threshold: 20
+    ignoreSingleWhenExpression: true
+    ignoreAnnotated:
+      - "Composable" # Recommended: Don't count complexity for UI components
+
   LongMethod:
     # UI trees can get deep and long, which is normal for Compose.
     ignoreAnnotated: ['Composable']

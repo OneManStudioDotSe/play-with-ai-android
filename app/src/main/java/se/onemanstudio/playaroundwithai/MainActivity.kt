@@ -28,7 +28,7 @@ import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
 import dagger.hilt.android.AndroidEntryPoint
 import se.onemanstudio.playaroundwithai.core.ui.theme.SofaAiTheme
-import se.onemanstudio.playaroundwithai.feature.chat.screen.ChatScreen
+import se.onemanstudio.playaroundwithai.feature.chat.ChatScreen
 import se.onemanstudio.playaroundwithai.ui.screens.unused.DesignDemoScreen
 import se.onemanstudio.playaroundwithai.ui.screens.unused.M3ComponentsShowcaseScreen
 

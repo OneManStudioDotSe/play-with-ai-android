@@ -16,6 +16,7 @@ import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import se.onemanstudio.playaroundwithai.core.data.domain.model.Prompt
 import se.onemanstudio.playaroundwithai.core.data.remote.gemini.GeminiRepository
+import se.onemanstudio.playaroundwithai.feature.chat.models.Attachment
 import timber.log.Timber
 import java.io.BufferedReader
 import java.io.FileNotFoundException
@@ -102,20 +103,10 @@ class ChatViewModel @Inject constructor(
         _isSheetOpen.value = false
     }
 
-    // Changed to return Result<String> so the caller knows IF it failed and WHY
     private fun extractFileContent(uri: Uri): Result<String> {
         return try {
-            val stringBuilder = StringBuilder()
-            application.contentResolver.openInputStream(uri)?.use { inputStream ->
-                BufferedReader(InputStreamReader(inputStream)).use { reader ->
-                    var line: String? = reader.readLine()
-                    while (line != null) {
-                        stringBuilder.append(line).append("\n")
-                        line = reader.readLine()
-                    }
-                }
-            }
-            Result.success(stringBuilder.toString())
+            val content = readTextFromUri(uri)
+            Result.success(content)
         } catch (e: FileNotFoundException) {
             Result.failure(e)
         } catch (e: IOException) {
@@ -123,6 +114,16 @@ class ChatViewModel @Inject constructor(
         } catch (e: SecurityException) {
             Result.failure(e)
         }
+    }
+
+    // Helper function that throws exceptions naturally
+    @Throws(IOException::class, SecurityException::class)
+    private fun readTextFromUri(uri: Uri): String {
+        return application.contentResolver.openInputStream(uri)?.use { inputStream ->
+            inputStream.bufferedReader().use { reader ->
+                reader.readText()
+            }
+        } ?: throw FileNotFoundException("Could not open input stream for URI: $uri")
     }
 
     private fun Uri.toBitmap(): Bitmap? {
