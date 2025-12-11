@@ -1,6 +1,8 @@
 import com.github.benmanes.gradle.versions.updates.DependencyUpdatesTask
 
-apply { plugin("com.github.ben-manes.versions") }
+apply {
+    plugin("com.github.ben-manes.versions")
+}
 
 //Check versions of dependencies: ./gradlew dependencyUpdates -Drevision=milestone -DoutputFormatter=json
 //Force-update dependencies:      ./gradlew clean build --refresh-dependencies
@@ -15,6 +17,7 @@ plugins {
     alias(libs.plugins.hilt) apply false
     alias(libs.plugins.detekt) apply false
     alias(libs.plugins.ksp) apply false
+    alias(libs.plugins.ktlint) apply false
 }
 
 
@@ -34,4 +37,5 @@ tasks.withType<DependencyUpdatesTask> {
 
 allprojects {
     apply(plugin = "io.gitlab.arturbosch.detekt")
+    apply(plugin = "org.jlleitschuh.gradle.ktlint")
 }

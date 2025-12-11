@@ -1,0 +1,57 @@
+name: Android CI
+
+# Trigger the workflow on push to main/develop branches and any PR
+on:
+  push:
+    branches: [ "main", "develop" ]
+  pull_request:
+    branches: [ "main", "develop" ]
+
+jobs:
+  build_and_test:
+    name: Build & Verify
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v4
+
+      # Set up JDK 17 (Required for Android Gradle Plugin 8.0+)
+      - name: Set up JDK 17
+        uses: actions/setup-java@v4
+        with:
+          java-version: '17'
+          distribution: 'temurin'
+
+      # Set up Gradle with caching to speed up subsequent builds
+      - name: Setup Gradle
+        uses: gradle/actions/setup-gradle@v3
+
+      # 1. Check Code Style (Detekt)
+      # This uses the detekt plugin you already have in libs.versions.toml
+      - name: Run Detekt
+        run: ./gradlew detekt
+
+      - name: Run Ktlint
+        run: ./gradlew ktlintCheck
+
+      # 2. Check Android Best Practices (Lint)
+      - name: Run Android Lint
+        run: ./gradlew lintDebug
+
+      # 3. Build the App (Ensures no compilation errors)
+      - name: Build Debug APK
+        run: ./gradlew assembleDebug
+
+      # 4. Run Unit Tests
+      # This runs tests across all modules (:app, :core:data, :feature:chat, etc.)
+      - name: Run Unit Tests
+        run: ./gradlew testDebugUnitTest
+
+      # (Optional) Upload Test Reports if failure occurs
+      - name: Upload Test Reports
+        if: failure()
+        uses: actions/upload-artifact@v4
+        with:
+          name: test-reports
+          path: '**/build/reports/tests/'
