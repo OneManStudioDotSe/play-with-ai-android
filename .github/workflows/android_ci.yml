@@ -2,6 +2,7 @@ name: Android CI
 
 # Trigger the workflow on push to main/develop branches and any PR
 on:
+  workflow_dispatch:
   push:
     branches: [ "main", "develop" ]
   pull_request:
