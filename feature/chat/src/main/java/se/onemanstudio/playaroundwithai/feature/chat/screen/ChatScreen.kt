@@ -6,13 +6,17 @@ import android.provider.OpenableColumns
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.PickVisualMediaRequest
 import androidx.activity.result.contract.ActivityResultContracts
+import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.rememberScrollState
@@ -21,8 +25,14 @@ import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Clear
 import androidx.compose.material.icons.filled.History
+import androidx.compose.material.icons.rounded.BrokenImage
+import androidx.compose.material.icons.rounded.Description
+import androidx.compose.material.icons.rounded.Lock
+import androidx.compose.material.icons.rounded.Warning
+import androidx.compose.material.icons.rounded.WifiOff
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.ModalBottomSheet
 import androidx.compose.material3.Scaffold
@@ -36,12 +46,13 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalSoftwareKeyboardController
 import androidx.compose.ui.text.input.TextFieldValue
+import androidx.compose.ui.text.style.TextAlign
 import se.onemanstudio.playaroundwithai.core.data.AnalysisType
 import se.onemanstudio.playaroundwithai.core.data.InputMode
-import se.onemanstudio.playaroundwithai.core.ui.views.HistoryItemCard
 import se.onemanstudio.playaroundwithai.core.ui.sofa.NeoBrutalCard
 import se.onemanstudio.playaroundwithai.core.ui.sofa.NeoBrutalIconButton
 import se.onemanstudio.playaroundwithai.core.ui.sofa.NeoBrutalTopAppBar
@@ -49,8 +60,10 @@ import se.onemanstudio.playaroundwithai.core.ui.theme.Dimensions
 import se.onemanstudio.playaroundwithai.core.ui.views.AmoebaShapeAnimation
 import se.onemanstudio.playaroundwithai.core.ui.views.AnalysisHeader
 import se.onemanstudio.playaroundwithai.core.ui.views.FilePreviewHeader
+import se.onemanstudio.playaroundwithai.core.ui.views.HistoryItemCard
 import se.onemanstudio.playaroundwithai.core.ui.views.PromptInputSection
 import se.onemanstudio.playaroundwithai.feature.chat.Attachment
+import se.onemanstudio.playaroundwithai.feature.chat.ChatError
 import se.onemanstudio.playaroundwithai.feature.chat.ChatUiState
 import se.onemanstudio.playaroundwithai.feature.chat.ChatViewModel
 
@@ -106,7 +119,6 @@ fun ChatScreen(viewModel: ChatViewModel) {
                         )
                     }
                     items(history) { prompt ->
-                        // Use our new HistoryItemCard
                         HistoryItemCard(
                             prompt = prompt,
                             onClick = { selectedText ->
@@ -122,17 +134,16 @@ fun ChatScreen(viewModel: ChatViewModel) {
     }
 
     Scaffold(
-        // Use the background color from our theme
         containerColor = MaterialTheme.colorScheme.background,
         topBar = {
             NeoBrutalTopAppBar(
                 title = "Let's talk",
                 actions = {
                     NeoBrutalIconButton(
-                        onClick = { viewModel.openHistorySheet() },
                         imageVector = Icons.Default.History,
                         contentDescription = "Prompt History",
-                        backgroundColor = MaterialTheme.colorScheme.tertiary // Use an accent color
+                        backgroundColor = MaterialTheme.colorScheme.tertiary,
+                        onClick = { viewModel.openHistorySheet() },
                     )
                 }
             )
@@ -201,71 +212,110 @@ fun ChatScreen(viewModel: ChatViewModel) {
         ) {
             when (val state = uiState) {
                 is ChatUiState.Initial -> AmoebaShapeAnimation()
-                is ChatUiState.Loading -> CircularProgressIndicator(
-                    // Style the indicator
-                    color = MaterialTheme.colorScheme.primary,
-                    strokeWidth = Dimensions.paddingSmall
-                )
-
-                else -> {
-                    // Display the result in a NeoBrutalCard
-                    NeoBrutalCard(
-                        modifier = Modifier
-                            .fillMaxSize()
-                            .padding(Dimensions.paddingLarge)
-                    ) {
-                        Column(
-                            modifier = Modifier
-                                .verticalScroll(rememberScrollState())
-                                .padding(Dimensions.paddingLarge)
-                        ) {
-                            if (state is ChatUiState.Success) {
-                                //TypewriterText(text = state.outputText)
-                                Text(
-                                    text = state.outputText,
-                                    style = MaterialTheme.typography.bodyLarge,
-                                    color = MaterialTheme.colorScheme.onSurface
-                                )
-                                NeoBrutalIconButton(
-                                    onClick = { viewModel.clearResponse() },
-                                    imageVector = Icons.Default.Clear,
-                                    contentDescription = "Clear response"
-                                )
-                            } else if (state is ChatUiState.Error) {
-                                NeoBrutalCard(
-                                    modifier = Modifier
-                                        .fillMaxSize()
-                                        .padding(Dimensions.paddingLarge),
-                                ) {
-                                    Column(
-                                        modifier = Modifier
-                                            .padding(Dimensions.paddingLarge),
-                                        horizontalAlignment = Alignment.CenterHorizontally
-                                    ) {
-                                        Text(
-                                            text = state.errorMessage,
-                                            color = MaterialTheme.colorScheme.error,
-                                            style = MaterialTheme.typography.bodyLarge,
-                                        )
-                                        NeoBrutalIconButton(
-                                            onClick = { viewModel.clearResponse() },
-                                            imageVector = Icons.Default.Clear,
-                                            contentDescription = "Clear response"
-                                        )
-                                    }
-                                }
-                            }
-                        }
-                    }
-                }
+                is ChatUiState.Loading -> CircularProgressIndicator()
+                is ChatUiState.Success -> ContentState(state, onClearResponse = { viewModel.clearResponse() })
+                is ChatUiState.Error -> ErrorState(state, onClearResponse = { viewModel.clearResponse() })
             }
         }
     }
 }
 
+@Composable
+private fun ContentState(
+    state: ChatUiState.Success,
+    onClearResponse: () -> Unit,
+) {
+    NeoBrutalCard(
+        modifier = Modifier
+            .fillMaxSize()
+            .padding(Dimensions.paddingLarge)
+    ) {
+        Column(
+            modifier = Modifier
+                .verticalScroll(rememberScrollState())
+                .padding(Dimensions.paddingLarge)
+        ) {
+            Text(
+                text = state.outputText,
+                style = MaterialTheme.typography.bodyLarge,
+                color = MaterialTheme.colorScheme.onSurface
+            )
+            Spacer(modifier = Modifier.height(Dimensions.paddingLarge))
+            NeoBrutalIconButton(
+                onClick = { onClearResponse() },
+                imageVector = Icons.Default.Clear,
+                contentDescription = "Clear response"
+            )
+        }
+    }
+}
+
+@Composable
+private fun ErrorState(
+    state: ChatUiState.Error,
+    onClearResponse: () -> Unit,
+) {
+    // Extract custom message and icon based on error type
+    val (errorMsg, errorIcon) = getErrorMessageAndIcon(state.error)
+
+    Box(
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(Dimensions.paddingLarge)
+            .background(
+                color = MaterialTheme.colorScheme.errorContainer,
+                shape = RoundedCornerShape(Dimensions.paddingMedium)
+            )
+            .padding(Dimensions.paddingLarge),
+        contentAlignment = Alignment.Center
+    ) {
+        Column(
+            horizontalAlignment = Alignment.CenterHorizontally,
+            verticalArrangement = Arrangement.Center
+        ) {
+            Icon(
+                imageVector = errorIcon,
+                contentDescription = "Error Icon",
+                tint = MaterialTheme.colorScheme.error,
+                modifier = Modifier.size(Dimensions.paddingExtraLarge)
+            )
+            Spacer(modifier = Modifier.height(Dimensions.paddingMedium))
+            Text(
+                text = "Oops!",
+                style = MaterialTheme.typography.titleMedium,
+                color = MaterialTheme.colorScheme.onErrorContainer
+            )
+            Spacer(modifier = Modifier.height(Dimensions.paddingSmall))
+            Text(
+                text = errorMsg,
+                style = MaterialTheme.typography.bodyMedium,
+                color = MaterialTheme.colorScheme.onErrorContainer,
+                textAlign = TextAlign.Center
+            )
+            Spacer(modifier = Modifier.height(Dimensions.paddingLarge))
+            NeoBrutalIconButton(
+                onClick = { onClearResponse() },
+                imageVector = Icons.Default.Clear,
+                contentDescription = "Dismiss error",
+                backgroundColor = MaterialTheme.colorScheme.error
+            )
+        }
+    }
+}
+
+// Helper to map ChatError to UI resources
+private fun getErrorMessageAndIcon(error: ChatError): Pair<String, ImageVector> {
+    return when (error) {
+        is ChatError.Network -> "No internet connection. Please check your network." to Icons.Rounded.WifiOff
+        is ChatError.Permission -> "I don't have permission to access that file." to Icons.Rounded.Lock
+        is ChatError.FileNotFound -> "I couldn't find the selected file." to Icons.Rounded.BrokenImage
+        is ChatError.FileRead -> "I couldn't read the file content." to Icons.Rounded.Description
+        is ChatError.Unknown -> (error.message ?: "An unknown error occurred.") to Icons.Rounded.Warning
+    }
+}
+
 fun getFileName(context: Context, uri: Uri): String? {
     var fileName: String? = null
-    // Use a content resolver to query the file name from the URI
     val cursor = context.contentResolver.query(uri, null, null, null, null)
     cursor?.use {
         if (it.moveToFirst()) {

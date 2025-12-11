@@ -88,6 +88,8 @@ dependencies {
 
     implementation(libs.okhttp.logging.interceptor)
 
+    implementation(libs.timber)
+
     // Hilt
     implementation(libs.hilt.android)
     implementation(libs.hilt.navigation.compose)

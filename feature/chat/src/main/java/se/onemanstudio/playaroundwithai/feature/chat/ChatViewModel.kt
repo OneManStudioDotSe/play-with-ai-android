@@ -16,7 +16,10 @@ import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import se.onemanstudio.playaroundwithai.core.data.domain.model.Prompt
 import se.onemanstudio.playaroundwithai.core.data.remote.gemini.GeminiRepository
+import timber.log.Timber
 import java.io.BufferedReader
+import java.io.FileNotFoundException
+import java.io.IOException
 import java.io.InputStreamReader
 import javax.inject.Inject
 
@@ -29,11 +32,9 @@ class ChatViewModel @Inject constructor(
     private val _uiState = MutableStateFlow<ChatUiState>(ChatUiState.Initial)
     val uiState = _uiState.asStateFlow()
 
-    // State for the bottom sheet visibility
     private val _isSheetOpen = MutableStateFlow(false)
     val isSheetOpen = _isSheetOpen.asStateFlow()
 
-    // State for the prompt history
     val promptHistory: StateFlow<List<Prompt>> = repository.getPromptHistory()
         .stateIn(
             scope = viewModelScope,
@@ -45,10 +46,27 @@ class ChatViewModel @Inject constructor(
         _uiState.update { ChatUiState.Loading }
 
         viewModelScope.launch {
+            // 1. Prepare Inputs
             val imageBitmap = (attachment as? Attachment.Image)?.uri?.toBitmap()
-            val fileText = (attachment as? Attachment.Document)?.uri?.let { extractTextFromFile(it) }
             val analysisType = (attachment as? Attachment.Image)?.analysisType
 
+            // 2. Try to read file if it exists
+            val fileResult = (attachment as? Attachment.Document)?.uri?.let { extractFileContent(it) }
+
+            // 3. Fail immediately if file reading failed
+            if (fileResult != null && fileResult.isFailure) {
+                val error = when (val e = fileResult.exceptionOrNull()) {
+                    is FileNotFoundException -> ChatError.FileNotFound
+                    is SecurityException -> ChatError.Permission
+                    else -> ChatError.FileRead
+                }
+                _uiState.update { ChatUiState.Error(error) }
+                return@launch
+            }
+
+            val fileText = fileResult?.getOrNull()
+
+            // 4. Proceed with API call
             repository.savePrompt(prompt)
 
             repository.generateContent(
@@ -62,9 +80,12 @@ class ChatViewModel @Inject constructor(
                     ChatUiState.Success(text)
                 }
             }.onFailure { exception ->
-                _uiState.update {
-                    ChatUiState.Error(exception.localizedMessage ?: "An unknown error occurred")
+                val error = when (exception) {
+                    is IOException -> ChatError.Network
+                    is SecurityException -> ChatError.Permission
+                    else -> ChatError.Unknown(exception.localizedMessage)
                 }
+                _uiState.update { ChatUiState.Error(error) }
             }
         }
     }
@@ -81,10 +102,10 @@ class ChatViewModel @Inject constructor(
         _isSheetOpen.value = false
     }
 
-    // Helper function to read a URI's content into a string
-    private fun extractTextFromFile(uri: Uri): String {
-        val stringBuilder = StringBuilder()
-        try {
+    // Changed to return Result<String> so the caller knows IF it failed and WHY
+    private fun extractFileContent(uri: Uri): Result<String> {
+        return try {
+            val stringBuilder = StringBuilder()
             application.contentResolver.openInputStream(uri)?.use { inputStream ->
                 BufferedReader(InputStreamReader(inputStream)).use { reader ->
                     var line: String? = reader.readLine()
@@ -94,17 +115,24 @@ class ChatViewModel @Inject constructor(
                     }
                 }
             }
-        } catch (e: Exception) {
-            return "Error reading file content."
+            Result.success(stringBuilder.toString())
+        } catch (e: FileNotFoundException) {
+            Result.failure(e)
+        } catch (e: IOException) {
+            Result.failure(e)
+        } catch (e: SecurityException) {
+            Result.failure(e)
         }
-        return stringBuilder.toString()
     }
 
-    // Helper to convert Uri to Bitmap
     private fun Uri.toBitmap(): Bitmap? {
         return try {
             ImageDecoder.decodeBitmap(ImageDecoder.createSource(application.contentResolver, this))
-        } catch (e: Exception) {
+        } catch (e: IOException) {
+            Timber.d("Error decoding image: ${e.message}")
+            null
+        } catch (e: SecurityException) {
+            Timber.d("Security exception decoding image: ${e.message}")
             null
         }
     }
