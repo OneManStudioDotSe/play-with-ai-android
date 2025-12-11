@@ -79,8 +79,8 @@ It utilizes Room for storing data locally on the device, for the chat history.
 
 
 ### Implement a scalable design system
-[ ] Create a custom theme in a `:core:theme` module
-[ ] Build a library of custom Composables for your app
+[x] Create a custom theme in a `:core:theme` module
+[x] Build a library of custom Composables for your app
 [ ] Implement a dark theme and consider dynamic theming
 
 
@@ -102,5 +102,5 @@ It utilizes Room for storing data locally on the device, for the chat history.
 
  
 ### Automate with CI/CD and support static analysis
-[ ] Set up a CI/CD pipeline using GitHub Actions.
-[ ] Static Analysis: Integrate `ktlint` and `detekt`.
+[x] Set up a CI/CD pipeline using GitHub Actions.
+[x] Static Analysis: Integrate `ktlint` and `detekt`.

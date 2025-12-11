@@ -21,8 +21,6 @@ import androidx.compose.material.icons.filled.AddAPhoto
 import androidx.compose.material.icons.filled.UploadFile
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
-import androidx.compose.material3.Icon
-import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.SuggestionChip
 import androidx.compose.material3.Text
@@ -133,27 +131,28 @@ fun PromptInputSection(
             if (inputMode != InputMode.TEXT) {
                 Spacer(modifier = Modifier.width(Dimensions.paddingMedium))
 
-                IconButton(
-                    onClick = onAttachClicked,
-                    modifier = Modifier
-                        .padding(top = Dimensions.paddingMedium)
-                        .border(Dimensions.borderStrokeSmall, outlineColor, MaterialTheme.shapes.small)
-                ) {
-                    if (inputMode == InputMode.IMAGE) {
-                        Icon(
-                            imageVector = Icons.Default.AddAPhoto,
-                            contentDescription = "Attach photo",
-                            tint = outlineColor
-                        )
-                    }
+                if (inputMode == InputMode.IMAGE) {
+                    NeoBrutalIconButton(
+                        modifier = Modifier
+                            .padding(end = Dimensions.paddingMedium)
+                            .border(Dimensions.borderStrokeSmall, outlineColor, MaterialTheme.shapes.small),
+                        onClick = onAttachClicked,
+                        imageVector = Icons.Default.AddAPhoto,
+                        contentDescription = "Attach photo",
+                        backgroundColor = MaterialTheme.colorScheme.secondary
+                    )
+                }
 
-                    if (inputMode == InputMode.DOCUMENT) {
-                        Icon(
-                            imageVector = Icons.Default.UploadFile,
-                            contentDescription = "Attach file",
-                            tint = outlineColor
-                        )
-                    }
+                if (inputMode == InputMode.DOCUMENT) {
+                    NeoBrutalIconButton(
+                        modifier = Modifier
+                            .padding(end = Dimensions.paddingMedium)
+                            .border(Dimensions.borderStrokeSmall, outlineColor, MaterialTheme.shapes.small),
+                        onClick = onAttachClicked,
+                        imageVector = Icons.Default.UploadFile,
+                        contentDescription = "Attach file",
+                        backgroundColor = MaterialTheme.colorScheme.tertiary
+                    )
                 }
             }
 
