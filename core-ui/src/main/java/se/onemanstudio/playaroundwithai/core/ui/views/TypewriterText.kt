@@ -13,7 +13,7 @@ import androidx.compose.ui.tooling.preview.Preview
 import kotlinx.coroutines.delay
 import se.onemanstudio.playaroundwithai.core.ui.theme.SofaAiTheme
 
-const val typingDelay = 20L
+const val TYPING_DELAY = 20L
 
 @Composable
 fun TypewriterText(text: String) {
@@ -23,7 +23,7 @@ fun TypewriterText(text: String) {
         displayedText = ""
         text.forEach { char ->
             displayedText += char
-            delay(typingDelay)
+            delay(TYPING_DELAY)
         }
     }
 

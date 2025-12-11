@@ -75,10 +75,6 @@ android {
             jvmTarget = JvmTarget.fromTarget("17")
         }
     }
-
-    detekt {
-        config.setFrom(files("../detekt.yml"))
-    }
 }
 
 dependencies {
@@ -91,6 +87,8 @@ dependencies {
     implementation(libs.androidx.material.icons.extended)
 
     implementation(libs.okhttp.logging.interceptor)
+
+    implementation(libs.timber)
 
     // Hilt
     implementation(libs.hilt.android)

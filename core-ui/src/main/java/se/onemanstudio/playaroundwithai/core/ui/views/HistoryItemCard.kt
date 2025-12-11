@@ -99,7 +99,7 @@ private fun HistoryItemCardPreview_LongText() {
         HistoryItemCard(
             prompt = Prompt(
                 id = 2,
-                text = "Can you please give me a very detailed and long explanation of how Jetpack Compose recomposition works under the hood, including implementation details?",
+                text = "Can you please give me a very detailed and long explanation of how Jetpack Compose works?",
                 timestamp = System.currentTimeMillis() - 1000 * 60 * 60 * 24 * 3 // 3 days ago
             ),
             onClick = {},

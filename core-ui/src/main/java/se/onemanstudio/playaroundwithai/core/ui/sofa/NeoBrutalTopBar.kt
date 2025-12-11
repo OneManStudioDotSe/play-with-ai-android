@@ -24,38 +24,31 @@ import se.onemanstudio.playaroundwithai.core.ui.theme.SofaAiTheme
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun NeoBrutalTopAppBar(
-    modifier: Modifier = Modifier,
     title: String,
     actions: @Composable RowScope.() -> Unit = {}
 ) {
-    NeoBrutalCard(
-        // Reusing the Card for a consistent look
-        modifier = modifier.fillMaxWidth().padding(horizontal = Dimensions.paddingMedium),
-    ) {
-        TopAppBar(
-            title = {
-                Text(
-                    text = title,
-                    style = MaterialTheme.typography.headlineLarge,
-                    textAlign = TextAlign.Center,
-                    modifier = Modifier.fillMaxWidth()
-                )
-            },
-            actions = {
-                Row(
-                    modifier = Modifier.padding(horizontal = Dimensions.paddingMedium),
-                    verticalAlignment = Alignment.CenterVertically
-                ) {
-                    actions()
-                }
-            },
-            // Make TopAppBar transparent to let NeoBrutalCard handle the drawing
-            colors = TopAppBarDefaults.topAppBarColors(
-                containerColor = Color.Transparent,
-                titleContentColor = MaterialTheme.colorScheme.onSurface
-            ),
-        )
-    }
+    TopAppBar(
+        title = {
+            Text(
+                text = title,
+                style = MaterialTheme.typography.headlineLarge,
+                textAlign = TextAlign.Center,
+                modifier = Modifier.fillMaxWidth()
+            )
+        },
+        actions = {
+            Row(
+                modifier = Modifier.padding(horizontal = Dimensions.paddingMedium),
+                verticalAlignment = Alignment.CenterVertically
+            ) {
+                actions()
+            }
+        },
+        colors = TopAppBarDefaults.topAppBarColors(
+            containerColor = Color.Transparent,
+            titleContentColor = MaterialTheme.colorScheme.onSurface
+        ),
+    )
 }
 
 @Preview(name = "Top App Bar - Light Theme", showBackground = true, backgroundColor = 0xFFF8F8F8)
