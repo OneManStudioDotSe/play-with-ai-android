@@ -36,17 +36,12 @@ allprojects {
     apply(plugin = "org.jlleitschuh.gradle.ktlint")
 }
 
-// Add this block to apply Detekt config to ALL sub-modules automatically
 subprojects {
     apply(plugin = "io.gitlab.arturbosch.detekt")
 
     // Use extensions.configure<DetektExtension> instead of just detekt { }
     extensions.configure<DetektExtension> {
-        // Point to the detekt.yml file in the root project directory
         config.setFrom(files("${rootProject.projectDir}/detekt.yml"))
-
-        // Optional: Create a baseline to ignore existing issues if you want
-        // baseline = file("${projectDir}/detekt-baseline.xml")
 
         buildUponDefaultConfig = true
         autoCorrect = true // This will auto-fix simple formatting issues

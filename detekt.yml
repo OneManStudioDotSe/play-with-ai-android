@@ -35,7 +35,7 @@ naming:
 
   TopLevelPropertyNaming:
     # Constants usually use SCREAMING_SNAKE_CASE, but CompositionLocals use PascalCase (e.g., 'LocalColors').
-    constantPattern: '[A-Z][A-Za-z0-9]*'
+    constantPattern: '[A-Z][_a-zA-Z0-9]*'
 
 complexity:
   LongParameterList:
