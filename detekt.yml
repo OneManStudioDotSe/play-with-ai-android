@@ -3,17 +3,50 @@ build:
 
 style:
   MagicNumber:
-    active: false
     ignoreAnnotated:
       - "Composable"
       - "Preview"
+    ignorePropertyDeclaration: true
+    ignoreEnums: true
 
   UnusedPrivateMember:
-    active: true
+    # Previews are only used by Android Studio, not the app code
     ignoreAnnotated:
-      - "Composable"
       - "Preview"
 
   MaxLineLength:
+    maxLineLength: 160
+    excludeCommentStatements: true
+
+  # Error: "file ... is not ending with a new line"
+  NewLineAtEndOfFile:
     active: true
-    maxLineLength: 180
+
+performance:
+  # Error: "Using the forEach method on ranges has a heavy performance cost"
+  # In UI code, this is often negligible, but you can disable it if you prefer readable loops.
+  ForEachOnRange:
+    active: false
+
+naming:
+  FunctionNaming:
+    # Compose functions use PascalCase (e.g., 'MyScreen'), which violates the standard 'camelCase' rule.
+    ignoreAnnotated: ['Composable']
+
+  TopLevelPropertyNaming:
+    # Constants usually use SCREAMING_SNAKE_CASE, but CompositionLocals use PascalCase (e.g., 'LocalColors').
+    constantPattern: '[A-Z][A-Za-z0-9]*'
+
+complexity:
+  LongParameterList:
+    # Composables often have many parameters (state, modifiers, lambdas).
+    ignoreAnnotated: ['Composable']
+    functionThreshold: 12 # Increases default threshold for non-composables if needed (default is 6)
+
+  LongMethod:
+    # UI trees can get deep and long, which is normal for Compose.
+    ignoreAnnotated: ['Composable']
+
+  TooManyFunctions:
+    # Compose files often contain many small helper composables.
+    ignoreAnnotated: ['Composable']

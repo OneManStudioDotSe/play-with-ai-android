@@ -75,10 +75,6 @@ android {
             jvmTarget = JvmTarget.fromTarget("17")
         }
     }
-
-    detekt {
-        config.setFrom(files("../detekt.yml"))
-    }
 }
 
 dependencies {
