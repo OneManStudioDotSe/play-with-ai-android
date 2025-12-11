@@ -15,7 +15,7 @@ fun Modifier.neoBrutalism(
     borderWidth: Dp = Dimensions.neoBrutalCardStrokeWidth,
     shadowOffset: Dp = Dimensions.neoBrutalCardShadowOffset
 ): Modifier = this.then(
-    drawBehind {
+    Modifier.drawBehind {
         drawIntoCanvas {
             // Draw the shadow
             drawRect(

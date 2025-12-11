@@ -54,6 +54,8 @@ import se.onemanstudio.playaroundwithai.core.ui.sofa.NeoBrutalTopAppBar
 import se.onemanstudio.playaroundwithai.core.ui.theme.Dimensions
 import se.onemanstudio.playaroundwithai.core.ui.views.AmoebaShapeAnimation
 import se.onemanstudio.playaroundwithai.feature.chat.models.Attachment
+import se.onemanstudio.playaroundwithai.feature.chat.states.ChatError
+import se.onemanstudio.playaroundwithai.feature.chat.states.ChatUiState
 import se.onemanstudio.playaroundwithai.feature.chat.views.ChatInputArea
 import se.onemanstudio.playaroundwithai.feature.chat.views.HistoryBottomSheet
 
@@ -257,7 +259,7 @@ private fun ErrorState(
 // Helper to map ChatError to UI resources
 private fun getErrorMessageAndIcon(error: ChatError): Pair<String, ImageVector> {
     return when (error) {
-        is ChatError.Network -> "No internet connection. Please check your network." to Icons.Rounded.WifiOff
+        is ChatError.NetworkMissing -> "No internet connection. Please check your network." to Icons.Rounded.WifiOff
         is ChatError.Permission -> "I don't have permission to access that file." to Icons.Rounded.Lock
         is ChatError.FileNotFound -> "I couldn't find the selected file." to Icons.Rounded.BrokenImage
         is ChatError.FileRead -> "I couldn't read the file content." to Icons.Rounded.Description

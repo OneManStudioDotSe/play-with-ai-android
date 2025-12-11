@@ -1,4 +1,4 @@
-package se.onemanstudio.playaroundwithai.feature.chat
+package se.onemanstudio.playaroundwithai.feature.chat.states
 
 sealed interface ChatUiState {
     data object Initial : ChatUiState
@@ -8,7 +8,7 @@ sealed interface ChatUiState {
 }
 
 sealed interface ChatError {
-    data object Network : ChatError
+    data object NetworkMissing : ChatError
     data object Permission : ChatError
     data object FileNotFound : ChatError
     data object FileRead : ChatError
