@@ -19,7 +19,7 @@ kotlinTest = "2.2.21"
 
 
 # plugins
-agp = "8.13.1"
+agp = "8.13.2"
 kotlin = "2.2.21"
 versionsCheck = "0.53.0"
 hilt = "2.57.2"
