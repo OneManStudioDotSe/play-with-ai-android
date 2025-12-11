@@ -8,8 +8,8 @@ import kotlinx.coroutines.flow.map
 import se.onemanstudio.playaroundwithai.core.data.AnalysisType
 import se.onemanstudio.playaroundwithai.core.data.domain.mapper.toDomain
 import se.onemanstudio.playaroundwithai.core.data.domain.model.Prompt
-import se.onemanstudio.playaroundwithai.core.data.local.PromptsHistoryDao
 import se.onemanstudio.playaroundwithai.core.data.local.PromptEntity
+import se.onemanstudio.playaroundwithai.core.data.local.PromptsHistoryDao
 import se.onemanstudio.playaroundwithai.core.data.remote.gemini.model.Content
 import se.onemanstudio.playaroundwithai.core.data.remote.gemini.model.GeminiRequest
 import se.onemanstudio.playaroundwithai.core.data.remote.gemini.model.GeminiResponse

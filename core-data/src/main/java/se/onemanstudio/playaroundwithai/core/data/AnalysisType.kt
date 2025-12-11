@@ -7,5 +7,5 @@ enum class AnalysisType(val displayName: String) {
     SONG("Song"),
     PERSONALITY("Personality"),
     PRODUCT("Product"),
-    TREND("Trend")
+    TREND("Trend"),
 }

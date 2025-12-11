@@ -14,7 +14,6 @@ import javax.inject.Singleton
 @Module
 @InstallIn(SingletonComponent::class)
 object ConfigurationModule {
-
     @Provides
     @Singleton
     @GeminiApiKey
