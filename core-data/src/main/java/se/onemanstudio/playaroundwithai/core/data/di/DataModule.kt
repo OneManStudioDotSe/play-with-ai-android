@@ -13,11 +13,12 @@ import javax.inject.Singleton
 @Module
 @InstallIn(SingletonComponent::class)
 object DataModule {
-
     @Provides
     @Singleton
     fun provideAppDatabase(@ApplicationContext context: Context): AppDatabase {
-        return Room.databaseBuilder(context, AppDatabase::class.java, "sofa-play-with-ai-db").build()
+        return Room.databaseBuilder(
+            context, AppDatabase::class.java, "sofa-play-with-ai-db"
+        ).build()
     }
 
     @Provides

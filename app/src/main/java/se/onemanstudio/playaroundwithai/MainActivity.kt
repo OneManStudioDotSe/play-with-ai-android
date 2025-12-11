@@ -35,7 +35,7 @@ import se.onemanstudio.playaroundwithai.ui.screens.unused.M3ComponentsShowcaseSc
 data class NavItem(
     val route: String,
     val label: String,
-    val icon: ImageVector
+    val icon: ImageVector,
 )
 
 @AndroidEntryPoint

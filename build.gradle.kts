@@ -4,8 +4,8 @@ apply {
     plugin("com.github.ben-manes.versions")
 }
 
-//Check versions of dependencies: ./gradlew dependencyUpdates -Drevision=milestone -DoutputFormatter=json
-//Force-update dependencies:      ./gradlew clean build --refresh-dependencies
+// Check versions of dependencies: ./gradlew dependencyUpdates -Drevision=milestone -DoutputFormatter=json
+// Force-update dependencies:      ./gradlew clean build --refresh-dependencies
 
 // Top-level build file where you can add configuration options common to all sub-projects/modules.
 plugins {
@@ -19,7 +19,6 @@ plugins {
     alias(libs.plugins.ksp) apply false
     alias(libs.plugins.ktlint) apply false
 }
-
 
 fun isNonStable(version: String): Boolean {
     val stableKeyword = listOf("RELEASE", "FINAL", "GA").any { version.uppercase().contains(it) }
