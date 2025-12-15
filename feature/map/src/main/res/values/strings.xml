@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="path_mode_title">PATH MODE</string>
+    <string name="points_selected">%d Points Selected</string>
+    <string name="total_distance">TOTAL DISTANCE</string>
+    <string name="distance_duration">%d m • %d min</string>
+    <string name="go">GO</string>
+    <string name="recalculate">RECALCULATE</string>
+    <string name="e_scooter">E-Scooter</string>
+    <string name="e_bike">E-Bike</string>
+    <string name="close">Close</string>
+    <string name="battery">Battery</string>
+    <string name="code">Code</string>
+</resources>

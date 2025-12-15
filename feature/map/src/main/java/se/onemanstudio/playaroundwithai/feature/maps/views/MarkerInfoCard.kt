@@ -24,12 +24,14 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.vector.ImageVector
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import se.onemanstudio.playaroundwithai.core.ui.sofa.NeoBrutalCard
 import se.onemanstudio.playaroundwithai.core.ui.sofa.NeoBrutalIconButton
 import se.onemanstudio.playaroundwithai.core.ui.theme.Dimensions
 import se.onemanstudio.playaroundwithai.core.ui.theme.SofaAiTheme
+import se.onemanstudio.playaroundwithai.feature.map.R
 import se.onemanstudio.playaroundwithai.feature.maps.models.ItemOnMap
 import se.onemanstudio.playaroundwithai.feature.maps.models.VehicleType
 
@@ -59,7 +61,7 @@ fun MarkerInfoCard(
                             fontWeight = FontWeight.Bold
                         )
                         Text(
-                            text = if (marker.type == VehicleType.SCOOTER) "E-Scooter" else "E-Bike",
+                            text = if (marker.type == VehicleType.SCOOTER) stringResource(R.string.e_scooter) else stringResource(R.string.e_bike),
                             style = MaterialTheme.typography.labelSmall
                         )
                     }
@@ -67,7 +69,7 @@ fun MarkerInfoCard(
 
                 NeoBrutalIconButton(
                     imageVector = Icons.Default.Close,
-                    contentDescription = "Close",
+                    contentDescription = stringResource(R.string.close),
                     size = Dimensions.iconSizeLarge,
                     backgroundColor = MaterialTheme.colorScheme.errorContainer,
                     onClick = onClose,
@@ -85,12 +87,12 @@ fun MarkerInfoCard(
             ) {
                 InfoStat(
                     icon = Icons.Default.BatteryStd,
-                    label = "Battery",
+                    label = stringResource(R.string.battery),
                     value = "${marker.batteryLevel}%"
                 )
                 InfoStat(
                     icon = Icons.Default.QrCode,
-                    label = "Code",
+                    label = stringResource(R.string.code),
                     value = marker.vehicleCode
                 )
             }

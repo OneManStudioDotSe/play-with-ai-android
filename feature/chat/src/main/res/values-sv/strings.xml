@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="prompt_history">Prompthistorik</string>
+    <string name="used_on">Användes den:</string>
+    <string name="let_s_talk">Låt oss prata</string>
+    <string name="label_prompt_history">Prompthistorik</string>
+    <string name="label_clear_response">Rensa svar</string>
+    <string name="label_error_icon">Felikon</string>
+    <string name="oops">Hoppsan!</string>
+    <string name="label_dismiss_error">Avfärda fel</string>
+    <string name="error_no_internet_connection_please_check_your_network">Ingen internetanslutning. Kontrollera ditt nätverk.</string>
+    <string name="error_i_don_t_have_permission_to_access_that_file">Jag har inte behörighet att komma åt den filen.</string>
+    <string name="error_i_couldn_t_find_the_selected_file">Jag kunde inte hitta den valda filen.</string>
+    <string name="error_i_couldn_t_read_the_file_content">Jag kunde inte läsa filinnehållet.</string>
+    <string name="error_an_unknown_error_occurred">Ett okänt fel inträffade.</string>
+</resources>
