@@ -47,7 +47,11 @@ fun PromptInputSection(
     onAttachClicked: () -> Unit,
     onModeChange: (InputMode) -> Unit
 ) {
-    val samplePrompts = listOf("Explain Quantum Computing", "Recipe for a cake", "Write a poem about rain")
+    val samplePrompts = listOf(
+        stringResource(id = R.string.sample_prompt_1),
+        stringResource(id = R.string.sample_prompt_2),
+        stringResource(id = R.string.sample_prompt_3)
+    )
     val outlineColor = MaterialTheme.colorScheme.outline
 
     Column(
@@ -111,6 +115,14 @@ fun PromptInputSection(
                     .weight(1f)
                     .padding(horizontal = Dimensions.paddingMedium)
             ) {
+                if (textState.text.isEmpty()) {
+                    Text(
+                        text = stringResource(id = R.string.prompt_input_label),
+                        style = MaterialTheme.typography.bodyLarge,
+                        color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.5f),
+                        modifier = Modifier.padding(Dimensions.paddingLarge)
+                    )
+                }
                 BasicTextField(
                     value = textState,
                     onValueChange = onTextChanged,

@@ -42,8 +42,9 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.stringResource
 import androidx.core.content.ContextCompat
-import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
+import androidx.hilt.navigation.compose.hiltViewModel
 import com.google.android.gms.location.LocationServices
 import com.google.android.gms.maps.CameraUpdateFactory
 import com.google.android.gms.maps.model.CameraPosition
@@ -185,7 +186,11 @@ fun MapScreen(viewModel: MapViewModel = hiltViewModel()) {
                             true
                         }
                     ) {
-                        CustomMarkerIcon(icon, isSelected)
+                        CustomMarkerIcon(
+                            icon,
+                            stringResource(id = R.string.marker_content_description, item.name),
+                            isSelected
+                        )
                     }
                 }
             }
@@ -214,7 +219,7 @@ fun MapScreen(viewModel: MapViewModel = hiltViewModel()) {
                 .padding(top = Dimensions.paddingLarge)
         ) {
             SelfDismissingNotification(
-                message = "Current location unknown. Cannot calculate path.",
+                message = stringResource(id = R.string.unknown_location_notification),
                 onDismiss = { showLocationError = false }
             )
         }
@@ -242,8 +247,14 @@ fun MapScreen(viewModel: MapViewModel = hiltViewModel()) {
                 .padding(top = Dimensions.paddingMedium)
         ) {
             Row(horizontalArrangement = Arrangement.spacedBy(Dimensions.paddingLarge)) {
-                FilterChip("Scooters", uiState.activeFilter.contains(VehicleType.SCOOTER)) { viewModel.toggleFilter(VehicleType.SCOOTER) }
-                FilterChip("Bicycles", uiState.activeFilter.contains(VehicleType.BICYCLE)) { viewModel.toggleFilter(VehicleType.BICYCLE) }
+                FilterChip(
+                    text = stringResource(id = R.string.scooters_filter_chip_label),
+                    selected = uiState.activeFilter.contains(VehicleType.SCOOTER)
+                ) { viewModel.toggleFilter(VehicleType.SCOOTER) }
+                FilterChip(
+                    text = stringResource(id = R.string.bicycles_filter_chip_label),
+                    selected = uiState.activeFilter.contains(VehicleType.BICYCLE)
+                ) { viewModel.toggleFilter(VehicleType.BICYCLE) }
             }
         }
 
@@ -258,14 +269,14 @@ fun MapScreen(viewModel: MapViewModel = hiltViewModel()) {
             NeoBrutalIconButton(
                 onClick = { scope.launch { cameraPositionState.animate(CameraUpdateFactory.zoomIn(), 500) } },
                 imageVector = Icons.Default.Add,
-                contentDescription = "Zoom In"
+                contentDescription = stringResource(id = R.string.zoom_in_button_content_description)
             )
 
             // zoom out
             NeoBrutalIconButton(
                 onClick = { scope.launch { cameraPositionState.animate(CameraUpdateFactory.zoomOut(), 500) } },
                 imageVector = Icons.Default.Remove,
-                contentDescription = "Zoom Out"
+                contentDescription = stringResource(id = R.string.zoom_out_button_content_description)
             )
 
             // my location
@@ -297,16 +308,26 @@ fun MapScreen(viewModel: MapViewModel = hiltViewModel()) {
                     }
                 },
                 imageVector = Icons.Default.MyLocation,
-                contentDescription = "My location",
+                contentDescription = stringResource(id = R.string.my_location_button_content_description),
                 backgroundColor = MaterialTheme.colorScheme.secondary
             )
 
             // path mode
             NeoBrutalIconButton(
-                contentDescription = if (uiState.isPathMode) "Exit path mode" else "Enter path mode",
+                contentDescription = if (uiState.isPathMode) stringResource(id = R.string.exit_path_mode_button_content_description) else stringResource(
+                    id = R.string.enter_path_mode_button_content_description
+                ),
                 imageVector = if (uiState.isPathMode) Icons.Default.Close else Icons.Default.LinearScale,
-                backgroundColor = if (uiState.isPathMode) MaterialTheme.colorScheme.errorContainer else MaterialTheme.colorScheme.primaryContainer,
-                shadowColor = if (uiState.isPathMode) MaterialTheme.colorScheme.error else MaterialTheme.colorScheme.onSurface,
+                backgroundColor = if (uiState.isPathMode) {
+                    MaterialTheme.colorScheme.errorContainer
+                } else {
+                    MaterialTheme.colorScheme.primaryContainer
+                },
+                shadowColor = if (uiState.isPathMode) {
+                    MaterialTheme.colorScheme.error
+                } else {
+                    MaterialTheme.colorScheme.onSurface
+                },
                 onClick = { viewModel.setPathMode(!uiState.isPathMode) },
             )
         }
