@@ -14,13 +14,24 @@ plugins {
 // Read the API key from local.properties
 val localProperties = Properties()
 val localPropertiesFile = rootProject.file("local.properties")
+
+// 1. Safe Load: Only load file if it exists
 if (localPropertiesFile.exists()) {
     localProperties.load(FileInputStream(localPropertiesFile))
-} else {
-    // Create a placeholder for CI environments
-    localProperties.setProperty("GEMINI_API_KEY_DEBUG", "")
-    localProperties.setProperty("GEMINI_API_KEY_RELEASE", "")
 }
+
+// 2. Read Keys: Check local.properties first, then System Environment (CI), then empty string
+val mapsApiKey = localProperties.getProperty("MAPS_API_KEY")
+    ?: System.getenv("MAPS_API_KEY")
+    ?: ""
+
+val geminiKeyDebug = localProperties.getProperty("GEMINI_API_KEY_DEBUG")
+    ?: System.getenv("GEMINI_API_KEY_DEBUG")
+    ?: ""
+
+val geminiKeyRelease = localProperties.getProperty("GEMINI_API_KEY_RELEASE")
+    ?: System.getenv("GEMINI_API_KEY_RELEASE")
+    ?: ""
 
 android {
     namespace = "se.onemanstudio.playaroundwithai"
@@ -33,20 +44,22 @@ android {
 
         versionCode = 1
         versionName = "1.0"
+
+        manifestPlaceholders["MAPS_API_KEY"] = mapsApiKey
     }
 
     buildTypes {
         debug {
             isMinifyEnabled = false
             isDebuggable = true
-            buildConfigField("String", "GEMINI_API_KEY", "\"${localProperties.getProperty("GEMINI_API_KEY_DEBUG")}\"")
+            buildConfigField("String", "GEMINI_API_KEY", "\"$geminiKeyDebug\"")
             buildConfigField("String", "BASE_URL", "\"https://generativelanguage.googleapis.com/\"")
         }
 
         release {
             isMinifyEnabled = false
             proguardFiles(getDefaultProguardFile("proguard-android-optimize.txt"), "proguard-rules.pro")
-            buildConfigField("String", "GEMINI_API_KEY", "\"${localProperties.getProperty("GEMINI_API_KEY_RELEASE")}\"")
+            buildConfigField("String", "GEMINI_API_KEY", "\"$geminiKeyRelease\"")
             buildConfigField("String", "BASE_URL", "\"https://generativelanguage.googleapis.com/\"")
         }
     }
