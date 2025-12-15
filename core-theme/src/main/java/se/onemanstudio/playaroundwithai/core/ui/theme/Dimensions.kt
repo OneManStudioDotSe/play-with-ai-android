@@ -17,14 +17,11 @@ object Dimensions {
     val iconSizeXLarge = 40.dp
     val iconSizeXXLarge = 48.dp
 
-    val shadowOffsetNormal = 4.dp
-
     // Component-specific dimensions
     val neoBrutalCardShadowOffset = 4.dp
     val neoBrutalCardStrokeWidth = 2.dp
     val minButtonHeight = 56.dp
     val imagePreviewSize = 96.dp
-    val promptInputMaxHeight = 160.dp
 
     // Border Strokes
     val borderStrokeSmall = 1.dp
