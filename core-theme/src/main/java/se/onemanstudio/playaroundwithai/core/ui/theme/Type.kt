@@ -35,6 +35,13 @@ val Typography = Typography(
         lineHeight = 28.sp,
         letterSpacing = 0.sp
     ),
+    titleMedium = TextStyle(
+        fontFamily = IbmPlexMono,
+        fontWeight = FontWeight.Medium,
+        fontSize = 20.sp,
+        lineHeight = 24.sp,
+        letterSpacing = 0.sp
+    ),
     bodyLarge = TextStyle( // Default text
         fontFamily = IbmPlexMono,
         fontWeight = FontWeight.Normal,
@@ -60,6 +67,14 @@ val Typography = Typography(
         fontFamily = IbmPlexMono,
         fontWeight = FontWeight.Medium,
         fontSize = 12.sp,
-        lineHeight = 16.sp, letterSpacing = 0.5.sp
+        lineHeight = 16.sp,
+        letterSpacing = 0.5.sp
+    ),
+    labelSmall = TextStyle(
+        fontFamily = IbmPlexMono,
+        fontWeight = FontWeight.Medium,
+        fontSize = 10.sp,
+        lineHeight = 12.sp,
+        letterSpacing = 0.sp
     )
 )

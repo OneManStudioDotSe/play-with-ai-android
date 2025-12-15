@@ -23,7 +23,7 @@ fun NeoBrutalCard(
         modifier = modifier.neoBrutalism(
             backgroundColor = MaterialTheme.colorScheme.surface,
             borderColor = MaterialTheme.colorScheme.onSurface,
-            shadowOffset = Dimensions.paddingMedium
+            shadowOffset = Dimensions.paddingSmall
         )
     ) {
         content()

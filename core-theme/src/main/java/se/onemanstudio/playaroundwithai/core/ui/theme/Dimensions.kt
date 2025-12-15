@@ -14,6 +14,10 @@ object Dimensions {
     val iconSizeSmall = 12.dp
     val iconSizeMedium = 24.dp
     val iconSizeLarge = 32.dp
+    val iconSizeXLarge = 40.dp
+    val iconSizeXXLarge = 48.dp
+
+    val shadowOffsetNormal = 4.dp
 
     // Component-specific dimensions
     val neoBrutalCardShadowOffset = 4.dp
