@@ -33,6 +33,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import coil.compose.AsyncImage
 import se.onemanstudio.playaroundwithai.core.data.AnalysisType
@@ -64,7 +65,7 @@ fun AnalysisHeader(
                 value = analysisType.displayName,
                 onValueChange = {},
                 readOnly = true,
-                label = { Text("Analysis Type") },
+                label = { Text(stringResource(R.string.analysis_type)) },
                 trailingIcon = { ExposedDropdownMenuDefaults.TrailingIcon(expanded = isDropdownExpanded) },
                 modifier = Modifier
                     .fillMaxWidth()
@@ -91,7 +92,7 @@ fun AnalysisHeader(
         Box(modifier = Modifier.wrapContentSize()) {
             AsyncImage(
                 model = selectedImageUri,
-                contentDescription = "Selected image",
+                contentDescription = stringResource(R.string.label_selected_image),
                 modifier = Modifier
                     .size(Dimensions.imagePreviewSize)
                     .padding(all = Dimensions.paddingExtraSmall)
@@ -113,7 +114,7 @@ fun AnalysisHeader(
             ) {
                 Icon(
                     imageVector = Icons.Default.Close,
-                    contentDescription = "Remove image",
+                    contentDescription = stringResource(R.string.label_remove_image),
                     modifier = Modifier.size(Dimensions.iconSizeSmall)
                 )
             }

@@ -18,6 +18,7 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
 import se.onemanstudio.playaroundwithai.core.ui.theme.Dimensions
@@ -43,7 +44,7 @@ fun FilePreviewHeader(
         ) {
             Icon(
                 imageVector = Icons.Default.Description,
-                contentDescription = "File Icon",
+                contentDescription = stringResource(R.string.label_file_icon),
                 tint = MaterialTheme.colorScheme.primary
             )
             Spacer(modifier = Modifier.width(Dimensions.paddingMedium))

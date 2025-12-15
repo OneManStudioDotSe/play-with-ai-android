@@ -28,6 +28,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.input.TextFieldValue
 import androidx.compose.ui.tooling.preview.Preview
 import se.onemanstudio.playaroundwithai.core.data.InputMode
@@ -79,19 +80,19 @@ fun PromptInputSection(
             horizontalArrangement = Arrangement.spacedBy(Dimensions.paddingMedium)
         ) {
             ModeButton(
-                text = "Text",
+                text = stringResource(R.string.text),
                 isSelected = inputMode == InputMode.TEXT,
                 onClick = { onModeChange(InputMode.TEXT) },
                 modifier = Modifier.weight(1f)
             )
             ModeButton(
-                text = "Image",
+                text = stringResource(R.string.image),
                 isSelected = inputMode == InputMode.IMAGE,
                 onClick = { onModeChange(InputMode.IMAGE) },
                 modifier = Modifier.weight(1f)
             )
             ModeButton(
-                text = "File",
+                text = stringResource(R.string.file),
                 isSelected = inputMode == InputMode.DOCUMENT,
                 onClick = { onModeChange(InputMode.DOCUMENT) },
                 modifier = Modifier.weight(1f)
@@ -115,7 +116,7 @@ fun PromptInputSection(
                     onValueChange = onTextChanged,
                     modifier = Modifier
                         .fillMaxWidth()
-                        .neoBrutalism( // Apply modifier here!
+                        .neoBrutalism(
                             backgroundColor = MaterialTheme.colorScheme.surface,
                             borderColor = MaterialTheme.colorScheme.onSurface,
                             shadowOffset = Dimensions.neoBrutalCardShadowOffset,
@@ -138,7 +139,7 @@ fun PromptInputSection(
                             .border(Dimensions.borderStrokeSmall, outlineColor, MaterialTheme.shapes.small),
                         onClick = onAttachClicked,
                         imageVector = Icons.Default.AddAPhoto,
-                        contentDescription = "Attach photo",
+                        contentDescription = stringResource(R.string.label_attach_photo),
                         backgroundColor = MaterialTheme.colorScheme.secondary
                     )
                 }
@@ -150,7 +151,7 @@ fun PromptInputSection(
                             .border(Dimensions.borderStrokeSmall, outlineColor, MaterialTheme.shapes.small),
                         onClick = onAttachClicked,
                         imageVector = Icons.Default.UploadFile,
-                        contentDescription = "Attach file",
+                        contentDescription = stringResource(R.string.label_attach_file),
                         backgroundColor = MaterialTheme.colorScheme.tertiary
                     )
                 }
@@ -159,7 +160,7 @@ fun PromptInputSection(
             NeoBrutalIconButton(
                 onClick = onSendClicked,
                 imageVector = Icons.AutoMirrored.Filled.Send,
-                contentDescription = "Send prompt",
+                contentDescription = stringResource(R.string.label_send_prompt),
                 backgroundColor = MaterialTheme.colorScheme.primary
             )
         }

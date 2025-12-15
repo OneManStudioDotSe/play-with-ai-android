@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="analysis_type">Analysis Type</string>
+    <string name="label_selected_image">Selected image</string>
+    <string name="label_remove_image">Remove image</string>
+    <string name="label_file_icon">File Icon</string>
+    <string name="text">Text</string>
+    <string name="image">Image</string>
+    <string name="file">File</string>
+    <string name="label_attach_photo">Attach photo</string>
+    <string name="label_attach_file">Attach file</string>
+    <string name="label_send_prompt">Send prompt</string>
+</resources>
