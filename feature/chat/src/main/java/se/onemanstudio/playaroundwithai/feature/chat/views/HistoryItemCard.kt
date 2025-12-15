@@ -11,9 +11,9 @@ import androidx.compose.foundation.layout.width
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
@@ -22,6 +22,7 @@ import se.onemanstudio.playaroundwithai.core.data.domain.model.Prompt
 import se.onemanstudio.playaroundwithai.core.ui.sofa.NeoBrutalCard
 import se.onemanstudio.playaroundwithai.core.ui.theme.Dimensions
 import se.onemanstudio.playaroundwithai.core.ui.theme.SofaAiTheme
+import se.onemanstudio.playaroundwithai.feature.chat.R
 import java.text.SimpleDateFormat
 import java.util.Date
 import java.util.Locale
@@ -32,10 +33,7 @@ fun HistoryItemCard(
     prompt: Prompt,
     onClick: (String) -> Unit
 ) {
-    // A memoized formatter to avoid recreating it on every recomposition
-    val dateFormatter = remember {
-        SimpleDateFormat("MMM dd, yyyy 'at' HH:mm", Locale.getDefault())
-    }
+    val dateFormatter = SimpleDateFormat("MMM dd, yyyy 'at' HH:mm", Locale.getDefault())
 
     NeoBrutalCard(
         modifier = modifier
@@ -45,7 +43,6 @@ fun HistoryItemCard(
         Column(
             modifier = Modifier.padding(horizontal = Dimensions.paddingLarge, vertical = Dimensions.paddingLarge)
         ) {
-            // Main prompt text
             Text(
                 text = "\"${prompt.text}\"",
                 style = MaterialTheme.typography.bodyLarge,
@@ -56,18 +53,17 @@ fun HistoryItemCard(
 
             Spacer(Modifier.height(Dimensions.paddingMedium))
 
-            // Timestamp
             Row(verticalAlignment = Alignment.CenterVertically) {
                 Text(
-                    text = "Used on:",
-                    style = MaterialTheme.typography.labelMedium, // Using a smaller label style
+                    text = stringResource(R.string.used_on),
+                    style = MaterialTheme.typography.labelMedium,
                     color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.7f)
                 )
                 Spacer(modifier = Modifier.weight(1f))
                 Text(
                     text = dateFormatter.format(Date(prompt.timestamp)),
                     style = MaterialTheme.typography.labelMedium,
-                    color = MaterialTheme.colorScheme.primary, // Use a vibrant color
+                    color = MaterialTheme.colorScheme.primary,
                     fontWeight = FontWeight.Bold
                 )
             }
@@ -76,7 +72,7 @@ fun HistoryItemCard(
 }
 
 
-@Preview(name = "Light Theme - Short Text", showBackground = true, backgroundColor = 0xFFF8F8F8)
+@Preview(name = "Light - Short Text", showBackground = true, backgroundColor = 0xFFF8F8F8)
 @Composable
 private fun HistoryItemCardPreview_ShortText() {
     SofaAiTheme {
@@ -92,7 +88,7 @@ private fun HistoryItemCardPreview_ShortText() {
     }
 }
 
-@Preview(name = "Dark Theme - Long Text", showBackground = true, backgroundColor = 0xFF000000)
+@Preview(name = "Dark - Long Text", showBackground = true, backgroundColor = 0xFF000000)
 @Composable
 private fun HistoryItemCardPreview_LongText() {
     SofaAiTheme(darkTheme = true) {
@@ -116,12 +112,12 @@ private fun HistoryItemCardPreview_Constrained() {
             prompt = Prompt(
                 id = 3,
                 text = "This is a prompt that should be long enough to wrap or truncate when the width is constrained.",
-                timestamp = System.currentTimeMillis() - 1000 * 60 * 60 // 1 hour ago
+                timestamp = System.currentTimeMillis() - 1000 * 60 * 60
             ),
             onClick = {},
             modifier = Modifier
                 .padding(Dimensions.paddingLarge)
-                .width(250.dp) // Simulate a narrow screen
+                .width(250.dp)
         )
     }
 }

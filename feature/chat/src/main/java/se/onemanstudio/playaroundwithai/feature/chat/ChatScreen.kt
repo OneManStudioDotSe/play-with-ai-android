@@ -44,6 +44,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalSoftwareKeyboardController
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.input.TextFieldValue
 import androidx.compose.ui.text.style.TextAlign
 import se.onemanstudio.playaroundwithai.core.data.AnalysisType
@@ -103,11 +104,11 @@ fun ChatScreen(viewModel: ChatViewModel) {
         containerColor = MaterialTheme.colorScheme.background,
         topBar = {
             NeoBrutalTopAppBar(
-                title = "Let's talk",
+                title = stringResource(R.string.let_s_talk),
                 actions = {
                     NeoBrutalIconButton(
                         imageVector = Icons.Default.History,
-                        contentDescription = "Prompt History",
+                        contentDescription = stringResource(R.string.label_prompt_history),
                         backgroundColor = MaterialTheme.colorScheme.tertiary,
                         onClick = { viewModel.openHistorySheet() },
                     )
@@ -172,7 +173,6 @@ fun ChatScreen(viewModel: ChatViewModel) {
     }
 }
 
-
 @Composable
 private fun ContentState(
     state: ChatUiState.Success,
@@ -197,7 +197,7 @@ private fun ContentState(
             NeoBrutalIconButton(
                 onClick = { onClearResponse() },
                 imageVector = Icons.Default.Clear,
-                contentDescription = "Clear response"
+                contentDescription = stringResource(R.string.label_clear_response)
             )
         }
     }
@@ -208,7 +208,6 @@ private fun ErrorState(
     state: ChatUiState.Error,
     onClearResponse: () -> Unit,
 ) {
-    // Extract custom message and icon based on error type
     val (errorMsg, errorIcon) = getErrorMessageAndIcon(state.error)
 
     Box(
@@ -228,13 +227,13 @@ private fun ErrorState(
         ) {
             Icon(
                 imageVector = errorIcon,
-                contentDescription = "Error Icon",
+                contentDescription = stringResource(R.string.label_error_icon),
                 tint = MaterialTheme.colorScheme.error,
                 modifier = Modifier.size(Dimensions.paddingExtraLarge)
             )
             Spacer(modifier = Modifier.height(Dimensions.paddingMedium))
             Text(
-                text = "Oops!",
+                text = stringResource(R.string.oops),
                 style = MaterialTheme.typography.titleMedium,
                 color = MaterialTheme.colorScheme.onErrorContainer
             )
@@ -249,7 +248,7 @@ private fun ErrorState(
             NeoBrutalIconButton(
                 onClick = { onClearResponse() },
                 imageVector = Icons.Default.Clear,
-                contentDescription = "Dismiss error",
+                contentDescription = stringResource(R.string.label_dismiss_error),
                 backgroundColor = MaterialTheme.colorScheme.error
             )
         }
@@ -257,13 +256,16 @@ private fun ErrorState(
 }
 
 // Helper to map ChatError to UI resources
+@Composable
 private fun getErrorMessageAndIcon(error: ChatError): Pair<String, ImageVector> {
+    val context = LocalContext.current
+
     return when (error) {
-        is ChatError.NetworkMissing -> "No internet connection. Please check your network." to Icons.Rounded.WifiOff
-        is ChatError.Permission -> "I don't have permission to access that file." to Icons.Rounded.Lock
-        is ChatError.FileNotFound -> "I couldn't find the selected file." to Icons.Rounded.BrokenImage
-        is ChatError.FileRead -> "I couldn't read the file content." to Icons.Rounded.Description
-        is ChatError.Unknown -> (error.message ?: "An unknown error occurred.") to Icons.Rounded.Warning
+        is ChatError.NetworkMissing -> context.getString(R.string.error_no_internet_connection_please_check_your_network) to Icons.Rounded.WifiOff
+        is ChatError.Permission -> stringResource(R.string.error_i_don_t_have_permission_to_access_that_file) to Icons.Rounded.Lock
+        is ChatError.FileNotFound -> stringResource(R.string.error_i_couldn_t_find_the_selected_file) to Icons.Rounded.BrokenImage
+        is ChatError.FileRead -> stringResource(R.string.error_i_couldn_t_read_the_file_content) to Icons.Rounded.Description
+        is ChatError.Unknown -> (error.message ?: stringResource(R.string.error_an_unknown_error_occurred)) to Icons.Rounded.Warning
     }
 }
 
