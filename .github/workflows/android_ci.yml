@@ -13,8 +13,13 @@ jobs:
     name: Build & Verify
     runs-on: ubuntu-latest
 
+    env:
+      MAPS_API_KEY: ${{ secrets.MAPS_API_KEY }}
+      GEMINI_API_KEY_DEBUG: ${{ secrets.GEMINI_API_KEY_DEBUG }}
+      GEMINI_API_KEY_RELEASE: ${{ secrets.GEMINI_API_KEY_RELEASE }}
+
     steps:
-      - name: Checkout Code
+      - name: Checkout code
         uses: actions/checkout@v4
 
       # Set up JDK 17 (Required for Android Gradle Plugin 8.0+)
@@ -23,34 +28,31 @@ jobs:
         with:
           java-version: '17'
           distribution: 'temurin'
-
-      # Set up Gradle with caching to speed up subsequent builds
-      - name: Setup Gradle
+      
+      # Set up gradle with caching to speed up subsequent builds
+      - name: Setup gradle
         uses: gradle/actions/setup-gradle@v3
 
-      # 1. Check Code Style (Detekt)
+      # 1. Check code style (Detekt)
       # This uses the detekt plugin you already have in libs.versions.toml
-      - name: Run Detekt
+      - name: Run detekt
         run: ./gradlew detekt
 
-      #- name: Run Ktlint
-      #  run: ./gradlew ktlintCheck
-
-      # 2. Check Android Best Practices (Lint)
-      - name: Run Android Lint
+      # 2. Check lint
+      - name: Run lint
         run: ./gradlew lintDebug
 
-      # 3. Build the App (Ensures no compilation errors)
-      - name: Build Debug APK
+      # 3. Build the app
+      - name: Build debug apk
         run: ./gradlew assembleDebug
 
-      # 4. Run Unit Tests
+      # 4. Run unit tests
       # This runs tests across all modules (:app, :core:data, :feature:chat, etc.)
-      - name: Run Unit Tests
+      - name: Run unit tests
         run: ./gradlew testDebugUnitTest
 
-      # (Optional) Upload Test Reports if failure occurs
-      - name: Upload Test Reports
+      # (Optional) Upload test reports if failure occurs
+      - name: Upload test reports
         if: failure()
         uses: actions/upload-artifact@v4
         with:
