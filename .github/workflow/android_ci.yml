@@ -22,7 +22,10 @@ jobs:
         with:
           java-version: '17'
           distribution: 'temurin'
-
+      
+      - name: Create local.properties
+        run: echo "MAPS_API_KEY=${{ secrets.MAPS_API_KEY }}" > ./local.properties
+      
       # Set up Gradle with caching to speed up subsequent builds
       - name: Setup Gradle
         uses: gradle/actions/setup-gradle@v3
