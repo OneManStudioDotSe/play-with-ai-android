@@ -15,14 +15,23 @@ plugins {
 val localProperties = Properties()
 val localPropertiesFile = rootProject.file("local.properties")
 
-// 1. Safe Load: Only load file if it exists
+// only load file if it exists
 if (localPropertiesFile.exists()) {
     localProperties.load(FileInputStream(localPropertiesFile))
 }
 
+// check local.properties first, then System Environment (CI), then empty string
 val mapsApiKey = localProperties.getProperty("MAPS_API_KEY")
     ?: System.getenv("MAPS_API_KEY")
-    ?: "" // Default to empty string to prevent build crash, or handle error later
+    ?: ""
+
+val geminiKeyDebug = localProperties.getProperty("GEMINI_API_KEY_DEBUG")
+    ?: System.getenv("GEMINI_API_KEY_DEBUG")
+    ?: ""
+
+val geminiKeyRelease = localProperties.getProperty("GEMINI_API_KEY_RELEASE")
+    ?: System.getenv("GEMINI_API_KEY_RELEASE")
+    ?: ""
 
 android {
     namespace = "se.onemanstudio.playaroundwithai"
