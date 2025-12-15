@@ -27,7 +27,7 @@ private const val SYSTEM_INSTRUCTION = """
 """
 
 private const val MAX_SIZE = 768
-
+private const val MAX_SUGGESTIONS = 3
 private const val COMPRESSION_QUALITY = 75
 
 @Suppress("MaxLineLength", "TooGenericExceptionCaught")
@@ -65,6 +65,39 @@ class GeminiRepository @Inject constructor(
             val request = GeminiRequest(contents = listOf(Content(parts = parts)))
             val response = apiService.generateContent(request)
             Result.success(response)
+        } catch (e: Exception) {
+            Result.failure(e)
+        }
+    }
+
+    suspend fun generateSuggestions(): Result<List<String>> {
+        return try {
+            // We create a specific prompt to ensure the output is machine-readable
+            val suggestionPrompt = """
+                Generate 3 short, witty, and slightly sarcastic conversation starters that a user could ask you.
+                Keep them under 6 words each.
+                Format the output strictly as: "Topic 1|Topic 2|Topic 3"
+                Do not add any numbering, bullet points, or extra text.
+            """.trimIndent()
+
+            val parts = listOf(Part(text = suggestionPrompt))
+
+            // We reuse the Request logic, but we don't necessarily need the full System Instruction
+            // of the main persona if it interferes with the formatting instructions,
+            // but keeping it adds flavor to the suggestions.
+            val request = GeminiRequest(contents = listOf(Content(parts = parts)))
+            val response = apiService.generateContent(request)
+
+            val text = response.extractText() ?: ""
+
+            // Parse the result based on the separator we requested
+            val suggestions = text.split("|").map { it.trim() }.filter { it.isNotEmpty() }
+
+            if (suggestions.isNotEmpty()) {
+                Result.success(suggestions.take(MAX_SUGGESTIONS)) // Ensure we only get 3
+            } else {
+                Result.failure(Exception("Failed to parse suggestions"))
+            }
         } catch (e: Exception) {
             Result.failure(e)
         }

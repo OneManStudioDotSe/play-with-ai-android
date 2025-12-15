@@ -8,14 +8,14 @@ object Dimensions {
     val paddingSmall = 4.dp
     val paddingMedium = 8.dp
     val paddingLarge = 16.dp
-    val paddingExtraLarge = 32.dp
+    val paddingExtraLarge = 36.dp
 
     // Icon Sizes
     val iconSizeSmall = 12.dp
     val iconSizeMedium = 24.dp
     val iconSizeLarge = 32.dp
     val iconSizeXLarge = 40.dp
-    val iconSizeXXLarge = 48.dp
+    val iconSizeXXLarge = 52.dp
 
     // Component-specific dimensions
     val neoBrutalCardShadowOffset = 4.dp
