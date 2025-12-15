@@ -14,10 +14,11 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.res.stringResource
 import se.onemanstudio.playaroundwithai.core.data.domain.model.Prompt
 import se.onemanstudio.playaroundwithai.core.ui.sofa.NeoBrutalCard
 import se.onemanstudio.playaroundwithai.core.ui.theme.Dimensions
-import se.onemanstudio.playaroundwithai.core.ui.views.HistoryItemCard
+import se.onemanstudio.playaroundwithai.feature.chat.R
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -44,7 +45,7 @@ fun HistoryBottomSheet(
             ) {
                 item {
                     Text(
-                        text = "Prompt history",
+                        text = stringResource(R.string.prompt_history),
                         style = MaterialTheme.typography.headlineLarge,
                         color = MaterialTheme.colorScheme.onBackground,
                         modifier = Modifier.padding(bottom = Dimensions.paddingMedium)

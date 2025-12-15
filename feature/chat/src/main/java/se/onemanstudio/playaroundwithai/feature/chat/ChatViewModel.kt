@@ -47,14 +47,14 @@ class ChatViewModel @Inject constructor(
         _uiState.update { ChatUiState.Loading }
 
         viewModelScope.launch {
-            // 1. Prepare Inputs
+            // see if we have something attached
             val imageBitmap = (attachment as? Attachment.Image)?.uri?.toBitmap()
             val analysisType = (attachment as? Attachment.Image)?.analysisType
 
-            // 2. Try to read file if it exists
+            // read attache stuff
             val fileResult = (attachment as? Attachment.Document)?.uri?.let { extractFileContent(it) }
 
-            // 3. Fail immediately if file reading failed
+            // fail directly if something is off
             if (fileResult != null && fileResult.isFailure) {
                 val error = when (val e = fileResult.exceptionOrNull()) {
                     is FileNotFoundException -> ChatError.FileNotFound
@@ -67,7 +67,7 @@ class ChatViewModel @Inject constructor(
 
             val fileText = fileResult?.getOrNull()
 
-            // 4. Proceed with API call
+            // do your magic
             repository.savePrompt(prompt)
 
             repository.generateContent(

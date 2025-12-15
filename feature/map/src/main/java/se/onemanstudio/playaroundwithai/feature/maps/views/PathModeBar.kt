@@ -13,11 +13,13 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import se.onemanstudio.playaroundwithai.core.ui.sofa.NeoBrutalButton
 import se.onemanstudio.playaroundwithai.core.ui.sofa.NeoBrutalCard
 import se.onemanstudio.playaroundwithai.core.ui.theme.Dimensions
 import se.onemanstudio.playaroundwithai.core.ui.theme.SofaAiTheme
+import se.onemanstudio.playaroundwithai.feature.map.R
 
 @Composable
 fun PathModeBar(
@@ -41,16 +43,19 @@ fun PathModeBar(
                 horizontalAlignment = Alignment.Start
             ) {
                 if (isRouteCalculated) {
-                    Text(text = "TOTAL DISTANCE", style = MaterialTheme.typography.labelSmall)
-                    Text(text = "$distance m • $duration min", style = MaterialTheme.typography.titleMedium)
+                    Text(text = stringResource(R.string.total_distance), style = MaterialTheme.typography.labelSmall)
+                    Text(
+                        text = stringResource(R.string.distance_duration, distance, duration),
+                        style = MaterialTheme.typography.titleMedium
+                    )
                 } else {
                     Text(
-                        text = "PATH MODE",
+                        text = stringResource(R.string.path_mode_title),
                         style = MaterialTheme.typography.labelSmall,
                         color = MaterialTheme.colorScheme.onSurfaceVariant
                     )
                     Text(
-                        text = "$count Points Selected",
+                        text = stringResource(R.string.points_selected, count),
                         style = MaterialTheme.typography.titleMedium,
                         color = MaterialTheme.colorScheme.onSurface
                     )
@@ -58,10 +63,15 @@ fun PathModeBar(
             }
 
             NeoBrutalButton(
-                text = if (isRouteCalculated) "RECALCULATE" else "GO",
+                text = if (isRouteCalculated) stringResource(R.string.recalculate) else stringResource(R.string.go),
                 onClick = onGoClick,
                 enabled = count > 1,
                 icon = if (isRouteCalculated) Icons.Default.Refresh else Icons.Default.PlayArrow,
+                iconContentDescription = if (isRouteCalculated) {
+                    stringResource(R.string.recalculate_icon_content_description)
+                } else {
+                    stringResource(R.string.go_icon_content_description)
+                },
                 backgroundColor = MaterialTheme.colorScheme.primary
             )
         }

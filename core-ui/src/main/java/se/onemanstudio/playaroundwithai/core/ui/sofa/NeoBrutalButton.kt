@@ -32,13 +32,14 @@ import se.onemanstudio.playaroundwithai.core.ui.theme.SofaAiTheme
 
 @Composable
 fun NeoBrutalButton(
-    text: String,
-    onClick: () -> Unit,
     modifier: Modifier = Modifier,
+    text: String,
     enabled: Boolean = true,
     icon: ImageVector? = null,
+    iconContentDescription: String? = null,
     backgroundColor: Color = MaterialTheme.colorScheme.secondary,
-    shadowColor: Color = MaterialTheme.colorScheme.onBackground
+    shadowColor: Color = MaterialTheme.colorScheme.onBackground,
+    onClick: () -> Unit,
 ) {
     val interactionSource = remember { MutableInteractionSource() }
     val isPressed by interactionSource.collectIsPressedAsState()
@@ -77,7 +78,7 @@ fun NeoBrutalButton(
             if (icon != null) {
                 Icon(
                     imageVector = icon,
-                    contentDescription = null,
+                    contentDescription = iconContentDescription,
                     tint = activeContentColor
                 )
             }
@@ -96,6 +97,7 @@ fun NeoBrutalIconButton(
     imageVector: ImageVector,
     contentDescription: String,
     size: Dp = Dimensions.iconSizeLarge,
+    contentColor: Color = MaterialTheme.colorScheme.onSurface,
     backgroundColor: Color = MaterialTheme.colorScheme.surface,
     shadowColor: Color = MaterialTheme.colorScheme.onSurface,
     onClick: () -> Unit,
@@ -113,7 +115,7 @@ fun NeoBrutalIconButton(
                 translationX = if (isPressed) pressOffset.toPx() else 0f
                 translationY = if (isPressed) pressOffset.toPx() else 0f
             }
-            .neoBrutalism( // Using our custom modifier
+            .neoBrutalism(
                 backgroundColor = backgroundColor,
                 borderColor = shadowColor,
                 borderWidth = Dimensions.neoBrutalCardStrokeWidth,
@@ -121,7 +123,7 @@ fun NeoBrutalIconButton(
             )
             .clickable(
                 interactionSource = interactionSource,
-                indication = null, // No ripple
+                indication = null,
                 onClick = onClick
             ),
         contentAlignment = Alignment.Center
@@ -129,13 +131,13 @@ fun NeoBrutalIconButton(
         Icon(
             imageVector = imageVector,
             contentDescription = contentDescription,
-            tint = MaterialTheme.colorScheme.onSecondary,
+            tint = contentColor,
             modifier = Modifier.padding(Dimensions.paddingMedium)
         )
     }
 }
 
-@Preview(name = "Buttons - Light Theme", showBackground = true, backgroundColor = 0xFFF8F8F8)
+@Preview(name = "Light", showBackground = true, backgroundColor = 0xFFF8F8F8)
 @Composable
 private fun NeoBrutalButtonPreview_Light() {
     SofaAiTheme {
@@ -160,7 +162,8 @@ private fun NeoBrutalButtonPreview_Light() {
                 onClick = {},
                 text = "DISABLED",
                 enabled = false,
-                icon = Icons.Default.Navigation
+                icon = Icons.Default.Navigation,
+                iconContentDescription = "Navigation icon"
             )
             NeoBrutalIconButton(
                 onClick = {},
@@ -172,7 +175,7 @@ private fun NeoBrutalButtonPreview_Light() {
     }
 }
 
-@Preview(name = "Buttons - Dark Theme", showBackground = true, backgroundColor = 0xFF000000)
+@Preview(name = "Dark", showBackground = true, backgroundColor = 0xFF000000)
 @Composable
 private fun NeoBrutalButtonPreview_Dark() {
     SofaAiTheme(darkTheme = true) {

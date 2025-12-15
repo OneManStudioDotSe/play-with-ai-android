@@ -33,6 +33,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import coil.compose.AsyncImage
 import se.onemanstudio.playaroundwithai.core.data.AnalysisType
@@ -51,6 +52,7 @@ fun AnalysisHeader(
 
     Column(
         modifier = Modifier
+            .background(color = MaterialTheme.colorScheme.surface)
             .fillMaxWidth()
             .padding(horizontal = Dimensions.paddingLarge, vertical = Dimensions.paddingMedium)
     ) {
@@ -62,9 +64,13 @@ fun AnalysisHeader(
         ) {
             OutlinedTextField(
                 value = analysisType.displayName,
+                colors = ExposedDropdownMenuDefaults.outlinedTextFieldColors(
+                    focusedBorderColor = MaterialTheme.colorScheme.onSurface,
+                    unfocusedBorderColor = MaterialTheme.colorScheme.onSurface
+                ),
                 onValueChange = {},
                 readOnly = true,
-                label = { Text("Analysis Type") },
+                label = { Text(stringResource(R.string.analysis_type)) },
                 trailingIcon = { ExposedDropdownMenuDefaults.TrailingIcon(expanded = isDropdownExpanded) },
                 modifier = Modifier
                     .fillMaxWidth()
@@ -91,7 +97,7 @@ fun AnalysisHeader(
         Box(modifier = Modifier.wrapContentSize()) {
             AsyncImage(
                 model = selectedImageUri,
-                contentDescription = "Selected image",
+                contentDescription = stringResource(R.string.label_selected_image),
                 modifier = Modifier
                     .size(Dimensions.imagePreviewSize)
                     .padding(all = Dimensions.paddingExtraSmall)
@@ -105,25 +111,26 @@ fun AnalysisHeader(
                 modifier = Modifier
                     .align(Alignment.TopEnd)
                     .padding(Dimensions.paddingSmall)
-                    .size(Dimensions.iconSizeLarge)
+                    .size(Dimensions.iconSizeXXLarge)
                     .background(
-                        color = MaterialTheme.colorScheme.primary.copy(alpha = 0.7f),
+                        color = MaterialTheme.colorScheme.secondaryContainer,
                         shape = CircleShape
                     )
             ) {
                 Icon(
                     imageVector = Icons.Default.Close,
-                    contentDescription = "Remove image",
-                    modifier = Modifier.size(Dimensions.iconSizeSmall)
+                    contentDescription = stringResource(R.string.label_remove_image),
+                    modifier = Modifier.size(Dimensions.iconSizeLarge),
+                    tint = MaterialTheme.colorScheme.onSecondaryContainer
                 )
             }
         }
     }
 }
 
-@Preview(showBackground = true)
+@Preview(showBackground = true, name = "Light")
 @Composable
-internal fun AnalysisHeaderPreview_Default() {
+internal fun AnalysisHeaderPreview_Light() {
     SofaAiTheme {
         AnalysisHeader(
             selectedImageUri = Uri.EMPTY,
@@ -134,22 +141,9 @@ internal fun AnalysisHeaderPreview_Default() {
     }
 }
 
-@Preview(showBackground = true, name = "Light Mode - Product")
+@Preview(showBackground = true, name = "Dark", uiMode = Configuration.UI_MODE_NIGHT_YES)
 @Composable
-internal fun AnalysisHeaderPreview_Light_Product() {
-    SofaAiTheme {
-        AnalysisHeader(
-            selectedImageUri = Uri.EMPTY,
-            analysisType = AnalysisType.PRODUCT,
-            onAnalysisTypeChange = {},
-            onClearImage = {}
-        )
-    }
-}
-
-@Preview(showBackground = true, name = "Dark Mode - Location", uiMode = Configuration.UI_MODE_NIGHT_YES)
-@Composable
-internal fun AnalysisHeaderPreview_Dark_Location() {
+internal fun AnalysisHeaderPreview_Dark() {
     SofaAiTheme(darkTheme = true) {
         AnalysisHeader(
             selectedImageUri = Uri.EMPTY,
@@ -157,44 +151,5 @@ internal fun AnalysisHeaderPreview_Dark_Location() {
             onAnalysisTypeChange = {},
             onClearImage = {}
         )
-    }
-}
-
-@OptIn(ExperimentalMaterial3Api::class)
-@Preview(showBackground = true, name = "Dropdown Expanded")
-@Composable
-internal fun AnalysisHeaderPreview_DropdownExpanded() {
-    SofaAiTheme {
-        Box(modifier = Modifier.padding(bottom = Dimensions.paddingExtraLarge)) {
-            Column {
-                ExposedDropdownMenuBox(
-                    expanded = true,
-                    onExpandedChange = {}
-                ) {
-                    OutlinedTextField(
-                        value = AnalysisType.MOVIE.displayName,
-                        onValueChange = {},
-                        readOnly = true,
-                        label = { Text("Analysis Type") },
-                        trailingIcon = { ExposedDropdownMenuDefaults.TrailingIcon(expanded = true) },
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .menuAnchor()
-                            .padding(horizontal = Dimensions.paddingLarge)
-                    )
-                    ExposedDropdownMenu(
-                        expanded = true,
-                        onDismissRequest = {}
-                    ) {
-                        AnalysisType.entries.forEach { type ->
-                            DropdownMenuItem(
-                                text = { Text(type.displayName) },
-                                onClick = {}
-                            )
-                        }
-                    }
-                }
-            }
-        }
     }
 }

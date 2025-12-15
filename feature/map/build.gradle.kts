@@ -47,7 +47,6 @@ android {
             jvmTarget = JvmTarget.fromTarget("17")
         }
     }
-
 }
 
 dependencies {
@@ -71,10 +70,4 @@ dependencies {
     implementation(libs.play.services.location)
 
     debugImplementation(libs.ui.tooling)
-
-    // Testing
-    testImplementation(libs.junit4)
-    testImplementation(libs.mockk)
-    testImplementation(libs.kotlinx.coroutines.test)
-    testImplementation(libs.kotlin.test)
 }

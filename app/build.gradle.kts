@@ -14,12 +14,12 @@ plugins {
 val localProperties = Properties()
 val localPropertiesFile = rootProject.file("local.properties")
 
-// 1. Safe Load: Only load file if it exists
+// only load file if it exists
 if (localPropertiesFile.exists()) {
     localProperties.load(FileInputStream(localPropertiesFile))
 }
 
-// 2. Read Keys: Check local.properties first, then System Environment (CI), then empty string
+// check local.properties first, then System Environment (CI), then empty string
 val mapsApiKey = localProperties.getProperty("MAPS_API_KEY")
     ?: System.getenv("MAPS_API_KEY")
     ?: ""
