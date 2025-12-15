@@ -97,6 +97,7 @@ fun NeoBrutalIconButton(
     imageVector: ImageVector,
     contentDescription: String,
     size: Dp = Dimensions.iconSizeLarge,
+    contentColor: Color = MaterialTheme.colorScheme.onSurface,
     backgroundColor: Color = MaterialTheme.colorScheme.surface,
     shadowColor: Color = MaterialTheme.colorScheme.onSurface,
     onClick: () -> Unit,
@@ -130,7 +131,7 @@ fun NeoBrutalIconButton(
         Icon(
             imageVector = imageVector,
             contentDescription = contentDescription,
-            tint = MaterialTheme.colorScheme.onSecondary,
+            tint = contentColor,
             modifier = Modifier.padding(Dimensions.paddingMedium)
         )
     }

@@ -20,35 +20,37 @@ fun FilterChip(
     selected: Boolean,
     onClick: () -> Unit
 ) {
-    val backgroundColor = if (selected) {
-        MaterialTheme.colorScheme.primary
-    } else {
-        MaterialTheme.colorScheme.surface
-    }
+    // 1. Determine colors based on state & theme
+    val backgroundColor = if (selected) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.surface
+    val contentColor = if (selected) MaterialTheme.colorScheme.onPrimary else MaterialTheme.colorScheme.onSurface
+
+    // 2. Dynamic border/shadow color (Black in Light Mode, White in Dark Mode)
+    val outlineColor = MaterialTheme.colorScheme.onSurface
 
     Box(
         modifier = Modifier
             .defaultMinSize(minHeight = Dimensions.minButtonHeight)
             .wrapContentSize()
-            .clickable { onClick() }
             .neoBrutalism(
                 backgroundColor = backgroundColor,
+                borderColor = outlineColor,
                 shadowOffset = Dimensions.neoBrutalCardShadowOffset
             )
+            .clickable { onClick() }
             .padding(horizontal = Dimensions.paddingLarge, vertical = Dimensions.paddingMedium)
     ) {
         Text(
             text = text,
             style = MaterialTheme.typography.labelLarge,
-            color = MaterialTheme.colorScheme.onSurface
+            color = contentColor
         )
     }
 }
 
-@Preview
+@Preview(name = "Light - Unselected", showBackground = true)
 @Composable
-fun FilterChipPreview() {
-    SofaAiTheme {
+fun FilterChipPreview_Light() {
+    SofaAiTheme(darkTheme = false) {
         FilterChip(
             text = "Scooters",
             selected = false,
@@ -57,10 +59,34 @@ fun FilterChipPreview() {
     }
 }
 
-@Preview
+@Preview(name = "Light - Selected", showBackground = true)
 @Composable
-fun FilterChipPreviewSelected() {
-    SofaAiTheme {
+fun FilterChipPreviewSelected_Light() {
+    SofaAiTheme(darkTheme = false) {
+        FilterChip(
+            text = "Bicycles",
+            selected = true,
+            onClick = {}
+        )
+    }
+}
+
+@Preview(name = "Dark - Unselected", showBackground = true, backgroundColor = 0xFF121212)
+@Composable
+fun FilterChipPreview_Dark() {
+    SofaAiTheme(darkTheme = true) {
+        FilterChip(
+            text = "Scooters",
+            selected = false,
+            onClick = {}
+        )
+    }
+}
+
+@Preview(name = "Dark - Selected", showBackground = true, backgroundColor = 0xFF121212)
+@Composable
+fun FilterChipPreviewSelected_Dark() {
+    SofaAiTheme(darkTheme = true) {
         FilterChip(
             text = "Bicycles",
             selected = true,

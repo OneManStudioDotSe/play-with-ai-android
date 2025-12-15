@@ -1,10 +1,9 @@
 package se.onemanstudio.playaroundwithai.core.ui.views
 
 import android.content.res.Configuration
-import androidx.compose.foundation.BorderStroke
+import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
 import androidx.compose.material.icons.Icons
@@ -13,7 +12,6 @@ import androidx.compose.material.icons.filled.Description
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
@@ -31,33 +29,28 @@ fun FilePreviewHeader(
 ) {
     if (fileName == null) return
 
-    Surface(
+    Row(
         modifier = Modifier
-            .fillMaxWidth()
-            .padding(all = Dimensions.paddingLarge),
-        shape = MaterialTheme.shapes.medium,
-        border = BorderStroke(Dimensions.borderStrokeSmall, MaterialTheme.colorScheme.outline)
+            .background(color = MaterialTheme.colorScheme.surface)
+            .padding(horizontal = Dimensions.paddingLarge, vertical = Dimensions.paddingMedium),
+        verticalAlignment = Alignment.CenterVertically
     ) {
-        Row(
-            modifier = Modifier.padding(horizontal = Dimensions.paddingLarge, vertical = Dimensions.paddingMedium),
-            verticalAlignment = Alignment.CenterVertically
-        ) {
-            Icon(
-                imageVector = Icons.Default.Description,
-                contentDescription = stringResource(R.string.label_file_icon),
-                tint = MaterialTheme.colorScheme.primary
-            )
-            Spacer(modifier = Modifier.width(Dimensions.paddingMedium))
-            Text(
-                text = fileName,
-                style = MaterialTheme.typography.bodyMedium,
-                modifier = Modifier.weight(1f),
-                maxLines = 1,
-                overflow = TextOverflow.Ellipsis
-            )
-            IconButton(onClick = onClearFile) {
-                Icon(Icons.Default.Close, contentDescription = stringResource(id = R.string.label_clear_file))
-            }
+        Icon(
+            imageVector = Icons.Default.Description,
+            contentDescription = stringResource(R.string.label_file_icon),
+            tint = MaterialTheme.colorScheme.primary
+        )
+        Spacer(modifier = Modifier.width(Dimensions.paddingMedium))
+        Text(
+            text = fileName,
+            style = MaterialTheme.typography.bodyMedium,
+            color = MaterialTheme.colorScheme.onSurface,
+            modifier = Modifier.weight(1f),
+            maxLines = 1,
+            overflow = TextOverflow.Ellipsis
+        )
+        IconButton(onClick = onClearFile) {
+            Icon(Icons.Default.Close, contentDescription = stringResource(id = R.string.label_clear_file))
         }
     }
 }

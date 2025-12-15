@@ -2,7 +2,6 @@ package se.onemanstudio.playaroundwithai.feature.maps
 
 import android.Manifest
 import android.annotation.SuppressLint
-import android.content.pm.PackageManager
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.animation.AnimatedVisibility
@@ -11,9 +10,9 @@ import androidx.compose.animation.core.tween
 import androidx.compose.animation.slideInHorizontally
 import androidx.compose.animation.slideOutHorizontally
 import androidx.compose.foundation.background
+import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.navigationBarsPadding
@@ -22,12 +21,7 @@ import androidx.compose.foundation.layout.statusBarsPadding
 import androidx.compose.foundation.layout.wrapContentSize
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.DirectionsBike
-import androidx.compose.material.icons.filled.Add
-import androidx.compose.material.icons.filled.Close
 import androidx.compose.material.icons.filled.ElectricScooter
-import androidx.compose.material.icons.filled.LinearScale
-import androidx.compose.material.icons.filled.MyLocation
-import androidx.compose.material.icons.filled.Remove
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.Composable
@@ -43,8 +37,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
-import androidx.core.content.ContextCompat
-import androidx.hilt.navigation.compose.hiltViewModel
+import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import com.google.android.gms.location.LocationServices
 import com.google.android.gms.maps.CameraUpdateFactory
 import com.google.android.gms.maps.model.CameraPosition
@@ -58,12 +51,9 @@ import com.google.maps.android.compose.MapsComposeExperimentalApi
 import com.google.maps.android.compose.MarkerComposable
 import com.google.maps.android.compose.Polyline
 import com.google.maps.android.compose.rememberCameraPositionState
-import com.google.maps.android.compose.rememberMarkerState
+import com.google.maps.android.compose.rememberUpdatedMarkerState
 import kotlinx.coroutines.launch
-import se.onemanstudio.playaroundwithai.core.ui.sofa.NeoBrutalIconButton
 import se.onemanstudio.playaroundwithai.core.ui.theme.Dimensions
-import se.onemanstudio.playaroundwithai.core.ui.theme.PrimaryBlack
-import se.onemanstudio.playaroundwithai.core.ui.theme.PrimaryBlack_50
 import se.onemanstudio.playaroundwithai.feature.map.R
 import se.onemanstudio.playaroundwithai.feature.maps.MapConstants.STOCKHOLM_LAT
 import se.onemanstudio.playaroundwithai.feature.maps.MapConstants.STOCKHOLM_LNG
@@ -73,6 +63,7 @@ import se.onemanstudio.playaroundwithai.feature.maps.views.FilterChip
 import se.onemanstudio.playaroundwithai.feature.maps.views.MarkerInfoCard
 import se.onemanstudio.playaroundwithai.feature.maps.views.PathModeBar
 import se.onemanstudio.playaroundwithai.feature.maps.views.SelfDismissingNotification
+import se.onemanstudio.playaroundwithai.feature.maps.views.SideControls
 
 @SuppressLint("MissingPermission", "GoogleMapComposable")
 @OptIn(MapsComposeExperimentalApi::class)
@@ -135,7 +126,16 @@ fun MapScreen(viewModel: MapViewModel = hiltViewModel()) {
             modifier = Modifier.fillMaxSize(),
             cameraPositionState = cameraPositionState,
             properties = MapProperties(
-                mapStyleOptions = MapStyleOptions.loadRawResourceStyle(context, R.raw.custom_map_style),
+                // Note: To fully support map styling in dark mode, consider switching to a dark JSON style
+                // based on isSystemInDarkTheme() if available (e.g., R.raw.custom_map_style_dark).
+                mapStyleOptions = MapStyleOptions.loadRawResourceStyle(
+                    context,
+                    if (isSystemInDarkTheme()) {
+                        R.raw.custom_map_style_dark
+                    } else {
+                        R.raw.custom_map_style_light
+                    }
+                ),
                 isMyLocationEnabled = hasLocationPermission
             ),
             uiSettings = MapUiSettings(
@@ -150,9 +150,10 @@ fun MapScreen(viewModel: MapViewModel = hiltViewModel()) {
             onMapClick = { viewModel.selectMarker(null) }
         ) {
             if (uiState.optimalRoute.isNotEmpty()) {
+                @Suppress("COMPOSE_APPLIER_CALL_MISMATCH")
                 Polyline(
                     points = uiState.optimalRoute,
-                    color = PrimaryBlack,
+                    color = MaterialTheme.colorScheme.onSurface,
                     width = 12f,
                     geodesic = true
                 )
@@ -167,7 +168,7 @@ fun MapScreen(viewModel: MapViewModel = hiltViewModel()) {
 
                     MarkerComposable(
                         keys = arrayOf(item.id, isSelected),
-                        state = rememberMarkerState(position = item.position),
+                        state = rememberUpdatedMarkerState(position = item.position),
                         title = item.name,
                         zIndex = if (isSelected) 10f else 1f,
                         onClick = {
@@ -259,76 +260,17 @@ fun MapScreen(viewModel: MapViewModel = hiltViewModel()) {
         }
 
         // Controls on the side
-        Column(
+        Box(
             modifier = Modifier
                 .align(Alignment.CenterEnd)
-                .padding(end = Dimensions.paddingMedium),
-            verticalArrangement = Arrangement.spacedBy(Dimensions.paddingMedium)
+                .padding(Dimensions.paddingLarge)
         ) {
-            // zoom in
-            NeoBrutalIconButton(
-                onClick = { scope.launch { cameraPositionState.animate(CameraUpdateFactory.zoomIn(), 500) } },
-                imageVector = Icons.Default.Add,
-                contentDescription = stringResource(id = R.string.zoom_in_button_content_description)
-            )
-
-            // zoom out
-            NeoBrutalIconButton(
-                onClick = { scope.launch { cameraPositionState.animate(CameraUpdateFactory.zoomOut(), 500) } },
-                imageVector = Icons.Default.Remove,
-                contentDescription = stringResource(id = R.string.zoom_out_button_content_description)
-            )
-
-            // my location
-            NeoBrutalIconButton(
-                onClick = {
-                    val hasPermission = ContextCompat.checkSelfPermission(
-                        context,
-                        Manifest.permission.ACCESS_FINE_LOCATION
-                    ) == PackageManager.PERMISSION_GRANTED
-
-                    if (hasPermission) {
-                        fusedLocationClient.lastLocation.addOnSuccessListener { location ->
-                            location?.let {
-                                val userLatLng = LatLng(it.latitude, it.longitude)
-                                scope.launch {
-                                    cameraPositionState.animate(
-                                        update = CameraUpdateFactory.newLatLngZoom(
-                                            userLatLng,
-                                            MapConstants.MAX_ZOOM_LEVEL
-                                        ),
-                                        durationMs = MapConstants.MOVE_TO_POINT_DURATION
-                                    )
-                                }
-                            }
-                        }
-                    } else {
-                        // If we don't have it, ask for it
-                        permissionLauncher.launch(Manifest.permission.ACCESS_FINE_LOCATION)
-                    }
-                },
-                imageVector = Icons.Default.MyLocation,
-                contentDescription = stringResource(id = R.string.my_location_button_content_description),
-                backgroundColor = MaterialTheme.colorScheme.secondary
-            )
-
-            // path mode
-            NeoBrutalIconButton(
-                contentDescription = if (uiState.isPathMode) stringResource(id = R.string.exit_path_mode_button_content_description) else stringResource(
-                    id = R.string.enter_path_mode_button_content_description
-                ),
-                imageVector = if (uiState.isPathMode) Icons.Default.Close else Icons.Default.LinearScale,
-                backgroundColor = if (uiState.isPathMode) {
-                    MaterialTheme.colorScheme.errorContainer
-                } else {
-                    MaterialTheme.colorScheme.primaryContainer
-                },
-                shadowColor = if (uiState.isPathMode) {
-                    MaterialTheme.colorScheme.error
-                } else {
-                    MaterialTheme.colorScheme.onSurface
-                },
-                onClick = { viewModel.setPathMode(!uiState.isPathMode) },
+            SideControls(
+                uiState = uiState,
+                cameraPositionState = cameraPositionState,
+                fusedLocationClient = fusedLocationClient,
+                permissionLauncher = permissionLauncher,
+                onSetPathMode = { viewModel.setPathMode(!uiState.isPathMode) }
             )
         }
 
@@ -411,7 +353,7 @@ fun MapScreen(viewModel: MapViewModel = hiltViewModel()) {
             Box(
                 modifier = Modifier
                     .fillMaxSize()
-                    .background(color = PrimaryBlack_50),
+                    .background(color = MaterialTheme.colorScheme.surface.copy(alpha = 0.8f)),
                 contentAlignment = Alignment.Center,
             ) {
                 CircularProgressIndicator(
@@ -422,3 +364,5 @@ fun MapScreen(viewModel: MapViewModel = hiltViewModel()) {
         }
     }
 }
+
+

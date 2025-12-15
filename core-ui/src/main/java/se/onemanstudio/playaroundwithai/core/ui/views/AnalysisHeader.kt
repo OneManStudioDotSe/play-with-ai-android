@@ -52,6 +52,7 @@ fun AnalysisHeader(
 
     Column(
         modifier = Modifier
+            .background(color = MaterialTheme.colorScheme.surface)
             .fillMaxWidth()
             .padding(horizontal = Dimensions.paddingLarge, vertical = Dimensions.paddingMedium)
     ) {
@@ -63,6 +64,10 @@ fun AnalysisHeader(
         ) {
             OutlinedTextField(
                 value = analysisType.displayName,
+                colors = ExposedDropdownMenuDefaults.outlinedTextFieldColors(
+                    focusedBorderColor = MaterialTheme.colorScheme.onSurface,
+                    unfocusedBorderColor = MaterialTheme.colorScheme.onSurface
+                ),
                 onValueChange = {},
                 readOnly = true,
                 label = { Text(stringResource(R.string.analysis_type)) },
@@ -108,23 +113,24 @@ fun AnalysisHeader(
                     .padding(Dimensions.paddingSmall)
                     .size(Dimensions.iconSizeXXLarge)
                     .background(
-                        color = MaterialTheme.colorScheme.primary.copy(alpha = 0.7f),
+                        color = MaterialTheme.colorScheme.secondaryContainer,
                         shape = CircleShape
                     )
             ) {
                 Icon(
                     imageVector = Icons.Default.Close,
                     contentDescription = stringResource(R.string.label_remove_image),
-                    modifier = Modifier.size(Dimensions.iconSizeLarge)
+                    modifier = Modifier.size(Dimensions.iconSizeLarge),
+                    tint = MaterialTheme.colorScheme.onSecondaryContainer
                 )
             }
         }
     }
 }
 
-@Preview(showBackground = true)
+@Preview(showBackground = true, name = "Light")
 @Composable
-internal fun AnalysisHeaderPreview_Default() {
+internal fun AnalysisHeaderPreview_Light() {
     SofaAiTheme {
         AnalysisHeader(
             selectedImageUri = Uri.EMPTY,
@@ -135,22 +141,9 @@ internal fun AnalysisHeaderPreview_Default() {
     }
 }
 
-@Preview(showBackground = true, name = "Light Mode - Product")
+@Preview(showBackground = true, name = "Dark", uiMode = Configuration.UI_MODE_NIGHT_YES)
 @Composable
-internal fun AnalysisHeaderPreview_Light_Product() {
-    SofaAiTheme {
-        AnalysisHeader(
-            selectedImageUri = Uri.EMPTY,
-            analysisType = AnalysisType.PRODUCT,
-            onAnalysisTypeChange = {},
-            onClearImage = {}
-        )
-    }
-}
-
-@Preview(showBackground = true, name = "Dark Mode - Location", uiMode = Configuration.UI_MODE_NIGHT_YES)
-@Composable
-internal fun AnalysisHeaderPreview_Dark_Location() {
+internal fun AnalysisHeaderPreview_Dark() {
     SofaAiTheme(darkTheme = true) {
         AnalysisHeader(
             selectedImageUri = Uri.EMPTY,
@@ -158,44 +151,5 @@ internal fun AnalysisHeaderPreview_Dark_Location() {
             onAnalysisTypeChange = {},
             onClearImage = {}
         )
-    }
-}
-
-@OptIn(ExperimentalMaterial3Api::class)
-@Preview(showBackground = true, name = "Dropdown Expanded")
-@Composable
-internal fun AnalysisHeaderPreview_DropdownExpanded() {
-    SofaAiTheme {
-        Box(modifier = Modifier.padding(bottom = Dimensions.paddingExtraLarge)) {
-            Column {
-                ExposedDropdownMenuBox(
-                    expanded = true,
-                    onExpandedChange = {}
-                ) {
-                    OutlinedTextField(
-                        value = AnalysisType.MOVIE.displayName,
-                        onValueChange = {},
-                        readOnly = true,
-                        label = { Text("Analysis Type") },
-                        trailingIcon = { ExposedDropdownMenuDefaults.TrailingIcon(expanded = true) },
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .menuAnchor()
-                            .padding(horizontal = Dimensions.paddingLarge)
-                    )
-                    ExposedDropdownMenu(
-                        expanded = true,
-                        onDismissRequest = {}
-                    ) {
-                        AnalysisType.entries.forEach { type ->
-                            DropdownMenuItem(
-                                text = { Text(type.displayName) },
-                                onClick = {}
-                            )
-                        }
-                    }
-                }
-            }
-        }
     }
 }

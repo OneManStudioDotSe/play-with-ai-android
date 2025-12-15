@@ -13,47 +13,53 @@ I look at every project from all the angles that matter:
 
 ## Coding
 I strive to write code that is clean, easy to understand and follows a cohesive and logical way of doing things.
-I use the latest and  greatest of programming guidelines when it comes to Android so expect to see Compose, Kotlin, coroutines, MVVM 
-and clean architecture. Consistent naming of files and variable, proper structure of folders and properly indented and lean code are 
-crucial as well.
+I use the latest and  greatest of programming guidelines when it comes to Android so expect to see Compose, Kotlin, 
+coroutines, MVVM and clean architecture. Consistent naming of files and variable, proper structure of folders and 
+properly indented and lean code are crucial as well.
 
 ## Design
-In the year 2025, an app should not be just screens with lists and details but it should also communicate an "air" of personality. For that
-reason, every one of my apps, including this one has its own little design system that I use consistently across it. A whole suite of custom
-fonts, text styles, color palette and UI components are utilized at the app in order to show the importance of a consistent design system 
-and the modern ways to use such. Of course, the whole DS is plug-n-play meaning that it is very straigh-forward to update or change it 
-completely, indicating the importance of a modular codebase.
+In the year 2025, an app should not be just screens with lists and details but it should also communicate an "air" 
+of personality. For that reason, every one of my apps, including this one has its own little design system that I 
+use consistently across it. A whole suite of custom fonts, text styles, color palette and UI components are utilized
+at the app in order to show the importance of a consistent design system and the modern ways to use such. Of course, 
+the whole DS is plug-n-play meaning that it is very straigh-forward to update or change it completely, indicating the
+importance of a modular codebase.
 
 ## Performance
-Apart from how an app looks and feels, it is equally important for it to work smoothly and efficiently. For that reason, I optimize my code
-to use the optimal amount of memory, avoid memory leaks, make the most out of DI, avoid unnecessary libraries or permissions and "weigh" 
-just as much as it is needed. Performance though is not only at the user level but also at the developer experience, so for that, I organize
-the project into modules, based on the functionality they hold. The modularity of the project results in optimized build times as 
-every consequent build doesn't require the full build of the project 
+Apart from how an app looks and feels, it is equally important for it to work smoothly and efficiently. For that 
+reason, I optimize my code to use the optimal amount of memory, avoid memory leaks, make the most out of DI, avoid 
+unnecessary libraries or permissions and "weigh" just as much as it is needed. Performance though is not only at the 
+user level but also at the developer experience, so for that, I organize the project into modules, based on the 
+functionality they hold. The modularity of the project results in optimized build times as every consequent build doesn't
+require the full build of the project 
 
 ## Scalability
-Projects on Android Studio have the tendency to grow as time goes by, therefore a scalable approach to the project's structure is necessary
-in order to keep the developer experience and maintanability of the project possible. For that reason, breaking a big monolith of a project
-into smaller modules that each one focus on one and only thing is a desired approch so we don't end up with a tangled mess of a project.
+Projects on Android Studio have the tendency to grow as time goes by, therefore a scalable approach to the project's 
+structure is necessary in order to keep the developer experience and maintanability of the project possible. For that
+reason, breaking a big monolith of a project into smaller modules that each one focus on one and only thing is a desired 
+approch so we don't end up with a tangled mess of a project.
 In this showcase project you can see that I have 3 core modules:
 -core-data', which contains the data layer of the app that is responsible for handling data that exist at remote or local locations
 -'core-theme', which contains the theme and design language of the app
 -'core-ui', which contains the ui components that are specific to the theme (called 'SoFa' in this case) and other views I use
-There is also a module of modules called 'feature', inside which resides a module called 'chat' which holds the core functionality of the
-project. The idea is that every potential feature would live inside that module on its own place, using only the dependencies that it needs.
-Such a project structure makes it much easier for multiple teams to work on the project, without worrying about steping on each other's code
-or dealing with endless git conflicts at the PRs.
+
+There is also a module of modules called 'feature', inside which resides a module called 'chat' which holds the core
+functionality of the project. The idea is that every potential feature would live inside that module on its own place, 
+using only the dependencies that it needs. Such a project structure makes it much easier for multiple teams to work on the
+project, without worrying about steping on each other's code or dealing with endless git conflicts at the PRs.
 
 ## Future-proofing
-An android app or project is in most cases part of a larger ecosystem where automations take place right in the form of automated scripts,
-CI/CD, publishing and report generation. To illustrate the consideration of these steps, I have also added support for running some basic
-maintenance and quality-of-code-related scripts when a PR is opened towards the develop branch of this project. This makes sure that all
-future development will abide to the team's or company's pipelines and will not break future releases.
+An android app or project is in most cases part of a larger ecosystem where automations take place right in the form of 
+automated scripts, CI/CD, publishing and report generation. To illustrate the consideration of these steps, I have also 
+added support for running some basic maintenance and quality-of-code-related scripts when a PR is opened towards the 
+develop branch of this project. This makes sure that all future development will abide to the team's or company's 
+pipelines and will not break future releases.
 
 ## The little extra
-To differentiate myself from the rest of the Android Engineers out there, I do the "little extra" that adds a nice layer of polishing on my
-apps. Things like a custom app icon, this README, a splash screen at the app and a few animations here are there, a11y, localization, are 
-all things that I considerable valuable as they can separate a generic app from a nice app. Enjoy!
+To differentiate myself from the rest of the Android Engineers out there, I do the "little extra" that adds a nice layer
+of polishing on my apps. Things like a custom app icon, this README, a splash screen at the app and a few animations here
+are there, a11y, localization, are all things that I considerable valuable as they can separate a generic app from a nice
+app. Enjoy!
 
 
 Core Functionality:
@@ -81,7 +87,7 @@ It utilizes Room for storing data locally on the device, for the chat history.
 ### Implement a scalable design system
 [x] Create a custom theme in a `:core:theme` module
 [x] Build a library of custom Composables for your app
-[ ] Implement a dark theme and consider dynamic theming
+[x] Implement a dark theme and consider dynamic theming
 
 
 ### Refactor to a modular architecture
