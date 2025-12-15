@@ -15,12 +15,12 @@ plugins {
 val localProperties = Properties()
 val localPropertiesFile = rootProject.file("local.properties")
 
-// only load file if it exists
+// 1. Safe Load: Only load file if it exists
 if (localPropertiesFile.exists()) {
     localProperties.load(FileInputStream(localPropertiesFile))
 }
 
-// check local.properties first, then System Environment (CI), then empty string
+// 2. Read Keys: Check local.properties first, then System Environment (CI), then empty string
 val mapsApiKey = localProperties.getProperty("MAPS_API_KEY")
     ?: System.getenv("MAPS_API_KEY")
     ?: ""
@@ -46,20 +46,22 @@ android {
         versionName = "1.0"
 
         manifestPlaceholders["MAPS_API_KEY"] = mapsApiKey
-        buildConfigField("String", "MAPS_API_KEY", "\"$mapsApiKey\"")
     }
 
     buildTypes {
         debug {
             isMinifyEnabled = false
             isDebuggable = true
+
             buildConfigField("String", "GEMINI_API_KEY", "\"$geminiKeyDebug\"")
             buildConfigField("String", "BASE_URL", "\"https://generativelanguage.googleapis.com/\"")
         }
 
         release {
             isMinifyEnabled = false
+
             proguardFiles(getDefaultProguardFile("proguard-android-optimize.txt"), "proguard-rules.pro")
+
             buildConfigField("String", "GEMINI_API_KEY", "\"$geminiKeyRelease\"")
             buildConfigField("String", "BASE_URL", "\"https://generativelanguage.googleapis.com/\"")
         }

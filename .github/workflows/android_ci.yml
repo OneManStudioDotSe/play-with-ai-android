@@ -45,6 +45,8 @@ jobs:
         run: ./gradlew assembleDebug
         env:
           MAPS_API_KEY: ${{ secrets.MAPS_API_KEY }}
+          GEMINI_API_KEY_DEBUG: ${{ secrets.GEMINI_API_KEY_DEBUG }}
+          GEMINI_API_KEY_RELEASE: ${{ secrets.GEMINI_API_KEY_RELEASE }}
 
       # 4. Run Unit Tests
       # This runs tests across all modules (:app, :core:data, :feature:chat, etc.)
@@ -52,6 +54,8 @@ jobs:
         run: ./gradlew testDebugUnitTest
         env:
           MAPS_API_KEY: ${{ secrets.MAPS_API_KEY }}
+          GEMINI_API_KEY_DEBUG: ${{ secrets.GEMINI_API_KEY_DEBUG }}
+          GEMINI_API_KEY_RELEASE: ${{ secrets.GEMINI_API_KEY_RELEASE }}
 
       # (Optional) Upload Test Reports if failure occurs
       - name: Upload Test Reports
