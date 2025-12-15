@@ -10,6 +10,7 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Chair
 import androidx.compose.material.icons.filled.FoodBank
+import androidx.compose.material.icons.filled.Map
 import androidx.compose.material.icons.filled.NewReleases
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
@@ -23,7 +24,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight.Companion.Bold
 import androidx.compose.ui.text.font.FontWeight.Companion.Normal
-import androidx.hilt.navigation.compose.hiltViewModel
+import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import androidx.navigation.NavDestination.Companion.hierarchy
 import androidx.navigation.NavGraph.Companion.findStartDestination
 import androidx.navigation.compose.NavHost
@@ -34,12 +35,14 @@ import dagger.hilt.android.AndroidEntryPoint
 import se.onemanstudio.playaroundwithai.core.ui.theme.Dimensions
 import se.onemanstudio.playaroundwithai.core.ui.theme.SofaAiTheme
 import se.onemanstudio.playaroundwithai.feature.chat.ChatScreen
+import se.onemanstudio.playaroundwithai.feature.maps.MapScreen
 import se.onemanstudio.playaroundwithai.ui.screens.unused.DesignDemoScreen
 import se.onemanstudio.playaroundwithai.ui.screens.unused.M3ComponentsShowcaseScreen
 
 // Define your navigation items
 val navItems = listOf(
     NavItem("chat", "Chat", Icons.Default.Chair),
+    NavItem("maps", "Explore", Icons.Default.Map),
     NavItem("showcase", "Showcase", Icons.Default.NewReleases),
     NavItem("eat", "Eat", Icons.Default.FoodBank),
 )
@@ -91,13 +94,14 @@ class MainActivity : ComponentActivity() {
                 ) { innerPadding ->
                     NavHost(
                         navController,
-                        startDestination = "chat",
+                        startDestination = "maps",
                         Modifier
                             .fillMaxSize()
                             .padding(innerPadding)
                             .consumeWindowInsets(innerPadding)
                     ) {
                         composable("chat") { ChatScreen(viewModel = hiltViewModel()) }
+                        composable("maps") { MapScreen() }
                         composable("showcase") { DesignDemoScreen() }
                         composable("eat") { M3ComponentsShowcaseScreen() }
                     }
