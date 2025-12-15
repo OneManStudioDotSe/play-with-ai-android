@@ -1,4 +1,4 @@
-package se.onemanstudio.playaroundwithai.core.ui.views
+package se.onemanstudio.playaroundwithai.feature.chat.views
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
@@ -30,39 +30,35 @@ import se.onemanstudio.playaroundwithai.core.ui.sofa.NeoBrutalSegmentedButton
 import se.onemanstudio.playaroundwithai.core.ui.sofa.NeoBrutalTextField
 import se.onemanstudio.playaroundwithai.core.ui.theme.Dimensions
 import se.onemanstudio.playaroundwithai.core.ui.theme.SofaAiTheme
+import se.onemanstudio.playaroundwithai.feature.chat.R
 
 @Composable
 fun PromptInputSection(
     textState: TextFieldValue,
     inputMode: InputMode,
+    suggestions: List<String>,
     onTextChanged: (TextFieldValue) -> Unit,
     onSendClicked: () -> Unit,
     onChipClicked: (String) -> Unit,
     onAttachClicked: () -> Unit,
     onModeChange: (InputMode) -> Unit
 ) {
-    val samplePrompts = listOf(
-        stringResource(id = R.string.sample_prompt_1),
-        stringResource(id = R.string.sample_prompt_2),
-        stringResource(id = R.string.sample_prompt_3)
-    )
-
     Column(
         modifier = Modifier
             .fillMaxWidth()
             .background(color = MaterialTheme.colorScheme.surface)
             .navigationBarsPadding()
-            .padding(vertical = Dimensions.paddingMedium),
+            .padding(vertical = Dimensions.paddingLarge),
         verticalArrangement = Arrangement.spacedBy(Dimensions.paddingMedium)
     ) {
         // 1. Suggestion Chips (Only in TEXT mode)
-        if (inputMode == InputMode.TEXT) {
+        if (inputMode == InputMode.TEXT && suggestions.isNotEmpty()) {
             LazyRow(
                 modifier = Modifier.fillMaxWidth(),
                 contentPadding = PaddingValues(horizontal = Dimensions.paddingLarge),
                 horizontalArrangement = Arrangement.spacedBy(Dimensions.paddingMedium)
             ) {
-                items(samplePrompts) { prompt ->
+                items(suggestions) { prompt ->
                     NeoBrutalChip(
                         text = prompt,
                         onClick = { onChipClicked(prompt) }
@@ -109,7 +105,8 @@ fun PromptInputSection(
                 val bgColor = if (inputMode == InputMode.IMAGE) MaterialTheme.colorScheme.secondary else MaterialTheme.colorScheme.tertiary
 
                 NeoBrutalIconButton(
-                    modifier = Modifier.padding(end = Dimensions.paddingMedium),
+                    modifier = Modifier.padding(start = Dimensions.paddingSmall, end = Dimensions.paddingLarge),
+                    size = Dimensions.iconSizeXXLarge,
                     onClick = onAttachClicked,
                     imageVector = icon,
                     contentDescription = desc,
@@ -119,10 +116,11 @@ fun PromptInputSection(
 
             // Send Button
             NeoBrutalIconButton(
-                onClick = onSendClicked,
+                size = Dimensions.iconSizeXXLarge,
                 imageVector = Icons.AutoMirrored.Filled.Send,
                 contentDescription = stringResource(R.string.label_send_prompt),
-                backgroundColor = MaterialTheme.colorScheme.primary
+                backgroundColor = MaterialTheme.colorScheme.primary,
+                onClick = onSendClicked,
             )
         }
     }
@@ -137,6 +135,7 @@ private fun PromptInputSectionLightPreview() {
         PromptInputSection(
             textState = TextFieldValue(""),
             inputMode = InputMode.TEXT,
+            suggestions = listOf("Tell me a joke", "Explain Quantum Physics", "Roast my code"),
             onTextChanged = {},
             onSendClicked = {},
             onChipClicked = {},
@@ -153,6 +152,7 @@ private fun PromptInputSectionDarkPreview() {
         PromptInputSection(
             textState = TextFieldValue("Describe this image"),
             inputMode = InputMode.IMAGE,
+            suggestions = listOf("Tell me a joke", "Explain Quantum Physics", "Roast my code"),
             onTextChanged = {},
             onSendClicked = {},
             onChipClicked = {},

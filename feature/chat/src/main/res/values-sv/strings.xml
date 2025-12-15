@@ -1,5 +1,22 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
+    <string name="analysis_type">Analystyp</string>
+    <string name="label_selected_image">Vald bild</string>
+    <string name="label_remove_image">Ta bort bild</string>
+    <string name="label_file_icon">Filikon</string>
+    <string name="text">Text</string>
+    <string name="image">Bild</string>
+    <string name="file">Fil</string>
+    <string name="label_attach_photo">Bifoga foto</string>
+    <string name="label_attach_file">Bifoga fil</string>
+    <string name="label_send_prompt">Skicka prompt</string>
+    <string name="dropdown_arrow">Listrutepil</string>
+    <string name="label_clear_file">Rensa fil</string>
+    <string name="sample_prompt_1">Förklara kvantdatorer</string>
+    <string name="sample_prompt_2">Recept på en tårta</string>
+    <string name="sample_prompt_3">Skriv en dikt om regn</string>
+    <string name="prompt_input_label">Prompt</string>
+
     <string name="prompt_history">Prompthistorik</string>
     <string name="used_on">Användes den:</string>
     <string name="let_s_talk">Låt oss prata</string>
