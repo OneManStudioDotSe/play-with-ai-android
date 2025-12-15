@@ -56,7 +56,7 @@ fun FilePreviewHeader(
                 overflow = TextOverflow.Ellipsis
             )
             IconButton(onClick = onClearFile) {
-                Icon(Icons.Default.Close, contentDescription = "Clear file")
+                Icon(Icons.Default.Close, contentDescription = stringResource(id = R.string.label_clear_file))
             }
         }
     }

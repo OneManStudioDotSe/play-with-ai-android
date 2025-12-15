@@ -44,7 +44,10 @@ fun PathModeBar(
             ) {
                 if (isRouteCalculated) {
                     Text(text = stringResource(R.string.total_distance), style = MaterialTheme.typography.labelSmall)
-                    Text(text = stringResource(R.string.distance_duration, distance, duration), style = MaterialTheme.typography.titleMedium)
+                    Text(
+                        text = stringResource(R.string.distance_duration, distance, duration),
+                        style = MaterialTheme.typography.titleMedium
+                    )
                 } else {
                     Text(
                         text = stringResource(R.string.path_mode_title),
@@ -64,6 +67,11 @@ fun PathModeBar(
                 onClick = onGoClick,
                 enabled = count > 1,
                 icon = if (isRouteCalculated) Icons.Default.Refresh else Icons.Default.PlayArrow,
+                iconContentDescription = if (isRouteCalculated) {
+                    stringResource(R.string.recalculate_icon_content_description)
+                } else {
+                    stringResource(R.string.go_icon_content_description)
+                },
                 backgroundColor = MaterialTheme.colorScheme.primary
             )
         }

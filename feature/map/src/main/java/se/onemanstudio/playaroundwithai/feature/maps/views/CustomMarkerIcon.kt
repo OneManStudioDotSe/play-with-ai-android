@@ -23,6 +23,7 @@ import se.onemanstudio.playaroundwithai.core.ui.theme.SofaAiTheme
 @Composable
 fun CustomMarkerIcon(
     icon: ImageVector,
+    iconContentDescription: String?,
     isSelected: Boolean
 ) {
     val color = if (isSelected) MaterialTheme.colorScheme.tertiary else MaterialTheme.colorScheme.surface
@@ -38,7 +39,7 @@ fun CustomMarkerIcon(
     ) {
         Icon(
             imageVector = icon,
-            contentDescription = null,
+            contentDescription = iconContentDescription,
             tint = Color.Black
         )
     }
@@ -50,6 +51,7 @@ fun CustomMarkerIconPreview() {
     SofaAiTheme {
         CustomMarkerIcon(
             icon = Icons.Default.Home,
+            iconContentDescription = "Home icon",
             isSelected = false
         )
     }
@@ -61,6 +63,7 @@ fun CustomMarkerIconPreview_Selected() {
     SofaAiTheme {
         CustomMarkerIcon(
             icon = Icons.Default.Home,
+            iconContentDescription = "Home icon",
             isSelected = true
         )
     }

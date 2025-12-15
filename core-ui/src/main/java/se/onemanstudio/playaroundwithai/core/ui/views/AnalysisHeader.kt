@@ -106,7 +106,7 @@ fun AnalysisHeader(
                 modifier = Modifier
                     .align(Alignment.TopEnd)
                     .padding(Dimensions.paddingSmall)
-                    .size(Dimensions.iconSizeLarge)
+                    .size(Dimensions.iconSizeXXLarge)
                     .background(
                         color = MaterialTheme.colorScheme.primary.copy(alpha = 0.7f),
                         shape = CircleShape
@@ -115,7 +115,7 @@ fun AnalysisHeader(
                 Icon(
                     imageVector = Icons.Default.Close,
                     contentDescription = stringResource(R.string.label_remove_image),
-                    modifier = Modifier.size(Dimensions.iconSizeSmall)
+                    modifier = Modifier.size(Dimensions.iconSizeLarge)
                 )
             }
         }

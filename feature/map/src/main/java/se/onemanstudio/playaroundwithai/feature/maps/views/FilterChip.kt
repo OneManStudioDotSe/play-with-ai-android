@@ -2,7 +2,9 @@ package se.onemanstudio.playaroundwithai.feature.maps.views
 
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.defaultMinSize
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.wrapContentSize
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -18,10 +20,16 @@ fun FilterChip(
     selected: Boolean,
     onClick: () -> Unit
 ) {
-    val backgroundColor = if (selected) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.surface
+    val backgroundColor = if (selected) {
+        MaterialTheme.colorScheme.primary
+    } else {
+        MaterialTheme.colorScheme.surface
+    }
 
     Box(
         modifier = Modifier
+            .defaultMinSize(minHeight = Dimensions.minButtonHeight)
+            .wrapContentSize()
             .clickable { onClick() }
             .neoBrutalism(
                 backgroundColor = backgroundColor,

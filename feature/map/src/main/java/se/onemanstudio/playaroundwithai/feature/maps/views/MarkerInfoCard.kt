@@ -50,7 +50,7 @@ fun MarkerInfoCard(
                 Row(verticalAlignment = Alignment.CenterVertically) {
                     Icon(
                         imageVector = if (marker.type == VehicleType.BICYCLE) Icons.AutoMirrored.Filled.DirectionsBike else Icons.Default.ElectricScooter,
-                        contentDescription = null,
+                        contentDescription = stringResource(id = R.string.vehicle_type_icon_content_description),
                         modifier = Modifier.size(Dimensions.iconSizeLarge)
                     )
                     Spacer(modifier = Modifier.width(Dimensions.paddingMedium))
@@ -70,7 +70,7 @@ fun MarkerInfoCard(
                 NeoBrutalIconButton(
                     imageVector = Icons.Default.Close,
                     contentDescription = stringResource(R.string.close),
-                    size = Dimensions.iconSizeLarge,
+                    size = Dimensions.iconSizeXXLarge,
                     backgroundColor = MaterialTheme.colorScheme.errorContainer,
                     onClick = onClose,
                 )
@@ -87,11 +87,13 @@ fun MarkerInfoCard(
             ) {
                 InfoStat(
                     icon = Icons.Default.BatteryStd,
+                    iconContentDescription = stringResource(id = R.string.battery_icon_content_description),
                     label = stringResource(R.string.battery),
                     value = "${marker.batteryLevel}%"
                 )
                 InfoStat(
                     icon = Icons.Default.QrCode,
+                    iconContentDescription = stringResource(id = R.string.code_icon_content_description),
                     label = stringResource(R.string.code),
                     value = marker.vehicleCode
                 )
@@ -103,13 +105,14 @@ fun MarkerInfoCard(
 @Composable
 private fun InfoStat(
     icon: ImageVector,
+    iconContentDescription: String,
     label: String,
     value: String
 ) {
     Row(verticalAlignment = Alignment.CenterVertically) {
         Icon(
             imageVector = icon,
-            contentDescription = null,
+            contentDescription = iconContentDescription,
             tint = MaterialTheme.colorScheme.primary
         )
         Spacer(modifier = Modifier.width(Dimensions.paddingSmall))

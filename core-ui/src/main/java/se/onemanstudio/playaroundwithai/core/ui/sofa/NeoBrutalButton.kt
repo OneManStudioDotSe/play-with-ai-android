@@ -36,6 +36,7 @@ fun NeoBrutalButton(
     text: String,
     enabled: Boolean = true,
     icon: ImageVector? = null,
+    iconContentDescription: String? = null,
     backgroundColor: Color = MaterialTheme.colorScheme.secondary,
     shadowColor: Color = MaterialTheme.colorScheme.onBackground,
     onClick: () -> Unit,
@@ -77,7 +78,7 @@ fun NeoBrutalButton(
             if (icon != null) {
                 Icon(
                     imageVector = icon,
-                    contentDescription = null,
+                    contentDescription = iconContentDescription,
                     tint = activeContentColor
                 )
             }
@@ -160,7 +161,8 @@ private fun NeoBrutalButtonPreview_Light() {
                 onClick = {},
                 text = "DISABLED",
                 enabled = false,
-                icon = Icons.Default.Navigation
+                icon = Icons.Default.Navigation,
+                iconContentDescription = "Navigation icon"
             )
             NeoBrutalIconButton(
                 onClick = {},
