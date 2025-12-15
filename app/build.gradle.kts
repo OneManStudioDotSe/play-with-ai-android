@@ -21,6 +21,10 @@ if (localPropertiesFile.exists()) {
     localProperties.setProperty("GEMINI_API_KEY_RELEASE", "")
 }
 
+val mapsApiKey = localProperties.getProperty("MAPS_API_KEY")
+    ?: System.getenv("MAPS_API_KEY")
+    ?: "" // Default to empty string to prevent build crash, or handle error later
+
 android {
     namespace = "se.onemanstudio.playaroundwithai"
     compileSdk = 36
@@ -32,6 +36,9 @@ android {
 
         versionCode = 1
         versionName = "1.0"
+
+        manifestPlaceholders["MAPS_API_KEY"] = mapsApiKey
+        buildConfigField("String", "MAPS_API_KEY", "\"$mapsApiKey\"")
     }
 
     buildTypes {
