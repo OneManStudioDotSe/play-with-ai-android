@@ -6,11 +6,13 @@ import androidx.compose.foundation.interaction.collectIsPressedAsState
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Favorite
+import androidx.compose.material.icons.filled.Navigation
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
@@ -24,8 +26,69 @@ import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.Dp
+import androidx.compose.ui.unit.dp
 import se.onemanstudio.playaroundwithai.core.ui.theme.Dimensions
 import se.onemanstudio.playaroundwithai.core.ui.theme.SofaAiTheme
+
+@Composable
+fun NeoBrutalButton(
+    text: String,
+    onClick: () -> Unit,
+    modifier: Modifier = Modifier,
+    enabled: Boolean = true,
+    icon: ImageVector? = null,
+    backgroundColor: Color = MaterialTheme.colorScheme.secondary,
+    shadowColor: Color = MaterialTheme.colorScheme.onBackground
+) {
+    val interactionSource = remember { MutableInteractionSource() }
+    val isPressed by interactionSource.collectIsPressedAsState()
+
+    val shadowOffset = if (enabled) Dimensions.paddingSmall else 0.dp
+    val pressOffset = if (enabled) Dimensions.paddingSmall else 0.dp
+
+    val activeBackgroundColor = if (enabled) backgroundColor else Color.LightGray
+    val activeContentColor = if (enabled) MaterialTheme.colorScheme.onSecondary else Color.DarkGray
+    val activeBorderColor = if (enabled) shadowColor else Color.Gray
+
+    Box(
+        modifier = modifier
+            .graphicsLayer {
+                translationX = if (isPressed) pressOffset.toPx() else 0f
+                translationY = if (isPressed) pressOffset.toPx() else 0f
+            }
+            .neoBrutalism(
+                backgroundColor = activeBackgroundColor,
+                borderColor = activeBorderColor,
+                shadowOffset = shadowOffset
+            )
+            .clickable(
+                interactionSource = interactionSource,
+                indication = null,
+                enabled = enabled,
+                onClick = onClick
+            )
+            .padding(horizontal = Dimensions.paddingLarge, vertical = Dimensions.paddingLarge),
+        contentAlignment = Alignment.Center
+    ) {
+        Row(
+            verticalAlignment = Alignment.CenterVertically,
+            horizontalArrangement = Arrangement.spacedBy(Dimensions.paddingSmall)
+        ) {
+            if (icon != null) {
+                Icon(
+                    imageVector = icon,
+                    contentDescription = null,
+                    tint = activeContentColor
+                )
+            }
+            Text(
+                text = text,
+                style = MaterialTheme.typography.labelLarge,
+                color = activeContentColor
+            )
+        }
+    }
+}
 
 @Composable
 fun NeoBrutalIconButton(
@@ -40,7 +103,7 @@ fun NeoBrutalIconButton(
     val interactionSource = remember { MutableInteractionSource() }
     val isPressed by interactionSource.collectIsPressedAsState()
 
-    val shadowOffset = Dimensions.paddingSmall
+    val shadowOffset = Dimensions.paddingExtraSmall
     val pressOffset = Dimensions.paddingExtraSmall
 
     Box(
@@ -66,50 +129,8 @@ fun NeoBrutalIconButton(
         Icon(
             imageVector = imageVector,
             contentDescription = contentDescription,
-            tint = shadowColor,
+            tint = MaterialTheme.colorScheme.onSecondary,
             modifier = Modifier.padding(Dimensions.paddingMedium)
-        )
-    }
-}
-
-@Composable
-fun NeoBrutalButton(
-    onClick: () -> Unit,
-    text: String,
-    modifier: Modifier = Modifier,
-    backgroundColor: Color = MaterialTheme.colorScheme.secondary,
-    shadowColor: Color = MaterialTheme.colorScheme.onBackground
-) {
-    val interactionSource = remember { MutableInteractionSource() }
-    val isPressed by interactionSource.collectIsPressedAsState()
-
-    val shadowOffset = Dimensions.paddingMedium
-    val pressOffset = Dimensions.paddingSmall
-
-    Box(
-        modifier = modifier
-            .graphicsLayer {
-                // Animate the press effect
-                translationX = if (isPressed) pressOffset.toPx() else 0f
-                translationY = if (isPressed) pressOffset.toPx() else 0f
-            }
-            .neoBrutalism(
-                backgroundColor = backgroundColor,
-                borderColor = shadowColor,
-                shadowOffset = shadowOffset
-            )
-            .clickable(
-                interactionSource = interactionSource,
-                indication = null, // No ripple effect
-                onClick = onClick
-            )
-            .padding(horizontal = Dimensions.paddingLarge, vertical = Dimensions.paddingLarge),
-        contentAlignment = Alignment.Center
-    ) {
-        Text(
-            text = text,
-            style = MaterialTheme.typography.labelLarge,
-            color = MaterialTheme.colorScheme.onSecondary
         )
     }
 }
@@ -134,6 +155,12 @@ private fun NeoBrutalButtonPreview_Light() {
                 onClick = {},
                 text = "SECONDARY ACTION",
                 backgroundColor = MaterialTheme.colorScheme.secondary
+            )
+            NeoBrutalButton(
+                onClick = {},
+                text = "DISABLED",
+                enabled = false,
+                icon = Icons.Default.Navigation
             )
             NeoBrutalIconButton(
                 onClick = {},
