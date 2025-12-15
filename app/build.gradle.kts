@@ -8,6 +8,7 @@ plugins {
     alias(libs.plugins.kotlin.compose)
     alias(libs.plugins.hilt)
     alias(libs.plugins.ksp)
+    alias(libs.plugins.maps.secrets)
 }
 
 // Read the API key from local.properties
@@ -82,6 +83,7 @@ dependencies {
     implementation(project(":core-theme"))
     implementation(project(":core-ui"))
     implementation(project(":feature:chat"))
+    implementation(project(":feature:map"))
 
     implementation(libs.material3)
     implementation(libs.androidx.material.icons.extended)
