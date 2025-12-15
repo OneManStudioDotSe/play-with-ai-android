@@ -23,7 +23,7 @@ jobs:
         with:
           java-version: '17'
           distribution: 'temurin'
-
+      
       # Set up Gradle with caching to speed up subsequent builds
       - name: Setup Gradle
         uses: gradle/actions/setup-gradle@v3
@@ -43,11 +43,15 @@ jobs:
       # 3. Build the App (Ensures no compilation errors)
       - name: Build Debug APK
         run: ./gradlew assembleDebug
+        env:
+          MAPS_API_KEY: ${{ secrets.MAPS_API_KEY }}
 
       # 4. Run Unit Tests
       # This runs tests across all modules (:app, :core:data, :feature:chat, etc.)
       - name: Run Unit Tests
         run: ./gradlew testDebugUnitTest
+        env:
+          MAPS_API_KEY: ${{ secrets.MAPS_API_KEY }}
 
       # (Optional) Upload Test Reports if failure occurs
       - name: Upload Test Reports
