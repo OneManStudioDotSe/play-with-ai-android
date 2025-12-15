@@ -94,7 +94,7 @@ class MainActivity : ComponentActivity() {
                 ) { innerPadding ->
                     NavHost(
                         navController,
-                        startDestination = "maps",
+                        startDestination = "chat",
                         Modifier
                             .fillMaxSize()
                             .padding(innerPadding)
