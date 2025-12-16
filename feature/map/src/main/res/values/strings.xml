@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="path_mode_title">PATH MODE</string>
+    <string name="points_selected">%d Points Selected</string>
+    <string name="total_distance">TOTAL DISTANCE</string>
+    <string name="distance_duration">%1$d m • %2$d min</string>
+    <string name="go">GO</string>
+    <string name="recalculate">RECALCULATE</string>
+    <string name="e_scooter">E-Scooter</string>
+    <string name="e_bike">E-Bike</string>
+    <string name="close">Close</string>
+    <string name="battery">Battery</string>
+    <string name="code">Code</string>
+    <string name="go_icon_content_description">Go icon</string>
+    <string name="recalculate_icon_content_description">Recalculate icon</string>
+    <string name="vehicle_type_icon_content_description">Vehicle type icon</string>
+    <string name="battery_icon_content_description">Battery icon</string>
+    <string name="code_icon_content_description">Code icon</string>
+    <string name="marker_content_description">Map marker for %s</string>
+    <string name="location_disabled_icon_content_description">Location disabled icon</string>
+    <string name="scooters_filter_chip_label">Scooters</string>
+    <string name="bicycles_filter_chip_label">Bicycles</string>
+    <string name="zoom_in_button_content_description">Zoom in</string>
+    <string name="zoom_out_button_content_description">Zoom out</string>
+    <string name="my_location_button_content_description">My location</string>
+    <string name="exit_path_mode_button_content_description">Exit path mode</string>
+    <string name="enter_path_mode_button_content_description">Enter path mode</string>
+    <string name="unknown_location_notification">Current location unknown. Cannot calculate path.</string>
+</resources>

@@ -23,14 +23,14 @@ fun NeoBrutalCard(
         modifier = modifier.neoBrutalism(
             backgroundColor = MaterialTheme.colorScheme.surface,
             borderColor = MaterialTheme.colorScheme.onSurface,
-            shadowOffset = Dimensions.paddingMedium
+            shadowOffset = Dimensions.paddingSmall
         )
     ) {
         content()
     }
 }
 
-@Preview(name = "Light Theme", showBackground = true, backgroundColor = 0xFFF8F8F8)
+@Preview(name = "Light", showBackground = true, backgroundColor = 0xFFF8F8F8)
 @Composable
 private fun NeoBrutalCardPreview_Light() {
     SofaAiTheme {
@@ -56,7 +56,7 @@ private fun NeoBrutalCardPreview_Light() {
     }
 }
 
-@Preview(name = "Dark Theme", showBackground = true, backgroundColor = 0xFF000000)
+@Preview(name = "Dark", showBackground = true, backgroundColor = 0xFF000000)
 @Composable
 private fun NeoBrutalCardPreview_Dark() {
     SofaAiTheme(darkTheme = true) {

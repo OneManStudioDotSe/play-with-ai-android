@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="analysis_type">Analysis Type</string>
+    <string name="label_selected_image">Selected image</string>
+    <string name="label_remove_image">Remove image</string>
+    <string name="label_file_icon">File Icon</string>
+    <string name="text">Text</string>
+    <string name="image">Image</string>
+    <string name="file">File</string>
+    <string name="label_attach_photo">Attach photo</string>
+    <string name="label_attach_file">Attach file</string>
+    <string name="label_send_prompt">Send prompt</string>
+    <string name="dropdown_arrow">Dropdown arrow</string>
+    <string name="label_clear_file">Clear file</string>
+    <string name="sample_prompt_1">Explain Quantum Computing</string>
+    <string name="sample_prompt_2">Recipe for a cake</string>
+    <string name="sample_prompt_3">Write a poem about rain</string>
+    <string name="prompt_input_label">Prompt</string>
+
+    <string name="prompt_history">Prompt history</string>
+    <string name="used_on">Used on:</string>
+    <string name="let_s_talk">Let\'s talk</string>
+    <string name="label_prompt_history">Prompt History</string>
+    <string name="label_clear_response">Clear response</string>
+    <string name="label_error_icon">Error Icon</string>
+    <string name="oops">Oops!</string>
+    <string name="label_dismiss_error">Dismiss error</string>
+    <string name="error_no_internet_connection_please_check_your_network">No internet connection. Please check your network.</string>
+    <string name="error_i_don_t_have_permission_to_access_that_file">I don\'t have permission to access that file.</string>
+    <string name="error_i_couldn_t_find_the_selected_file">I couldn\'t find the selected file.</string>
+    <string name="error_i_couldn_t_read_the_file_content">I couldn\'t read the file content.</string>
+    <string name="error_an_unknown_error_occurred">An unknown error occurred.</string>
+</resources>

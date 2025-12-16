@@ -16,8 +16,12 @@ import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import se.onemanstudio.playaroundwithai.core.data.domain.model.Prompt
 import se.onemanstudio.playaroundwithai.core.data.remote.gemini.GeminiRepository
-import java.io.BufferedReader
-import java.io.InputStreamReader
+import se.onemanstudio.playaroundwithai.feature.chat.models.Attachment
+import se.onemanstudio.playaroundwithai.feature.chat.states.ChatError
+import se.onemanstudio.playaroundwithai.feature.chat.states.ChatUiState
+import timber.log.Timber
+import java.io.FileNotFoundException
+import java.io.IOException
 import javax.inject.Inject
 
 @HiltViewModel
@@ -25,15 +29,15 @@ class ChatViewModel @Inject constructor(
     private val repository: GeminiRepository,
     private val application: Application
 ) : ViewModel() {
+    private val _suggestions = MutableStateFlow<List<String>>(emptyList())
+    val suggestions = _suggestions.asStateFlow()
 
     private val _uiState = MutableStateFlow<ChatUiState>(ChatUiState.Initial)
     val uiState = _uiState.asStateFlow()
 
-    // State for the bottom sheet visibility
     private val _isSheetOpen = MutableStateFlow(false)
     val isSheetOpen = _isSheetOpen.asStateFlow()
 
-    // State for the prompt history
     val promptHistory: StateFlow<List<Prompt>> = repository.getPromptHistory()
         .stateIn(
             scope = viewModelScope,
@@ -41,14 +45,51 @@ class ChatViewModel @Inject constructor(
             initialValue = emptyList()
         )
 
+    init {
+        loadSuggestions()
+    }
+
+    private fun loadSuggestions() {
+        viewModelScope.launch {
+            // Optional: You could set some fallback/loading strings here first
+            repository.generateSuggestions()
+                .onSuccess { topics ->
+                    _suggestions.update { topics }
+                }
+                .onFailure {
+                    // Fallback to static ones if API fails
+                    _suggestions.update {
+                        listOf("Tell me a joke", "Explain Quantum Physics", "Roast my code")
+                    }
+                }
+        }
+    }
+
     fun generateContent(prompt: String, attachment: Attachment?) {
         _uiState.update { ChatUiState.Loading }
 
         viewModelScope.launch {
+            // see if we have something attached
             val imageBitmap = (attachment as? Attachment.Image)?.uri?.toBitmap()
-            val fileText = (attachment as? Attachment.Document)?.uri?.let { extractTextFromFile(it) }
             val analysisType = (attachment as? Attachment.Image)?.analysisType
 
+            // read attached stuff
+            val fileResult = (attachment as? Attachment.Document)?.uri?.let { extractFileContent(it) }
+
+            // fail directly if something is off
+            if (fileResult != null && fileResult.isFailure) {
+                val error = when (val e = fileResult.exceptionOrNull()) {
+                    is FileNotFoundException -> ChatError.FileNotFound
+                    is SecurityException -> ChatError.Permission
+                    else -> ChatError.FileRead
+                }
+                _uiState.update { ChatUiState.Error(error) }
+                return@launch
+            }
+
+            val fileText = fileResult?.getOrNull()
+
+            // do your magic
             repository.savePrompt(prompt)
 
             repository.generateContent(
@@ -62,9 +103,12 @@ class ChatViewModel @Inject constructor(
                     ChatUiState.Success(text)
                 }
             }.onFailure { exception ->
-                _uiState.update {
-                    ChatUiState.Error(exception.localizedMessage ?: "An unknown error occurred")
+                val error = when (exception) {
+                    is IOException -> ChatError.NetworkMissing
+                    is SecurityException -> ChatError.Permission
+                    else -> ChatError.Unknown(exception.localizedMessage)
                 }
+                _uiState.update { ChatUiState.Error(error) }
             }
         }
     }
@@ -81,30 +125,37 @@ class ChatViewModel @Inject constructor(
         _isSheetOpen.value = false
     }
 
-    // Helper function to read a URI's content into a string
-    private fun extractTextFromFile(uri: Uri): String {
-        val stringBuilder = StringBuilder()
-        try {
-            application.contentResolver.openInputStream(uri)?.use { inputStream ->
-                BufferedReader(InputStreamReader(inputStream)).use { reader ->
-                    var line: String? = reader.readLine()
-                    while (line != null) {
-                        stringBuilder.append(line).append("\n")
-                        line = reader.readLine()
-                    }
-                }
-            }
-        } catch (e: Exception) {
-            return "Error reading file content."
+    private fun extractFileContent(uri: Uri): Result<String> {
+        return try {
+            val content = readTextFromUri(uri)
+            Result.success(content)
+        } catch (e: FileNotFoundException) {
+            Result.failure(e)
+        } catch (e: IOException) {
+            Result.failure(e)
+        } catch (e: SecurityException) {
+            Result.failure(e)
         }
-        return stringBuilder.toString()
     }
 
-    // Helper to convert Uri to Bitmap
+    // Helper function that throws exceptions naturally
+    @Throws(IOException::class, SecurityException::class)
+    private fun readTextFromUri(uri: Uri): String {
+        return application.contentResolver.openInputStream(uri)?.use { inputStream ->
+            inputStream.bufferedReader().use { reader ->
+                reader.readText()
+            }
+        } ?: throw FileNotFoundException("Could not open input stream for URI: $uri")
+    }
+
     private fun Uri.toBitmap(): Bitmap? {
         return try {
             ImageDecoder.decodeBitmap(ImageDecoder.createSource(application.contentResolver, this))
-        } catch (e: Exception) {
+        } catch (e: IOException) {
+            Timber.d("Error decoding image: ${e.message}")
+            null
+        } catch (e: SecurityException) {
+            Timber.d("Security exception decoding image: ${e.message}")
             null
         }
     }

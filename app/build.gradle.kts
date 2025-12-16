@@ -6,6 +6,7 @@ plugins {
     alias(libs.plugins.android.application)
     alias(libs.plugins.kotlin.android)
     alias(libs.plugins.kotlin.compose)
+    alias(libs.plugins.kotlin.serialization)
     alias(libs.plugins.hilt)
     alias(libs.plugins.ksp)
 }
@@ -13,13 +14,24 @@ plugins {
 // Read the API key from local.properties
 val localProperties = Properties()
 val localPropertiesFile = rootProject.file("local.properties")
+
+// only load file if it exists
 if (localPropertiesFile.exists()) {
     localProperties.load(FileInputStream(localPropertiesFile))
-} else {
-    // Create a placeholder for CI environments
-    localProperties.setProperty("GEMINI_API_KEY_DEBUG", "")
-    localProperties.setProperty("GEMINI_API_KEY_RELEASE", "")
 }
+
+// check local.properties first, then System Environment (CI), then empty string
+val mapsApiKey = localProperties.getProperty("MAPS_API_KEY")
+    ?: System.getenv("MAPS_API_KEY")
+    ?: ""
+
+val geminiKeyDebug = localProperties.getProperty("GEMINI_API_KEY_DEBUG")
+    ?: System.getenv("GEMINI_API_KEY_DEBUG")
+    ?: ""
+
+val geminiKeyRelease = localProperties.getProperty("GEMINI_API_KEY_RELEASE")
+    ?: System.getenv("GEMINI_API_KEY_RELEASE")
+    ?: ""
 
 android {
     namespace = "se.onemanstudio.playaroundwithai"
@@ -32,20 +44,25 @@ android {
 
         versionCode = 1
         versionName = "1.0"
+
+        manifestPlaceholders["MAPS_API_KEY"] = mapsApiKey
     }
 
     buildTypes {
         debug {
             isMinifyEnabled = false
             isDebuggable = true
-            buildConfigField("String", "GEMINI_API_KEY", "\"${localProperties.getProperty("GEMINI_API_KEY_DEBUG")}\"")
+
+            buildConfigField("String", "GEMINI_API_KEY", "\"$geminiKeyDebug\"")
             buildConfigField("String", "BASE_URL", "\"https://generativelanguage.googleapis.com/\"")
         }
 
         release {
             isMinifyEnabled = false
+
             proguardFiles(getDefaultProguardFile("proguard-android-optimize.txt"), "proguard-rules.pro")
-            buildConfigField("String", "GEMINI_API_KEY", "\"${localProperties.getProperty("GEMINI_API_KEY_RELEASE")}\"")
+
+            buildConfigField("String", "GEMINI_API_KEY", "\"$geminiKeyRelease\"")
             buildConfigField("String", "BASE_URL", "\"https://generativelanguage.googleapis.com/\"")
         }
     }
@@ -75,10 +92,6 @@ android {
             jvmTarget = JvmTarget.fromTarget("17")
         }
     }
-
-    detekt {
-        config.setFrom(files("../detekt.yml"))
-    }
 }
 
 dependencies {
@@ -86,11 +99,17 @@ dependencies {
     implementation(project(":core-theme"))
     implementation(project(":core-ui"))
     implementation(project(":feature:chat"))
+    implementation(project(":feature:map"))
 
     implementation(libs.material3)
     implementation(libs.androidx.material.icons.extended)
 
+    implementation(libs.androidx.navigation.compose)
+    implementation(libs.kotlinx.serialization.json)
+
     implementation(libs.okhttp.logging.interceptor)
+
+    implementation(libs.timber)
 
     // Hilt
     implementation(libs.hilt.android)

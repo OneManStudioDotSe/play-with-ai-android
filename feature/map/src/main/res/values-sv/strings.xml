@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="path_mode_title">STIGLÄGE</string>
+    <string name="points_selected">%d valda punkter</string>
+    <string name="total_distance">TOTALT AVSTÅND</string>
+    <string name="distance_duration">%1$d m • %2$d min</string>
+    <string name="go">KÖR</string>
+    <string name="recalculate">BERÄKNA OM</string>
+    <string name="e_scooter">E-skoter</string>
+    <string name="e_bike">E-cykel</string>
+    <string name="close">Stäng</string>
+    <string name="battery">Batteri</string>
+    <string name="code">Kod</string>
+    <string name="go_icon_content_description">Kör-ikon</string>
+    <string name="recalculate_icon_content_description">Beräkna om-ikon</string>
+    <string name="vehicle_type_icon_content_description">Fordonstyp-ikon</string>
+    <string name="battery_icon_content_description">Batteri-ikon</string>
+    <string name="code_icon_content_description">Kod-ikon</string>
+    <string name="marker_content_description">Kartmarkör för %s</string>
+    <string name="location_disabled_icon_content_description">Plats inaktiverad-ikon</string>
+    <string name="scooters_filter_chip_label">Skotrar</string>
+    <string name="bicycles_filter_chip_label">Cyklar</string>
+    <string name="zoom_in_button_content_description">Zooma in</string>
+    <string name="zoom_out_button_content_description">Zooma ut</string>
+    <string name="my_location_button_content_description">Min plats</string>
+    <string name="exit_path_mode_button_content_description">Avsluta stiglÄge</string>
+    <string name="enter_path_mode_button_content_description">Gå in i stiglÄge</string>
+    <string name="unknown_location_notification">Aktuell plats okänd. Kan inte beräkna stig.</string>
+</resources>

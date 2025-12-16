@@ -1,8 +1,5 @@
 import com.github.benmanes.gradle.versions.updates.DependencyUpdatesTask
-
-apply {
-    plugin("com.github.ben-manes.versions")
-}
+import io.gitlab.arturbosch.detekt.extensions.DetektExtension
 
 // Check versions of dependencies: ./gradlew dependencyUpdates -Drevision=milestone -DoutputFormatter=json
 // Force-update dependencies:      ./gradlew clean build --refresh-dependencies
@@ -13,7 +10,7 @@ plugins {
     alias(libs.plugins.android.library) apply false
     alias(libs.plugins.kotlin.android) apply false
     alias(libs.plugins.kotlin.compose) apply false
-    alias(libs.plugins.versionsCheck) apply false
+    alias(libs.plugins.versionsCheck)
     alias(libs.plugins.hilt) apply false
     alias(libs.plugins.detekt) apply false
     alias(libs.plugins.ksp) apply false
@@ -37,4 +34,16 @@ tasks.withType<DependencyUpdatesTask> {
 allprojects {
     apply(plugin = "io.gitlab.arturbosch.detekt")
     apply(plugin = "org.jlleitschuh.gradle.ktlint")
+}
+
+subprojects {
+    apply(plugin = "io.gitlab.arturbosch.detekt")
+
+    // Use extensions.configure<DetektExtension> instead of just detekt { }
+    extensions.configure<DetektExtension> {
+        config.setFrom(files("${rootProject.projectDir}/detekt.yml"))
+
+        buildUponDefaultConfig = true
+        autoCorrect = true // This will auto-fix simple formatting issues
+    }
 }
