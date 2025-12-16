@@ -29,6 +29,8 @@ class ChatViewModel @Inject constructor(
     private val repository: GeminiRepository,
     private val application: Application
 ) : ViewModel() {
+    private val _suggestions = MutableStateFlow<List<String>>(emptyList())
+    val suggestions = _suggestions.asStateFlow()
 
     private val _uiState = MutableStateFlow<ChatUiState>(ChatUiState.Initial)
     val uiState = _uiState.asStateFlow()
@@ -43,6 +45,26 @@ class ChatViewModel @Inject constructor(
             initialValue = emptyList()
         )
 
+    init {
+        loadSuggestions()
+    }
+
+    private fun loadSuggestions() {
+        viewModelScope.launch {
+            // Optional: You could set some fallback/loading strings here first
+            repository.generateSuggestions()
+                .onSuccess { topics ->
+                    _suggestions.update { topics }
+                }
+                .onFailure {
+                    // Fallback to static ones if API fails
+                    _suggestions.update {
+                        listOf("Tell me a joke", "Explain Quantum Physics", "Roast my code")
+                    }
+                }
+        }
+    }
+
     fun generateContent(prompt: String, attachment: Attachment?) {
         _uiState.update { ChatUiState.Loading }
 
@@ -51,7 +73,7 @@ class ChatViewModel @Inject constructor(
             val imageBitmap = (attachment as? Attachment.Image)?.uri?.toBitmap()
             val analysisType = (attachment as? Attachment.Image)?.analysisType
 
-            // read attache stuff
+            // read attached stuff
             val fileResult = (attachment as? Attachment.Document)?.uri?.let { extractFileContent(it) }
 
             // fail directly if something is off

@@ -16,6 +16,7 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.wrapContentSize
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
@@ -27,7 +28,6 @@ import androidx.compose.material.icons.rounded.Description
 import androidx.compose.material.icons.rounded.Lock
 import androidx.compose.material.icons.rounded.Warning
 import androidx.compose.material.icons.rounded.WifiOff
-import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
@@ -47,23 +47,27 @@ import androidx.compose.ui.platform.LocalSoftwareKeyboardController
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.input.TextFieldValue
 import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.tooling.preview.Preview
 import se.onemanstudio.playaroundwithai.core.data.AnalysisType
 import se.onemanstudio.playaroundwithai.core.data.InputMode
-import se.onemanstudio.playaroundwithai.core.ui.sofa.NeoBrutalCard
 import se.onemanstudio.playaroundwithai.core.ui.sofa.NeoBrutalIconButton
 import se.onemanstudio.playaroundwithai.core.ui.sofa.NeoBrutalTopAppBar
 import se.onemanstudio.playaroundwithai.core.ui.theme.Dimensions
-import se.onemanstudio.playaroundwithai.core.ui.views.AmoebaShapeAnimation
+import se.onemanstudio.playaroundwithai.core.ui.theme.SofaAiTheme
 import se.onemanstudio.playaroundwithai.feature.chat.models.Attachment
 import se.onemanstudio.playaroundwithai.feature.chat.states.ChatError
 import se.onemanstudio.playaroundwithai.feature.chat.states.ChatUiState
+import se.onemanstudio.playaroundwithai.feature.chat.views.AmoebaShapeAnimation
+import se.onemanstudio.playaroundwithai.feature.chat.views.AmoebaState
 import se.onemanstudio.playaroundwithai.feature.chat.views.ChatInputArea
-import se.onemanstudio.playaroundwithai.feature.chat.views.HistoryBottomSheet
+import se.onemanstudio.playaroundwithai.feature.chat.views.TypewriterText
+import se.onemanstudio.playaroundwithai.feature.chat.views.history.HistoryBottomSheet
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun ChatScreen(viewModel: ChatViewModel) {
     val uiState by viewModel.uiState.collectAsState()
+    val suggestions by viewModel.suggestions.collectAsState()
     var textState by remember { mutableStateOf(TextFieldValue("")) }
     val keyboardController = LocalSoftwareKeyboardController.current
 
@@ -119,6 +123,7 @@ fun ChatScreen(viewModel: ChatViewModel) {
             ChatInputArea(
                 inputMode = inputMode,
                 textState = textState,
+                suggestions = suggestions,
                 selectedImageUri = selectedImageUri,
                 selectedFileName = selectedFileName,
                 analysisType = analysisType,
@@ -164,8 +169,8 @@ fun ChatScreen(viewModel: ChatViewModel) {
             contentAlignment = Alignment.Center
         ) {
             when (val state = uiState) {
-                is ChatUiState.Initial -> AmoebaShapeAnimation()
-                is ChatUiState.Loading -> CircularProgressIndicator()
+                is ChatUiState.Initial -> AmoebaShapeAnimation(state = AmoebaState.IDLE)
+                is ChatUiState.Loading -> AmoebaShapeAnimation(state = AmoebaState.SPIKY) //CircularProgressIndicator()
                 is ChatUiState.Success -> ContentState(state, onClearResponse = { viewModel.clearResponse() })
                 is ChatUiState.Error -> ErrorState(state, onClearResponse = { viewModel.clearResponse() })
             }
@@ -178,28 +183,27 @@ private fun ContentState(
     state: ChatUiState.Success,
     onClearResponse: () -> Unit,
 ) {
-    NeoBrutalCard(
-        modifier = Modifier
-            .fillMaxSize()
-            .padding(Dimensions.paddingLarge)
-    ) {
-        Column(
+    Box(modifier = Modifier.padding(Dimensions.paddingLarge)) {
+        Box(
             modifier = Modifier
+                .padding(top = Dimensions.paddingExtraLarge)
+                .fillMaxSize()
                 .verticalScroll(rememberScrollState())
-                .padding(Dimensions.paddingLarge)
         ) {
-            Text(
-                text = state.outputText,
-                style = MaterialTheme.typography.bodyLarge,
-                color = MaterialTheme.colorScheme.onSurface
-            )
-            Spacer(modifier = Modifier.height(Dimensions.paddingLarge))
-            NeoBrutalIconButton(
-                onClick = { onClearResponse() },
-                imageVector = Icons.Default.Clear,
-                contentDescription = stringResource(R.string.label_clear_response)
+            TypewriterText(
+                modifier = Modifier.align(Alignment.TopStart),
+                text = state.outputText
             )
         }
+
+        NeoBrutalIconButton(
+            modifier = Modifier
+                .align(Alignment.TopEnd)
+                .wrapContentSize(),
+            onClick = { onClearResponse() },
+            imageVector = Icons.Default.Clear,
+            contentDescription = stringResource(R.string.label_clear_response)
+        )
     }
 }
 
@@ -255,7 +259,6 @@ private fun ErrorState(
     }
 }
 
-// Helper to map ChatError to UI resources
 @Composable
 private fun getErrorMessageAndIcon(error: ChatError): Pair<String, ImageVector> {
     val context = LocalContext.current
@@ -281,4 +284,57 @@ fun getFileName(context: Context, uri: Uri): String? {
         }
     }
     return fileName
+}
+
+@Preview(name = "Content State - Light", showBackground = true)
+@Composable
+private fun ContentStatePreview_Light() {
+    SofaAiTheme(darkTheme = false) {
+        // Mocking a Success state
+        ContentState(
+            state = ChatUiState.Success(
+                outputText = "Here is a sample response from the AI."
+            ),
+            onClearResponse = {}
+        )
+    }
+}
+
+@Preview(name = "Content State - Dark", showBackground = true, backgroundColor = 0xFF121212)
+@Composable
+private fun ContentStatePreview_Dark() {
+    SofaAiTheme(darkTheme = true) {
+        ContentState(
+            state = ChatUiState.Success(
+                outputText = "This is the dark mode version. Notice how the surface color and text contrast adapts"
+            ),
+            onClearResponse = {}
+        )
+    }
+}
+
+// --- Error State Previews ---
+
+@Preview(name = "Error State - Light", showBackground = true)
+@Composable
+private fun ErrorStatePreview_Light() {
+    SofaAiTheme(darkTheme = false) {
+        // Mocking an Error state (assuming your Error state takes a string or similar)
+        // If your 'error' property is a specific Enum or Object, pass that instance here.
+        ErrorState(
+            state = ChatUiState.Error(error = ChatError.NetworkMissing),
+            onClearResponse = {}
+        )
+    }
+}
+
+@Preview(name = "Error State - Dark", showBackground = true, backgroundColor = 0xFF121212)
+@Composable
+private fun ErrorStatePreview_Dark() {
+    SofaAiTheme(darkTheme = true) {
+        ErrorState(
+            state = ChatUiState.Error(error = ChatError.Permission),
+            onClearResponse = {}
+        )
+    }
 }

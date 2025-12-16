@@ -1,5 +1,9 @@
-package se.onemanstudio.playaroundwithai.core.ui.views
+package se.onemanstudio.playaroundwithai.feature.chat.views
 
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.wrapContentHeight
+import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
@@ -9,14 +13,18 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
+import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
 import kotlinx.coroutines.delay
 import se.onemanstudio.playaroundwithai.core.ui.theme.SofaAiTheme
 
-const val TYPING_DELAY = 20L
+const val TYPING_DELAY = 10L
 
 @Composable
-fun TypewriterText(text: String) {
+fun TypewriterText(
+    modifier: Modifier = Modifier,
+    text: String
+) {
     var displayedText by remember { mutableStateOf("") }
 
     LaunchedEffect(key1 = text) {
@@ -28,9 +36,13 @@ fun TypewriterText(text: String) {
     }
 
     Text(
+        modifier = modifier
+            .fillMaxWidth()
+            .wrapContentHeight()
+            ,
         text = displayedText,
         style = MaterialTheme.typography.bodyLarge,
-        color = MaterialTheme.colorScheme.onBackground
+        color = MaterialTheme.colorScheme.onSurface
     )
 }
 

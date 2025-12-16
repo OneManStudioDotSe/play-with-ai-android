@@ -1,10 +1,12 @@
 package se.onemanstudio.playaroundwithai.feature.chat.views
 
 import android.net.Uri
+import androidx.compose.animation.animateContentSize
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.runtime.Composable
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.input.TextFieldValue
 import androidx.compose.ui.tooling.preview.Preview
@@ -13,14 +15,12 @@ import se.onemanstudio.playaroundwithai.core.data.InputMode
 import se.onemanstudio.playaroundwithai.core.ui.sofa.NeoBrutalCard
 import se.onemanstudio.playaroundwithai.core.ui.theme.Dimensions
 import se.onemanstudio.playaroundwithai.core.ui.theme.SofaAiTheme
-import se.onemanstudio.playaroundwithai.core.ui.views.AnalysisHeader
-import se.onemanstudio.playaroundwithai.core.ui.views.FilePreviewHeader
-import se.onemanstudio.playaroundwithai.core.ui.views.PromptInputSection
 
 @Composable
 fun ChatInputArea(
     inputMode: InputMode,
     textState: TextFieldValue,
+    suggestions: List<String>,
     selectedImageUri: Uri?,
     selectedFileName: String?,
     analysisType: AnalysisType,
@@ -33,7 +33,11 @@ fun ChatInputArea(
     onAttachClicked: () -> Unit,
     onSendClicked: () -> Unit
 ) {
-    NeoBrutalCard(modifier = Modifier.fillMaxWidth()) {
+    NeoBrutalCard(
+        modifier = Modifier
+            .fillMaxWidth()
+            .animateContentSize(alignment = Alignment.BottomCenter)
+    ) {
         Column(modifier = Modifier.padding(top = Dimensions.paddingMedium)) {
             when (inputMode) {
                 InputMode.IMAGE -> AnalysisHeader(
@@ -54,6 +58,7 @@ fun ChatInputArea(
             PromptInputSection(
                 textState = textState,
                 inputMode = inputMode,
+                suggestions = suggestions,
                 onModeChange = onModeChange,
                 onTextChanged = onTextChanged,
                 onChipClicked = onChipClicked,
@@ -71,6 +76,7 @@ fun ChatInputAreaForTextPreview() {
         ChatInputArea(
             inputMode = InputMode.TEXT,
             textState = TextFieldValue("What is the meaning of life?"),
+            suggestions = listOf("Tell me a joke", "Explain Quantum Physics", "Roast my code"),
             selectedImageUri = null,
             selectedFileName = null,
             analysisType = AnalysisType.LOCATION,
@@ -93,6 +99,7 @@ fun ChatInputAreaForImagePreview() {
         ChatInputArea(
             inputMode = InputMode.IMAGE,
             textState = TextFieldValue("What do you see at this image?"),
+            suggestions = listOf("Tell me a joke", "Explain Quantum Physics", "Roast my code"),
             selectedImageUri = null,
             selectedFileName = null,
             analysisType = AnalysisType.LOCATION,
@@ -115,6 +122,7 @@ fun ChatInputAreaForDocumentPreview() {
         ChatInputArea(
             inputMode = InputMode.DOCUMENT,
             textState = TextFieldValue("Summarize this document in a funny way"),
+            suggestions = listOf("Tell me a joke", "Explain Quantum Physics", "Roast my code"),
             selectedImageUri = null,
             selectedFileName = null,
             analysisType = AnalysisType.LOCATION,

@@ -117,12 +117,48 @@ class ChatViewModelTest {
         assertEquals(expected = ChatError.NetworkMissing, actual = (states[2] as ChatUiState.Error).error)
     }
 
+    @Test
+    fun `init loads suggestions successfully`() = runTest {
+        // Given
+        val expectedSuggestions = listOf("Topic 1", "Topic 2", "Topic 3")
+        val viewModel = createViewModel(
+            suggestionsResult = Result.success(expectedSuggestions)
+        )
+
+        // When
+        // (Init happens automatically on creation)
+        advanceUntilIdle() // Ensure coroutine in init block finishes
+
+        // Then
+        assertEquals(expectedSuggestions, viewModel.suggestions.value)
+    }
+
+    @Test
+    fun `init loads fallback suggestions on failure`() = runTest {
+        // Given
+        val failureResult = Result.failure<List<String>>(Exception("API Error"))
+        // These hardcoded strings must match what you put in ChatViewModel's onFailure block
+        val fallbackSuggestions = listOf("Tell me a joke", "Explain Quantum Physics", "Roast my code")
+
+        val viewModel = createViewModel(
+            suggestionsResult = failureResult
+        )
+
+        // When
+        advanceUntilIdle()
+
+        // Then
+        assertEquals(fallbackSuggestions, viewModel.suggestions.value)
+    }
+
     private fun createViewModel(
         geminiResult: Result<GeminiResponse>? = null,
+        suggestionsResult: Result<List<String>> = Result.success(emptyList()),
         promptHistoryResult: List<Prompt> = emptyList(),
     ): ChatViewModel {
         val repository = mockk<GeminiRepository> {
             geminiResult?.let { coEvery { generateContent(any(), any(), any(), any()) } returns it }
+            coEvery { generateSuggestions() } returns suggestionsResult
             coEvery { savePrompt(any()) } returns Unit
             every { getPromptHistory() } returns flowOf(promptHistoryResult)
         }

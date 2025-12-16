@@ -1,4 +1,4 @@
-package se.onemanstudio.playaroundwithai.core.ui.views
+package se.onemanstudio.playaroundwithai.feature.chat.views
 
 import android.content.res.Configuration
 import android.net.Uri
@@ -39,6 +39,7 @@ import coil.compose.AsyncImage
 import se.onemanstudio.playaroundwithai.core.data.AnalysisType
 import se.onemanstudio.playaroundwithai.core.ui.theme.Dimensions
 import se.onemanstudio.playaroundwithai.core.ui.theme.SofaAiTheme
+import se.onemanstudio.playaroundwithai.feature.chat.R
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable

@@ -105,8 +105,8 @@ fun NeoBrutalIconButton(
     val interactionSource = remember { MutableInteractionSource() }
     val isPressed by interactionSource.collectIsPressedAsState()
 
-    val shadowOffset = Dimensions.paddingExtraSmall
-    val pressOffset = Dimensions.paddingExtraSmall
+    val shadowOffset = Dimensions.paddingSmall
+    val pressOffset = Dimensions.paddingSmall
 
     Box(
         modifier = modifier

@@ -1,4 +1,4 @@
-package se.onemanstudio.playaroundwithai.core.ui.views
+package se.onemanstudio.playaroundwithai.feature.chat.views
 
 import android.content.res.Configuration
 import androidx.compose.foundation.background
@@ -21,6 +21,7 @@ import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
 import se.onemanstudio.playaroundwithai.core.ui.theme.Dimensions
 import se.onemanstudio.playaroundwithai.core.ui.theme.SofaAiTheme
+import se.onemanstudio.playaroundwithai.feature.chat.R
 
 @Composable
 fun FilePreviewHeader(

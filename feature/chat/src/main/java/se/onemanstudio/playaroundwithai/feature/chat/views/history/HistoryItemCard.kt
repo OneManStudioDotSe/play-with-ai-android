@@ -1,4 +1,4 @@
-package se.onemanstudio.playaroundwithai.feature.chat.views
+package se.onemanstudio.playaroundwithai.feature.chat.views.history
 
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Column
@@ -13,7 +13,6 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
@@ -22,7 +21,6 @@ import se.onemanstudio.playaroundwithai.core.data.domain.model.Prompt
 import se.onemanstudio.playaroundwithai.core.ui.sofa.NeoBrutalCard
 import se.onemanstudio.playaroundwithai.core.ui.theme.Dimensions
 import se.onemanstudio.playaroundwithai.core.ui.theme.SofaAiTheme
-import se.onemanstudio.playaroundwithai.feature.chat.R
 import java.text.SimpleDateFormat
 import java.util.Date
 import java.util.Locale
@@ -41,7 +39,7 @@ fun HistoryItemCard(
             .clickable { onClick(prompt.text) }
     ) {
         Column(
-            modifier = Modifier.padding(horizontal = Dimensions.paddingLarge, vertical = Dimensions.paddingLarge)
+            modifier = Modifier.padding(all = Dimensions.paddingMedium)
         ) {
             Text(
                 text = "\"${prompt.text}\"",
@@ -51,15 +49,9 @@ fun HistoryItemCard(
                 overflow = TextOverflow.Ellipsis
             )
 
-            Spacer(Modifier.height(Dimensions.paddingMedium))
+            Spacer(Modifier.height(Dimensions.paddingLarge))
 
             Row(verticalAlignment = Alignment.CenterVertically) {
-                Text(
-                    text = stringResource(R.string.used_on),
-                    style = MaterialTheme.typography.labelMedium,
-                    color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.7f)
-                )
-                Spacer(modifier = Modifier.weight(1f))
                 Text(
                     text = dateFormatter.format(Date(prompt.timestamp)),
                     style = MaterialTheme.typography.labelMedium,
