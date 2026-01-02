@@ -1,6 +1,6 @@
 package se.onemanstudio.playaroundwithai.core.data.model
 
-import se.onemanstudio.playaroundwithai.core.data.feature.map.remote.dto.VehicleType
+import se.onemanstudio.playaroundwithai.core.data.feature.map.dto.VehicleType
 
 data class MapItem(
     val id: String,

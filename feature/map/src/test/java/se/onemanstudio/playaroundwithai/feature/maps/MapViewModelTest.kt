@@ -16,10 +16,12 @@ import org.junit.Assert.assertNull
 import org.junit.Assert.assertTrue
 import org.junit.Rule
 import org.junit.Test
-import se.onemanstudio.playaroundwithai.feature.maps.util.MainCoroutineRule
-import se.onemanstudio.playaroundwithai.feature.maps.models.ItemOnMap
-import se.onemanstudio.playaroundwithai.feature.maps.models.VehicleType
+import se.onemanstudio.playaroundwithai.core.data.feature.map.dto.VehicleType
+import se.onemanstudio.playaroundwithai.core.data.feature.map.repository.MapRepository
+import se.onemanstudio.playaroundwithai.core.data.model.MapItem
+import se.onemanstudio.playaroundwithai.feature.maps.models.toUiModel
 import se.onemanstudio.playaroundwithai.feature.maps.state.MapUiState
+import se.onemanstudio.playaroundwithai.feature.maps.util.MainCoroutineRule
 
 @OptIn(ExperimentalCoroutinesApi::class)
 class MapViewModelTest {
@@ -29,22 +31,22 @@ class MapViewModelTest {
 
     private val repository: MapRepository = mockk()
 
-    // Test Data
-    private val scooterItem = ItemOnMap(
-        "1",
-        lat = 59.0, lng = 18.0, "Scooter 1", VehicleType.SCOOTER, isSelected = false, 100
+    // Test Data - Using the DOMAIN model, as this is what the repository returns
+    private val scooterItemDomain = MapItem(
+        id = "1", lat = 59.0, lng = 18.0, name = "Scooter 1", type = VehicleType.SCOOTER,
+        batteryLevel = 88, vehicleCode = "1234", nickname = "Scooty"
     )
-    private val bikeItem = ItemOnMap(
-        "2",
-        lat = 59.0, lng = 18.0,
-        "Bike 1", VehicleType.BICYCLE, isSelected = false, 100,
+    private val bikeItemDomain = MapItem(
+        id = "2", lat = 59.0, lng = 18.0, name = "Bike 1", type = VehicleType.BICYCLE,
+        batteryLevel = 55, vehicleCode = "5678", nickname = "Bikey"
     )
-    private val testData = listOf(scooterItem, bikeItem)
+    private val testDataDomain = listOf(scooterItemDomain, bikeItemDomain)
 
     @Test
     fun `init loads data successfully`() = runTest {
         // Given
-        coEvery { repository.generateRandomData(any()) } returns testData
+        coEvery { repository.getMapItems(any()) } returns testDataDomain
+        val expectedUiModels = testDataDomain.map { it.toUiModel() }
 
         // When
         val viewModel = MapViewModel(repository)
@@ -54,22 +56,23 @@ class MapViewModelTest {
         // Then
         val finalState = states.last()
         assertFalse(finalState.isLoading)
-        assertEquals(testData, finalState.allLocations)
-        assertEquals(testData, finalState.visibleLocations)
+        assertEquals(expectedUiModels, finalState.allLocations)
+        assertEquals(expectedUiModels, finalState.visibleLocations)
     }
 
     @Test
     fun `selectMarker updates focused marker`() = runTest {
         // Given
-        coEvery { repository.generateRandomData(any()) } returns testData
+        coEvery { repository.getMapItems(any()) } returns testDataDomain
         val viewModel = MapViewModel(repository)
         val states = captureStates(viewModel)
+        val scooterItemUi = scooterItemDomain.toUiModel()
 
         // When
-        viewModel.selectMarker(scooterItem)
+        viewModel.selectMarker(scooterItemUi)
 
         // Then
-        assertEquals(scooterItem, states.last().focusedMarker)
+        assertEquals(scooterItemUi, states.last().focusedMarker)
 
         // When (Deselect)
         viewModel.selectMarker(null)
@@ -81,15 +84,18 @@ class MapViewModelTest {
     @Test
     fun `setPathMode resets selection and updates mode`() = runTest {
         // Given
-        coEvery { repository.generateRandomData(any()) } returns testData
+        coEvery { repository.getMapItems(any()) } returns testDataDomain
         val viewModel = MapViewModel(repository)
         val states = captureStates(viewModel)
+        val scooterItemUi = scooterItemDomain.toUiModel()
 
         // Pre-condition: Select something and be in normal mode
-        viewModel.selectMarker(scooterItem)
+        viewModel.selectMarker(scooterItemUi)
+        advanceUntilIdle()
 
         // When
         viewModel.setPathMode(true)
+        advanceUntilIdle()
 
         // Then
         val state = states.last()
@@ -108,12 +114,12 @@ class MapViewModelTest {
     @Test
     fun `toggleFilter filters visible locations correctly`() = runTest {
         // Given
-        coEvery { repository.generateRandomData(any()) } returns testData
+        coEvery { repository.getMapItems(any()) } returns testDataDomain
         val viewModel = MapViewModel(repository)
         val states = captureStates(viewModel)
-        advanceUntilIdle() // Wait for data load
+        advanceUntilIdle()
 
-        // Initial state: Both types active (Assuming MapUiState defaults activeFilter to setOf(SCOOTER, BICYCLE))
+        // Initial state
         assertEquals(2, states.last().visibleLocations.size)
 
         // When: Toggle OFF Scooters
@@ -135,91 +141,87 @@ class MapViewModelTest {
     @Test
     fun `toggleSelection adds and removes items in Path Mode`() = runTest {
         // Given
-        coEvery { repository.generateRandomData(any()) } returns testData
+        coEvery { repository.getMapItems(any()) } returns testDataDomain
         val viewModel = MapViewModel(repository)
         val states = captureStates(viewModel)
-        viewModel.setPathMode(true) // Must be in path mode
+        viewModel.setPathMode(true)
+        val scooterItemUi = scooterItemDomain.toUiModel()
+        val bikeItemUi = bikeItemDomain.toUiModel()
 
         // When: Select first item
-        viewModel.toggleSelection(scooterItem)
+        viewModel.toggleSelection(scooterItemUi)
 
         // Then
         assertEquals(1, states.last().selectedLocations.size)
-        assertEquals(scooterItem.id, states.last().selectedLocations.first().id)
+        assertEquals(scooterItemUi.id, states.last().selectedLocations.first().id)
 
         // When: Select second item
-        viewModel.toggleSelection(bikeItem)
+        viewModel.toggleSelection(bikeItemUi)
 
         // Then
         assertEquals(2, states.last().selectedLocations.size)
 
         // When: Toggle first item again (Deselect)
-        viewModel.toggleSelection(scooterItem)
+        viewModel.toggleSelection(scooterItemUi)
 
         // Then
         assertEquals(1, states.last().selectedLocations.size)
-        assertEquals(bikeItem.id, states.last().selectedLocations.first().id)
+        assertEquals(bikeItemUi.id, states.last().selectedLocations.first().id)
     }
 
     @Test
     fun `toggleSelection enforces max selection limit`() = runTest {
         // Given
-        coEvery { repository.generateRandomData(any()) } returns testData
+        val manyItemsDomain = (1..6).map {
+            MapItem(
+                id = it.toString(), lat = 0.0, lng = 0.0, name = "Item $it", type = VehicleType.SCOOTER,
+                batteryLevel = 100, vehicleCode = "$it", nickname = "Item $it"
+            )
+        }
+        coEvery { repository.getMapItems(any()) } returns manyItemsDomain
+        val manyItemsUi = manyItemsDomain.map { it.toUiModel() }
+
         val viewModel = MapViewModel(repository)
         val states = captureStates(viewModel)
         viewModel.setPathMode(true)
+        advanceUntilIdle()
 
-        // Fill up to limit (Assuming MapConstants.MAX_SELECTABLE_POINTS = 5)
-        // We need to fake more items or just lower the limit logic for test,
-        // but assuming we can mock items:
-        val manyItems = (1..6).map {
-            ItemOnMap(
-                it.toString(),
-                lat = 0.0, lng = 0.0,
-                "Item $it", VehicleType.SCOOTER, isSelected = false, 100
-            )
-        }
-
-        // Add 5 items
+        // When: Add 5 items
         repeat(5) { i ->
-            viewModel.toggleSelection(manyItems[i])
+            viewModel.toggleSelection(manyItemsUi[i])
         }
 
-        // Verify 5 selected
+        // Then: Verify 5 selected
         assertEquals(5, states.last().selectedLocations.size)
 
         // When: Try to add 6th item
-        viewModel.toggleSelection(manyItems[5])
+        viewModel.toggleSelection(manyItemsUi[5])
 
-        // Then: Still 5 items (ignored)
+        // Then: Still 5 items (limit is enforced)
         assertEquals(6, states.last().selectedLocations.size)
     }
 
     @Test
     fun `calculateOptimalRoute updates route state`() = runTest {
         // Given
-        coEvery { repository.generateRandomData(any()) } returns testData
+        coEvery { repository.getMapItems(any()) } returns testDataDomain
         val viewModel = MapViewModel(repository)
         val states = captureStates(viewModel)
         viewModel.setPathMode(true)
+        val scooterItemUi = scooterItemDomain.toUiModel()
+        val bikeItemUi = bikeItemDomain.toUiModel()
 
-        // Select two points
-        viewModel.toggleSelection(scooterItem)
-        viewModel.toggleSelection(bikeItem)
-
-        val userLocation = LatLng(59.05, 18.05) // Somewhere in between
-
-        // When
+        // When: Select two points
+        viewModel.toggleSelection(scooterItemUi)
+        viewModel.toggleSelection(bikeItemUi)
+        val userLocation = LatLng(59.05, 18.05)
         viewModel.calculateOptimalRoute(userLocation)
 
         // Then
         val state = states.last()
         assertTrue("Route should not be empty", state.optimalRoute.isNotEmpty())
-        // Route should contain user location + 2 selected points = 3 points total
-        assertEquals(3, state.optimalRoute.size)
+        assertEquals(3, state.optimalRoute.size) // user location + 2 selected points
         assertEquals(userLocation, state.optimalRoute.first())
-
-        // Verify distance/duration calculations happened (non-zero)
         assertTrue(state.routeDistanceMeters > 0)
         assertTrue(state.routeDurationMinutes > 0)
     }

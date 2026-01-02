@@ -8,6 +8,7 @@ import kotlinx.coroutines.flow.map
 import se.onemanstudio.playaroundwithai.core.data.AnalysisType
 import se.onemanstudio.playaroundwithai.core.data.feature.chat.local.dao.PromptsHistoryDao
 import se.onemanstudio.playaroundwithai.core.data.feature.chat.local.entity.PromptEntity
+import se.onemanstudio.playaroundwithai.core.data.feature.chat.local.entity.toDomain
 import se.onemanstudio.playaroundwithai.core.data.feature.chat.remote.api.GeminiApiService
 import se.onemanstudio.playaroundwithai.core.data.feature.chat.remote.dto.Content
 import se.onemanstudio.playaroundwithai.core.data.feature.chat.remote.dto.GeminiRequest
@@ -15,7 +16,6 @@ import se.onemanstudio.playaroundwithai.core.data.feature.chat.remote.dto.Gemini
 import se.onemanstudio.playaroundwithai.core.data.feature.chat.remote.dto.ImageData
 import se.onemanstudio.playaroundwithai.core.data.feature.chat.remote.dto.Part
 import se.onemanstudio.playaroundwithai.core.data.model.Prompt
-import se.onemanstudio.playaroundwithai.core.data.model.mapper.toDomain
 import java.io.ByteArrayOutputStream
 import javax.inject.Inject
 import javax.inject.Singleton
