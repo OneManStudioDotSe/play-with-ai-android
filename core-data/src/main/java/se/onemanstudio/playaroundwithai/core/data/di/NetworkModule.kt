@@ -8,8 +8,8 @@ import okhttp3.OkHttpClient
 import okhttp3.logging.HttpLoggingInterceptor
 import retrofit2.Retrofit
 import retrofit2.converter.gson.GsonConverterFactory
-import se.onemanstudio.playaroundwithai.core.data.remote.gemini.network.AuthenticationInterceptor
-import se.onemanstudio.playaroundwithai.core.data.remote.gemini.network.GeminiApiService
+import se.onemanstudio.playaroundwithai.core.data.feature.chat.remote.api.GeminiApiService
+import se.onemanstudio.playaroundwithai.core.data.feature.chat.remote.network.AuthenticationInterceptor
 import javax.inject.Singleton
 
 @Module

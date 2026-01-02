@@ -1,4 +1,4 @@
-package se.onemanstudio.playaroundwithai.core.data.remote.gemini
+package se.onemanstudio.playaroundwithai.core.data.feature.chat.repository
 
 import android.graphics.Bitmap
 import android.util.Base64
@@ -6,16 +6,16 @@ import androidx.core.graphics.scale
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.map
 import se.onemanstudio.playaroundwithai.core.data.AnalysisType
-import se.onemanstudio.playaroundwithai.core.data.domain.mapper.toDomain
-import se.onemanstudio.playaroundwithai.core.data.domain.model.Prompt
-import se.onemanstudio.playaroundwithai.core.data.local.PromptEntity
-import se.onemanstudio.playaroundwithai.core.data.local.PromptsHistoryDao
-import se.onemanstudio.playaroundwithai.core.data.remote.gemini.model.Content
-import se.onemanstudio.playaroundwithai.core.data.remote.gemini.model.GeminiRequest
-import se.onemanstudio.playaroundwithai.core.data.remote.gemini.model.GeminiResponse
-import se.onemanstudio.playaroundwithai.core.data.remote.gemini.model.ImageData
-import se.onemanstudio.playaroundwithai.core.data.remote.gemini.model.Part
-import se.onemanstudio.playaroundwithai.core.data.remote.gemini.network.GeminiApiService
+import se.onemanstudio.playaroundwithai.core.data.feature.chat.local.dao.PromptsHistoryDao
+import se.onemanstudio.playaroundwithai.core.data.feature.chat.local.entity.PromptEntity
+import se.onemanstudio.playaroundwithai.core.data.feature.chat.remote.api.GeminiApiService
+import se.onemanstudio.playaroundwithai.core.data.feature.chat.remote.dto.Content
+import se.onemanstudio.playaroundwithai.core.data.feature.chat.remote.dto.GeminiRequest
+import se.onemanstudio.playaroundwithai.core.data.feature.chat.remote.dto.GeminiResponse
+import se.onemanstudio.playaroundwithai.core.data.feature.chat.remote.dto.ImageData
+import se.onemanstudio.playaroundwithai.core.data.feature.chat.remote.dto.Part
+import se.onemanstudio.playaroundwithai.core.data.model.Prompt
+import se.onemanstudio.playaroundwithai.core.data.model.mapper.toDomain
 import java.io.ByteArrayOutputStream
 import javax.inject.Inject
 import javax.inject.Singleton
@@ -32,11 +32,11 @@ private const val COMPRESSION_QUALITY = 75
 
 @Suppress("MaxLineLength", "TooGenericExceptionCaught")
 @Singleton
-class GeminiRepository @Inject constructor(
+class GeminiRepositoryImpl @Inject constructor(
     private val apiService: GeminiApiService,
     private val promptsHistoryDao: PromptsHistoryDao,
-) {
-    suspend fun generateContent(
+) : GeminiRepository {
+    override suspend fun generateContent(
         prompt: String,
         imageBitmap: Bitmap?,
         fileText: String?,
@@ -46,12 +46,10 @@ class GeminiRepository @Inject constructor(
             val parts = mutableListOf<Part>()
             var fullPrompt = SYSTEM_INSTRUCTION + prompt
 
-            // Add system instruction if it's an image analysis
             if (analysisType != null) {
                 fullPrompt = SYSTEM_INSTRUCTION + "${getSystemInstruction(analysisType)}\n\nUser prompt: $prompt"
             }
 
-            // Append document text if it exists
             if (!fileText.isNullOrBlank()) {
                 fullPrompt += "\n\n--- DOCUMENT CONTEXT ---\n$fileText"
             }
@@ -70,9 +68,8 @@ class GeminiRepository @Inject constructor(
         }
     }
 
-    suspend fun generateSuggestions(): Result<List<String>> {
+    override suspend fun generateSuggestions(): Result<List<String>> {
         return try {
-            // We create a specific prompt to ensure the output is machine-readable
             val suggestionPrompt = """
                 Generate 3 short, witty, and slightly sarcastic conversation starters that a user could ask you.
                 Keep them under 6 words each.
@@ -81,20 +78,14 @@ class GeminiRepository @Inject constructor(
             """.trimIndent()
 
             val parts = listOf(Part(text = suggestionPrompt))
-
-            // We reuse the Request logic, but we don't necessarily need the full System Instruction
-            // of the main persona if it interferes with the formatting instructions,
-            // but keeping it adds flavor to the suggestions.
             val request = GeminiRequest(contents = listOf(Content(parts = parts)))
             val response = apiService.generateContent(request)
 
             val text = response.extractText() ?: ""
-
-            // Parse the result based on the separator we requested
             val suggestions = text.split("|").map { it.trim() }.filter { it.isNotEmpty() }
 
             if (suggestions.isNotEmpty()) {
-                Result.success(suggestions.take(MAX_SUGGESTIONS)) // Ensure we only get 3
+                Result.success(suggestions.take(MAX_SUGGESTIONS))
             } else {
                 Result.failure(Exception("Failed to parse suggestions"))
             }
@@ -103,7 +94,6 @@ class GeminiRepository @Inject constructor(
         }
     }
 
-    // This function provides the correct context based on the dropdown selection
     private fun getSystemInstruction(analysisType: AnalysisType): String {
         return when (analysisType) {
             AnalysisType.LOCATION -> "You are an expert location identifier. Analyze the attached screenshot(s) to identify the geographical location (city, landmark, country). Be specific and concise."
@@ -117,14 +107,11 @@ class GeminiRepository @Inject constructor(
     }
 
     private fun Bitmap.toImageData(): ImageData {
-        val scaledBitmap = this.scaleBitmap(MAX_SIZE) // Max dimension of 768px
-
+        val scaledBitmap = this.scaleBitmap(MAX_SIZE)
         val byteArrayOutputStream = ByteArrayOutputStream()
-        scaledBitmap.compress(Bitmap.CompressFormat.JPEG, COMPRESSION_QUALITY, byteArrayOutputStream) // 75% quality
+        scaledBitmap.compress(Bitmap.CompressFormat.JPEG, COMPRESSION_QUALITY, byteArrayOutputStream)
         val byteArray = byteArrayOutputStream.toByteArray()
-
         val base64String = Base64.encodeToString(byteArray, Base64.NO_WRAP)
-
         return ImageData(mimeType = "image/jpeg", data = base64String)
     }
 
@@ -143,9 +130,9 @@ class GeminiRepository @Inject constructor(
         return this.scale(resizedWidth, resizedHeight, false)
     }
 
-    suspend fun savePrompt(promptText: String) {
+    override suspend fun savePrompt(promptText: String) {
         promptsHistoryDao.insertPrompt(PromptEntity(text = promptText))
     }
 
-    fun getPromptHistory(): Flow<List<Prompt>> = promptsHistoryDao.getPromptHistory().map { list -> list.map { it.toDomain() } }
+    override fun getPromptHistory(): Flow<List<Prompt>> = promptsHistoryDao.getPromptHistory().map { list -> list.map { it.toDomain() } }
 }

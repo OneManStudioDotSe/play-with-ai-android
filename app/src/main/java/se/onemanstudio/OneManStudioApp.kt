@@ -11,7 +11,10 @@ class OneManStudioApp : Application() {
         super.onCreate()
 
         //"There are no Tree implementations installed by default because every time you log in production, a puppy dies."
-        if (BuildConfig.DEBUG) Timber.plant(Timber.DebugTree())
+        if (BuildConfig.DEBUG) {
+            Timber.plant(Timber.DebugTree())
+        }
+
         Timber.d("Hello world")
     }
 }

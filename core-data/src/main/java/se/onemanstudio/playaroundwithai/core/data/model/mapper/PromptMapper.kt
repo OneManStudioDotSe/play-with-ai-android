@@ -1,7 +1,7 @@
-package se.onemanstudio.playaroundwithai.core.data.domain.mapper
+package se.onemanstudio.playaroundwithai.core.data.model.mapper
 
-import se.onemanstudio.playaroundwithai.core.data.domain.model.Prompt
-import se.onemanstudio.playaroundwithai.core.data.local.PromptEntity
+import se.onemanstudio.playaroundwithai.core.data.feature.chat.local.entity.PromptEntity
+import se.onemanstudio.playaroundwithai.core.data.model.Prompt
 
 /**
  * Maps a [PromptEntity] from the data layer to a [Prompt] in the domain layer.

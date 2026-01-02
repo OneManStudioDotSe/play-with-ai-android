@@ -1,4 +1,4 @@
-package se.onemanstudio.playaroundwithai.core.data.remote.gemini.model
+package se.onemanstudio.playaroundwithai.core.data.feature.chat.remote.dto
 
 import com.google.gson.annotations.SerializedName
 

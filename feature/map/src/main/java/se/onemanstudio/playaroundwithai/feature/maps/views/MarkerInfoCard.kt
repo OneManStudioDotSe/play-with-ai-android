@@ -27,17 +27,17 @@ import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
+import se.onemanstudio.playaroundwithai.core.data.feature.map.remote.dto.VehicleType
 import se.onemanstudio.playaroundwithai.core.ui.sofa.NeoBrutalCard
 import se.onemanstudio.playaroundwithai.core.ui.sofa.NeoBrutalIconButton
 import se.onemanstudio.playaroundwithai.core.ui.theme.Dimensions
 import se.onemanstudio.playaroundwithai.core.ui.theme.SofaAiTheme
 import se.onemanstudio.playaroundwithai.feature.map.R
-import se.onemanstudio.playaroundwithai.feature.maps.models.ItemOnMap
-import se.onemanstudio.playaroundwithai.feature.maps.models.VehicleType
+import se.onemanstudio.playaroundwithai.feature.maps.models.MapItem
 
 @Composable
 fun MarkerInfoCard(
-    marker: ItemOnMap,
+    marker: MapItem,
     onClose: () -> Unit
 ) {
     NeoBrutalCard(modifier = Modifier.fillMaxWidth()) {
@@ -139,7 +139,7 @@ private fun InfoStat(
 fun MarkerInfoCardPreview_Scooter() {
     SofaAiTheme {
         MarkerInfoCard(
-            marker = ItemOnMap(
+            marker = MapItem(
                 id = "1",
                 name = "Scooty",
                 lat = 0.0,
@@ -159,7 +159,7 @@ fun MarkerInfoCardPreview_Scooter() {
 fun MarkerInfoCardPreview_Bicycle() {
     SofaAiTheme {
         MarkerInfoCard(
-            marker = ItemOnMap(
+            marker = MapItem(
                 id = "2",
                 name = "Bikey",
                 lat = 0.0,

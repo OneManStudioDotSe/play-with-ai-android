@@ -1,10 +1,11 @@
-package se.onemanstudio.playaroundwithai.core.data.local
+package se.onemanstudio.playaroundwithai.core.data.feature.chat.local.dao
 
 import androidx.room.Dao
 import androidx.room.Insert
 import androidx.room.OnConflictStrategy
 import androidx.room.Query
 import kotlinx.coroutines.flow.Flow
+import se.onemanstudio.playaroundwithai.core.data.feature.chat.local.entity.PromptEntity
 
 @Dao
 interface PromptsHistoryDao {

@@ -1,4 +1,4 @@
-package se.onemanstudio.playaroundwithai.core.data.remote.gemini.network
+package se.onemanstudio.playaroundwithai.core.data.feature.chat.remote.network
 
 import okhttp3.Interceptor
 import okhttp3.Response

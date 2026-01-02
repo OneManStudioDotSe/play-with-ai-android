@@ -261,10 +261,8 @@ private fun ErrorState(
 
 @Composable
 private fun getErrorMessageAndIcon(error: ChatError): Pair<String, ImageVector> {
-    val context = LocalContext.current
-
     return when (error) {
-        is ChatError.NetworkMissing -> context.getString(R.string.error_no_internet_connection_please_check_your_network) to Icons.Rounded.WifiOff
+        is ChatError.NetworkMissing -> stringResource(R.string.error_no_internet_connection_please_check_your_network) to Icons.Rounded.WifiOff
         is ChatError.Permission -> stringResource(R.string.error_i_don_t_have_permission_to_access_that_file) to Icons.Rounded.Lock
         is ChatError.FileNotFound -> stringResource(R.string.error_i_couldn_t_find_the_selected_file) to Icons.Rounded.BrokenImage
         is ChatError.FileRead -> stringResource(R.string.error_i_couldn_t_read_the_file_content) to Icons.Rounded.Description
@@ -290,7 +288,6 @@ fun getFileName(context: Context, uri: Uri): String? {
 @Composable
 private fun ContentStatePreview_Light() {
     SofaAiTheme(darkTheme = false) {
-        // Mocking a Success state
         ContentState(
             state = ChatUiState.Success(
                 outputText = "Here is a sample response from the AI."
@@ -312,8 +309,6 @@ private fun ContentStatePreview_Dark() {
         )
     }
 }
-
-// --- Error State Previews ---
 
 @Preview(name = "Error State - Light", showBackground = true)
 @Composable

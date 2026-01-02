@@ -55,11 +55,11 @@ import com.google.maps.android.compose.Polyline
 import com.google.maps.android.compose.rememberCameraPositionState
 import com.google.maps.android.compose.rememberUpdatedMarkerState
 import kotlinx.coroutines.launch
+import se.onemanstudio.playaroundwithai.core.data.feature.map.remote.dto.VehicleType
 import se.onemanstudio.playaroundwithai.core.ui.theme.Dimensions
 import se.onemanstudio.playaroundwithai.feature.map.R
 import se.onemanstudio.playaroundwithai.feature.maps.MapConstants.STOCKHOLM_LAT
 import se.onemanstudio.playaroundwithai.feature.maps.MapConstants.STOCKHOLM_LNG
-import se.onemanstudio.playaroundwithai.feature.maps.models.VehicleType
 import se.onemanstudio.playaroundwithai.feature.maps.views.CustomMarkerIcon
 import se.onemanstudio.playaroundwithai.feature.maps.views.FilterChip
 import se.onemanstudio.playaroundwithai.feature.maps.views.MarkerInfoCard

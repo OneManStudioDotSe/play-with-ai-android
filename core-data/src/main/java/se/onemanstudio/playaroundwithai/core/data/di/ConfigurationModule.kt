@@ -1,14 +1,11 @@
-package se.onemanstudio.playaroundwithai.di
+package se.onemanstudio.playaroundwithai.core.data.di
 
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
 import dagger.hilt.components.SingletonComponent
 import okhttp3.logging.HttpLoggingInterceptor
-import se.onemanstudio.playaroundwithai.BuildConfig
-import se.onemanstudio.playaroundwithai.core.data.di.BaseUrl
-import se.onemanstudio.playaroundwithai.core.data.di.GeminiApiKey
-import se.onemanstudio.playaroundwithai.core.data.di.LoggingLevel
+import se.onemanstudio.playaroundwithai.core.data.BuildConfig
 import javax.inject.Singleton
 
 @Module

@@ -1,6 +1,6 @@
-package se.onemanstudio.playaroundwithai.feature.maps.utils
+package se.onemanstudio.playaroundwithai.core.data.util
 
-import se.onemanstudio.playaroundwithai.feature.maps.models.VehicleType
+import se.onemanstudio.playaroundwithai.core.data.feature.map.remote.dto.VehicleType
 import kotlin.random.Random
 
 @Suppress("MagicNumber")

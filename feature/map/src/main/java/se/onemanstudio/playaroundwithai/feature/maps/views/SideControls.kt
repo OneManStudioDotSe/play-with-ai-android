@@ -14,13 +14,11 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
-import androidx.compose.ui.tooling.preview.Preview
 import com.google.android.gms.maps.CameraUpdateFactory
 import com.google.maps.android.compose.CameraPositionState
 import kotlinx.coroutines.launch
 import se.onemanstudio.playaroundwithai.core.ui.sofa.NeoBrutalIconButton
 import se.onemanstudio.playaroundwithai.core.ui.theme.Dimensions
-import se.onemanstudio.playaroundwithai.core.ui.theme.SofaAiTheme
 import se.onemanstudio.playaroundwithai.feature.map.R
 import se.onemanstudio.playaroundwithai.feature.maps.state.MapUiState
 
@@ -77,19 +75,6 @@ fun SideControls(
                 MaterialTheme.colorScheme.onSurface
             },
             onClick = { onSetPathMode(uiState.isPathMode) },
-        )
-    }
-}
-
-@Preview
-@Composable
-private fun SideControlsPreview() {
-    SofaAiTheme {
-        SideControls(
-            uiState = MapUiState(),
-            cameraPositionState = CameraPositionState(),
-            onMyLocationClick = {},
-            onSetPathMode = {}
         )
     }
 }

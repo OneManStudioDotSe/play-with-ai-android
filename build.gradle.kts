@@ -1,7 +1,7 @@
 import com.github.benmanes.gradle.versions.updates.DependencyUpdatesTask
 import io.gitlab.arturbosch.detekt.extensions.DetektExtension
 
-// Check versions of dependencies: ./gradlew dependencyUpdates -Drevision=milestone -DoutputFormatter=json
+// Check versions of dependencies: ./gradlew dependencyUpdates -Drevision=release -DoutputFormatter=plain
 // Force-update dependencies:      ./gradlew clean build --refresh-dependencies
 
 // Top-level build file where you can add configuration options common to all sub-projects/modules.

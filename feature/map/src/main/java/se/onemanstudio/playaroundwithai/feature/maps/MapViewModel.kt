@@ -8,9 +8,10 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
-import se.onemanstudio.playaroundwithai.feature.maps.MapRepository
-import se.onemanstudio.playaroundwithai.feature.maps.models.ItemOnMap
-import se.onemanstudio.playaroundwithai.feature.maps.models.VehicleType
+import se.onemanstudio.playaroundwithai.core.data.feature.map.remote.dto.VehicleType
+import se.onemanstudio.playaroundwithai.core.data.feature.map.repository.MapRepository
+import se.onemanstudio.playaroundwithai.feature.maps.models.MapItem
+import se.onemanstudio.playaroundwithai.feature.maps.models.toUiModel
 import se.onemanstudio.playaroundwithai.feature.maps.state.MapUiState
 import se.onemanstudio.playaroundwithai.feature.maps.utils.calculatePathDistance
 import se.onemanstudio.playaroundwithai.feature.maps.utils.permutations
@@ -36,7 +37,7 @@ class MapViewModel @Inject constructor(
         _uiState.update { it.copy(isLoading = true) }
 
         viewModelScope.launch {
-            val data = repository.generateRandomData(AMOUNT_OF_POINTS_TO_GENERATE)
+            val data = repository.getMapItems(AMOUNT_OF_POINTS_TO_GENERATE).map { it.toUiModel() }
             _uiState.update {
                 it.copy(
                     isLoading = false,
@@ -58,7 +59,7 @@ class MapViewModel @Inject constructor(
         }
     }
 
-    fun selectMarker(marker: ItemOnMap?) {
+    fun selectMarker(marker: MapItem?) {
         _uiState.update { it.copy(focusedMarker = marker) }
     }
 
@@ -82,7 +83,7 @@ class MapViewModel @Inject constructor(
         }
     }
 
-    fun toggleSelection(location: ItemOnMap) {
+    fun toggleSelection(location: MapItem) {
         if (!_uiState.value.isPathMode) return
 
         _uiState.update { state ->
