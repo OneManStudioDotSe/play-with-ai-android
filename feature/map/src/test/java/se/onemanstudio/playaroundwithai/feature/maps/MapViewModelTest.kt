@@ -31,7 +31,7 @@ class MapViewModelTest {
 
     private val repository: MapRepository = mockk()
 
-    // Test Data - Using the DOMAIN model, as this is what the repository returns
+    // Test Data
     private val scooterItemDomain = MapItem(
         id = "1", lat = 59.0, lng = 18.0, name = "Scooter 1", type = VehicleType.SCOOTER,
         batteryLevel = 88, vehicleCode = "1234", nickname = "Scooty"
