@@ -28,7 +28,7 @@ class MapViewModel @Inject constructor(
 
     private val _uiState = MutableStateFlow(MapUiState())
     val uiState = _uiState.asStateFlow()
-
+    
     init {
         loadMapData()
     }

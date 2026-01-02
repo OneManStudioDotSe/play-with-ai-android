@@ -26,6 +26,6 @@ fun MapItemDto.toDomain(): MapItem {
         type = this.type,
         batteryLevel = 100,
         vehicleCode = "0000",
-        nickname = "Unnamed"
+        nickname = this.nickname
     )
 }
