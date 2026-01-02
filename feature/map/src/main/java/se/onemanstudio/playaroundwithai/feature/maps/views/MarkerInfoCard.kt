@@ -27,17 +27,18 @@ import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
+import se.onemanstudio.playaroundwithai.core.data.feature.map.dto.VehicleType
 import se.onemanstudio.playaroundwithai.core.ui.sofa.NeoBrutalCard
 import se.onemanstudio.playaroundwithai.core.ui.sofa.NeoBrutalIconButton
 import se.onemanstudio.playaroundwithai.core.ui.theme.Dimensions
 import se.onemanstudio.playaroundwithai.core.ui.theme.SofaAiTheme
 import se.onemanstudio.playaroundwithai.feature.map.R
-import se.onemanstudio.playaroundwithai.feature.maps.models.ItemOnMap
-import se.onemanstudio.playaroundwithai.feature.maps.models.VehicleType
+import se.onemanstudio.playaroundwithai.feature.maps.models.MapItemUiModel
+import se.onemanstudio.playaroundwithai.core.data.model.MapItem
 
 @Composable
 fun MarkerInfoCard(
-    marker: ItemOnMap,
+    marker: MapItemUiModel,
     onClose: () -> Unit
 ) {
     NeoBrutalCard(modifier = Modifier.fillMaxWidth()) {
@@ -49,19 +50,23 @@ fun MarkerInfoCard(
             ) {
                 Row(verticalAlignment = Alignment.CenterVertically) {
                     Icon(
-                        imageVector = if (marker.type == VehicleType.BICYCLE) Icons.AutoMirrored.Filled.DirectionsBike else Icons.Default.ElectricScooter,
+                        imageVector = if (marker.mapItem.type == VehicleType.BICYCLE) {
+                            Icons.AutoMirrored.Filled.DirectionsBike
+                        } else {
+                            Icons.Default.ElectricScooter
+                        },
                         contentDescription = stringResource(id = R.string.vehicle_type_icon_content_description),
                         modifier = Modifier.size(Dimensions.iconSizeLarge)
                     )
                     Spacer(modifier = Modifier.width(Dimensions.paddingMedium))
                     Column {
                         Text(
-                            text = marker.nickname.uppercase(),
+                            text = marker.mapItem.nickname.uppercase(),
                             style = MaterialTheme.typography.titleMedium,
                             fontWeight = FontWeight.Bold
                         )
                         Text(
-                            text = if (marker.type == VehicleType.SCOOTER) stringResource(R.string.e_scooter) else stringResource(R.string.e_bike),
+                            text = if (marker.mapItem.type == VehicleType.SCOOTER) stringResource(R.string.e_scooter) else stringResource(R.string.e_bike),
                             style = MaterialTheme.typography.labelSmall
                         )
                     }
@@ -89,13 +94,13 @@ fun MarkerInfoCard(
                     icon = Icons.Default.BatteryStd,
                     iconContentDescription = stringResource(id = R.string.battery_icon_content_description),
                     label = stringResource(R.string.battery),
-                    value = "${marker.batteryLevel}%"
+                    value = "${marker.mapItem.batteryLevel}%"
                 )
                 InfoStat(
                     icon = Icons.Default.QrCode,
                     iconContentDescription = stringResource(id = R.string.code_icon_content_description),
                     label = stringResource(R.string.code),
-                    value = marker.vehicleCode
+                    value = marker.mapItem.vehicleCode
                 )
             }
         }
@@ -139,15 +144,17 @@ private fun InfoStat(
 fun MarkerInfoCardPreview_Scooter() {
     SofaAiTheme {
         MarkerInfoCard(
-            marker = ItemOnMap(
-                id = "1",
-                name = "Scooty",
-                lat = 0.0,
-                lng = 0.0,
-                type = VehicleType.SCOOTER,
-                batteryLevel = 87,
-                vehicleCode = "1234",
-                nickname = "Scooty"
+            marker = MapItemUiModel(
+                mapItem = MapItem(
+                    id = "1",
+                    name = "Scooty",
+                    lat = 0.0,
+                    lng = 0.0,
+                    type = VehicleType.SCOOTER,
+                    batteryLevel = 87,
+                    vehicleCode = "1234",
+                    nickname = "Scooty"
+                )
             ),
             onClose = {}
         )
@@ -159,15 +166,17 @@ fun MarkerInfoCardPreview_Scooter() {
 fun MarkerInfoCardPreview_Bicycle() {
     SofaAiTheme {
         MarkerInfoCard(
-            marker = ItemOnMap(
-                id = "2",
-                name = "Bikey",
-                lat = 0.0,
-                lng = 0.0,
-                type = VehicleType.BICYCLE,
-                batteryLevel = 55,
-                vehicleCode = "6789",
-                nickname = "Bikey"
+            marker = MapItemUiModel(
+                mapItem = MapItem(
+                    id = "2",
+                    name = "Bikey",
+                    lat = 0.0,
+                    lng = 0.0,
+                    type = VehicleType.BICYCLE,
+                    batteryLevel = 55,
+                    vehicleCode = "6789",
+                    nickname = "Bikey"
+                )
             ),
             onClose = {}
         )

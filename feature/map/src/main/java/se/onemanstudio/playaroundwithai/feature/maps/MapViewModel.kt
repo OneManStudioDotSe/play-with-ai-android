@@ -8,9 +8,10 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
-import se.onemanstudio.playaroundwithai.feature.maps.MapRepository
-import se.onemanstudio.playaroundwithai.feature.maps.models.ItemOnMap
-import se.onemanstudio.playaroundwithai.feature.maps.models.VehicleType
+import se.onemanstudio.playaroundwithai.core.data.feature.map.dto.VehicleType
+import se.onemanstudio.playaroundwithai.core.data.feature.map.repository.MapRepository
+import se.onemanstudio.playaroundwithai.feature.maps.models.MapItemUiModel
+import se.onemanstudio.playaroundwithai.feature.maps.models.toUiModel
 import se.onemanstudio.playaroundwithai.feature.maps.state.MapUiState
 import se.onemanstudio.playaroundwithai.feature.maps.utils.calculatePathDistance
 import se.onemanstudio.playaroundwithai.feature.maps.utils.permutations
@@ -36,7 +37,7 @@ class MapViewModel @Inject constructor(
         _uiState.update { it.copy(isLoading = true) }
 
         viewModelScope.launch {
-            val data = repository.generateRandomData(AMOUNT_OF_POINTS_TO_GENERATE)
+            val data = repository.getMapItems(AMOUNT_OF_POINTS_TO_GENERATE).map { it.toUiModel() }
             _uiState.update {
                 it.copy(
                     isLoading = false,
@@ -58,7 +59,7 @@ class MapViewModel @Inject constructor(
         }
     }
 
-    fun selectMarker(marker: ItemOnMap?) {
+    fun selectMarker(marker: MapItemUiModel?) {
         _uiState.update { it.copy(focusedMarker = marker) }
     }
 
@@ -82,28 +83,23 @@ class MapViewModel @Inject constructor(
         }
     }
 
-    fun toggleSelection(location: ItemOnMap) {
+    fun toggleSelection(location: MapItemUiModel) {
         if (!_uiState.value.isPathMode) return
 
         _uiState.update { state ->
             val currentSelected = state.selectedLocations
-            if (currentSelected.any { it.id == location.id }) {
-                state.copy(
-                    selectedLocations = currentSelected.filter { it.id != location.id },
-                    optimalRoute = emptyList(),
-                    routeDistanceMeters = 0
-                )
+            val isAlreadySelected = currentSelected.any { it.id == location.id }
+
+            val newSelected = if (isAlreadySelected) {
+                currentSelected.filter { it.id != location.id }
             } else {
                 if (currentSelected.size < MapConstants.MAX_SELECTABLE_POINTS) {
-                    state.copy(
-                        selectedLocations = currentSelected + location.copy(isSelected = true),
-                        optimalRoute = emptyList(),
-                        routeDistanceMeters = 0
-                    )
+                    currentSelected + location.copy(isSelected = true)
                 } else {
-                    state
+                    currentSelected // Limit reached, do not add
                 }
             }
+            state.copy(selectedLocations = newSelected, optimalRoute = emptyList(), routeDistanceMeters = 0)
         }
     }
 

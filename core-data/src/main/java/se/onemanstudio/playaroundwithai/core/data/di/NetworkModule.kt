@@ -8,8 +8,10 @@ import okhttp3.OkHttpClient
 import okhttp3.logging.HttpLoggingInterceptor
 import retrofit2.Retrofit
 import retrofit2.converter.gson.GsonConverterFactory
-import se.onemanstudio.playaroundwithai.core.data.remote.gemini.network.AuthenticationInterceptor
-import se.onemanstudio.playaroundwithai.core.data.remote.gemini.network.GeminiApiService
+import se.onemanstudio.playaroundwithai.core.data.feature.chat.remote.api.GeminiApiService
+import se.onemanstudio.playaroundwithai.core.data.feature.chat.remote.network.AuthenticationInterceptor
+import se.onemanstudio.playaroundwithai.core.data.feature.map.api.MapApiService
+import se.onemanstudio.playaroundwithai.core.data.feature.map.api.FakeMapApiService
 import javax.inject.Singleton
 
 @Module
@@ -44,5 +46,11 @@ object NetworkModule {
     @Singleton
     fun provideGeminiApiService(retrofit: Retrofit): GeminiApiService {
         return retrofit.create(GeminiApiService::class.java)
+    }
+
+    @Provides
+    @Singleton
+    fun provideMapApiService(): MapApiService {
+        return FakeMapApiService()
     }
 }

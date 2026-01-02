@@ -1,7 +1,7 @@
 import com.github.benmanes.gradle.versions.updates.DependencyUpdatesTask
 import io.gitlab.arturbosch.detekt.extensions.DetektExtension
 
-// Check versions of dependencies: ./gradlew dependencyUpdates -Drevision=milestone -DoutputFormatter=json
+// Check versions of dependencies: ./gradlew dependencyUpdates -Drevision=release -DoutputFormatter=plain
 // Force-update dependencies:      ./gradlew clean build --refresh-dependencies
 
 // Top-level build file where you can add configuration options common to all sub-projects/modules.
@@ -39,11 +39,16 @@ allprojects {
 subprojects {
     apply(plugin = "io.gitlab.arturbosch.detekt")
 
-    // Use extensions.configure<DetektExtension> instead of just detekt { }
     extensions.configure<DetektExtension> {
         config.setFrom(files("${rootProject.projectDir}/detekt.yml"))
 
         buildUponDefaultConfig = true
         autoCorrect = true // This will auto-fix simple formatting issues
+    }
+
+    configurations.configureEach {
+        resolutionStrategy {
+            force("org.jetbrains.kotlin:kotlin-metadata-jvm:2.3.0")
+        }
     }
 }

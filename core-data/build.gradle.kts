@@ -1,3 +1,5 @@
+import java.io.FileInputStream
+import java.util.Properties
 import org.jetbrains.kotlin.gradle.dsl.JvmTarget
 
 plugins {
@@ -7,6 +9,23 @@ plugins {
     alias(libs.plugins.ksp)
 }
 
+// Read the API key from local.properties
+val localProperties = Properties()
+val localPropertiesFile = rootProject.file("local.properties")
+
+// only load file if it exists
+if (localPropertiesFile.exists()) {
+    localProperties.load(FileInputStream(localPropertiesFile))
+}
+
+val geminiKeyDebug = localProperties.getProperty("GEMINI_API_KEY_DEBUG")
+    ?: System.getenv("GEMINI_API_KEY_DEBUG")
+    ?: ""
+
+val geminiKeyRelease = localProperties.getProperty("GEMINI_API_KEY_RELEASE")
+    ?: System.getenv("GEMINI_API_KEY_RELEASE")
+    ?: ""
+
 android {
     namespace = "se.onemanstudio.playaroundwithai.core.data"
     compileSdk = 36
@@ -15,10 +34,21 @@ android {
         minSdk = 31
     }
 
+    buildFeatures {
+        buildConfig = true
+    }
+
     buildTypes {
+        debug {
+            isMinifyEnabled = false
+            buildConfigField("String", "GEMINI_API_KEY", "\"$geminiKeyDebug\"")
+            buildConfigField("String", "BASE_URL", "\"https://generativelanguage.googleapis.com/\"")
+        }
         release {
             isMinifyEnabled = false
             proguardFiles(getDefaultProguardFile("proguard-android-optimize.txt"), "proguard-rules.pro")
+            buildConfigField("String", "GEMINI_API_KEY", "\"$geminiKeyRelease\"")
+            buildConfigField("String", "BASE_URL", "\"https://generativelanguage.googleapis.com/\"")
         }
     }
 

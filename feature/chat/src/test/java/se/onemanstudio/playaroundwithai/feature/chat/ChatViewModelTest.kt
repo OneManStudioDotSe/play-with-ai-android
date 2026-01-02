@@ -14,9 +14,9 @@ import kotlinx.coroutines.test.advanceUntilIdle
 import kotlinx.coroutines.test.runTest
 import org.junit.Rule
 import org.junit.Test
-import se.onemanstudio.playaroundwithai.core.data.domain.model.Prompt
-import se.onemanstudio.playaroundwithai.core.data.remote.gemini.GeminiRepository
-import se.onemanstudio.playaroundwithai.core.data.remote.gemini.model.GeminiResponse
+import se.onemanstudio.playaroundwithai.core.data.feature.chat.remote.dto.GeminiResponse
+import se.onemanstudio.playaroundwithai.core.data.feature.chat.repository.GeminiRepository
+import se.onemanstudio.playaroundwithai.core.data.model.Prompt
 import se.onemanstudio.playaroundwithai.feature.chat.states.ChatError
 import se.onemanstudio.playaroundwithai.feature.chat.states.ChatUiState
 import se.onemanstudio.playaroundwithai.feature.chat.util.MainCoroutineRule

@@ -9,9 +9,3 @@ object Chat : Route
 
 @Serializable
 object Maps : Route
-
-@Serializable
-object Showcase : Route
-
-@Serializable
-object Eat : Route
