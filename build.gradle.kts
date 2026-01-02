@@ -39,11 +39,16 @@ allprojects {
 subprojects {
     apply(plugin = "io.gitlab.arturbosch.detekt")
 
-    // Use extensions.configure<DetektExtension> instead of just detekt { }
     extensions.configure<DetektExtension> {
         config.setFrom(files("${rootProject.projectDir}/detekt.yml"))
 
         buildUponDefaultConfig = true
         autoCorrect = true // This will auto-fix simple formatting issues
+    }
+
+    configurations.configureEach {
+        resolutionStrategy {
+            force("org.jetbrains.kotlin:kotlin-metadata-jvm:2.3.0")
+        }
     }
 }

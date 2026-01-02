@@ -114,6 +114,7 @@ dependencies {
     // Hilt
     implementation(libs.hilt.android)
     implementation(libs.hilt.navigation.compose)
+    implementation(libs.material)
     ksp(libs.hilt.compiler)
 
     debugImplementation(libs.ui.tooling)

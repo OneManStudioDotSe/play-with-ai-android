@@ -1,11 +1,11 @@
 [versions]
 # libraries
 coroutines = "1.10.2"
-material3 = "1.5.0-alpha10"
+material3 = "1.4.0"
 materialIconsExtended = "1.7.8"
-
-navigationCompose = "2.8.0"
-kotlinxSerialization = "1.7.1"
+uiTooling = "1.10.0"
+navigationCompose = "2.9.6"
+kotlinxSerialization = "1.9.0"
 
 hiltNavigationCompose = "1.3.0"
 
@@ -17,24 +17,25 @@ room = "2.8.4"
 coil = "2.7.0"
 timber = "5.0.1"
 
-mapsCompose = "6.12.2"
+mapsCompose = "7.0.0"
 playServicesMaps = "19.2.0"
 playServicesLocation = "21.3.0"
 
 # testing
 junit4 = "4.13.2"
 mockk = "1.14.7"
-kotlinTest = "2.2.21"
+kotlinTest = "2.3.0"
 
 
 # plugins
 agp = "8.13.2"
-kotlin = "2.2.21"
+kotlin = "2.3.0"
 versionsCheck = "0.53.0"
 hilt = "2.57.2"
-ksp = "2.3.3"
+ksp = "2.3.4"
 detekt = "1.23.8"
 ktlint = "14.0.1"
+material = "1.13.0"
 
 [libraries]
 
@@ -43,7 +44,7 @@ kotlinx-coroutines-test = { module = "org.jetbrains.kotlinx:kotlinx-coroutines-t
 
 # UI
 material3 = { module = "androidx.compose.material3:material3", version.ref = "material3" }
-ui-tooling = { group = "androidx.compose.ui", name = "ui-tooling" }
+ui-tooling = { group = "androidx.compose.ui", name = "ui-tooling", version.ref = "uiTooling" }
 
 androidx-navigation-compose = { group = "androidx.navigation", name = "navigation-compose", version.ref = "navigationCompose" }
 kotlinx-serialization-json = { group = "org.jetbrains.kotlinx", name = "kotlinx-serialization-json", version.ref = "kotlinxSerialization" }
@@ -79,6 +80,7 @@ play-services-location = { module = "com.google.android.gms:play-services-locati
 junit4 = { module = "junit:junit", version.ref = "junit4" }
 mockk = { module = "io.mockk:mockk", version.ref = "mockk" }
 kotlin-test = { module = "org.jetbrains.kotlin:kotlin-test", version.ref = "kotlinTest" }
+material = { group = "com.google.android.material", name = "material", version.ref = "material" }
 
 [plugins]
 android-application = { id = "com.android.application", version.ref = "agp" }

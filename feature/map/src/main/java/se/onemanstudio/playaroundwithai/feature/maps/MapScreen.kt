@@ -2,6 +2,7 @@ package se.onemanstudio.playaroundwithai.feature.maps
 
 import android.Manifest
 import android.annotation.SuppressLint
+import android.content.pm.PackageManager
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.animation.AnimatedVisibility
@@ -37,6 +38,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
+import androidx.core.content.ContextCompat
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import com.google.android.gms.location.LocationServices
 import com.google.android.gms.maps.CameraUpdateFactory
@@ -167,7 +169,7 @@ fun MapScreen(viewModel: MapViewModel = hiltViewModel()) {
                         if (item.type == VehicleType.BICYCLE) Icons.AutoMirrored.Filled.DirectionsBike else Icons.Default.ElectricScooter
 
                     MarkerComposable(
-                        keys = arrayOf(item.id, isSelected),
+                        keys = arrayOf<Any>(item.id, isSelected),
                         state = rememberUpdatedMarkerState(position = item.position),
                         title = item.name,
                         zIndex = if (isSelected) 10f else 1f,
@@ -268,8 +270,32 @@ fun MapScreen(viewModel: MapViewModel = hiltViewModel()) {
             SideControls(
                 uiState = uiState,
                 cameraPositionState = cameraPositionState,
-                fusedLocationClient = fusedLocationClient,
-                permissionLauncher = permissionLauncher,
+                onMyLocationClick = {
+                    val hasPermission = ContextCompat.checkSelfPermission(
+                        context,
+                        Manifest.permission.ACCESS_FINE_LOCATION
+                    ) == PackageManager.PERMISSION_GRANTED
+
+                    if (hasPermission) {
+                        fusedLocationClient.lastLocation.addOnSuccessListener { location ->
+                            location?.let {
+                                val userLatLng = LatLng(it.latitude, it.longitude)
+                                scope.launch {
+                                    cameraPositionState.animate(
+                                        update = CameraUpdateFactory.newLatLngZoom(
+                                            userLatLng,
+                                            MapConstants.MAX_ZOOM_LEVEL
+                                        ),
+                                        durationMs = MapConstants.MOVE_TO_POINT_DURATION
+                                    )
+                                }
+                            }
+                        }
+                    } else {
+                        // If we don't have it, ask for it
+                        permissionLauncher.launch(Manifest.permission.ACCESS_FINE_LOCATION)
+                    }
+                },
                 onSetPathMode = { viewModel.setPathMode(!uiState.isPathMode) }
             )
         }
@@ -364,5 +390,3 @@ fun MapScreen(viewModel: MapViewModel = hiltViewModel()) {
         }
     }
 }
-
-

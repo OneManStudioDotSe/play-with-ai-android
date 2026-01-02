@@ -10,7 +10,6 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Chair
 import androidx.compose.material.icons.filled.Map
-import androidx.compose.material.icons.filled.NewReleases
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.NavigationBar
@@ -38,13 +37,10 @@ import se.onemanstudio.playaroundwithai.feature.maps.MapScreen
 import se.onemanstudio.playaroundwithai.navigation.Chat
 import se.onemanstudio.playaroundwithai.navigation.Maps
 import se.onemanstudio.playaroundwithai.navigation.NavItem
-import se.onemanstudio.playaroundwithai.navigation.Showcase
-import se.onemanstudio.playaroundwithai.ui.screens.unused.DesignDemoScreen
 
 val navItems = listOf(
     NavItem(Chat, "Chat", Icons.Default.Chair),
     NavItem(Maps, "Explore", Icons.Default.Map),
-    NavItem(Showcase, "Showcase", Icons.Default.NewReleases),
 )
 
 @AndroidEntryPoint
@@ -102,7 +98,6 @@ class MainActivity : ComponentActivity() {
                     ) {
                         composable<Chat> { ChatScreen(viewModel = hiltViewModel()) }
                         composable<Maps> { MapScreen() }
-                        composable<Showcase> { DesignDemoScreen() }
                     }
                 }
             }
