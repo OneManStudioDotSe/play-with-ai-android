@@ -9,6 +9,7 @@ plugins {
     alias(libs.plugins.kotlin.serialization)
     alias(libs.plugins.hilt)
     alias(libs.plugins.ksp)
+    alias(libs.plugins.google.services)
 }
 
 // Read the API key from local.properties
@@ -81,6 +82,7 @@ android {
 }
 
 dependencies {
+    implementation(project(":core-domain"))
     implementation(project(":core-data"))
     implementation(project(":core-theme"))
     implementation(project(":core-ui"))
@@ -96,6 +98,15 @@ dependencies {
     implementation(libs.okhttp.logging.interceptor)
 
     implementation(libs.timber)
+
+    // Firebase
+    implementation(platform(libs.firebase.bom))
+    implementation(libs.firebase.firestore)
+    implementation(libs.firebase.auth)
+
+    // WorkManager
+    implementation(libs.androidx.work.runtime.ktx)
+    implementation(libs.androidx.hilt.work)
 
     // Hilt
     implementation(libs.hilt.android)

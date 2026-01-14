@@ -1,11 +1,11 @@
-package se.onemanstudio.playaroundwithai.core.domain.usecase
+package se.onemanstudio.playaroundwithai.core.domain.feature.chat.usecase
 
-import se.onemanstudio.playaroundwithai.core.domain.model.AnalysisType
-import se.onemanstudio.playaroundwithai.core.domain.repository.GeminiDomainRepository
+import se.onemanstudio.playaroundwithai.core.domain.feature.chat.model.AnalysisType
+import se.onemanstudio.playaroundwithai.core.domain.feature.chat.repository.GeminiRepository
 import javax.inject.Inject
 
 class GenerateContentUseCase @Inject constructor(
-    private val repository: GeminiDomainRepository
+    private val repository: GeminiRepository
 ) {
     suspend operator fun invoke(
         prompt: String,

@@ -16,3 +16,4 @@ local.properties
 /.kotlin
 /feature/map/build
 /.idea
+/core-domain/build

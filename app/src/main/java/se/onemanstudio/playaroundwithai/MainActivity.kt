@@ -50,6 +50,9 @@ class MainActivity : ComponentActivity() {
         enableEdgeToEdge()
 
         setContent {
+            // This will trigger the anonymous login
+            val viewModel: MainViewModel = hiltViewModel()
+
             SofaAiTheme {
                 val navController = rememberNavController()
 
