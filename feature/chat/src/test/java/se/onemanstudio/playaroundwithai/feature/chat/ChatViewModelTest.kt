@@ -14,9 +14,12 @@ import kotlinx.coroutines.test.advanceUntilIdle
 import kotlinx.coroutines.test.runTest
 import org.junit.Rule
 import org.junit.Test
-import se.onemanstudio.playaroundwithai.core.data.feature.chat.remote.dto.GeminiResponse
-import se.onemanstudio.playaroundwithai.core.data.feature.chat.repository.GeminiRepository
-import se.onemanstudio.playaroundwithai.core.data.model.Prompt
+import se.onemanstudio.playaroundwithai.core.domain.feature.chat.model.Prompt
+import se.onemanstudio.playaroundwithai.core.domain.feature.chat.repository.GeminiRepository
+import se.onemanstudio.playaroundwithai.core.domain.feature.chat.usecase.GenerateContentUseCase
+import se.onemanstudio.playaroundwithai.core.domain.feature.chat.usecase.GetPromptHistoryUseCase
+import se.onemanstudio.playaroundwithai.core.domain.feature.chat.usecase.GetSuggestionsUseCase
+import se.onemanstudio.playaroundwithai.core.domain.feature.chat.usecase.GetSyncStateUseCase
 import se.onemanstudio.playaroundwithai.feature.chat.states.ChatError
 import se.onemanstudio.playaroundwithai.feature.chat.states.ChatUiState
 import se.onemanstudio.playaroundwithai.feature.chat.util.MainCoroutineRule
@@ -49,9 +52,8 @@ class ChatViewModelTest {
     fun `generateContent success updates state to Success`() = runTest {
         // Given
         val prompt = "What is the meaning of life?"
-        val fakeResponse = GeminiResponse(candidates = emptyList())
         val viewModel = createViewModel(
-            geminiResult = Result.success(fakeResponse)
+            generateContentResult = Result.success("Mocked AI response")
         )
         val states = mutableListOf<ChatUiState>()
 
@@ -66,7 +68,7 @@ class ChatViewModelTest {
         assertEquals(expected = ChatUiState.Initial, actual = states[0])
         assertEquals(expected = ChatUiState.Loading, actual = states[1])
         assert(states[2] is ChatUiState.Success)
-        assertEquals(expected = "No response text found.", actual = (states[2] as ChatUiState.Success).outputText)
+        assertEquals(expected = "Mocked AI response", actual = (states[2] as ChatUiState.Success).outputText)
     }
 
     @Test
@@ -75,7 +77,7 @@ class ChatViewModelTest {
         val prompt = "What is the meaning of life?"
         val exception = RuntimeException("Test error")
         val viewModel = createViewModel(
-            geminiResult = Result.failure(exception)
+            generateContentResult = Result.failure(exception)
         )
         val states = mutableListOf<ChatUiState>()
 
@@ -99,7 +101,7 @@ class ChatViewModelTest {
         val prompt = "Prompt that will be used for testing network errors"
         val exception = IOException("Oh no, no internet!")
         val viewModel = createViewModel(
-            geminiResult = Result.failure(exception)
+            generateContentResult = Result.failure(exception)
         )
         val states = mutableListOf<ChatUiState>()
 
@@ -152,19 +154,27 @@ class ChatViewModelTest {
     }
 
     private fun createViewModel(
-        geminiResult: Result<GeminiResponse>? = null,
+        generateContentResult: Result<String>? = null,
         suggestionsResult: Result<List<String>> = Result.success(emptyList()),
         promptHistoryResult: List<Prompt> = emptyList(),
+        isSyncingResult: Boolean = false
     ): ChatViewModel {
         val repository = mockk<GeminiRepository> {
-            geminiResult?.let { coEvery { generateContent(any(), any(), any(), any()) } returns it }
+            generateContentResult?.let { coEvery { generateContent(any(), any(), any(), any()) } returns it }
             coEvery { generateSuggestions() } returns suggestionsResult
             coEvery { savePrompt(any()) } returns Unit
             every { getPromptHistory() } returns flowOf(promptHistoryResult)
+            every { isSyncing() } returns flowOf(isSyncingResult)
         }
 
         val application = mockk<Application>(relaxed = true)
 
-        return ChatViewModel(repository, application)
+        return ChatViewModel(
+            GenerateContentUseCase(repository),
+            GetSuggestionsUseCase(repository),
+            GetPromptHistoryUseCase(repository),
+            GetSyncStateUseCase(repository),
+            application
+        )
     }
 }

@@ -20,7 +20,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import se.onemanstudio.playaroundwithai.core.data.InputMode
+import se.onemanstudio.playaroundwithai.core.domain.feature.chat.model.InputMode
 import se.onemanstudio.playaroundwithai.core.ui.theme.Dimensions
 import se.onemanstudio.playaroundwithai.core.ui.theme.SofaAiTheme
 
@@ -75,7 +75,7 @@ fun NeoBrutalSegmentedButton(
                 }
 
                 // Divider between items
-                if (index < modes.lastIndex) {
+                if (index < modes.size - 1) {
                     VerticalDivider(
                         modifier = Modifier.fillMaxHeight(),
                         thickness = Dimensions.borderStrokeSmall,
@@ -92,7 +92,7 @@ fun NeoBrutalSegmentedButton(
 private fun SegmentedButtonPreview() {
     SofaAiTheme {
         NeoBrutalSegmentedButton(
-            modes = InputMode.values().toList(),
+            modes = InputMode.entries,
             selectedMode = InputMode.TEXT,
             onModeSelected = {}
         )

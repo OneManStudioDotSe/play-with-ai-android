@@ -27,14 +27,14 @@ import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
-import se.onemanstudio.playaroundwithai.core.data.feature.map.dto.VehicleType
+import se.onemanstudio.playaroundwithai.core.domain.feature.map.model.MapItem
+import se.onemanstudio.playaroundwithai.core.domain.feature.map.model.VehicleType
 import se.onemanstudio.playaroundwithai.core.ui.sofa.NeoBrutalCard
 import se.onemanstudio.playaroundwithai.core.ui.sofa.NeoBrutalIconButton
 import se.onemanstudio.playaroundwithai.core.ui.theme.Dimensions
 import se.onemanstudio.playaroundwithai.core.ui.theme.SofaAiTheme
 import se.onemanstudio.playaroundwithai.feature.map.R
 import se.onemanstudio.playaroundwithai.feature.maps.models.MapItemUiModel
-import se.onemanstudio.playaroundwithai.core.data.model.MapItem
 
 @Composable
 fun MarkerInfoCard(
@@ -75,7 +75,7 @@ fun MarkerInfoCard(
                 NeoBrutalIconButton(
                     imageVector = Icons.Default.Close,
                     contentDescription = stringResource(R.string.close),
-                    size = Dimensions.iconSizeXLarge, // Changed from XXLarge to XLarge
+                    size = Dimensions.iconSizeXLarge,
                     backgroundColor = MaterialTheme.colorScheme.errorContainer,
                     onClick = onClose,
                 )

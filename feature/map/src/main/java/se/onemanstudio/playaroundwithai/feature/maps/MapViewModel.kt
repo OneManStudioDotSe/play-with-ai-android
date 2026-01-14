@@ -11,11 +11,11 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
-import se.onemanstudio.playaroundwithai.core.domain.model.VehicleType
-import se.onemanstudio.playaroundwithai.core.domain.usecase.GetMapItemsUseCase
+import se.onemanstudio.playaroundwithai.core.domain.feature.map.model.VehicleType
+import se.onemanstudio.playaroundwithai.core.domain.feature.map.usecase.GetMapItemsUseCase
 import se.onemanstudio.playaroundwithai.feature.maps.models.MapItemUiModel
 import se.onemanstudio.playaroundwithai.feature.maps.models.toUiModel
-import se.onemanstudio.playaroundwithai.feature.maps.state.MapUiState
+import se.onemanstudio.playaroundwithai.feature.maps.states.MapUiState
 import se.onemanstudio.playaroundwithai.feature.maps.utils.calculatePathDistance
 import se.onemanstudio.playaroundwithai.feature.maps.utils.permutations
 import javax.inject.Inject

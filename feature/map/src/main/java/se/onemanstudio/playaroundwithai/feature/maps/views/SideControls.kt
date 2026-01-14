@@ -20,7 +20,7 @@ import kotlinx.coroutines.launch
 import se.onemanstudio.playaroundwithai.core.ui.sofa.NeoBrutalIconButton
 import se.onemanstudio.playaroundwithai.core.ui.theme.Dimensions
 import se.onemanstudio.playaroundwithai.feature.map.R
-import se.onemanstudio.playaroundwithai.feature.maps.state.MapUiState
+import se.onemanstudio.playaroundwithai.feature.maps.states.MapUiState
 
 @Composable
 fun SideControls(

@@ -14,11 +14,11 @@ import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
-import se.onemanstudio.playaroundwithai.core.domain.model.AnalysisType
-import se.onemanstudio.playaroundwithai.core.domain.model.Prompt
-import se.onemanstudio.playaroundwithai.core.domain.usecase.GenerateContentUseCase
-import se.onemanstudio.playaroundwithai.core.domain.usecase.GetPromptHistoryUseCase
-import se.onemanstudio.playaroundwithai.core.domain.usecase.GetSuggestionsUseCase
+import se.onemanstudio.playaroundwithai.core.domain.feature.chat.model.Prompt
+import se.onemanstudio.playaroundwithai.core.domain.feature.chat.usecase.GenerateContentUseCase
+import se.onemanstudio.playaroundwithai.core.domain.feature.chat.usecase.GetPromptHistoryUseCase
+import se.onemanstudio.playaroundwithai.core.domain.feature.chat.usecase.GetSuggestionsUseCase
+import se.onemanstudio.playaroundwithai.core.domain.feature.chat.usecase.GetSyncStateUseCase
 import se.onemanstudio.playaroundwithai.feature.chat.models.Attachment
 import se.onemanstudio.playaroundwithai.feature.chat.states.ChatError
 import se.onemanstudio.playaroundwithai.feature.chat.states.ChatUiState
@@ -33,6 +33,7 @@ class ChatViewModel @Inject constructor(
     private val generateContentUseCase: GenerateContentUseCase,
     private val getSuggestionsUseCase: GetSuggestionsUseCase,
     private val getPromptHistoryUseCase: GetPromptHistoryUseCase,
+    private val getSyncStateUseCase: GetSyncStateUseCase,
     private val application: Application
 ) : ViewModel() {
     private val _suggestions = MutableStateFlow<List<String>>(emptyList())
@@ -52,6 +53,13 @@ class ChatViewModel @Inject constructor(
             scope = viewModelScope,
             started = SharingStarted.WhileSubscribed(5000),
             initialValue = emptyList()
+        )
+
+    val isSyncing: StateFlow<Boolean> = getSyncStateUseCase()
+        .stateIn(
+            scope = viewModelScope,
+            started = SharingStarted.WhileSubscribed(5000),
+            initialValue = false
         )
 
     init {
@@ -81,7 +89,7 @@ class ChatViewModel @Inject constructor(
         viewModelScope.launch {
             // see if we have something attached
             val imageBytes = (attachment as? Attachment.Image)?.uri?.toByteArray()
-            val analysisType = (attachment as? Attachment.Image)?.analysisType?.toDomain()
+            val analysisType = (attachment as? Attachment.Image)?.analysisType
 
             // read attached stuff
             val fileResult = (attachment as? Attachment.Document)?.uri?.let { extractFileContent(it) }
@@ -166,18 +174,6 @@ class ChatViewModel @Inject constructor(
         } catch (e: SecurityException) {
             Timber.d("Security exception decoding image: ${e.message}")
             null
-        }
-    }
-
-    private fun se.onemanstudio.playaroundwithai.core.data.AnalysisType.toDomain(): AnalysisType {
-        return when (this) {
-            se.onemanstudio.playaroundwithai.core.data.AnalysisType.LOCATION -> AnalysisType.LOCATION
-            se.onemanstudio.playaroundwithai.core.data.AnalysisType.RECIPE -> AnalysisType.RECIPE
-            se.onemanstudio.playaroundwithai.core.data.AnalysisType.MOVIE -> AnalysisType.MOVIE
-            se.onemanstudio.playaroundwithai.core.data.AnalysisType.SONG -> AnalysisType.SONG
-            se.onemanstudio.playaroundwithai.core.data.AnalysisType.PERSONALITY -> AnalysisType.PERSONALITY
-            se.onemanstudio.playaroundwithai.core.data.AnalysisType.PRODUCT -> AnalysisType.PRODUCT
-            se.onemanstudio.playaroundwithai.core.data.AnalysisType.TREND -> AnalysisType.TREND
         }
     }
 }

@@ -16,11 +16,12 @@ import org.junit.Assert.assertNull
 import org.junit.Assert.assertTrue
 import org.junit.Rule
 import org.junit.Test
-import se.onemanstudio.playaroundwithai.core.data.feature.map.dto.VehicleType
-import se.onemanstudio.playaroundwithai.core.data.feature.map.repository.MapRepository
-import se.onemanstudio.playaroundwithai.core.data.model.MapItem
+import se.onemanstudio.playaroundwithai.core.domain.feature.map.model.VehicleType
+import se.onemanstudio.playaroundwithai.core.domain.feature.map.repository.MapRepository
+import se.onemanstudio.playaroundwithai.core.domain.feature.map.model.MapItem
+import se.onemanstudio.playaroundwithai.core.domain.feature.map.usecase.GetMapItemsUseCase
 import se.onemanstudio.playaroundwithai.feature.maps.models.toUiModel
-import se.onemanstudio.playaroundwithai.feature.maps.state.MapUiState
+import se.onemanstudio.playaroundwithai.feature.maps.states.MapUiState
 import se.onemanstudio.playaroundwithai.feature.maps.util.MainCoroutineRule
 
 @OptIn(ExperimentalCoroutinesApi::class)
@@ -49,7 +50,7 @@ class MapViewModelTest {
         val expectedUiModels = testDataDomain.map { it.toUiModel() }
 
         // When
-        val viewModel = MapViewModel(repository)
+        val viewModel = MapViewModel(GetMapItemsUseCase(repository))
         val states = captureStates(viewModel)
         advanceUntilIdle()
 
@@ -64,7 +65,7 @@ class MapViewModelTest {
     fun `selectMarker updates focused marker`() = runTest {
         // Given
         coEvery { repository.getMapItems(any()) } returns testDataDomain
-        val viewModel = MapViewModel(repository)
+        val viewModel = MapViewModel(GetMapItemsUseCase(repository))
         val states = captureStates(viewModel)
         val scooterItemUi = scooterItemDomain.toUiModel()
 
@@ -85,7 +86,7 @@ class MapViewModelTest {
     fun `setPathMode resets selection and updates mode`() = runTest {
         // Given
         coEvery { repository.getMapItems(any()) } returns testDataDomain
-        val viewModel = MapViewModel(repository)
+        val viewModel = MapViewModel(GetMapItemsUseCase(repository))
         val states = captureStates(viewModel)
         val scooterItemUi = scooterItemDomain.toUiModel()
 
@@ -115,7 +116,7 @@ class MapViewModelTest {
     fun `toggleFilter filters visible locations correctly`() = runTest {
         // Given
         coEvery { repository.getMapItems(any()) } returns testDataDomain
-        val viewModel = MapViewModel(repository)
+        val viewModel = MapViewModel(GetMapItemsUseCase(repository))
         val states = captureStates(viewModel)
         advanceUntilIdle()
 
@@ -142,7 +143,7 @@ class MapViewModelTest {
     fun `toggleSelection adds and removes items in Path Mode`() = runTest {
         // Given
         coEvery { repository.getMapItems(any()) } returns testDataDomain
-        val viewModel = MapViewModel(repository)
+        val viewModel = MapViewModel(GetMapItemsUseCase(repository))
         val states = captureStates(viewModel)
         viewModel.setPathMode(true)
         val scooterItemUi = scooterItemDomain.toUiModel()
@@ -181,7 +182,7 @@ class MapViewModelTest {
         coEvery { repository.getMapItems(any()) } returns manyItemsDomain
         val manyItemsUi = manyItemsDomain.map { it.toUiModel() }
 
-        val viewModel = MapViewModel(repository)
+        val viewModel = MapViewModel(GetMapItemsUseCase(repository))
         val states = captureStates(viewModel)
         viewModel.setPathMode(true)
         advanceUntilIdle()
@@ -198,14 +199,14 @@ class MapViewModelTest {
         viewModel.toggleSelection(manyItemsUi[5])
 
         // Then: Still 5 items (limit is enforced)
-        assertEquals(6, states.last().selectedLocations.size)
+        assertEquals(5, states.last().selectedLocations.size)
     }
 
     @Test
     fun `calculateOptimalRoute updates route state`() = runTest {
         // Given
         coEvery { repository.getMapItems(any()) } returns testDataDomain
-        val viewModel = MapViewModel(repository)
+        val viewModel = MapViewModel(GetMapItemsUseCase(repository))
         val states = captureStates(viewModel)
         viewModel.setPathMode(true)
         val scooterItemUi = scooterItemDomain.toUiModel()
