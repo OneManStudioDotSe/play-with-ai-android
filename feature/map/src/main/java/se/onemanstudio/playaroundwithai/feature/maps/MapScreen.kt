@@ -108,6 +108,18 @@ fun MapScreen(viewModel: MapViewModel = hiltViewModel()) {
         }
     }
 
+    // Smoothly zoom out to fit all visible locations
+    LaunchedEffect(uiState.visibleLocations) {
+        if (uiState.visibleLocations.isNotEmpty()) {
+            val boundsBuilder = LatLngBounds.builder()
+            uiState.visibleLocations.forEach { boundsBuilder.include(it.position) }
+            cameraPositionState.animate(
+                update = CameraUpdateFactory.newLatLngBounds(boundsBuilder.build(), 150), // 150px padding
+                durationMs = MapConstants.MOVE_TO_POINT_DURATION
+            )
+        }
+    }
+
     LaunchedEffect(uiState.optimalRoute) {
         if (uiState.optimalRoute.isNotEmpty()) {
             val boundsBuilder = LatLngBounds.builder()

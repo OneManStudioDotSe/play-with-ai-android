@@ -75,7 +75,7 @@ fun MarkerInfoCard(
                 NeoBrutalIconButton(
                     imageVector = Icons.Default.Close,
                     contentDescription = stringResource(R.string.close),
-                    size = Dimensions.iconSizeXXLarge,
+                    size = Dimensions.iconSizeXLarge, // Changed from XXLarge to XLarge
                     backgroundColor = MaterialTheme.colorScheme.errorContainer,
                     onClick = onClose,
                 )
