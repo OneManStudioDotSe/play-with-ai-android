@@ -4,6 +4,9 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.google.android.gms.maps.model.LatLng
 import dagger.hilt.android.lifecycle.HiltViewModel
+import kotlinx.collections.immutable.persistentListOf
+import kotlinx.collections.immutable.toPersistentList
+import kotlinx.collections.immutable.toPersistentSet
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
@@ -37,7 +40,7 @@ class MapViewModel @Inject constructor(
         _uiState.update { it.copy(isLoading = true) }
 
         viewModelScope.launch {
-            val data = getMapItemsUseCase(AMOUNT_OF_POINTS_TO_GENERATE).map { it.toUiModel() }
+            val data = getMapItemsUseCase(AMOUNT_OF_POINTS_TO_GENERATE).map { it.toUiModel() }.toPersistentList()
             _uiState.update {
                 it.copy(
                     isLoading = false,
@@ -53,8 +56,8 @@ class MapViewModel @Inject constructor(
             it.copy(
                 isPathMode = active,
                 focusedMarker = null,
-                selectedLocations = emptyList(),
-                optimalRoute = emptyList()
+                selectedLocations = persistentListOf(),
+                optimalRoute = persistentListOf()
             )
         }
     }
@@ -66,18 +69,18 @@ class MapViewModel @Inject constructor(
     fun toggleFilter(type: VehicleType) {
         _uiState.update { currentState ->
             val newFilters = if (currentState.activeFilter.contains(type)) {
-                currentState.activeFilter - type
+                (currentState.activeFilter - type).toPersistentSet()
             } else {
-                currentState.activeFilter + type
+                (currentState.activeFilter + type).toPersistentSet()
             }
 
-            val filtered = currentState.allLocations.filter { newFilters.contains(it.type) }
+            val filtered = currentState.allLocations.filter { newFilters.contains(it.type) }.toPersistentList()
 
             currentState.copy(
                 activeFilter = newFilters,
                 visibleLocations = filtered,
-                selectedLocations = emptyList(),
-                optimalRoute = emptyList(),
+                selectedLocations = persistentListOf(),
+                optimalRoute = persistentListOf(),
                 focusedMarker = null
             )
         }
@@ -91,15 +94,15 @@ class MapViewModel @Inject constructor(
             val isAlreadySelected = currentSelected.any { it.id == location.id }
 
             val newSelected = if (isAlreadySelected) {
-                currentSelected.filter { it.id != location.id }
+                currentSelected.filter { it.id != location.id }.toPersistentList()
             } else {
                 if (currentSelected.size < MapConstants.MAX_SELECTABLE_POINTS) {
-                    currentSelected + location.copy(isSelected = true)
+                    (currentSelected + location.copy(isSelected = true)).toPersistentList()
                 } else {
                     currentSelected // Limit reached, do not add
                 }
             }
-            state.copy(selectedLocations = newSelected, optimalRoute = emptyList(), routeDistanceMeters = 0)
+            state.copy(selectedLocations = newSelected, optimalRoute = persistentListOf(), routeDistanceMeters = 0)
         }
     }
 
@@ -115,7 +118,7 @@ class MapViewModel @Inject constructor(
             .minByOrNull { path -> calculatePathDistance(startPoint, path) }
             ?: pointsToVisit
 
-        val fullPath = listOf(startPoint) + bestPermutation
+        val fullPath = (listOf(startPoint) + bestPermutation).toPersistentList()
         val totalDistance = calculatePathDistance(startPoint, bestPermutation)
 
         _uiState.update {

@@ -57,6 +57,7 @@ dependencies {
 
     implementation(libs.material3)
     implementation(libs.androidx.material.icons.extended)
+    implementation(libs.kotlinx.collections.immutable)
 
     implementation(libs.timber)
 
