@@ -10,8 +10,14 @@ import se.onemanstudio.playaroundwithai.core.data.feature.chat.local.entity.Prom
 @Dao
 interface PromptsHistoryDao {
     @Insert(onConflict = OnConflictStrategy.REPLACE)
-    suspend fun insertPrompt(prompt: PromptEntity)
+    suspend fun insertPrompt(prompt: PromptEntity): Long
 
     @Query("SELECT * FROM prompt_history ORDER BY timestamp DESC")
     fun getPromptHistory(): Flow<List<PromptEntity>>
+
+    @Query("SELECT * FROM prompt_history WHERE syncStatus = :status")
+    suspend fun getPromptsBySyncStatus(status: String): List<PromptEntity>
+
+    @Query("UPDATE prompt_history SET syncStatus = :status WHERE id = :id")
+    suspend fun updateSyncStatus(id: Int, status: String)
 }

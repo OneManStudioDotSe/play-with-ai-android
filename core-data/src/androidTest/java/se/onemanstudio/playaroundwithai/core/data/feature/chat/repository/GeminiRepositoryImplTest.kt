@@ -3,6 +3,7 @@ package se.onemanstudio.playaroundwithai.core.data.feature.chat.repository
 import androidx.room.Room
 import androidx.test.core.app.ApplicationProvider
 import androidx.test.ext.junit.runners.AndroidJUnit4
+import androidx.work.WorkManager
 import com.google.common.truth.Truth.assertThat
 import io.mockk.mockk
 import kotlinx.coroutines.flow.first
@@ -22,7 +23,7 @@ class GeminiRepositoryImplTest {
     private lateinit var database: AppDatabase
     private lateinit var promptsHistoryDao: PromptsHistoryDao
     private val geminiApiService: GeminiApiService = mockk(relaxed = true) // Mocked, as we're not testing the network
-
+    private val workManager = mockk<WorkManager>(relaxed = true) // Mocked, as we're not testing WorkManager
     private lateinit var repository: GeminiRepositoryImpl
 
     @Before
@@ -37,7 +38,7 @@ class GeminiRepositoryImplTest {
         promptsHistoryDao = database.promptDao()
 
         // Create the repository with a real DAO and a mock API service
-        repository = GeminiRepositoryImpl(geminiApiService, promptsHistoryDao)
+        repository = GeminiRepositoryImpl(geminiApiService, promptsHistoryDao, workManager)
     }
 
     @After

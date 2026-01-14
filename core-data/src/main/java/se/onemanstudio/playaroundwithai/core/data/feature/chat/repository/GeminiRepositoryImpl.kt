@@ -4,20 +4,28 @@ import android.graphics.Bitmap
 import android.graphics.BitmapFactory
 import android.util.Base64
 import androidx.core.graphics.scale
+import androidx.work.Constraints
+import androidx.work.ExistingWorkPolicy
+import androidx.work.NetworkType
+import androidx.work.OneTimeWorkRequestBuilder
+import androidx.work.WorkInfo
+import androidx.work.WorkManager
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.map
 import se.onemanstudio.playaroundwithai.core.data.feature.chat.local.dao.PromptsHistoryDao
 import se.onemanstudio.playaroundwithai.core.data.feature.chat.local.entity.PromptEntity
+import se.onemanstudio.playaroundwithai.core.data.feature.chat.local.entity.toDomain
 import se.onemanstudio.playaroundwithai.core.data.feature.chat.remote.api.GeminiApiService
 import se.onemanstudio.playaroundwithai.core.data.feature.chat.remote.dto.Content
 import se.onemanstudio.playaroundwithai.core.data.feature.chat.remote.dto.GeminiRequest
 import se.onemanstudio.playaroundwithai.core.data.feature.chat.remote.dto.ImageData
 import se.onemanstudio.playaroundwithai.core.data.feature.chat.remote.dto.Part
-import se.onemanstudio.playaroundwithai.core.domain.model.AnalysisType
-import se.onemanstudio.playaroundwithai.core.domain.model.Prompt
-import se.onemanstudio.playaroundwithai.core.domain.repository.GeminiDomainRepository
+import se.onemanstudio.playaroundwithai.core.data.feature.chat.remote.firebase.SyncWorker
+import se.onemanstudio.playaroundwithai.core.domain.feature.chat.model.AnalysisType
+import se.onemanstudio.playaroundwithai.core.domain.feature.chat.model.Prompt
+import se.onemanstudio.playaroundwithai.core.domain.feature.chat.model.SyncStatus
+import se.onemanstudio.playaroundwithai.core.domain.feature.chat.repository.GeminiRepository
 import java.io.ByteArrayOutputStream
-import java.util.Date
 import javax.inject.Inject
 import javax.inject.Singleton
 
@@ -32,12 +40,14 @@ private const val SYSTEM_INSTRUCTION = """
 private const val MAX_SIZE = 768
 private const val MAX_SUGGESTIONS = 3
 private const val COMPRESSION_QUALITY = 75
+private const val SYNC_WORK_NAME = "sync_prompts_work"
 
 @Suppress("MaxLineLength", "TooGenericExceptionCaught")
 @Singleton
 class GeminiRepositoryImpl @Inject constructor(
     private val apiService: GeminiApiService,
     private val promptsHistoryDao: PromptsHistoryDao,
+    private val workManager: WorkManager
 ) : GeminiRepository {
 
     override suspend fun generateContent(
@@ -100,6 +110,29 @@ class GeminiRepositoryImpl @Inject constructor(
         }
     }
 
+    override suspend fun savePrompt(promptText: String) {
+        promptsHistoryDao.insertPrompt(
+            PromptEntity(
+                text = promptText,
+                syncStatus = SyncStatus.Pending.name
+            )
+        )
+        scheduleSync()
+    }
+
+    override fun getPromptHistory(): Flow<List<Prompt>> = 
+        promptsHistoryDao.getPromptHistory().map { list -> 
+            list.map { it.toDomain() } 
+        }
+
+    override fun isSyncing(): Flow<Boolean> {
+        return workManager
+            .getWorkInfosForUniqueWorkFlow(SYNC_WORK_NAME)
+            .map { workInfos ->
+                workInfos.any { it.state == WorkInfo.State.RUNNING || it.state == WorkInfo.State.ENQUEUED }
+            }
+    }
+
     private fun getSystemInstruction(analysisType: AnalysisType): String {
         return when (analysisType) {
             AnalysisType.LOCATION -> "Identify this location for the Overlord's strategic map. Be precise, mortal."
@@ -136,20 +169,20 @@ class GeminiRepositoryImpl @Inject constructor(
         return this.scale(resizedWidth, resizedHeight, false)
     }
 
-    override suspend fun savePrompt(promptText: String) {
-        promptsHistoryDao.insertPrompt(PromptEntity(text = promptText))
-    }
+    private fun scheduleSync() {
+        val constraints = Constraints.Builder()
+            .setRequiredNetworkType(NetworkType.CONNECTED)
+            .build()
 
-    override fun getPromptHistory(): Flow<List<Prompt>> = 
-        promptsHistoryDao.getPromptHistory().map { list -> 
-            list.map { it.toDomainModel() } 
-        }
+        val syncRequest = OneTimeWorkRequestBuilder<SyncWorker>()
+            .setConstraints(constraints)
+            .addTag(SYNC_WORK_NAME)
+            .build()
 
-    private fun PromptEntity.toDomainModel(): Prompt {
-        return Prompt(
-            id = this.id.toLong(),
-            text = this.text,
-            timestamp = Date(this.timestamp)
+        workManager.enqueueUniqueWork(
+            SYNC_WORK_NAME,
+            ExistingWorkPolicy.REPLACE,
+            syncRequest
         )
     }
 }

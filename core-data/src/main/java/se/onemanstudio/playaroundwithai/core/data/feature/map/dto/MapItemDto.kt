@@ -1,7 +1,7 @@
 package se.onemanstudio.playaroundwithai.core.data.feature.map.dto
 
-import se.onemanstudio.playaroundwithai.core.domain.model.MapItem
-import se.onemanstudio.playaroundwithai.core.domain.model.VehicleType
+import se.onemanstudio.playaroundwithai.core.domain.feature.map.model.MapItem
+import se.onemanstudio.playaroundwithai.core.domain.feature.map.model.VehicleType
 
 enum class VehicleTypeDto {
     SCOOTER, BICYCLE

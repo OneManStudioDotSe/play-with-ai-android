@@ -53,6 +53,7 @@ android {
         }
     }
 
+    @Suppress("UnstableApiUsage")
     packaging {
         resources {
             excludes += "/META-INF/{AL2.0,LGPL2.1}"
@@ -88,6 +89,21 @@ dependencies {
     implementation(libs.room.runtime)
     ksp(libs.room.compiler)
     implementation(libs.room.ktx)
+
+    // Firebase
+    implementation(platform(libs.firebase.bom))
+    implementation(libs.firebase.firestore)
+    implementation(libs.firebase.auth)
+
+    // WorkManager
+    implementation(libs.androidx.work.runtime.ktx)
+    implementation(libs.androidx.hilt.work)
+    ksp(libs.androidx.hilt.compiler)
+
+    // Coroutines
+    implementation(libs.kotlinx.coroutines.play.services)
+
+    implementation(libs.timber)
 
     // Local tests
     testImplementation(libs.junit4)

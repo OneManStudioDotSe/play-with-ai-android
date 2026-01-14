@@ -17,7 +17,6 @@ import java.io.IOException
 
 @RunWith(AndroidJUnit4::class)
 class PromptsHistoryDaoTest {
-
     private lateinit var db: AppDatabase
     private lateinit var dao: PromptsHistoryDao
 
