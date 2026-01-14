@@ -35,4 +35,22 @@
     <string name="mime_type_all">*\/*</string>
     <string name="preview_chat_response_light">Here is a sample response from the AI.</string>
     <string name="preview_chat_response_dark">This is the dark mode version. Notice how the surface color and text contrast adapts</string>
+
+    <string name="sync_notification_channel_name">Data Sync</string>
+    <string name="sync_notification_channel_description">Shows progress of data synchronization</string>
+    <string name="sync_notification_title">Syncing Prompts</string>
+    <string name="sync_notification_content">Synchronizing your prompt history with the cloud…</string>
+    <string name="sync_notification_complete">Sync complete</string>
+    <string name="sync_notification_failed">Sync failed</string>
+
+    <string name="no_history_yet">No history yet. Start a conversation to see it here!</string>
+
+    <!-- Analysis Types -->
+    <string name="analysis_type_location">Location</string>
+    <string name="analysis_type_recipe">Recipe</string>
+    <string name="analysis_type_movie">Movie</string>
+    <string name="analysis_type_song">Song</string>
+    <string name="analysis_type_personality">Personality</string>
+    <string name="analysis_type_product">Product</string>
+    <string name="analysis_type_trend">Trend</string>
 </resources>
