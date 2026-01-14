@@ -6,6 +6,6 @@ import se.onemanstudio.playaroundwithai.core.data.feature.chat.remote.dto.Gemini
 import se.onemanstudio.playaroundwithai.core.data.feature.chat.remote.dto.GeminiResponse
 
 interface GeminiApiService {
-    @POST("v1beta/models/gemini-2.5-flash-lite:generateContent")
+    @POST("v1beta/models/gemini-3-flash-preview:generateContent")
     suspend fun generateContent(@Body request: GeminiRequest): GeminiResponse
 }
