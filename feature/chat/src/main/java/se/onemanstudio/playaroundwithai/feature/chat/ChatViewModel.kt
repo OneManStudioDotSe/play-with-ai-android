@@ -32,6 +32,9 @@ class ChatViewModel @Inject constructor(
     private val _suggestions = MutableStateFlow<List<String>>(emptyList())
     val suggestions = _suggestions.asStateFlow()
 
+    private val _isSuggestionsLoading = MutableStateFlow(false)
+    val isSuggestionsLoading = _isSuggestionsLoading.asStateFlow()
+
     private val _uiState = MutableStateFlow<ChatUiState>(ChatUiState.Initial)
     val uiState = _uiState.asStateFlow()
 
@@ -51,7 +54,7 @@ class ChatViewModel @Inject constructor(
 
     private fun loadSuggestions() {
         viewModelScope.launch {
-            // Optional: You could set some fallback/loading strings here first
+            _isSuggestionsLoading.value = true
             repository.generateSuggestions()
                 .onSuccess { topics ->
                     _suggestions.update { topics }
@@ -62,6 +65,7 @@ class ChatViewModel @Inject constructor(
                         listOf("Tell me a joke", "Explain Quantum Physics", "Roast my code")
                     }
                 }
+            _isSuggestionsLoading.value = false
         }
     }
 

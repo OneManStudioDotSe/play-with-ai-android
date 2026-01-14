@@ -68,6 +68,7 @@ import se.onemanstudio.playaroundwithai.feature.chat.views.history.HistoryBottom
 fun ChatScreen(viewModel: ChatViewModel) {
     val uiState by viewModel.uiState.collectAsState()
     val suggestions by viewModel.suggestions.collectAsState()
+    val isSuggestionsLoading by viewModel.isSuggestionsLoading.collectAsState()
     var textState by remember { mutableStateOf(TextFieldValue("")) }
     val keyboardController = LocalSoftwareKeyboardController.current
 
@@ -126,6 +127,7 @@ fun ChatScreen(viewModel: ChatViewModel) {
                 inputMode = inputMode,
                 textState = textState,
                 suggestions = suggestions,
+                isSuggestionsLoading = isSuggestionsLoading,
                 selectedImageUri = selectedImageUri,
                 selectedFileName = selectedFileName,
                 analysisType = analysisType,
@@ -185,16 +187,19 @@ private fun ContentState(
     state: ChatUiState.Success,
     onClearResponse: () -> Unit,
 ) {
+    val scrollState = rememberScrollState()
+    
     Box(modifier = Modifier.padding(Dimensions.paddingLarge)) {
         Box(
             modifier = Modifier
                 .padding(top = Dimensions.paddingExtraLarge)
                 .fillMaxSize()
-                .verticalScroll(rememberScrollState())
+                .verticalScroll(scrollState)
         ) {
             TypewriterText(
                 modifier = Modifier.align(Alignment.TopStart),
-                text = state.outputText
+                text = state.outputText,
+                scrollState = scrollState
             )
         }
 
