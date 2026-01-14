@@ -30,4 +30,9 @@
     <string name="error_i_couldn_t_find_the_selected_file">I couldn\'t find the selected file.</string>
     <string name="error_i_couldn_t_read_the_file_content">I couldn\'t read the file content.</string>
     <string name="error_an_unknown_error_occurred">An unknown error occurred.</string>
+
+    <!-- New Strings -->
+    <string name="mime_type_all">*\/*</string>
+    <string name="preview_chat_response_light">Here is a sample response from the AI.</string>
+    <string name="preview_chat_response_dark">This is the dark mode version. Notice how the surface color and text contrast adapts</string>
 </resources>

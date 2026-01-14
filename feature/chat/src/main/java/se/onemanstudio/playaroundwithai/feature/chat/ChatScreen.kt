@@ -92,6 +92,8 @@ fun ChatScreen(viewModel: ChatViewModel) {
         onResult = { uri -> selectedFileUri = uri }
     )
 
+    val allMimeType = stringResource(R.string.mime_type_all)
+
     if (isSheetOpen) {
         HistoryBottomSheet(
             history = history,
@@ -143,7 +145,7 @@ fun ChatScreen(viewModel: ChatViewModel) {
                             PickVisualMediaRequest(ActivityResultContracts.PickVisualMedia.ImageOnly)
                         )
 
-                        InputMode.DOCUMENT -> documentPickerLauncher.launch(arrayOf("*/*"))
+                        InputMode.DOCUMENT -> documentPickerLauncher.launch(arrayOf(allMimeType))
                         InputMode.TEXT -> {}
                     }
                 },
@@ -287,10 +289,11 @@ fun getFileName(context: Context, uri: Uri): String? {
 @Preview(name = "Content State - Light", showBackground = true)
 @Composable
 private fun ContentStatePreview_Light() {
+    val outputText = stringResource(R.string.preview_chat_response_light)
     SofaAiTheme(darkTheme = false) {
         ContentState(
             state = ChatUiState.Success(
-                outputText = "Here is a sample response from the AI."
+                outputText = outputText
             ),
             onClearResponse = {}
         )
@@ -300,10 +303,11 @@ private fun ContentStatePreview_Light() {
 @Preview(name = "Content State - Dark", showBackground = true, backgroundColor = 0xFF121212)
 @Composable
 private fun ContentStatePreview_Dark() {
+    val outputText = stringResource(R.string.preview_chat_response_dark)
     SofaAiTheme(darkTheme = true) {
         ContentState(
             state = ChatUiState.Success(
-                outputText = "This is the dark mode version. Notice how the surface color and text contrast adapts"
+                outputText = outputText
             ),
             onClearResponse = {}
         )
