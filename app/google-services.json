@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "617245429053",
+    "project_id": "play-with-ai-754cf",
+    "storage_bucket": "play-with-ai-754cf.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:617245429053:android:2b2f2cbff5fd06edb2c954",
+        "android_client_info": {
+          "package_name": "se.onemanstudio.playaroundwithai"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyCVUVVw0jvPE26M-49t1-ckJKoRBxoVyTk"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
