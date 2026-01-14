@@ -17,11 +17,13 @@ import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import se.onemanstudio.playaroundwithai.core.domain.feature.chat.model.InputMode
 import se.onemanstudio.playaroundwithai.core.ui.theme.Dimensions
+import se.onemanstudio.playaroundwithai.core.ui.views.R
 import se.onemanstudio.playaroundwithai.core.ui.theme.SofaAiTheme
 
 @Composable
@@ -67,7 +69,11 @@ fun NeoBrutalSegmentedButton(
                     contentAlignment = Alignment.Center
                 ) {
                     Text(
-                        text = mode.name,
+                        text = when (mode) {
+                            InputMode.TEXT -> stringResource(R.string.input_mode_text)
+                            InputMode.IMAGE -> stringResource(R.string.input_mode_image)
+                            InputMode.DOCUMENT -> stringResource(R.string.input_mode_document)
+                        },
                         style = MaterialTheme.typography.labelLarge,
                         fontWeight = if (isSelected) FontWeight.Black else FontWeight.Medium,
                         color = textColor

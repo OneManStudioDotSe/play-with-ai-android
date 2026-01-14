@@ -19,6 +19,7 @@ import se.onemanstudio.playaroundwithai.core.domain.feature.chat.usecase.Generat
 import se.onemanstudio.playaroundwithai.core.domain.feature.chat.usecase.GetPromptHistoryUseCase
 import se.onemanstudio.playaroundwithai.core.domain.feature.chat.usecase.GetSuggestionsUseCase
 import se.onemanstudio.playaroundwithai.core.domain.feature.chat.usecase.GetSyncStateUseCase
+import se.onemanstudio.playaroundwithai.core.domain.feature.chat.usecase.SavePromptUseCase
 import se.onemanstudio.playaroundwithai.feature.chat.models.Attachment
 import se.onemanstudio.playaroundwithai.feature.chat.states.ChatError
 import se.onemanstudio.playaroundwithai.feature.chat.states.ChatUiState
@@ -34,6 +35,7 @@ class ChatViewModel @Inject constructor(
     private val getSuggestionsUseCase: GetSuggestionsUseCase,
     private val getPromptHistoryUseCase: GetPromptHistoryUseCase,
     private val getSyncStateUseCase: GetSyncStateUseCase,
+    private val savePromptUseCase: SavePromptUseCase,
     private val application: Application
 ) : ViewModel() {
     private val _suggestions = MutableStateFlow<List<String>>(emptyList())
@@ -53,13 +55,6 @@ class ChatViewModel @Inject constructor(
             scope = viewModelScope,
             started = SharingStarted.WhileSubscribed(5000),
             initialValue = emptyList()
-        )
-
-    val isSyncing: StateFlow<Boolean> = getSyncStateUseCase()
-        .stateIn(
-            scope = viewModelScope,
-            started = SharingStarted.WhileSubscribed(5000),
-            initialValue = false
         )
 
     init {

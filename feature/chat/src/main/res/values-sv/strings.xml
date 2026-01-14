@@ -30,4 +30,20 @@
     <string name="error_i_couldn_t_find_the_selected_file">Jag kunde inte hitta den valda filen.</string>
     <string name="error_i_couldn_t_read_the_file_content">Jag kunde inte läsa filinnehållet.</string>
     <string name="error_an_unknown_error_occurred">Ett okänt fel inträffade.</string>
+
+    <string name="no_history_yet">Ingen historik än. Starta en konversation för att se den här!</string>
+
+    <!-- Analysis Types -->
+    <string name="analysis_type_location">Plats</string>
+    <string name="analysis_type_recipe">Recept</string>
+    <string name="analysis_type_movie">Film</string>
+    <string name="analysis_type_song">Låt</string>
+    <string name="analysis_type_personality">Personlighet</string>
+    <string name="analysis_type_product">Produkt</string>
+    <string name="analysis_type_trend">Trend</string>
+
+    <!-- Input Modes -->
+    <string name="input_mode_text">Text</string>
+    <string name="input_mode_image">Bild</string>
+    <string name="input_mode_document">Dokument</string>
 </resources>
