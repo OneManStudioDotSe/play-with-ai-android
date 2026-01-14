@@ -1,6 +1,6 @@
 package se.onemanstudio.playaroundwithai.core.data.util
 
-import se.onemanstudio.playaroundwithai.core.data.feature.map.dto.VehicleType
+import se.onemanstudio.playaroundwithai.core.data.feature.map.dto.VehicleTypeDto
 import kotlin.random.Random
 
 @Suppress("MagicNumber")
@@ -18,8 +18,8 @@ object MapDataGenerator {
         return CENTER_LNG + (Random.nextDouble() - 0.5) * 0.08
     }
 
-    fun generateRandomVehicleType(): VehicleType {
-        return if (Random.nextBoolean()) VehicleType.SCOOTER else VehicleType.BICYCLE
+    fun generateRandomVehicleType(): VehicleTypeDto {
+        return if (Random.nextBoolean()) VehicleTypeDto.SCOOTER else VehicleTypeDto.BICYCLE
     }
 
     fun generateRandomBatteryLevel(): Int {
