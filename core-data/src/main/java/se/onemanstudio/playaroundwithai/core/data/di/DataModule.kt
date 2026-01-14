@@ -8,6 +8,7 @@ import se.onemanstudio.playaroundwithai.core.data.feature.chat.repository.Gemini
 import se.onemanstudio.playaroundwithai.core.data.feature.chat.repository.GeminiRepositoryImpl
 import se.onemanstudio.playaroundwithai.core.data.feature.map.repository.MapRepository
 import se.onemanstudio.playaroundwithai.core.data.feature.map.repository.MapRepositoryImpl
+import se.onemanstudio.playaroundwithai.core.domain.repository.GeminiDomainRepository
 
 @Module
 @InstallIn(SingletonComponent::class)
@@ -22,4 +23,9 @@ abstract class DataModule {
     abstract fun bindGeminiRepository(
         geminiRepositoryImpl: GeminiRepositoryImpl
     ): GeminiRepository
+
+    @Binds
+    abstract fun bindGeminiDomainRepository(
+        geminiRepositoryImpl: GeminiRepositoryImpl
+    ): GeminiDomainRepository
 }

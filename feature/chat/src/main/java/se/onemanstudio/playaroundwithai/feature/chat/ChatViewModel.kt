@@ -14,19 +14,25 @@ import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
-import se.onemanstudio.playaroundwithai.core.data.feature.chat.repository.GeminiRepository
-import se.onemanstudio.playaroundwithai.core.data.model.Prompt
+import se.onemanstudio.playaroundwithai.core.domain.model.AnalysisType
+import se.onemanstudio.playaroundwithai.core.domain.model.Prompt
+import se.onemanstudio.playaroundwithai.core.domain.usecase.GenerateContentUseCase
+import se.onemanstudio.playaroundwithai.core.domain.usecase.GetPromptHistoryUseCase
+import se.onemanstudio.playaroundwithai.core.domain.usecase.GetSuggestionsUseCase
 import se.onemanstudio.playaroundwithai.feature.chat.models.Attachment
 import se.onemanstudio.playaroundwithai.feature.chat.states.ChatError
 import se.onemanstudio.playaroundwithai.feature.chat.states.ChatUiState
 import timber.log.Timber
+import java.io.ByteArrayOutputStream
 import java.io.FileNotFoundException
 import java.io.IOException
 import javax.inject.Inject
 
 @HiltViewModel
 class ChatViewModel @Inject constructor(
-    private val repository: GeminiRepository,
+    private val generateContentUseCase: GenerateContentUseCase,
+    private val getSuggestionsUseCase: GetSuggestionsUseCase,
+    private val getPromptHistoryUseCase: GetPromptHistoryUseCase,
     private val application: Application
 ) : ViewModel() {
     private val _suggestions = MutableStateFlow<List<String>>(emptyList())
@@ -41,7 +47,7 @@ class ChatViewModel @Inject constructor(
     private val _isSheetOpen = MutableStateFlow(false)
     val isSheetOpen = _isSheetOpen.asStateFlow()
 
-    val promptHistory: StateFlow<List<Prompt>> = repository.getPromptHistory()
+    val promptHistory: StateFlow<List<Prompt>> = getPromptHistoryUseCase()
         .stateIn(
             scope = viewModelScope,
             started = SharingStarted.WhileSubscribed(5000),
@@ -55,7 +61,7 @@ class ChatViewModel @Inject constructor(
     private fun loadSuggestions() {
         viewModelScope.launch {
             _isSuggestionsLoading.value = true
-            repository.generateSuggestions()
+            getSuggestionsUseCase()
                 .onSuccess { topics ->
                     _suggestions.update { topics }
                 }
@@ -74,8 +80,8 @@ class ChatViewModel @Inject constructor(
 
         viewModelScope.launch {
             // see if we have something attached
-            val imageBitmap = (attachment as? Attachment.Image)?.uri?.toBitmap()
-            val analysisType = (attachment as? Attachment.Image)?.analysisType
+            val imageBytes = (attachment as? Attachment.Image)?.uri?.toByteArray()
+            val analysisType = (attachment as? Attachment.Image)?.analysisType?.toDomain()
 
             // read attached stuff
             val fileResult = (attachment as? Attachment.Document)?.uri?.let { extractFileContent(it) }
@@ -93,18 +99,14 @@ class ChatViewModel @Inject constructor(
 
             val fileText = fileResult?.getOrNull()
 
-            // do your magic
-            repository.savePrompt(prompt)
-
-            repository.generateContent(
+            generateContentUseCase(
                 prompt = prompt,
-                imageBitmap = imageBitmap,
+                imageBytes = imageBytes,
                 fileText = fileText,
                 analysisType = analysisType
-            ).onSuccess { response ->
+            ).onSuccess { responseText ->
                 _uiState.update {
-                    val text = response.extractText() ?: "No response text found."
-                    ChatUiState.Success(text)
+                    ChatUiState.Success(responseText)
                 }
             }.onFailure { exception ->
                 val error = when (exception) {
@@ -152,15 +154,30 @@ class ChatViewModel @Inject constructor(
         } ?: throw FileNotFoundException("Could not open input stream for URI: $uri")
     }
 
-    private fun Uri.toBitmap(): Bitmap? {
+    private fun Uri.toByteArray(): ByteArray? {
         return try {
-            ImageDecoder.decodeBitmap(ImageDecoder.createSource(application.contentResolver, this))
+            val bitmap = ImageDecoder.decodeBitmap(ImageDecoder.createSource(application.contentResolver, this))
+            val bos = ByteArrayOutputStream()
+            bitmap.compress(Bitmap.CompressFormat.JPEG, 100, bos)
+            bos.toByteArray()
         } catch (e: IOException) {
             Timber.d("Error decoding image: ${e.message}")
             null
         } catch (e: SecurityException) {
             Timber.d("Security exception decoding image: ${e.message}")
             null
+        }
+    }
+
+    private fun se.onemanstudio.playaroundwithai.core.data.AnalysisType.toDomain(): AnalysisType {
+        return when (this) {
+            se.onemanstudio.playaroundwithai.core.data.AnalysisType.LOCATION -> AnalysisType.LOCATION
+            se.onemanstudio.playaroundwithai.core.data.AnalysisType.RECIPE -> AnalysisType.RECIPE
+            se.onemanstudio.playaroundwithai.core.data.AnalysisType.MOVIE -> AnalysisType.MOVIE
+            se.onemanstudio.playaroundwithai.core.data.AnalysisType.SONG -> AnalysisType.SONG
+            se.onemanstudio.playaroundwithai.core.data.AnalysisType.PERSONALITY -> AnalysisType.PERSONALITY
+            se.onemanstudio.playaroundwithai.core.data.AnalysisType.PRODUCT -> AnalysisType.PRODUCT
+            se.onemanstudio.playaroundwithai.core.data.AnalysisType.TREND -> AnalysisType.TREND
         }
     }
 }

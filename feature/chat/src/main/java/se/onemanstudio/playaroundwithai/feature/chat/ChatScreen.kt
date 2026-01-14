@@ -34,7 +34,6 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -48,6 +47,7 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.input.TextFieldValue
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import se.onemanstudio.playaroundwithai.core.data.AnalysisType
 import se.onemanstudio.playaroundwithai.core.data.InputMode
 import se.onemanstudio.playaroundwithai.core.ui.sofa.NeoBrutalIconButton
@@ -66,14 +66,14 @@ import se.onemanstudio.playaroundwithai.feature.chat.views.history.HistoryBottom
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun ChatScreen(viewModel: ChatViewModel) {
-    val uiState by viewModel.uiState.collectAsState()
-    val suggestions by viewModel.suggestions.collectAsState()
-    val isSuggestionsLoading by viewModel.isSuggestionsLoading.collectAsState()
+    val uiState by viewModel.uiState.collectAsStateWithLifecycle()
+    val suggestions by viewModel.suggestions.collectAsStateWithLifecycle()
+    val isSuggestionsLoading by viewModel.isSuggestionsLoading.collectAsStateWithLifecycle()
     var textState by remember { mutableStateOf(TextFieldValue("")) }
     val keyboardController = LocalSoftwareKeyboardController.current
 
-    val isSheetOpen by viewModel.isSheetOpen.collectAsState()
-    val history by viewModel.promptHistory.collectAsState()
+    val isSheetOpen by viewModel.isSheetOpen.collectAsStateWithLifecycle()
+    val history by viewModel.promptHistory.collectAsStateWithLifecycle()
 
     var inputMode by remember { mutableStateOf(InputMode.TEXT) }
     var selectedImageUri by remember { mutableStateOf<Uri?>(null) }

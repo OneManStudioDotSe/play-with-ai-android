@@ -51,12 +51,14 @@ android {
 }
 
 dependencies {
+    implementation(project(":core-domain"))
     implementation(project(":core-data"))
     implementation(project(":core-theme"))
     implementation(project(":core-ui"))
 
     implementation(libs.material3)
     implementation(libs.androidx.material.icons.extended)
+    implementation(libs.androidx.lifecycle.runtime.compose)
 
     implementation(libs.coil.compose)
 

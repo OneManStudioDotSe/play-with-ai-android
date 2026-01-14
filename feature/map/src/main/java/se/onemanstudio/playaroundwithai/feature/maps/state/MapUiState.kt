@@ -1,7 +1,7 @@
 package se.onemanstudio.playaroundwithai.feature.maps.state
 
 import com.google.android.gms.maps.model.LatLng
-import se.onemanstudio.playaroundwithai.core.data.feature.map.dto.VehicleType
+import se.onemanstudio.playaroundwithai.core.domain.model.VehicleType
 import se.onemanstudio.playaroundwithai.feature.maps.models.MapItemUiModel
 
 data class MapUiState(

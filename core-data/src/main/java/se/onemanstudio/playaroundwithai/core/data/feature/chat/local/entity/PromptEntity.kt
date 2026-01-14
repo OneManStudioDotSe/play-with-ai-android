@@ -2,7 +2,8 @@ package se.onemanstudio.playaroundwithai.core.data.feature.chat.local.entity
 
 import androidx.room.Entity
 import androidx.room.PrimaryKey
-import se.onemanstudio.playaroundwithai.core.data.model.Prompt
+import se.onemanstudio.playaroundwithai.core.domain.model.Prompt
+import java.util.Date
 
 @Entity(tableName = "prompt_history")
 data class PromptEntity(
@@ -17,8 +18,8 @@ data class PromptEntity(
  */
 fun PromptEntity.toDomain(): Prompt {
     return Prompt(
-        id = this.id,
+        id = this.id.toLong(),
         text = this.text,
-        timestamp = this.timestamp
+        timestamp = Date(this.timestamp)
     )
 }

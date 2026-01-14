@@ -8,8 +8,8 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
-import se.onemanstudio.playaroundwithai.core.data.feature.map.dto.VehicleType
-import se.onemanstudio.playaroundwithai.core.data.feature.map.repository.MapRepository
+import se.onemanstudio.playaroundwithai.core.domain.model.VehicleType
+import se.onemanstudio.playaroundwithai.core.domain.usecase.GetMapItemsUseCase
 import se.onemanstudio.playaroundwithai.feature.maps.models.MapItemUiModel
 import se.onemanstudio.playaroundwithai.feature.maps.models.toUiModel
 import se.onemanstudio.playaroundwithai.feature.maps.state.MapUiState
@@ -23,7 +23,7 @@ private const val WALKING_SPEED_METERS_PER_MIN = 83.0 // approx 5km/h
 
 @HiltViewModel
 class MapViewModel @Inject constructor(
-    private val repository: MapRepository
+    private val getMapItemsUseCase: GetMapItemsUseCase
 ) : ViewModel() {
 
     private val _uiState = MutableStateFlow(MapUiState())
@@ -37,7 +37,7 @@ class MapViewModel @Inject constructor(
         _uiState.update { it.copy(isLoading = true) }
 
         viewModelScope.launch {
-            val data = repository.getMapItems(AMOUNT_OF_POINTS_TO_GENERATE).map { it.toUiModel() }
+            val data = getMapItemsUseCase(AMOUNT_OF_POINTS_TO_GENERATE).map { it.toUiModel() }
             _uiState.update {
                 it.copy(
                     isLoading = false,

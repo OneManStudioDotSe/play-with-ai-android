@@ -1,7 +1,5 @@
 package se.onemanstudio.playaroundwithai.core.data.feature.map.repository
 
-import se.onemanstudio.playaroundwithai.core.data.model.MapItem
+import se.onemanstudio.playaroundwithai.core.domain.repository.MapDomainRepository
 
-interface MapRepository {
-    suspend fun getMapItems(count: Int): List<MapItem>
-}
+interface MapRepository : MapDomainRepository

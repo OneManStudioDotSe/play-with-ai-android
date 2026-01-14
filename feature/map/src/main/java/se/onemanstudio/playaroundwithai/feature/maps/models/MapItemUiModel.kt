@@ -1,7 +1,7 @@
 package se.onemanstudio.playaroundwithai.feature.maps.models
 
 import com.google.android.gms.maps.model.LatLng
-import se.onemanstudio.playaroundwithai.core.data.model.MapItem as DomainMapItem
+import se.onemanstudio.playaroundwithai.core.domain.model.MapItem as DomainMapItem
 
 /**
  * Represents a map item that is displayed on the UI.

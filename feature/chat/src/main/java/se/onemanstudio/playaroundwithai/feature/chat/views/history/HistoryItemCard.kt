@@ -17,7 +17,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import se.onemanstudio.playaroundwithai.core.data.model.Prompt
+import se.onemanstudio.playaroundwithai.core.domain.model.Prompt
 import se.onemanstudio.playaroundwithai.core.ui.sofa.NeoBrutalCard
 import se.onemanstudio.playaroundwithai.core.ui.theme.Dimensions
 import se.onemanstudio.playaroundwithai.core.ui.theme.SofaAiTheme
@@ -53,7 +53,7 @@ fun HistoryItemCard(
 
             Row(verticalAlignment = Alignment.CenterVertically) {
                 Text(
-                    text = dateFormatter.format(Date(prompt.timestamp)),
+                    text = dateFormatter.format(prompt.timestamp),
                     style = MaterialTheme.typography.labelMedium,
                     color = MaterialTheme.colorScheme.primary,
                     fontWeight = FontWeight.Bold
@@ -72,7 +72,7 @@ private fun HistoryItemCardPreview_ShortText() {
             prompt = Prompt(
                 id = 1,
                 text = "What is neo-brutalism?",
-                timestamp = System.currentTimeMillis() - 1000 * 60 * 5 // 5 minutes ago
+                timestamp = Date(System.currentTimeMillis() - 1000 * 60 * 5) // 5 minutes ago
             ),
             onClick = {},
             modifier = Modifier.padding(Dimensions.paddingLarge)
@@ -88,7 +88,7 @@ private fun HistoryItemCardPreview_LongText() {
             prompt = Prompt(
                 id = 2,
                 text = "Can you please give me a very detailed and long explanation of how Jetpack Compose works?",
-                timestamp = System.currentTimeMillis() - 1000 * 60 * 60 * 24 * 3 // 3 days ago
+                timestamp = Date(System.currentTimeMillis() - 1000 * 60 * 60 * 24 * 3) // 3 days ago
             ),
             onClick = {},
             modifier = Modifier.padding(Dimensions.paddingLarge)
@@ -104,7 +104,7 @@ private fun HistoryItemCardPreview_Constrained() {
             prompt = Prompt(
                 id = 3,
                 text = "This is a prompt that should be long enough to wrap or truncate when the width is constrained.",
-                timestamp = System.currentTimeMillis() - 1000 * 60 * 60
+                timestamp = Date(System.currentTimeMillis() - 1000 * 60 * 60)
             ),
             onClick = {},
             modifier = Modifier

@@ -1,22 +1,23 @@
 package se.onemanstudio.playaroundwithai.core.data.feature.chat.repository
 
 import android.graphics.Bitmap
+import android.graphics.BitmapFactory
 import android.util.Base64
 import androidx.core.graphics.scale
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.map
-import se.onemanstudio.playaroundwithai.core.data.AnalysisType
 import se.onemanstudio.playaroundwithai.core.data.feature.chat.local.dao.PromptsHistoryDao
 import se.onemanstudio.playaroundwithai.core.data.feature.chat.local.entity.PromptEntity
-import se.onemanstudio.playaroundwithai.core.data.feature.chat.local.entity.toDomain
 import se.onemanstudio.playaroundwithai.core.data.feature.chat.remote.api.GeminiApiService
 import se.onemanstudio.playaroundwithai.core.data.feature.chat.remote.dto.Content
 import se.onemanstudio.playaroundwithai.core.data.feature.chat.remote.dto.GeminiRequest
-import se.onemanstudio.playaroundwithai.core.data.feature.chat.remote.dto.GeminiResponse
 import se.onemanstudio.playaroundwithai.core.data.feature.chat.remote.dto.ImageData
 import se.onemanstudio.playaroundwithai.core.data.feature.chat.remote.dto.Part
-import se.onemanstudio.playaroundwithai.core.data.model.Prompt
+import se.onemanstudio.playaroundwithai.core.domain.model.AnalysisType
+import se.onemanstudio.playaroundwithai.core.domain.model.Prompt
+import se.onemanstudio.playaroundwithai.core.domain.repository.GeminiDomainRepository
 import java.io.ByteArrayOutputStream
+import java.util.Date
 import javax.inject.Inject
 import javax.inject.Singleton
 
@@ -38,12 +39,13 @@ class GeminiRepositoryImpl @Inject constructor(
     private val apiService: GeminiApiService,
     private val promptsHistoryDao: PromptsHistoryDao,
 ) : GeminiRepository {
+
     override suspend fun generateContent(
         prompt: String,
-        imageBitmap: Bitmap?,
+        imageBytes: ByteArray?,
         fileText: String?,
         analysisType: AnalysisType?
-    ): Result<GeminiResponse> {
+    ): Result<String> {
         return try {
             val parts = mutableListOf<Part>()
             var fullPrompt = SYSTEM_INSTRUCTION + prompt
@@ -58,13 +60,15 @@ class GeminiRepositoryImpl @Inject constructor(
 
             parts.add(Part(text = fullPrompt))
 
-            imageBitmap?.let {
-                parts.add(Part(inlineData = it.toImageData()))
+            imageBytes?.let {
+                val bitmap = BitmapFactory.decodeByteArray(it, 0, it.size)
+                parts.add(Part(inlineData = bitmap.toImageData()))
             }
 
             val request = GeminiRequest(contents = listOf(Content(parts = parts)))
             val response = apiService.generateContent(request)
-            Result.success(response)
+            val text = response.extractText() ?: "No response text found."
+            Result.success(text)
         } catch (e: Exception) {
             Result.failure(e)
         }
@@ -136,5 +140,16 @@ class GeminiRepositoryImpl @Inject constructor(
         promptsHistoryDao.insertPrompt(PromptEntity(text = promptText))
     }
 
-    override fun getPromptHistory(): Flow<List<Prompt>> = promptsHistoryDao.getPromptHistory().map { list -> list.map { it.toDomain() } }
+    override fun getPromptHistory(): Flow<List<Prompt>> = 
+        promptsHistoryDao.getPromptHistory().map { list -> 
+            list.map { it.toDomainModel() } 
+        }
+
+    private fun PromptEntity.toDomainModel(): Prompt {
+        return Prompt(
+            id = this.id.toLong(),
+            text = this.text,
+            timestamp = Date(this.timestamp)
+        )
+    }
 }
