@@ -111,6 +111,10 @@ class ChatViewModel @Inject constructor(
                 _uiState.update {
                     ChatUiState.Success(responseText)
                 }
+                viewModelScope.launch {
+                    val fullPromptText = "Q: $prompt\nA: $responseText"
+                    savePromptUseCase(fullPromptText)
+                }
             }.onFailure { exception ->
                 val error = when (exception) {
                     is IOException -> ChatError.NetworkMissing

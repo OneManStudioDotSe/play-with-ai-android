@@ -2,7 +2,7 @@ package se.onemanstudio.playaroundwithai.core.data.feature.chat.remote.network
 
 import okhttp3.Interceptor
 import okhttp3.Response
-import se.onemanstudio.playaroundwithai.core.data.di.GeminiApiKey
+import se.onemanstudio.playaroundwithai.core.data.di.network.GeminiApiKey
 import javax.inject.Inject
 
 class AuthenticationInterceptor @Inject constructor(
