@@ -27,7 +27,7 @@ class PromptsHistoryDaoTest {
             // Allowing main thread queries, just for testing.
             .allowMainThreadQueries()
             .build()
-        dao = db.promptDao()
+        dao = db.historyDao()
     }
 
     @After
@@ -41,7 +41,7 @@ class PromptsHistoryDaoTest {
     fun insertAndGetHistory_returnsCorrectData() = runBlocking {
         // Given
         val prompt = PromptEntity(text = "Tell me a fun fact", timestamp = System.currentTimeMillis())
-        dao.insertPrompt(prompt)
+        dao.savePrompt(prompt)
 
         // When
         val history = dao.getPromptHistory().first()

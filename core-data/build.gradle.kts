@@ -73,8 +73,6 @@ android {
 }
 
 dependencies {
-    implementation(project(":core-domain"))
-
     // Hilt
     implementation(libs.hilt.android)
     ksp(libs.hilt.compiler)
@@ -104,6 +102,9 @@ dependencies {
     implementation(libs.kotlinx.coroutines.play.services)
 
     implementation(libs.timber)
+
+    // Add core-domain dependency
+    implementation(project(":core-domain"))
 
     // Local tests
     testImplementation(libs.junit4)

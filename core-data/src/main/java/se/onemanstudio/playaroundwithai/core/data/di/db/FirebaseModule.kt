@@ -1,4 +1,4 @@
-package se.onemanstudio.playaroundwithai.core.data.di
+package se.onemanstudio.playaroundwithai.core.data.di.db
 
 import com.google.firebase.Firebase
 import com.google.firebase.auth.FirebaseAuth

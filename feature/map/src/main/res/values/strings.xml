@@ -26,4 +26,11 @@
     <string name="exit_path_mode_button_content_description">Exit path mode</string>
     <string name="enter_path_mode_button_content_description">Enter path mode</string>
     <string name="unknown_location_notification">Current location unknown. Cannot calculate path.</string>
+
+    <!-- AI Integration -->
+    <string name="suggest_places_button_content_description">Suggest places with AI</string>
+    <string name="suggest_places_button_label">Suggest Places</string>
+    <string name="ai_suggested_place_marker_content_description">AI suggested place: %s</string>
+    <string name="clear_ai_suggestions_button_content_description">Clear AI suggested places</string>
+    <string name="clear_ai_suggestions_button_label">Clear Suggestions</string>
 </resources>

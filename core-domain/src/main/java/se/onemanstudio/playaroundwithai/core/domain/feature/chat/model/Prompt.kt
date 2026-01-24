@@ -1,6 +1,5 @@
 package se.onemanstudio.playaroundwithai.core.domain.feature.chat.model
 
-import se.onemanstudio.playaroundwithai.core.domain.feature.chat.model.SyncStatus
 import java.util.Date
 
 data class Prompt(

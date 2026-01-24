@@ -1,4 +1,4 @@
-package se.onemanstudio.playaroundwithai.core.data.di
+package se.onemanstudio.playaroundwithai.core.data.di.db
 
 import android.content.Context
 import androidx.room.Room
@@ -27,6 +27,6 @@ object DatabaseModule {
 
     @Provides
     fun providePromptsHistoryDao(appDatabase: AppDatabase): PromptsHistoryDao {
-        return appDatabase.promptDao()
+        return appDatabase.historyDao()
     }
 }

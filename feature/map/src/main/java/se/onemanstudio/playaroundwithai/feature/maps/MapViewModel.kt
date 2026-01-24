@@ -11,13 +11,16 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
+import se.onemanstudio.playaroundwithai.core.domain.feature.map.model.SuggestedPlace
 import se.onemanstudio.playaroundwithai.core.domain.feature.map.model.VehicleType
 import se.onemanstudio.playaroundwithai.core.domain.feature.map.usecase.GetMapItemsUseCase
+import se.onemanstudio.playaroundwithai.core.domain.feature.map.usecase.GetSuggestedPlacesUseCase
 import se.onemanstudio.playaroundwithai.feature.maps.models.MapItemUiModel
 import se.onemanstudio.playaroundwithai.feature.maps.models.toUiModel
 import se.onemanstudio.playaroundwithai.feature.maps.states.MapUiState
 import se.onemanstudio.playaroundwithai.feature.maps.utils.calculatePathDistance
 import se.onemanstudio.playaroundwithai.feature.maps.utils.permutations
+import timber.log.Timber
 import javax.inject.Inject
 import kotlin.math.roundToInt
 
@@ -26,26 +29,52 @@ private const val WALKING_SPEED_METERS_PER_MIN = 83.0 // approx 5km/h
 
 @HiltViewModel
 class MapViewModel @Inject constructor(
-    private val getMapItemsUseCase: GetMapItemsUseCase
+    private val getMapItemsUseCase: GetMapItemsUseCase,
+    private val getSuggestedPlacesUseCase: GetSuggestedPlacesUseCase
 ) : ViewModel() {
 
     private val _uiState = MutableStateFlow(MapUiState())
     val uiState = _uiState.asStateFlow()
-    
+
     init {
         loadMapData()
     }
 
     fun loadMapData() {
-        _uiState.update { it.copy(isLoading = true) }
-
+        _uiState.update {
+            it.copy(
+                isLoading = true,
+                isPathMode = it.isPathMode,
+                allLocations = it.allLocations,
+                visibleLocations = it.visibleLocations,
+                selectedLocations = it.selectedLocations,
+                activeFilter = it.activeFilter,
+                focusedMarker = null,
+                optimalRoute = it.optimalRoute,
+                routeDistanceMeters = it.routeDistanceMeters,
+                routeDurationMinutes = it.routeDurationMinutes,
+                suggestedPlaces = it.suggestedPlaces,
+                focusedSuggestedPlace = null, 
+                showLocationError = false
+            )
+        }
         viewModelScope.launch {
             val data = getMapItemsUseCase(AMOUNT_OF_POINTS_TO_GENERATE).map { it.toUiModel() }.toPersistentList()
             _uiState.update {
                 it.copy(
                     isLoading = false,
+                    isPathMode = it.isPathMode,
                     allLocations = data,
-                    visibleLocations = data
+                    visibleLocations = data,
+                    selectedLocations = it.selectedLocations,
+                    activeFilter = it.activeFilter,
+                    focusedMarker = it.focusedMarker,
+                    optimalRoute = it.optimalRoute,
+                    routeDistanceMeters = it.routeDistanceMeters,
+                    routeDurationMinutes = it.routeDurationMinutes,
+                    suggestedPlaces = it.suggestedPlaces,
+                    focusedSuggestedPlace = it.focusedSuggestedPlace,
+                    showLocationError = it.showLocationError
                 )
             }
         }
@@ -54,16 +83,61 @@ class MapViewModel @Inject constructor(
     fun setPathMode(active: Boolean) {
         _uiState.update {
             it.copy(
+                isLoading = it.isLoading,
                 isPathMode = active,
-                focusedMarker = null,
+                allLocations = it.allLocations,
+                visibleLocations = it.visibleLocations,
                 selectedLocations = persistentListOf(),
-                optimalRoute = persistentListOf()
+                activeFilter = it.activeFilter,
+                focusedMarker = null,
+                optimalRoute = persistentListOf(),
+                routeDistanceMeters = it.routeDistanceMeters,
+                routeDurationMinutes = it.routeDurationMinutes,
+                suggestedPlaces = persistentListOf(),
+                focusedSuggestedPlace = null,
+                showLocationError = false
             )
         }
     }
 
     fun selectMarker(marker: MapItemUiModel?) {
-        _uiState.update { it.copy(focusedMarker = marker) }
+        _uiState.update {
+            it.copy(
+                isLoading = it.isLoading,
+                isPathMode = it.isPathMode,
+                allLocations = it.allLocations,
+                visibleLocations = it.visibleLocations,
+                selectedLocations = it.selectedLocations,
+                activeFilter = it.activeFilter,
+                focusedMarker = marker,
+                optimalRoute = it.optimalRoute,
+                routeDistanceMeters = it.routeDistanceMeters,
+                routeDurationMinutes = it.routeDurationMinutes,
+                suggestedPlaces = it.suggestedPlaces,
+                focusedSuggestedPlace = null, // Clear focused AI place
+                showLocationError = it.showLocationError
+            )
+        }
+    }
+
+    fun selectSuggestedPlace(place: SuggestedPlace?) {
+        _uiState.update {
+            it.copy(
+                isLoading = it.isLoading,
+                isPathMode = it.isPathMode,
+                allLocations = it.allLocations,
+                visibleLocations = it.visibleLocations,
+                selectedLocations = it.selectedLocations,
+                activeFilter = it.activeFilter,
+                focusedMarker = null, // Clear focused regular marker
+                optimalRoute = it.optimalRoute,
+                routeDistanceMeters = it.routeDistanceMeters,
+                routeDurationMinutes = it.routeDurationMinutes,
+                suggestedPlaces = it.suggestedPlaces,
+                focusedSuggestedPlace = place,
+                showLocationError = it.showLocationError
+            )
+        }
     }
 
     fun toggleFilter(type: VehicleType) {
@@ -77,11 +151,19 @@ class MapViewModel @Inject constructor(
             val filtered = currentState.allLocations.filter { newFilters.contains(it.type) }.toPersistentList()
 
             currentState.copy(
-                activeFilter = newFilters,
+                isLoading = currentState.isLoading,
+                isPathMode = currentState.isPathMode,
+                allLocations = currentState.allLocations,
                 visibleLocations = filtered,
                 selectedLocations = persistentListOf(),
+                activeFilter = newFilters,
+                focusedMarker = null,
                 optimalRoute = persistentListOf(),
-                focusedMarker = null
+                routeDistanceMeters = currentState.routeDistanceMeters,
+                routeDurationMinutes = currentState.routeDurationMinutes,
+                suggestedPlaces = persistentListOf(),
+                focusedSuggestedPlace = null, // Clear focused AI place
+                showLocationError = false
             )
         }
     }
@@ -99,10 +181,24 @@ class MapViewModel @Inject constructor(
                 if (currentSelected.size < MapConstants.MAX_SELECTABLE_POINTS) {
                     (currentSelected + location.copy(isSelected = true)).toPersistentList()
                 } else {
-                    currentSelected // Limit reached, do not add
+                    currentSelected
                 }
             }
-            state.copy(selectedLocations = newSelected, optimalRoute = persistentListOf(), routeDistanceMeters = 0)
+            state.copy(
+                isLoading = state.isLoading,
+                isPathMode = state.isPathMode,
+                allLocations = state.allLocations,
+                visibleLocations = state.visibleLocations,
+                selectedLocations = newSelected,
+                activeFilter = state.activeFilter,
+                focusedMarker = state.focusedMarker,
+                optimalRoute = persistentListOf(),
+                routeDistanceMeters = 0,
+                routeDurationMinutes = state.routeDurationMinutes,
+                suggestedPlaces = persistentListOf(),
+                focusedSuggestedPlace = null, // Clear focused AI place
+                showLocationError = false
+            )
         }
     }
 
@@ -110,23 +206,144 @@ class MapViewModel @Inject constructor(
         val points = _uiState.value.selectedLocations.map { it.position }
         if (points.isEmpty()) return
 
-        val startPoint = userLocation ?: points.first()
-        // Ensure we visit all selected points, starting from user location
-        val pointsToVisit = points
+        _uiState.update {
+            it.copy(
+                isLoading = true,
+                isPathMode = it.isPathMode,
+                allLocations = it.allLocations,
+                visibleLocations = it.visibleLocations,
+                selectedLocations = it.selectedLocations,
+                activeFilter = it.activeFilter,
+                focusedMarker = it.focusedMarker,
+                optimalRoute = it.optimalRoute,
+                routeDistanceMeters = it.routeDistanceMeters,
+                routeDurationMinutes = it.routeDurationMinutes,
+                suggestedPlaces = it.suggestedPlaces,
+                focusedSuggestedPlace = it.focusedSuggestedPlace, // Keep existing
+                showLocationError = it.showLocationError
+            )
+        }
 
-        val bestPermutation = permutations(pointsToVisit)
-            .minByOrNull { path -> calculatePathDistance(startPoint, path) }
-            ?: pointsToVisit
+        viewModelScope.launch {
+            val startPoint = userLocation ?: points.first()
+            val pointsToVisit = points
 
-        val fullPath = (listOf(startPoint) + bestPermutation).toPersistentList()
-        val totalDistance = calculatePathDistance(startPoint, bestPermutation)
+            val bestPermutation = permutations(pointsToVisit)
+                .minByOrNull { path -> calculatePathDistance(startPoint, path) }
+                ?: pointsToVisit
+
+            val fullPath = (listOf(startPoint) + bestPermutation).toPersistentList()
+            val totalDistance = calculatePathDistance(startPoint, bestPermutation)
+
+            _uiState.update {
+                it.copy(
+                    isLoading = false,
+                    isPathMode = it.isPathMode,
+                    allLocations = it.allLocations,
+                    visibleLocations = it.visibleLocations,
+                    selectedLocations = it.selectedLocations,
+                    activeFilter = it.activeFilter,
+                    focusedMarker = it.focusedMarker,
+                    optimalRoute = fullPath,
+                    routeDistanceMeters = (totalDistance * 1000).roundToInt(),
+                    routeDurationMinutes = ((totalDistance * 1000) / WALKING_SPEED_METERS_PER_MIN).roundToInt(),
+                    suggestedPlaces = it.suggestedPlaces,
+                    focusedSuggestedPlace = it.focusedSuggestedPlace,
+                    showLocationError = it.showLocationError
+                )
+            }
+        }
+    }
+
+    fun getAiSuggestedPlaces(userLocation: LatLng?) {
+        if (userLocation == null) {
+            _uiState.update { 
+                it.copy(
+                    isLoading = it.isLoading,
+                    isPathMode = it.isPathMode,
+                    allLocations = it.allLocations,
+                    visibleLocations = it.visibleLocations,
+                    selectedLocations = it.selectedLocations,
+                    activeFilter = it.activeFilter,
+                    focusedMarker = it.focusedMarker,
+                    optimalRoute = it.optimalRoute,
+                    routeDistanceMeters = it.routeDistanceMeters,
+                    routeDurationMinutes = it.routeDurationMinutes,
+                    suggestedPlaces = it.suggestedPlaces,
+                    focusedSuggestedPlace = null, // Clear focused AI place
+                    showLocationError = true
+                )
+            }
+            return
+        }
 
         _uiState.update {
             it.copy(
-                optimalRoute = fullPath,
-                routeDistanceMeters = (totalDistance * 1000).roundToInt(),
-                routeDurationMinutes = ((totalDistance * 1000) / WALKING_SPEED_METERS_PER_MIN).roundToInt()
+                isLoading = true,
+                isPathMode = it.isPathMode,
+                allLocations = it.allLocations,
+                visibleLocations = it.visibleLocations,
+                selectedLocations = it.selectedLocations,
+                activeFilter = it.activeFilter,
+                focusedMarker = null, // Clear focused marker too
+                optimalRoute = it.optimalRoute,
+                routeDistanceMeters = it.routeDistanceMeters,
+                routeDurationMinutes = it.routeDurationMinutes,
+                suggestedPlaces = persistentListOf(),
+                focusedSuggestedPlace = null, 
+                showLocationError = false
             )
         }
+
+        viewModelScope.launch {
+            getSuggestedPlacesUseCase(userLocation.latitude, userLocation.longitude)
+                .onSuccess { places ->
+                    _uiState.update {
+                        it.copy(
+                            isLoading = false,
+                            isPathMode = it.isPathMode,
+                            allLocations = it.allLocations,
+                            visibleLocations = it.visibleLocations,
+                            selectedLocations = it.selectedLocations,
+                            activeFilter = it.activeFilter,
+                            focusedMarker = it.focusedMarker,
+                            optimalRoute = it.optimalRoute,
+                            routeDistanceMeters = it.routeDistanceMeters,
+                            routeDurationMinutes = it.routeDurationMinutes,
+                            suggestedPlaces = places.toPersistentList(),
+                            focusedSuggestedPlace = it.focusedSuggestedPlace,
+                            showLocationError = false
+                        )
+                    }
+                }
+                .onFailure { exception ->
+                    Timber.e(exception, "Failed to get AI suggested places")
+                    _uiState.update {
+                        it.copy(
+                            isLoading = false,
+                            isPathMode = it.isPathMode,
+                            allLocations = it.allLocations,
+                            visibleLocations = it.visibleLocations,
+                            selectedLocations = it.selectedLocations,
+                            activeFilter = it.activeFilter,
+                            focusedMarker = it.focusedMarker,
+                            optimalRoute = it.optimalRoute,
+                            routeDistanceMeters = it.routeDistanceMeters,
+                            routeDurationMinutes = it.routeDurationMinutes,
+                            suggestedPlaces = it.suggestedPlaces,
+                            focusedSuggestedPlace = it.focusedSuggestedPlace,
+                            showLocationError = true
+                        )
+                    }
+                }
+        }
+    }
+
+    fun clearLocationError() {
+        _uiState.update { it.copy(showLocationError = false, isLoading = it.isLoading, isPathMode = it.isPathMode, allLocations = it.allLocations, visibleLocations = it.visibleLocations, selectedLocations = it.selectedLocations, activeFilter = it.activeFilter, focusedMarker = it.focusedMarker, optimalRoute = it.optimalRoute, routeDistanceMeters = it.routeDistanceMeters, routeDurationMinutes = it.routeDurationMinutes, suggestedPlaces = it.suggestedPlaces, focusedSuggestedPlace = it.focusedSuggestedPlace) }
+    }
+
+    fun clearSuggestedPlaces() {
+        _uiState.update { it.copy(suggestedPlaces = persistentListOf(), focusedSuggestedPlace = null, focusedMarker = null, isLoading = it.isLoading, isPathMode = it.isPathMode, allLocations = it.allLocations, visibleLocations = it.visibleLocations, selectedLocations = it.selectedLocations, activeFilter = it.activeFilter, optimalRoute = it.optimalRoute, routeDistanceMeters = it.routeDistanceMeters, routeDurationMinutes = it.routeDurationMinutes, showLocationError = it.showLocationError) }
     }
 }

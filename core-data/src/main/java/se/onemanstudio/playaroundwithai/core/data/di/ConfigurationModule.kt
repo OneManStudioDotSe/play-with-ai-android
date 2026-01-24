@@ -6,6 +6,9 @@ import dagger.hilt.InstallIn
 import dagger.hilt.components.SingletonComponent
 import okhttp3.logging.HttpLoggingInterceptor
 import se.onemanstudio.playaroundwithai.core.data.BuildConfig
+import se.onemanstudio.playaroundwithai.core.data.di.network.BaseUrl
+import se.onemanstudio.playaroundwithai.core.data.di.network.GeminiApiKey
+import se.onemanstudio.playaroundwithai.core.data.di.network.LoggingLevel
 import javax.inject.Singleton
 
 @Module

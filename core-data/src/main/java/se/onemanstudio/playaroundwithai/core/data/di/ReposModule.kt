@@ -13,20 +13,14 @@ import se.onemanstudio.playaroundwithai.core.domain.feature.map.repository.MapRe
 
 @Module
 @InstallIn(SingletonComponent::class)
-abstract class DataModule {
+abstract class ReposModule {
 
     @Binds
-    abstract fun bindGeminiDomainRepository(
-        geminiRepositoryImpl: GeminiRepositoryImpl
-    ): GeminiRepository
+    abstract fun bindGeminiDomainRepository(geminiRepositoryImpl: GeminiRepositoryImpl): GeminiRepository
 
     @Binds
-    abstract fun bindMapDomainRepository(
-        mapRepositoryImpl: MapRepositoryImpl
-    ): MapRepository
+    abstract fun bindMapDomainRepository(mapRepositoryImpl: MapRepositoryImpl): MapRepository
 
     @Binds
-    abstract fun bindAuthRepository(
-        authRepositoryImpl: AuthRepositoryImpl
-    ): AuthRepository
+    abstract fun bindAuthRepository(authRepositoryImpl: AuthRepositoryImpl): AuthRepository
 }

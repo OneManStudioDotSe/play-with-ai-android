@@ -26,4 +26,11 @@
     <string name="exit_path_mode_button_content_description">Avsluta stiglÄge</string>
     <string name="enter_path_mode_button_content_description">Gå in i stiglÄge</string>
     <string name="unknown_location_notification">Aktuell plats okänd. Kan inte beräkna stig.</string>
+
+    <!-- AI Integration -->
+    <string name="suggest_places_button_content_description">Föreslå platser med AI</string>
+    <string name="suggest_places_button_label">Föreslå platser</string>
+    <string name="ai_suggested_place_marker_content_description">AI-föreslagen plats: %s</string>
+    <string name="clear_ai_suggestions_button_content_description">Rensa AI-föreslagna platser</string>
+    <string name="clear_ai_suggestions_button_label">Rensa förslag</string>
 </resources>

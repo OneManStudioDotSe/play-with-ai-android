@@ -35,7 +35,7 @@ class GeminiRepositoryImplTest {
         ).allowMainThreadQueries().build()
 
         // Get a real DAO instance from the database
-        promptsHistoryDao = database.promptDao()
+        promptsHistoryDao = database.historyDao()
 
         // Create the repository with a real DAO and a mock API service
         repository = GeminiRepositoryImpl(geminiApiService, promptsHistoryDao, workManager)
@@ -50,7 +50,7 @@ class GeminiRepositoryImplTest {
     fun getPromptHistory_whenDataExists_returnsMappedDomainModels() = runBlocking {
         // Given: We insert an Entity directly into the database using the DAO
         val promptEntity = PromptEntity(id = 1, text = "Test prompt", timestamp = 12345L)
-        promptsHistoryDao.insertPrompt(promptEntity)
+        promptsHistoryDao.savePrompt(promptEntity)
 
         // When: We call the repository method
         val promptHistoryFlow = repository.getPromptHistory()
