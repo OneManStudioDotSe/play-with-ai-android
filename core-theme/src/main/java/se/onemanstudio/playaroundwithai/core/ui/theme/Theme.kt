@@ -54,8 +54,8 @@ fun SofaAiTheme(
     // Neo-brutalism uses sharp corners. We will override the shapes here.
     MaterialTheme(
         colorScheme = colorScheme,
-        typography = Typography, // We'll define this next
-        shapes = Shapes( // Override all shapes to be perfectly sharp
+        typography = Typography,
+        shapes = Shapes(
             extraSmall = ZeroCornerSize,
             small = ZeroCornerSize,
             medium = ZeroCornerSize,

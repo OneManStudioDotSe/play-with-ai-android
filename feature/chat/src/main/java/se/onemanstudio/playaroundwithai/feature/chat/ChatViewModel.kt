@@ -15,6 +15,7 @@ import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import se.onemanstudio.playaroundwithai.core.domain.feature.chat.model.Prompt
+import se.onemanstudio.playaroundwithai.core.domain.feature.chat.model.SyncStatus
 import se.onemanstudio.playaroundwithai.core.domain.feature.chat.usecase.GenerateContentUseCase
 import se.onemanstudio.playaroundwithai.core.domain.feature.chat.usecase.GetPromptHistoryUseCase
 import se.onemanstudio.playaroundwithai.core.domain.feature.chat.usecase.GetSuggestionsUseCase
@@ -27,6 +28,7 @@ import timber.log.Timber
 import java.io.ByteArrayOutputStream
 import java.io.FileNotFoundException
 import java.io.IOException
+import java.util.Date
 import javax.inject.Inject
 
 @HiltViewModel
@@ -112,8 +114,14 @@ class ChatViewModel @Inject constructor(
                     ChatUiState.Success(responseText)
                 }
                 viewModelScope.launch {
-                    val fullPromptText = "Q: $prompt\nA: $responseText"
-                    savePromptUseCase(fullPromptText)
+                    val promptToSave = Prompt(
+                        text = "Q: $prompt\nA: $responseText",
+                        timestamp = Date(),
+                        syncStatus = SyncStatus.Pending,
+                        imageAttachment = imageBytes,
+                        documentAttachment = fileText
+                    )
+                    savePromptUseCase(promptToSave)
                 }
             }.onFailure { exception ->
                 val error = when (exception) {

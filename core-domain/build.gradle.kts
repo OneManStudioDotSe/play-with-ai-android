@@ -1,4 +1,3 @@
-import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
 import org.jetbrains.kotlin.gradle.dsl.JvmTarget
 
 plugins {
@@ -8,10 +7,10 @@ plugins {
 
 android {
     namespace = "se.onemanstudio.playaroundwithai.core.domain"
-    compileSdk = 36 // Use the same compileSdk as core-data
+    compileSdk = 36
 
     defaultConfig {
-        minSdk = 31 // Use the same minSdk as core-data
+        minSdk = 31
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
     }
 

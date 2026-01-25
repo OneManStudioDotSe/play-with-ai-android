@@ -22,9 +22,7 @@ import androidx.compose.foundation.layout.statusBarsPadding
 import androidx.compose.foundation.layout.wrapContentSize
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.DirectionsBike
-import androidx.compose.material.icons.filled.Clear
 import androidx.compose.material.icons.filled.ElectricScooter
-import androidx.compose.material.icons.filled.Stars
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.Composable
@@ -58,7 +56,6 @@ import com.google.maps.android.compose.rememberCameraPositionState
 import com.google.maps.android.compose.rememberUpdatedMarkerState
 import kotlinx.coroutines.launch
 import se.onemanstudio.playaroundwithai.core.domain.feature.map.model.VehicleType
-import se.onemanstudio.playaroundwithai.core.ui.sofa.NeoBrutalIconButton
 import se.onemanstudio.playaroundwithai.core.ui.theme.Dimensions
 import se.onemanstudio.playaroundwithai.feature.map.R
 import se.onemanstudio.playaroundwithai.feature.maps.MapConstants.STOCKHOLM_LAT
@@ -67,9 +64,7 @@ import se.onemanstudio.playaroundwithai.feature.maps.views.CustomMarkerIcon
 import se.onemanstudio.playaroundwithai.feature.maps.views.FilterChip
 import se.onemanstudio.playaroundwithai.feature.maps.views.MarkerInfoCard
 import se.onemanstudio.playaroundwithai.feature.maps.views.PathModeBar
-import se.onemanstudio.playaroundwithai.feature.maps.views.SelfDismissingNotification
 import se.onemanstudio.playaroundwithai.feature.maps.views.SideControls
-import se.onemanstudio.playaroundwithai.feature.maps.views.SuggestedPlaceInfoCard
 
 @SuppressLint("MissingPermission", "GoogleMapComposable")
 @OptIn(MapsComposeExperimentalApi::class)
@@ -106,10 +101,9 @@ fun MapScreen(viewModel: MapViewModel = hiltViewModel()) {
         }
     }
 
-    LaunchedEffect(uiState.visibleLocations, uiState.suggestedPlaces) {
+    LaunchedEffect(uiState.visibleLocations) {
         val allPoints = mutableListOf<LatLng>()
         uiState.visibleLocations.forEach { allPoints.add(it.position) }
-        uiState.suggestedPlaces.forEach { allPoints.add(LatLng(it.lat, it.lng)) }
 
         if (allPoints.isNotEmpty()) {
             val boundsBuilder = LatLngBounds.builder()
@@ -158,7 +152,6 @@ fun MapScreen(viewModel: MapViewModel = hiltViewModel()) {
             ),
             onMapClick = {
                 viewModel.selectMarker(null)
-                viewModel.selectSuggestedPlace(null)
             }
         ) {
             if (uiState.optimalRoute.isNotEmpty()) {
@@ -207,59 +200,6 @@ fun MapScreen(viewModel: MapViewModel = hiltViewModel()) {
                     }
                 }
             }
-
-            uiState.suggestedPlaces.forEach { place ->
-                key(place.name + place.lat + place.lng) {
-                    MarkerComposable(
-                        state = rememberUpdatedMarkerState(position = LatLng(place.lat, place.lng)),
-                        title = place.name,
-                        snippet = place.description,
-                        onClick = {
-                            scope.launch {
-                                cameraPositionState.animate(
-                                    update = CameraUpdateFactory.newLatLng(LatLng(place.lat, place.lng)),
-                                    durationMs = MapConstants.MOVE_TO_POINT_DURATION
-                                )
-                            }
-                            viewModel.selectSuggestedPlace(place)
-                            true
-                        }
-                    ) {
-                        CustomMarkerIcon(
-                            Icons.Filled.Stars,
-                            stringResource(id = R.string.ai_suggested_place_marker_content_description, place.name),
-                            false
-                        )
-                    }
-                }
-            }
-        }
-
-        AnimatedVisibility(
-            visible = uiState.showLocationError,
-            enter = slideInHorizontally(
-                initialOffsetX = { it },
-                animationSpec = tween(
-                    durationMillis = AnimationConstants.ANIMATION_DURATION,
-                    easing = EaseInOutQuart
-                )
-            ),
-            exit = slideOutHorizontally(
-                targetOffsetX = { it },
-                animationSpec = tween(
-                    durationMillis = AnimationConstants.ANIMATION_DURATION,
-                    easing = EaseInOutQuart
-                )
-            ),
-            modifier = Modifier
-                .align(Alignment.TopCenter)
-                .statusBarsPadding()
-                .padding(top = Dimensions.paddingLarge)
-        ) {
-            SelfDismissingNotification(
-                message = stringResource(id = R.string.unknown_location_notification),
-                onDismiss = { viewModel.clearLocationError() }
-            )
         }
 
         AnimatedVisibility(
@@ -292,50 +232,6 @@ fun MapScreen(viewModel: MapViewModel = hiltViewModel()) {
                     text = stringResource(id = R.string.bicycles_filter_chip_label),
                     selected = uiState.activeFilter.contains(VehicleType.BICYCLE)
                 ) { viewModel.toggleFilter(VehicleType.BICYCLE) }
-            }
-        }
-
-        // AI Suggestion Buttons Row
-        AnimatedVisibility(
-            visible = !uiState.isPathMode && userLocation != null,
-            enter = slideInHorizontally(
-                initialOffsetX = { it * 2 },
-                animationSpec = tween(
-                    durationMillis = AnimationConstants.ANIMATION_DURATION,
-                    easing = EaseInOutQuart
-                )
-            ),
-            exit = slideOutHorizontally(
-                targetOffsetX = { it * 2 },
-                animationSpec = tween(
-                    durationMillis = AnimationConstants.ANIMATION_DURATION,
-                    easing = EaseInOutQuart
-                )
-            ),
-            modifier = Modifier
-                .align(Alignment.TopEnd)
-                .statusBarsPadding()
-                .padding(top = Dimensions.paddingMedium)
-        ) {
-            Row(horizontalArrangement = Arrangement.spacedBy(Dimensions.paddingMedium)) {
-                // Suggest Places Button
-                AnimatedVisibility(visible = uiState.suggestedPlaces.isEmpty()) {
-                    NeoBrutalIconButton(
-                        imageVector = Icons.Filled.Stars,
-                        contentDescription = stringResource(R.string.suggest_places_button_content_description),
-                        backgroundColor = MaterialTheme.colorScheme.secondary,
-                        onClick = { viewModel.getAiSuggestedPlaces(userLocation) }
-                    )
-                }
-                // Clear Suggestions Button
-                AnimatedVisibility(visible = uiState.suggestedPlaces.isNotEmpty()) {
-                    NeoBrutalIconButton(
-                        imageVector = Icons.Default.Clear,
-                        contentDescription = stringResource(R.string.clear_ai_suggestions_button_content_description),
-                        backgroundColor = MaterialTheme.colorScheme.errorContainer,
-                        onClick = { viewModel.clearSuggestedPlaces() }
-                    )
-                }
             }
         }
 
@@ -409,8 +305,6 @@ fun MapScreen(viewModel: MapViewModel = hiltViewModel()) {
                     onGoClick = {
                         if (userLocation != null) {
                             viewModel.calculateOptimalRoute(userLocation)
-                        } else {
-                            viewModel.clearLocationError()
                         }
                     }
                 )
@@ -418,7 +312,7 @@ fun MapScreen(viewModel: MapViewModel = hiltViewModel()) {
         }
 
         AnimatedVisibility(
-            visible = uiState.focusedMarker != null && !uiState.isPathMode && uiState.focusedSuggestedPlace == null,
+            visible = uiState.focusedMarker != null && !uiState.isPathMode,
             enter = slideInHorizontally(
                 initialOffsetX = { it },
                 animationSpec = tween(
@@ -444,38 +338,6 @@ fun MapScreen(viewModel: MapViewModel = hiltViewModel()) {
                     MarkerInfoCard(
                         marker = marker,
                         onClose = { viewModel.selectMarker(null) }
-                    )
-                }
-            }
-        }
-
-        AnimatedVisibility(
-            visible = uiState.focusedSuggestedPlace != null && !uiState.isPathMode && uiState.focusedMarker == null,
-            enter = slideInHorizontally(
-                initialOffsetX = { it },
-                animationSpec = tween(
-                    durationMillis = AnimationConstants.ANIMATION_DURATION,
-                    easing = EaseInOutQuart
-                )
-            ),
-            exit = slideOutHorizontally(
-                targetOffsetX = { it },
-                animationSpec = tween(
-                    durationMillis = AnimationConstants.ANIMATION_DURATION,
-                    easing = EaseInOutQuart
-                )
-            ),
-            modifier = Modifier.align(Alignment.BottomCenter)
-        ) {
-            Box(
-                modifier = Modifier
-                    .navigationBarsPadding()
-                    .padding(Dimensions.paddingLarge)
-            ) {
-                uiState.focusedSuggestedPlace?.let { place ->
-                    SuggestedPlaceInfoCard(
-                        place = place,
-                        onClose = { viewModel.selectSuggestedPlace(null) }
                     )
                 }
             }

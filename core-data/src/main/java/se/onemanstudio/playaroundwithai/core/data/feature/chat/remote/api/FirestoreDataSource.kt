@@ -1,4 +1,4 @@
-package se.onemanstudio.playaroundwithai.core.data.feature.chat.remote.firebase
+package se.onemanstudio.playaroundwithai.core.data.feature.chat.remote.api
 
 import com.google.firebase.FirebaseException
 import com.google.firebase.auth.FirebaseAuth

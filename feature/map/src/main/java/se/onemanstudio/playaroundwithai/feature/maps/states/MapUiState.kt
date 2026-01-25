@@ -6,7 +6,6 @@ import kotlinx.collections.immutable.PersistentList
 import kotlinx.collections.immutable.PersistentSet
 import kotlinx.collections.immutable.persistentListOf
 import kotlinx.collections.immutable.persistentSetOf
-import se.onemanstudio.playaroundwithai.core.domain.feature.map.model.SuggestedPlace
 import se.onemanstudio.playaroundwithai.core.domain.feature.map.model.VehicleType
 import se.onemanstudio.playaroundwithai.feature.maps.models.MapItemUiModel
 
@@ -17,12 +16,10 @@ data class MapUiState(
     val allLocations: PersistentList<MapItemUiModel> = persistentListOf(),
     val visibleLocations: PersistentList<MapItemUiModel> = persistentListOf(),
     val selectedLocations: PersistentList<MapItemUiModel> = persistentListOf(),
-    val activeFilter: PersistentSet<VehicleType> = persistentSetOf(VehicleType.SCOOTER, VehicleType.BICYCLE),
+    val activeFilter: Set<VehicleType> = persistentSetOf(VehicleType.SCOOTER, VehicleType.BICYCLE),
     val focusedMarker: MapItemUiModel? = null,
     val optimalRoute: PersistentList<LatLng> = persistentListOf(),
     val routeDistanceMeters: Int = 0,
     val routeDurationMinutes: Int = 0,
-    val suggestedPlaces: PersistentList<SuggestedPlace> = persistentListOf(),
-    val focusedSuggestedPlace: SuggestedPlace? = null,
     val showLocationError: Boolean = false
 )

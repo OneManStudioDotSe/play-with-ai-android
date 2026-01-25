@@ -7,7 +7,7 @@ import se.onemanstudio.playaroundwithai.core.domain.feature.chat.model.SyncStatu
 @Entity(tableName = "prompt_history")
 data class PromptEntity(
     @PrimaryKey(autoGenerate = true)
-    val id: Int = 0,
+    val id: Int,
     val text: String,
     val timestamp: Long = System.currentTimeMillis(),
     val syncStatus: SyncStatus

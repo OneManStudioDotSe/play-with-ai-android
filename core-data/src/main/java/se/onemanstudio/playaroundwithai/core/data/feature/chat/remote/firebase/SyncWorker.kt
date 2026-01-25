@@ -12,6 +12,7 @@ import dagger.assisted.Assisted
 import dagger.assisted.AssistedInject
 import se.onemanstudio.playaroundwithai.core.data.R
 import se.onemanstudio.playaroundwithai.core.data.feature.chat.local.dao.PromptsHistoryDao
+import se.onemanstudio.playaroundwithai.core.data.feature.chat.remote.api.FirestoreDataSource
 import se.onemanstudio.playaroundwithai.core.domain.feature.chat.model.SyncStatus
 import timber.log.Timber
 
@@ -59,11 +60,7 @@ class SyncWorker @AssistedInject constructor(
             .setOngoing(true)
             .build()
 
-        return if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
-            ForegroundInfo(NOTIFICATION_ID, notification, ServiceInfo.FOREGROUND_SERVICE_TYPE_DATA_SYNC)
-        } else {
-            ForegroundInfo(NOTIFICATION_ID, notification)
-        }
+        return ForegroundInfo(NOTIFICATION_ID, notification, ServiceInfo.FOREGROUND_SERVICE_TYPE_DATA_SYNC)
     }
 
     companion object {

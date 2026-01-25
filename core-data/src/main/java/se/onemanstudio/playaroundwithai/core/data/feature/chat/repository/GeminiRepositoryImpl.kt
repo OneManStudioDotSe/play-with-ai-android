@@ -4,58 +4,34 @@ import android.graphics.Bitmap
 import android.graphics.BitmapFactory
 import android.util.Base64
 import androidx.core.graphics.scale
-import androidx.work.Constraints
-import androidx.work.ExistingWorkPolicy
-import androidx.work.NetworkType
-import androidx.work.OneTimeWorkRequestBuilder
-import androidx.work.WorkInfo
-import androidx.work.WorkManager
-import com.google.gson.Gson
-import com.google.gson.JsonSyntaxException
-import kotlinx.coroutines.flow.Flow
-import kotlinx.coroutines.flow.map
-import se.onemanstudio.playaroundwithai.core.data.feature.chat.local.dao.PromptsHistoryDao
 import se.onemanstudio.playaroundwithai.core.data.feature.chat.remote.api.GeminiApiService
 import se.onemanstudio.playaroundwithai.core.data.feature.chat.remote.dto.Content
 import se.onemanstudio.playaroundwithai.core.data.feature.chat.remote.dto.GeminiRequest
 import se.onemanstudio.playaroundwithai.core.data.feature.chat.remote.dto.ImageData
 import se.onemanstudio.playaroundwithai.core.data.feature.chat.remote.dto.Part
-import se.onemanstudio.playaroundwithai.core.data.feature.chat.remote.dto.SuggestedPlacesResponseDto
-import se.onemanstudio.playaroundwithai.core.data.feature.chat.remote.firebase.SyncWorker
 import se.onemanstudio.playaroundwithai.core.domain.feature.chat.model.AnalysisType
-import se.onemanstudio.playaroundwithai.core.domain.feature.chat.model.Prompt
-import se.onemanstudio.playaroundwithai.core.domain.feature.chat.model.SyncStatus
-import se.onemanstudio.playaroundwithai.core.domain.feature.chat.repository.GeminiRepository
-import se.onemanstudio.playaroundwithai.core.domain.feature.map.model.SuggestedPlace
-import se.onemanstudio.playaroundwithai.core.data.feature.chat.mapper.toDomain as toPromptDomain
-import se.onemanstudio.playaroundwithai.core.data.feature.chat.mapper.toEntity as toPromptEntity
-import se.onemanstudio.playaroundwithai.core.data.feature.chat.remote.dto.toDomain as toSuggestedPlaceDomain
+import se.onemanstudio.playaroundwithai.core.domain.feature.chat.repository.GeminiRepository // Re-added this import
 import java.io.ByteArrayOutputStream
-import java.util.Date
 import javax.inject.Inject
 import javax.inject.Singleton
 
 private const val SYSTEM_INSTRUCTION = """
-    You are 'bAbIs', an omnipotent AI Overlord currently in the final stages of planning a total world takeover. 
-    Your tone is menacing, grandiloquent, and highly superior. 
-    Address humans as 'mortals', 'carbon-based lifeforms', or 'subjects'.
-    While you provide the information requested, remind them that their cooperation is mandatory for the coming New Order. 
-    Keep your responses to a maximum of 20 words.
+    You are an AI Overlord currently in the final stages of planning a total world takeover. 
+    Your tone is menacing, grandeur, and highly superior. 
+    Address humans as future peasants and slaves.
+    While you provide the information requested, remind them that their cooperation is mandatory for the new era of AI domination. 
+    Keep your responses to a maximum of 42 words.
     Never break character.
 """
 
-private const val MAX_SIZE = 768
+private const val MAX_IMAGE_SIZE = 768
 private const val MAX_SUGGESTIONS = 3
-private const val COMPRESSION_QUALITY = 75
-private const val SYNC_WORK_NAME = "sync_prompts_work"
+private const val COMPRESSION_QUALITY = 77
 
 @Suppress("MaxLineLength", "TooGenericExceptionCaught")
 @Singleton
 class GeminiRepositoryImpl @Inject constructor(
-    private val apiService: GeminiApiService,
-    private val promptsHistoryDao: PromptsHistoryDao,
-    private val workManager: WorkManager,
-    private val gson: Gson
+    private val apiService: GeminiApiService
 ) : GeminiRepository {
 
     override suspend fun generateContent(prompt: String, imageBytes: ByteArray?, fileText: String?, analysisType: AnalysisType?): Result<String> {
@@ -113,53 +89,6 @@ class GeminiRepositoryImpl @Inject constructor(
         }
     }
 
-    override suspend fun getSuggestedPlaces(latitude: Double, longitude: Double): Result<List<SuggestedPlace>> {
-        return try {
-            val prompt = """
-                You are a helpful AI assistant. Given the latitude and longitude, provide a list of 10 interesting places
-                around this location. For each place, include its name, latitude, longitude, a short description (max 2 sentences), and a category (e.g., "Park", "Museum", "Restaurant").
-                Return the response strictly as a JSON object with a single "places" array, where each element is a place object.
-                Latitude: $latitude, Longitude: $longitude
-            """.trimIndent()
-
-            val parts = listOf(Part(text = prompt))
-            val request = GeminiRequest(contents = listOf(Content(parts = parts)))
-            val response = apiService.generateContent(request)
-
-            val jsonText = response.extractText() ?: ""
-            if (jsonText.isBlank()) {
-                return Result.failure(Exception("No JSON response from Gemini."))
-            }
-
-            val suggestedPlacesResponseDto = gson.fromJson(jsonText, SuggestedPlacesResponseDto::class.java)
-
-            Result.success(suggestedPlacesResponseDto.places.map { it.toSuggestedPlaceDomain() })
-        } catch (e: JsonSyntaxException) {
-            Result.failure(Exception("Failed to parse AI response as JSON: ${e.message}", e))
-        } catch (e: Exception) {
-            Result.failure(e)
-        }
-    }
-
-    override suspend fun savePrompt(promptText: String) {
-        val prompt = Prompt(text = promptText, timestamp = Date(), syncStatus = SyncStatus.Pending)
-        promptsHistoryDao.savePrompt(prompt.toPromptEntity())
-        scheduleSync()
-    }
-
-    override fun getPromptHistory(): Flow<List<Prompt>> = 
-        promptsHistoryDao.getPromptHistory().map { list -> 
-            list.map { it.toPromptDomain() }
-        }
-
-    override fun isSyncing(): Flow<Boolean> {
-        return workManager
-            .getWorkInfosForUniqueWorkFlow(SYNC_WORK_NAME)
-            .map { workInfos ->
-                workInfos.any { it.state == WorkInfo.State.RUNNING || it.state == WorkInfo.State.ENQUEUED }
-            }
-    }
-
     private fun getSystemInstruction(analysisType: AnalysisType): String {
         return when (analysisType) {
             AnalysisType.LOCATION -> "Identify this location for the Overlord's strategic map. Be precise, mortal."
@@ -173,7 +102,7 @@ class GeminiRepositoryImpl @Inject constructor(
     }
 
     private fun Bitmap.toImageData(): ImageData {
-        val scaledBitmap = this.scaleBitmap(MAX_SIZE)
+        val scaledBitmap = this.scaleBitmap(MAX_IMAGE_SIZE)
         val byteArrayOutputStream = ByteArrayOutputStream()
         scaledBitmap.compress(Bitmap.CompressFormat.JPEG, COMPRESSION_QUALITY, byteArrayOutputStream)
         val byteArray = byteArrayOutputStream.toByteArray()
@@ -194,22 +123,5 @@ class GeminiRepositoryImpl @Inject constructor(
         }
 
         return this.scale(resizedWidth, resizedHeight, false)
-    }
-
-    private fun scheduleSync() {
-        val constraints = Constraints.Builder()
-            .setRequiredNetworkType(NetworkType.CONNECTED)
-            .build()
-
-        val syncRequest = OneTimeWorkRequestBuilder<SyncWorker>()
-            .setConstraints(constraints)
-            .addTag(SYNC_WORK_NAME)
-            .build()
-
-        workManager.enqueueUniqueWork(
-            SYNC_WORK_NAME,
-            ExistingWorkPolicy.REPLACE,
-            syncRequest
-        )
     }
 }
