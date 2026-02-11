@@ -1,10 +1,10 @@
 package se.onemanstudio.playaroundwithai.feature.chat
 
 import android.content.Context
+import android.content.Intent
 import android.net.Uri
 import android.provider.OpenableColumns
 import androidx.activity.compose.rememberLauncherForActivityResult
-import androidx.activity.result.PickVisualMediaRequest
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
@@ -83,14 +83,31 @@ fun ChatScreen(viewModel: ChatViewModel) {
     val context = LocalContext.current
     val selectedFileName = remember(selectedFileUri) { selectedFileUri?.let { getFileName(context, it) } }
 
+    // Use OpenDocument instead of PickVisualMedia to allow access to Downloads and other folders
     val imagePickerLauncher = rememberLauncherForActivityResult(
-        contract = ActivityResultContracts.PickVisualMedia(),
-        onResult = { uri -> selectedImageUri = uri }
+        contract = ActivityResultContracts.OpenDocument(),
+        onResult = { uri ->
+            uri?.let {
+                context.contentResolver.takePersistableUriPermission(
+                    it,
+                    Intent.FLAG_GRANT_READ_URI_PERMISSION
+                )
+                selectedImageUri = it
+            }
+        }
     )
 
     val documentPickerLauncher = rememberLauncherForActivityResult(
         contract = ActivityResultContracts.OpenDocument(),
-        onResult = { uri -> selectedFileUri = uri }
+        onResult = { uri ->
+            uri?.let {
+                context.contentResolver.takePersistableUriPermission(
+                    it,
+                    Intent.FLAG_GRANT_READ_URI_PERMISSION
+                )
+                selectedFileUri = it
+            }
+        }
     )
 
     val allMimeType = stringResource(R.string.mime_type_all)
@@ -143,10 +160,7 @@ fun ChatScreen(viewModel: ChatViewModel) {
                 onClearFile = { selectedFileUri = null },
                 onAttachClicked = {
                     when (inputMode) {
-                        InputMode.IMAGE -> imagePickerLauncher.launch(
-                            PickVisualMediaRequest(ActivityResultContracts.PickVisualMedia.ImageOnly)
-                        )
-
+                        InputMode.IMAGE -> imagePickerLauncher.launch(arrayOf("image/*"))
                         InputMode.DOCUMENT -> documentPickerLauncher.launch(arrayOf(allMimeType))
                         InputMode.TEXT -> {}
                     }
