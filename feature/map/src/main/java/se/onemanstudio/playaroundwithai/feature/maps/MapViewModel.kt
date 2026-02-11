@@ -74,11 +74,11 @@ class MapViewModel @Inject constructor(
                 currentState.activeFilter + type
             }
 
-            val filtered = currentState.allLocations.filter { newFilters.contains(it.type) }
+            val filtered = currentState.allLocations.filter { newFilters.contains(it.type) }.toPersistentList()
 
             currentState.copy(
                 activeFilter = newFilters,
-                visibleLocations = filtered as PersistentList<MapItemUiModel>,
+                visibleLocations = filtered,
                 selectedLocations = persistentListOf(),
                 optimalRoute = persistentListOf(),
                 focusedMarker = null
@@ -94,16 +94,16 @@ class MapViewModel @Inject constructor(
             val isAlreadySelected = currentSelected.any { it.id == location.id }
 
             val newSelected = if (isAlreadySelected) {
-                currentSelected.filter { it.id != location.id }
+                currentSelected.filter { it.id != location.id }.toPersistentList()
             } else {
                 if (currentSelected.size < MapConstants.MAX_SELECTABLE_POINTS) {
-                    currentSelected + location.copy(isSelected = true)
+                    (currentSelected + location.copy(isSelected = true)).toPersistentList()
                 } else {
                     currentSelected // Limit reached, do not add
                 }
             }
             state.copy(
-                selectedLocations = newSelected as PersistentList<MapItemUiModel>,
+                selectedLocations = newSelected,
                 optimalRoute = persistentListOf(),
                 routeDistanceMeters = 0
             )
@@ -122,12 +122,12 @@ class MapViewModel @Inject constructor(
             .minByOrNull { path -> calculatePathDistance(startPoint, path) }
             ?: pointsToVisit
 
-        val fullPath = listOf(startPoint) + bestPermutation
+        val fullPath = (listOf(startPoint) + bestPermutation).toPersistentList()
         val totalDistance = calculatePathDistance(startPoint, bestPermutation)
 
         _uiState.update {
             it.copy(
-                optimalRoute = fullPath as PersistentList<LatLng>,
+                optimalRoute = fullPath,
                 routeDistanceMeters = (totalDistance * 1000).roundToInt(),
                 routeDurationMinutes = ((totalDistance * 1000) / WALKING_SPEED_METERS_PER_MIN).roundToInt()
             )
