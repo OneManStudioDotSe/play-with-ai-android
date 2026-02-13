@@ -21,6 +21,7 @@ import androidx.compose.material3.SnackbarHost
 import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.SnackbarResult
 import androidx.compose.material3.Text
+import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
@@ -56,80 +57,81 @@ class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
+        setContent { SofaApp() }
+    }
+}
 
-        setContent {
-            // This will trigger the anonymous login
-            val viewModel: MainViewModel = hiltViewModel()
-            val authError by viewModel.authError.collectAsState()
-            val snackbarHostState = remember { SnackbarHostState() }
+@Composable
+private fun SofaApp() {
+    val viewModel: MainViewModel = hiltViewModel()
+    val authError by viewModel.authError.collectAsState()
+    val snackbarHostState = remember { SnackbarHostState() }
 
-            val authErrorMessage = stringResource(R.string.auth_error_message)
-            val retryLabel = stringResource(R.string.auth_error_retry)
+    val authErrorMessage = stringResource(R.string.auth_error_message)
+    val retryLabel = stringResource(R.string.auth_error_retry)
 
-            LaunchedEffect(authError) {
-                if (authError) {
-                    val result = snackbarHostState.showSnackbar(
-                        message = authErrorMessage,
-                        actionLabel = retryLabel,
-                        duration = SnackbarDuration.Long
-                    )
-                    if (result == SnackbarResult.ActionPerformed) {
-                        viewModel.retryAuth()
+    LaunchedEffect(authError) {
+        if (authError) {
+            val result = snackbarHostState.showSnackbar(
+                message = authErrorMessage,
+                actionLabel = retryLabel,
+                duration = SnackbarDuration.Long
+            )
+            if (result == SnackbarResult.ActionPerformed) {
+                viewModel.retryAuth()
+            }
+        }
+    }
+
+    SofaAiTheme {
+        val navController = rememberNavController()
+
+        Scaffold(
+            snackbarHost = { SnackbarHost(hostState = snackbarHostState) },
+            bottomBar = {
+                NavigationBar(
+                    containerColor = Color.Transparent,
+                    modifier = Modifier.padding(horizontal = Dimensions.paddingLarge)
+                ) {
+                    val navBackStackEntry by navController.currentBackStackEntryAsState()
+                    val currentDestination = navBackStackEntry?.destination
+
+                    navItems.forEach { screen ->
+                        val isSelected = currentDestination?.hasRoute(screen.route::class) == true
+
+                        NavigationBarItem(
+                            selected = isSelected,
+                            onClick = {
+                                navController.navigate(screen.route) {
+                                    popUpTo(navController.graph.findStartDestination().id) { saveState = true }
+                                    launchSingleTop = true
+                                    restoreState = true
+                                }
+                            },
+                            label = { Text(text = screen.label, fontWeight = if (isSelected) Bold else Normal) },
+                            icon = { Icon(screen.icon, contentDescription = "${screen.label} Tab") },
+                            colors = NavigationBarItemDefaults.colors(
+                                selectedIconColor = MaterialTheme.colorScheme.surface,
+                                selectedTextColor = MaterialTheme.colorScheme.onSurface,
+                                indicatorColor = MaterialTheme.colorScheme.onSurface,
+                                unselectedIconColor = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.5f),
+                                unselectedTextColor = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.5f)
+                            )
+                        )
                     }
                 }
             }
-
-            SofaAiTheme {
-                val navController = rememberNavController()
-
-                Scaffold(
-                    snackbarHost = { SnackbarHost(hostState = snackbarHostState) },
-                    bottomBar = {
-                        NavigationBar(
-                            containerColor = Color.Transparent,
-                            modifier = Modifier.padding(horizontal = Dimensions.paddingLarge)
-                        ) {
-                            val navBackStackEntry by navController.currentBackStackEntryAsState()
-                            val currentDestination = navBackStackEntry?.destination
-
-                            navItems.forEach { screen ->
-                                val isSelected = currentDestination?.hasRoute(screen.route::class) == true
-
-                                NavigationBarItem(
-                                    selected = isSelected,
-                                    onClick = {
-                                        navController.navigate(screen.route) {
-                                            popUpTo(navController.graph.findStartDestination().id) { saveState = true }
-                                            launchSingleTop = true
-                                            restoreState = true
-                                        }
-                                    },
-                                    label = { Text(text = screen.label, fontWeight = if (isSelected) Bold else Normal) },
-                                    icon = { Icon(screen.icon, contentDescription = "${screen.label} Tab") },
-                                    colors = NavigationBarItemDefaults.colors(
-                                        selectedIconColor = MaterialTheme.colorScheme.surface,
-                                        selectedTextColor = MaterialTheme.colorScheme.onSurface,
-                                        indicatorColor = MaterialTheme.colorScheme.onSurface,
-                                        unselectedIconColor = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.5f),
-                                        unselectedTextColor = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.5f)
-                                    )
-                                )
-                            }
-                        }
-                    }
-                ) { innerPadding ->
-                    NavHost(
-                        navController,
-                        startDestination = Chat,
-                        Modifier
-                            .fillMaxSize()
-                            .padding(innerPadding)
-                            .consumeWindowInsets(innerPadding)
-                    ) {
-                        composable<Chat> { ChatScreen(viewModel = hiltViewModel()) }
-                        composable<Maps> { MapScreen() }
-                    }
-                }
+        ) { innerPadding ->
+            NavHost(
+                navController,
+                startDestination = Chat,
+                Modifier
+                    .fillMaxSize()
+                    .padding(innerPadding)
+                    .consumeWindowInsets(innerPadding)
+            ) {
+                composable<Chat> { ChatScreen(viewModel = hiltViewModel()) }
+                composable<Maps> { MapScreen() }
             }
         }
     }
