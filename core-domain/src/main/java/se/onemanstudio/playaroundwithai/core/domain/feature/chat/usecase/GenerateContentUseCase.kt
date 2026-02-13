@@ -16,6 +16,7 @@ class GenerateContentUseCase @Inject constructor(
         if (prompt.isBlank() && imageBytes == null && fileText == null) {
             return Result.failure(IllegalArgumentException("Prompt and attachments cannot all be empty"))
         }
+
         return repository.generateContent(prompt, imageBytes, fileText, analysisType)
     }
 }
