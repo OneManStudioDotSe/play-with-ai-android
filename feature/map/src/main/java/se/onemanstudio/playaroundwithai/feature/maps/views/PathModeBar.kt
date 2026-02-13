@@ -78,9 +78,9 @@ fun PathModeBar(
     }
 }
 
-@Preview
+@Preview(name = "Disabled")
 @Composable
-fun PathModeBarPreview_Disabled() {
+private fun PathModeBarDisabledPreview() {
     SofaAiTheme {
         PathModeBar(
             count = 1,
@@ -91,9 +91,9 @@ fun PathModeBarPreview_Disabled() {
     }
 }
 
-@Preview
+@Preview(name = "Enabled")
 @Composable
-fun PathModeBarPreview_Enabled() {
+private fun PathModeBarEnabledPreview() {
     SofaAiTheme {
         PathModeBar(
             count = 2,

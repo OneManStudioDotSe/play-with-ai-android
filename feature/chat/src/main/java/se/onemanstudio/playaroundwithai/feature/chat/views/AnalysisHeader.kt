@@ -1,6 +1,5 @@
 package se.onemanstudio.playaroundwithai.feature.chat.views
 
-import android.content.res.Configuration
 import android.net.Uri
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
@@ -141,9 +140,9 @@ fun AnalysisType.asStringRes(): Int {
     }
 }
 
-@Preview(showBackground = true, name = "Light")
+@Preview(name = "Light")
 @Composable
-internal fun AnalysisHeaderPreview_Light() {
+private fun AnalysisHeaderLightPreview() {
     SofaAiTheme {
         AnalysisHeader(
             selectedImageUri = Uri.EMPTY,
@@ -154,9 +153,9 @@ internal fun AnalysisHeaderPreview_Light() {
     }
 }
 
-@Preview(showBackground = true, name = "Dark", uiMode = Configuration.UI_MODE_NIGHT_YES)
+@Preview(name = "Dark")
 @Composable
-internal fun AnalysisHeaderPreview_Dark() {
+private fun AnalysisHeaderDarkPreview() {
     SofaAiTheme(darkTheme = true) {
         AnalysisHeader(
             selectedImageUri = Uri.EMPTY,

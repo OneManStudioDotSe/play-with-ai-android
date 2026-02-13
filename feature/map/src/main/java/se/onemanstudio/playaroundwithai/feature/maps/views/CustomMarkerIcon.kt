@@ -54,11 +54,9 @@ fun CustomMarkerIcon(
     }
 }
 
-// --- Previews ---
-
-@Preview(name = "Light Mode - Unselected", showBackground = true)
+@Preview(name = "Light - Unselected")
 @Composable
-fun CustomMarkerIconPreview_Light() {
+private fun CustomMarkerIconUnselectedLightPreview() {
     SofaAiTheme(darkTheme = false) {
         CustomMarkerIcon(
             icon = Icons.Default.Home,
@@ -68,9 +66,9 @@ fun CustomMarkerIconPreview_Light() {
     }
 }
 
-@Preview(name = "Light Mode - Selected", showBackground = true)
+@Preview(name = "Light - Selected")
 @Composable
-fun CustomMarkerIconPreview_Selected_Light() {
+private fun CustomMarkerIconSelectedLightPreview() {
     SofaAiTheme(darkTheme = false) {
         CustomMarkerIcon(
             icon = Icons.Default.Home,
@@ -80,9 +78,9 @@ fun CustomMarkerIconPreview_Selected_Light() {
     }
 }
 
-@Preview(name = "Dark Mode - Unselected", showBackground = true, backgroundColor = 0xFF121212)
+@Preview(name = "Dark - Unselected")
 @Composable
-fun CustomMarkerIconPreview_Dark() {
+private fun CustomMarkerIconUnselectedDarkPreview() {
     SofaAiTheme(darkTheme = true) {
         CustomMarkerIcon(
             icon = Icons.Default.Home,
@@ -92,9 +90,9 @@ fun CustomMarkerIconPreview_Dark() {
     }
 }
 
-@Preview(name = "Dark Mode - Selected", showBackground = true, backgroundColor = 0xFF121212)
+@Preview(name = "Dark - Selected")
 @Composable
-fun CustomMarkerIconPreview_Selected_Dark() {
+private fun CustomMarkerIconSelectedDarkPreview() {
     SofaAiTheme(darkTheme = true) {
         CustomMarkerIcon(
             icon = Icons.Default.Home,

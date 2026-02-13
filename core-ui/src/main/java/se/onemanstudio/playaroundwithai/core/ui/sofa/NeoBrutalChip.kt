@@ -46,17 +46,17 @@ fun NeoBrutalChip(
     }
 }
 
-@Preview(name = "Light Mode")
+@Preview(name = "Light")
 @Composable
-private fun NeoBrutalChipPreviewLight() {
+private fun NeoBrutalChipLightPreview() {
     SofaAiTheme(darkTheme = false) {
         NeoBrutalChip(text = "Suggest a recipe", onClick = {})
     }
 }
 
-@Preview(name = "Dark Mode")
+@Preview(name = "Dark")
 @Composable
-private fun NeoBrutalChipPreviewDark() {
+private fun NeoBrutalChipDarkPreview() {
     SofaAiTheme(darkTheme = true) {
         NeoBrutalChip(text = "Summarize text", onClick = {})
     }

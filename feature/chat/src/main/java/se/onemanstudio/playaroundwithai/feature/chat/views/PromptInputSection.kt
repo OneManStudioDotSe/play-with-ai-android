@@ -220,7 +220,7 @@ fun ThreeDotsLoadingAnimation(modifier: Modifier = Modifier) {
 
 // --- Previews ---
 
-@Preview(showBackground = true, name = "Full Layout - Light")
+@Preview(name = "Light")
 @Composable
 private fun PromptInputSectionLightPreview() {
     SofaAiTheme(darkTheme = false) {
@@ -238,7 +238,7 @@ private fun PromptInputSectionLightPreview() {
     }
 }
 
-@Preview(showBackground = true, name = "Loading State")
+@Preview(name = "Loading")
 @Composable
 private fun PromptInputSectionLoadingPreview() {
     SofaAiTheme(darkTheme = false) {

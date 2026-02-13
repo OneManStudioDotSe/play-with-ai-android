@@ -71,9 +71,9 @@ fun ChatInputArea(
     }
 }
 
-@Preview
+@Preview(name = "Text Mode")
 @Composable
-fun ChatInputAreaForTextPreview() {
+private fun ChatInputAreaTextModePreview() {
     SofaAiTheme {
         ChatInputArea(
             inputMode = InputMode.TEXT,
@@ -95,9 +95,9 @@ fun ChatInputAreaForTextPreview() {
     }
 }
 
-@Preview
+@Preview(name = "Image Mode")
 @Composable
-fun ChatInputAreaForImagePreview() {
+private fun ChatInputAreaImageModePreview() {
     SofaAiTheme {
         ChatInputArea(
             inputMode = InputMode.IMAGE,
@@ -119,9 +119,9 @@ fun ChatInputAreaForImagePreview() {
     }
 }
 
-@Preview
+@Preview(name = "Document Mode")
 @Composable
-fun ChatInputAreaForDocumentPreview() {
+private fun ChatInputAreaDocumentModePreview() {
     SofaAiTheme {
         ChatInputArea(
             inputMode = InputMode.DOCUMENT,

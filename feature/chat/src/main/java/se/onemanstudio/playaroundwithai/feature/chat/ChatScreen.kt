@@ -320,9 +320,9 @@ fun getFileName(context: Context, uri: Uri): String? {
     return fileName
 }
 
-@Preview(name = "Content State - Light", showBackground = true)
+@Preview(name = "Content Light")
 @Composable
-private fun ContentStatePreview_Light() {
+private fun ContentStateLightPreview() {
     val outputText = stringResource(R.string.preview_chat_response_light)
     SofaAiTheme(darkTheme = false) {
         ContentState(
@@ -334,9 +334,9 @@ private fun ContentStatePreview_Light() {
     }
 }
 
-@Preview(name = "Content State - Dark", showBackground = true, backgroundColor = 0xFF121212)
+@Preview(name = "Content Dark")
 @Composable
-private fun ContentStatePreview_Dark() {
+private fun ContentStateDarkPreview() {
     val outputText = stringResource(R.string.preview_chat_response_dark)
     SofaAiTheme(darkTheme = true) {
         ContentState(
@@ -348,9 +348,9 @@ private fun ContentStatePreview_Dark() {
     }
 }
 
-@Preview(name = "Error State - Light", showBackground = true)
+@Preview(name = "Error Light")
 @Composable
-private fun ErrorStatePreview_Light() {
+private fun ErrorStateLightPreview() {
     SofaAiTheme(darkTheme = false) {
         // Mocking an Error state (assuming your Error state takes a string or similar)
         // If your 'error' property is a specific Enum or Object, pass that instance here.
@@ -361,9 +361,9 @@ private fun ErrorStatePreview_Light() {
     }
 }
 
-@Preview(name = "Error State - Dark", showBackground = true, backgroundColor = 0xFF121212)
+@Preview(name = "Error Dark")
 @Composable
-private fun ErrorStatePreview_Dark() {
+private fun ErrorStateDarkPreview() {
     SofaAiTheme(darkTheme = true) {
         ErrorState(
             state = ChatUiState.Error(error = ChatError.Permission),

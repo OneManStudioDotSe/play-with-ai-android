@@ -139,9 +139,9 @@ fun NeoBrutalIconButton(
     }
 }
 
-@Preview(name = "Light", showBackground = true, backgroundColor = 0xFFF8F8F8)
+@Preview(name = "Light")
 @Composable
-private fun NeoBrutalButtonPreview_Light() {
+private fun NeoBrutalButtonLightPreview() {
     SofaAiTheme {
         Column(
             modifier = Modifier
@@ -177,9 +177,9 @@ private fun NeoBrutalButtonPreview_Light() {
     }
 }
 
-@Preview(name = "Dark", showBackground = true, backgroundColor = 0xFF000000)
+@Preview(name = "Dark")
 @Composable
-private fun NeoBrutalButtonPreview_Dark() {
+private fun NeoBrutalButtonDarkPreview() {
     SofaAiTheme(darkTheme = true) {
         Column(
             modifier = Modifier

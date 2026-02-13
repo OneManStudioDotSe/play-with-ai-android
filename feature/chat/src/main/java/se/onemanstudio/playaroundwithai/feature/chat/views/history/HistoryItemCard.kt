@@ -64,9 +64,9 @@ fun HistoryItemCard(
 }
 
 
-@Preview(name = "Light - Short Text", showBackground = true, backgroundColor = 0xFFF8F8F8)
+@Preview(name = "Light - Short Text")
 @Composable
-private fun HistoryItemCardPreview_ShortText() {
+private fun HistoryItemCardShortTextPreview() {
     SofaAiTheme {
         HistoryItemCard(
             prompt = Prompt(
@@ -80,9 +80,9 @@ private fun HistoryItemCardPreview_ShortText() {
     }
 }
 
-@Preview(name = "Dark - Long Text", showBackground = true, backgroundColor = 0xFF000000)
+@Preview(name = "Dark - Long Text")
 @Composable
-private fun HistoryItemCardPreview_LongText() {
+private fun HistoryItemCardLongTextPreview() {
     SofaAiTheme(darkTheme = true) {
         HistoryItemCard(
             prompt = Prompt(
@@ -96,9 +96,9 @@ private fun HistoryItemCardPreview_LongText() {
     }
 }
 
-@Preview(name = "Constrained Width", showBackground = true)
+@Preview(name = "Constrained Width")
 @Composable
-private fun HistoryItemCardPreview_Constrained() {
+private fun HistoryItemCardConstrainedPreview() {
     SofaAiTheme {
         HistoryItemCard(
             prompt = Prompt(

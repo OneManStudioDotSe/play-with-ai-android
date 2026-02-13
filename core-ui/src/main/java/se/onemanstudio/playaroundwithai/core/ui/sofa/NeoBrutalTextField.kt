@@ -51,9 +51,9 @@ fun NeoBrutalTextField(
     }
 }
 
-@Preview(name = "Light Mode")
+@Preview(name = "Light")
 @Composable
-private fun TextFieldPreviewLight() {
+private fun NeoBrutalTextFieldLightPreview() {
     SofaAiTheme(darkTheme = false) {
         NeoBrutalTextField(
             value = TextFieldValue(""),
@@ -63,9 +63,9 @@ private fun TextFieldPreviewLight() {
     }
 }
 
-@Preview(name = "Dark Mode")
+@Preview(name = "Dark")
 @Composable
-private fun TextFieldPreviewDark() {
+private fun NeoBrutalTextFieldDarkPreview() {
     SofaAiTheme(darkTheme = true) {
         NeoBrutalTextField(
             value = TextFieldValue("User Input"),

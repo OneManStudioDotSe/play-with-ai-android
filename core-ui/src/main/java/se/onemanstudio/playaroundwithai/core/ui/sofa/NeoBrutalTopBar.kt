@@ -52,9 +52,9 @@ fun NeoBrutalTopAppBar(
     )
 }
 
-@Preview(name = "Top App Bar - Light Theme", showBackground = true, backgroundColor = 0xFFF8F8F8)
+@Preview(name = "Light")
 @Composable
-private fun NeoBrutalTopAppBarPreview_Light() {
+private fun NeoBrutalTopAppBarLightPreview() {
     SofaAiTheme {
         Column {
             NeoBrutalTopAppBar(
@@ -71,9 +71,9 @@ private fun NeoBrutalTopAppBarPreview_Light() {
     }
 }
 
-@Preview(name = "Top App Bar - Dark Theme", showBackground = true, backgroundColor = 0xFF000000)
+@Preview(name = "Dark")
 @Composable
-private fun NeoBrutalTopAppBarPreview_Dark() {
+private fun NeoBrutalTopAppBarDarkPreview() {
     SofaAiTheme(darkTheme = true) {
         Column {
             NeoBrutalTopAppBar(

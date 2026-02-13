@@ -141,7 +141,7 @@ private fun InfoStat(
 
 @Preview(name = "Scooter")
 @Composable
-fun MarkerInfoCardPreview_Scooter() {
+private fun MarkerInfoCardScooterPreview() {
     SofaAiTheme {
         MarkerInfoCard(
             marker = MapItemUiModel(
@@ -163,7 +163,7 @@ fun MarkerInfoCardPreview_Scooter() {
 
 @Preview(name = "Bicycle")
 @Composable
-fun MarkerInfoCardPreview_Bicycle() {
+private fun MarkerInfoCardBicyclePreview() {
     SofaAiTheme {
         MarkerInfoCard(
             marker = MapItemUiModel(

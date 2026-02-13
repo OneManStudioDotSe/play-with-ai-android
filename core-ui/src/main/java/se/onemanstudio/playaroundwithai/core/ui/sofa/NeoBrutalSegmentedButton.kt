@@ -85,9 +85,9 @@ fun NeoBrutalSegmentedButton(
     }
 }
 
-@Preview(name = "Light Mode")
+@Preview(name = "Light")
 @Composable
-private fun SegmentedButtonPreview_Light() {
+private fun NeoBrutalSegmentedButtonLightPreview() {
     SofaAiTheme(darkTheme = false) {
         NeoBrutalSegmentedButton(
             labels = listOf("Text", "Image", "Document"),
@@ -97,9 +97,9 @@ private fun SegmentedButtonPreview_Light() {
     }
 }
 
-@Preview(name = "Dark Mode")
+@Preview(name = "Dark")
 @Composable
-private fun SegmentedButtonPreview_Dark() {
+private fun NeoBrutalSegmentedButtonDarkPreview() {
     SofaAiTheme(darkTheme = true) {
         NeoBrutalSegmentedButton(
             labels = listOf("Text", "Image", "Document"),

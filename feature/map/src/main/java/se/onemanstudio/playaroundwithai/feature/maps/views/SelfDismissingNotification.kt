@@ -97,9 +97,9 @@ fun SelfDismissingNotification(
     }
 }
 
-@Preview
+@Preview(name = "Default")
 @Composable
-fun SelfDismissingNotificationPreview() {
+private fun SelfDismissingNotificationDefaultPreview() {
     SofaAiTheme {
         SelfDismissingNotification(
             message = "Location services are disabled.",
@@ -108,9 +108,9 @@ fun SelfDismissingNotificationPreview() {
     }
 }
 
-@Preview
+@Preview(name = "Long Message")
 @Composable
-fun SelfDismissingNotificationPreview_LongMessage() {
+private fun SelfDismissingNotificationLongMessagePreview() {
     SofaAiTheme {
         SelfDismissingNotification(
             message = "This is a much longer notification message to see how the layout handles more text.",

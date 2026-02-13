@@ -55,9 +55,9 @@ fun TypewriterText(
     )
 }
 
-@Preview(showBackground = true, name = "Static Style Preview")
+@Preview(name = "Static")
 @Composable
-internal fun TypewriterText_StaticPreview() {
+private fun TypewriterTextStaticPreview() {
     SofaAiTheme {
         Surface {
             Text(
@@ -73,9 +73,9 @@ internal fun TypewriterText_StaticPreview() {
  * Interactive preview to see the animation in action.
  * Click the "Start Interactive Mode" button in the Android Studio preview pane to run it.
  */
-@Preview(showBackground = true, name = "Interactive Animation Preview")
+@Preview(name = "Interactive")
 @Composable
-internal fun TypewriterText_InteractivePreview() {
+private fun TypewriterTextInteractivePreview() {
     SofaAiTheme {
         Surface {
             TypewriterText(text = "Hello, this text will type out one letter at a time...")
