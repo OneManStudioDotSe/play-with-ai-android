@@ -33,6 +33,35 @@ import kotlin.math.sin
 import kotlin.random.Random
 
 private const val NUM_POINTS = 12
+private const val SPLINE_SEGMENTS = 10
+
+// Animation durations
+private const val ROTATION_DURATION = 2000
+private const val STOP_ROTATION_DURATION = 500
+
+// Idle state animation
+private const val IDLE_MIN_SCALE = 0.7f
+private const val IDLE_SCALE_RANGE = 0.6f
+private const val IDLE_MIN_DURATION = 1500
+private const val IDLE_MAX_DURATION = 3000
+
+// Loading state animation
+private const val LOADING_MIN_SCALE = 0.9f
+private const val LOADING_SCALE_RANGE = 0.2f
+private const val LOADING_MIN_DURATION = 500
+private const val LOADING_MAX_DURATION = 1000
+
+// Spiky state animation
+private const val SPIKY_PEAK_SCALE = 1.6f
+private const val SPIKY_VALLEY_SCALE = 0.5f
+private const val SPIKY_JITTER_RANGE = 0.2f
+private const val SPIKY_MIN_DURATION = 200
+private const val SPIKY_MAX_DURATION = 600
+
+// Canvas
+private val CanvasSize = 200.dp
+private const val RADIUS_DIVISOR = 2.5f
+private const val INITIAL_POINT_SCALE = 1.0f
 
 enum class AmoebaState {
     IDLE,       // Soft, organic movement
@@ -53,7 +82,7 @@ fun AmoebaShapeAnimation(
     LaunchedEffect(Unit) {
         if (points.isEmpty()) {
             repeat(NUM_POINTS) {
-                points.add(Animatable(1.0f))
+                points.add(Animatable(INITIAL_POINT_SCALE))
             }
         }
     }
@@ -64,7 +93,7 @@ fun AmoebaShapeAnimation(
             rotation.animateTo(
                 targetValue = 360f,
                 animationSpec = infiniteRepeatable(
-                    animation = tween(2000, easing = LinearEasing),
+                    animation = tween(ROTATION_DURATION, easing = LinearEasing),
                     repeatMode = RepeatMode.Restart
                 )
             )
@@ -74,7 +103,7 @@ fun AmoebaShapeAnimation(
             rotation.snapTo(currentRotation)
             rotation.animateTo(
                 targetValue = if (currentRotation > 180) 360f else 0f,
-                animationSpec = tween(500, easing = LinearOutSlowInEasing)
+                animationSpec = tween(STOP_ROTATION_DURATION, easing = LinearOutSlowInEasing)
             )
             rotation.snapTo(0f)
         }
@@ -90,25 +119,25 @@ fun AmoebaShapeAnimation(
                         val (target, duration) = when (state) {
                             AmoebaState.IDLE -> {
                                 // Original logic: random flow
-                                val t = 0.7f + Random.nextFloat() * 0.6f
-                                val d = Random.nextInt(1500, 3000)
+                                val t = IDLE_MIN_SCALE + Random.nextFloat() * IDLE_SCALE_RANGE
+                                val d = Random.nextInt(IDLE_MIN_DURATION, IDLE_MAX_DURATION)
                                 t to d
                             }
 
                             AmoebaState.LOADING -> {
                                 // Tighter circle, small ripples
-                                val t = 0.9f + Random.nextFloat() * 0.2f
-                                val d = Random.nextInt(500, 1000)
+                                val t = LOADING_MIN_SCALE + Random.nextFloat() * LOADING_SCALE_RANGE
+                                val d = Random.nextInt(LOADING_MIN_DURATION, LOADING_MAX_DURATION)
                                 t to d
                             }
 
                             AmoebaState.SPIKY -> {
                                 // Spikes: Alternating Highs (Odd) and Lows (Even)
                                 val isSpike = index % 2 == 0
-                                val base = if (isSpike) 1.6f else 0.5f
+                                val base = if (isSpike) SPIKY_PEAK_SCALE else SPIKY_VALLEY_SCALE
                                 // Add random jitter so it feels alive, not static
-                                val t = base + (Random.nextFloat() - 0.5f) * 0.2f
-                                val d = Random.nextInt(200, 600) // Fast, aggressive movement
+                                val t = base + (Random.nextFloat() - SPIKY_VALLEY_SCALE) * SPIKY_JITTER_RANGE
+                                val d = Random.nextInt(SPIKY_MIN_DURATION, SPIKY_MAX_DURATION)
                                 t to d
                             }
                         }
@@ -131,12 +160,12 @@ fun AmoebaShapeAnimation(
         contentAlignment = Alignment.Center
     ) {
         if (points.isNotEmpty()) {
-            Canvas(modifier = Modifier.size(200.dp)) {
+            Canvas(modifier = Modifier.size(CanvasSize)) {
                 // Apply rotation for loading state
                 rotate(rotation.value) {
                     val path = Path()
                     val angleStep = (2 * PI / NUM_POINTS).toFloat()
-                    val radius = size.minDimension / 2.5f
+                    val radius = size.minDimension / RADIUS_DIVISOR
 
                     // Calculate control points based on current animated values
                     val controlPoints = mutableListOf<Offset>()
@@ -161,8 +190,8 @@ fun AmoebaShapeAnimation(
                             val p3 = controlPoints[(i + 2) % controlPoints.size]
 
                             // Interpolate segments
-                            for (t in 1..10) {
-                                val tFloat = t / 10f
+                            for (t in 1..SPLINE_SEGMENTS) {
+                                val tFloat = t / SPLINE_SEGMENTS.toFloat()
                                 val a = -0.5f * p0 + 1.5f * p1 - 1.5f * p2 + 0.5f * p3
                                 val b = p0 - 2.5f * p1 + 2f * p2 - 0.5f * p3
                                 val c = -0.5f * p0 + 0.5f * p2

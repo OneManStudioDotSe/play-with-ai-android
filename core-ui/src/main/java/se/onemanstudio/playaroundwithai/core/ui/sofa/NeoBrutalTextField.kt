@@ -41,7 +41,7 @@ fun NeoBrutalTextField(
         if (value.text.isEmpty()) {
             Text(
                 text = placeholder,
-                style = MaterialTheme.typography.bodyLarge,
+                style = MaterialTheme.typography.bodySmall,
                 color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.5f),
                 modifier = Modifier
                     .padding(Dimensions.paddingLarge)

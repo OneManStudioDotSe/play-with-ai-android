@@ -52,6 +52,16 @@
     <string name="input_mode_image">Image</string>
     <string name="input_mode_document">Document</string>
 
+    <!-- Fallback Suggestions -->
+    <string name="fallback_suggestion_joke">Tell me a joke</string>
+    <string name="fallback_suggestion_physics">Explain Quantum Physics</string>
+    <string name="fallback_suggestion_roast">Roast my code</string>
+
+    <!-- Date Formats -->
+    <string name="date_format_history" translatable="false">MMM dd, yyyy</string>
+    <string name="history_date_at">%1$s at %2$s</string>
+    <string name="time_format_history" translatable="false">HH:mm</string>
+
     <!-- Analysis Types -->
     <string name="analysis_type_location">Location</string>
     <string name="analysis_type_recipe">Recipe</string>

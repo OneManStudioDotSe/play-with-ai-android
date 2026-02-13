@@ -7,6 +7,7 @@ import android.net.Uri
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import dagger.hilt.android.lifecycle.HiltViewModel
+import se.onemanstudio.playaroundwithai.feature.chat.R
 import kotlinx.coroutines.channels.BufferOverflow
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -37,6 +38,9 @@ import java.io.FileNotFoundException
 import java.io.IOException
 import java.util.Date
 import javax.inject.Inject
+
+private const val SUBSCRIBE_TIMEOUT = 5000L
+private const val JPEG_QUALITY = 100
 
 @HiltViewModel
 @Suppress("LongParameterList")
@@ -71,7 +75,7 @@ class ChatViewModel @Inject constructor(
     val promptHistory: StateFlow<List<Prompt>> = getPromptHistoryUseCase()
         .stateIn(
             scope = viewModelScope,
-            started = SharingStarted.WhileSubscribed(5000),
+            started = SharingStarted.WhileSubscribed(SUBSCRIBE_TIMEOUT),
             initialValue = emptyList()
         )
 
@@ -101,7 +105,11 @@ class ChatViewModel @Inject constructor(
                 .onFailure {
                     // Fallback to static ones if API fails
                     _suggestions.update {
-                        listOf("Tell me a joke", "Explain Quantum Physics", "Roast my code")
+                        listOf(
+                            application.getString(R.string.fallback_suggestion_joke),
+                            application.getString(R.string.fallback_suggestion_physics),
+                            application.getString(R.string.fallback_suggestion_roast)
+                        )
                     }
                 }
             _isSuggestionsLoading.value = false
@@ -201,7 +209,7 @@ class ChatViewModel @Inject constructor(
         return try {
             val bitmap = ImageDecoder.decodeBitmap(ImageDecoder.createSource(application.contentResolver, this))
             val bos = ByteArrayOutputStream()
-            bitmap.compress(Bitmap.CompressFormat.JPEG, 100, bos)
+            bitmap.compress(Bitmap.CompressFormat.JPEG, JPEG_QUALITY, bos)
             bos.toByteArray()
         } catch (e: IOException) {
             Timber.d("Error decoding image: ${e.message}")

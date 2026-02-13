@@ -28,6 +28,11 @@ import se.onemanstudio.playaroundwithai.core.ui.sofa.NeoBrutalCard
 import se.onemanstudio.playaroundwithai.core.ui.theme.Dimensions
 import se.onemanstudio.playaroundwithai.feature.chat.R
 
+private val DragHandleWidth = 32.dp
+private val DragHandleHeight = 4.dp
+private val DragHandleCornerRadius = 2.dp
+private const val DRAG_HANDLE_ALPHA = 0.4f
+
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun HistoryBottomSheet(
@@ -43,7 +48,7 @@ fun HistoryBottomSheet(
     ) {
         NeoBrutalCard(modifier = Modifier.fillMaxWidth()) {
             Column {
-                // Custom Drag Handle inside the card
+                // a custom drag handle to match our theme
                 Box(
                     modifier = Modifier
                         .fillMaxWidth()
@@ -52,11 +57,11 @@ fun HistoryBottomSheet(
                 ) {
                     Box(
                         modifier = Modifier
-                            .width(32.dp)
-                            .height(4.dp)
+                            .width(DragHandleWidth)
+                            .height(DragHandleHeight)
                             .background(
-                                color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.4f),
-                                shape = RoundedCornerShape(2.dp)
+                                color = MaterialTheme.colorScheme.onSurface.copy(alpha = DRAG_HANDLE_ALPHA),
+                                shape = RoundedCornerShape(DragHandleCornerRadius)
                             )
                     )
                 }

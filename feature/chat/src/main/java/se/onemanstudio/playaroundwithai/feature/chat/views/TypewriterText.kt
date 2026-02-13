@@ -18,6 +18,7 @@ import kotlinx.coroutines.delay
 import se.onemanstudio.playaroundwithai.core.ui.theme.SofaAiTheme
 
 const val TYPING_DELAY = 10L
+private const val SCROLL_BOTTOM_THRESHOLD = 10
 
 @Composable
 fun TypewriterText(
@@ -32,7 +33,7 @@ fun TypewriterText(
         text.forEach { char ->
             val wasAtBottom = scrollState?.let { 
                 // Using a small threshold (e.g., 10px) to handle precision issues
-                it.value >= it.maxValue - 10 
+                it.value >= it.maxValue - SCROLL_BOTTOM_THRESHOLD
             } ?: false
 
             displayedText += char

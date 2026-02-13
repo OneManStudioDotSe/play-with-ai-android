@@ -14,6 +14,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
@@ -21,6 +22,7 @@ import se.onemanstudio.playaroundwithai.core.domain.feature.chat.model.Prompt
 import se.onemanstudio.playaroundwithai.core.ui.sofa.NeoBrutalCard
 import se.onemanstudio.playaroundwithai.core.ui.theme.Dimensions
 import se.onemanstudio.playaroundwithai.core.ui.theme.SofaAiTheme
+import se.onemanstudio.playaroundwithai.feature.chat.R
 import java.text.SimpleDateFormat
 import java.util.Date
 import java.util.Locale
@@ -31,7 +33,9 @@ fun HistoryItemCard(
     prompt: Prompt,
     onClick: (String) -> Unit
 ) {
-    val dateFormatter = SimpleDateFormat("MMM dd, yyyy 'at' HH:mm", Locale.getDefault())
+    val dateFormat = stringResource(R.string.date_format_history)
+    val timeFormat = stringResource(R.string.time_format_history)
+    val dateAtTimePattern = stringResource(R.string.history_date_at)
 
     NeoBrutalCard(
         modifier = modifier
@@ -52,8 +56,11 @@ fun HistoryItemCard(
             Spacer(Modifier.height(Dimensions.paddingLarge))
 
             Row(verticalAlignment = Alignment.CenterVertically) {
+                val formattedDate = SimpleDateFormat(dateFormat, Locale.getDefault()).format(prompt.timestamp)
+                val formattedTime = SimpleDateFormat(timeFormat, Locale.getDefault()).format(prompt.timestamp)
+
                 Text(
-                    text = dateFormatter.format(prompt.timestamp),
+                    text = String.format(dateAtTimePattern, formattedDate, formattedTime),
                     style = MaterialTheme.typography.labelMedium,
                     color = MaterialTheme.colorScheme.primary,
                     fontWeight = FontWeight.Bold

@@ -51,6 +51,14 @@ import se.onemanstudio.playaroundwithai.core.ui.theme.Dimensions
 import se.onemanstudio.playaroundwithai.core.ui.theme.SofaAiTheme
 import se.onemanstudio.playaroundwithai.feature.chat.R
 
+private val InputButtonSize = 56.dp
+private val DotSize = 12.dp
+private val DotSpacing = 8.dp
+private const val DOT_DELAY_UNIT = 150
+private const val DOT_SCALE_MIN = 0.6f
+private const val DOT_SCALE_MAX = 1.2f
+private const val DOT_ANIMATION_DURATION = 600
+
 @Composable
 fun PromptInputSection(
     textState: TextFieldValue,
@@ -68,15 +76,15 @@ fun PromptInputSection(
             .fillMaxWidth()
             .background(color = MaterialTheme.colorScheme.surface)
             .navigationBarsPadding()
-            .padding(vertical = Dimensions.paddingLarge),
+            .padding(vertical = Dimensions.paddingLarge, horizontal = Dimensions.paddingSmall),
         verticalArrangement = Arrangement.spacedBy(Dimensions.paddingMedium)
     ) {
-        // 1. Suggestion Chips or Loading Dots (Only in TEXT mode)
+        // our conversation starters
         if (inputMode == InputMode.TEXT) {
             Box(
                 modifier = Modifier
                     .fillMaxWidth()
-                    .height(48.dp), // Fixed height to prevent jump when suggestions load
+                    .height(Dimensions.heightMedium),
                 contentAlignment = Alignment.CenterStart
             ) {
                 if (isSuggestionsLoading) {
@@ -102,7 +110,7 @@ fun PromptInputSection(
 
         Spacer(modifier = Modifier.height(Dimensions.paddingSmall))
 
-        // 2. Mode Selector (Segmented Button)
+        // buttons to select a mode
         val modeLabels = InputMode.entries.map { mode ->
             when (mode) {
                 InputMode.TEXT -> stringResource(R.string.input_mode_text)
@@ -121,11 +129,10 @@ fun PromptInputSection(
 
         Spacer(modifier = Modifier.height(Dimensions.paddingSmall))
 
-        // 3. Input Row
         Row(
             modifier = Modifier
                 .fillMaxWidth()
-                .height(IntrinsicSize.Max) // Force children to match heights
+                .height(IntrinsicSize.Max) // force children to match heights
                 .padding(horizontal = Dimensions.paddingLarge),
             verticalAlignment = Alignment.CenterVertically
         ) {
@@ -138,7 +145,7 @@ fun PromptInputSection(
                     .padding(end = Dimensions.paddingMedium)
             )
 
-            // Attachment Buttons (Animated)
+            // buttons for attachments (if at Image or Document mode)
             AnimatedVisibility(
                 visible = inputMode != InputMode.TEXT,
                 enter = expandHorizontally(),
@@ -153,7 +160,7 @@ fun PromptInputSection(
                     modifier = Modifier
                         .fillMaxHeight()
                         .padding(end = Dimensions.paddingMedium),
-                    size = 56.dp, // Match default height of NeoBrutalTextField with padding
+                    size = InputButtonSize, // Match default height of NeoBrutalTextField with padding
                     onClick = onAttachClicked,
                     imageVector = icon,
                     contentDescription = desc,
@@ -161,7 +168,6 @@ fun PromptInputSection(
                 )
             }
 
-            // Send Button
             NeoBrutalIconButton(
                 modifier = Modifier.fillMaxHeight(),
                 size = 56.dp, // Match default height of NeoBrutalTextField
@@ -178,16 +184,16 @@ fun PromptInputSection(
 fun ThreeDotsLoadingAnimation(modifier: Modifier = Modifier) {
     val infiniteTransition = rememberInfiniteTransition(label = "dots")
     
-    val dotSize = 12.dp
-    val delayUnit = 150
+    val dotSize = DotSize
+    val delayUnit = DOT_DELAY_UNIT
 
     @Composable
     fun Dot(delay: Int) {
         val scale by infiniteTransition.animateFloat(
-            initialValue = 0.6f,
-            targetValue = 1.2f,
+            initialValue = DOT_SCALE_MIN,
+            targetValue = DOT_SCALE_MAX,
             animationSpec = infiniteRepeatable(
-                animation = tween(durationMillis = 600, delayMillis = delay, easing = LinearEasing),
+                animation = tween(durationMillis = DOT_ANIMATION_DURATION, delayMillis = delay, easing = LinearEasing),
                 repeatMode = RepeatMode.Reverse
             ),
             label = "scale"
@@ -211,9 +217,9 @@ fun ThreeDotsLoadingAnimation(modifier: Modifier = Modifier) {
         verticalAlignment = Alignment.CenterVertically
     ) {
         Dot(delay = 0)
-        Spacer(modifier = Modifier.width(8.dp))
+        Spacer(modifier = Modifier.width(DotSpacing))
         Dot(delay = delayUnit)
-        Spacer(modifier = Modifier.width(8.dp))
+        Spacer(modifier = Modifier.width(DotSpacing))
         Dot(delay = delayUnit * 2)
     }
 }
