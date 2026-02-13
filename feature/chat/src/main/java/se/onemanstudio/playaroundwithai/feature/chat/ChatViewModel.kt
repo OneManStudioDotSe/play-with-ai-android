@@ -41,7 +41,7 @@ import javax.inject.Inject
 private const val SUBSCRIBE_TIMEOUT = 5000L
 private const val JPEG_QUALITY = 100
 
-@Suppress("CanBeParameter")
+@Suppress("CanBeParameter", "LongParameterList")
 @HiltViewModel
 class ChatViewModel @Inject constructor(
     private val generateContentUseCase: GenerateContentUseCase,

@@ -26,12 +26,18 @@ import androidx.compose.foundation.layout.statusBarsPadding
 import androidx.compose.foundation.layout.wrapContentSize
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.DirectionsBike
+import androidx.compose.material.icons.filled.AutoAwesome
 import androidx.compose.material.icons.filled.ElectricScooter
+import androidx.compose.material.icons.filled.Stars
 import androidx.compose.material.icons.rounded.Warning
 import androidx.compose.material.icons.rounded.WifiOff
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Snackbar
+import androidx.compose.material3.SnackbarHost
+import androidx.compose.material3.SnackbarHostState
+import androidx.compose.material3.SnackbarResult
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
@@ -67,6 +73,7 @@ import com.google.maps.android.compose.rememberUpdatedMarkerState
 import kotlinx.coroutines.launch
 import se.onemanstudio.playaroundwithai.core.domain.feature.map.model.VehicleType
 import se.onemanstudio.playaroundwithai.core.ui.sofa.NeoBrutalButton
+import se.onemanstudio.playaroundwithai.core.ui.sofa.NeoBrutalIconButton
 import se.onemanstudio.playaroundwithai.core.ui.theme.Alphas
 import se.onemanstudio.playaroundwithai.core.ui.theme.Dimensions
 import se.onemanstudio.playaroundwithai.feature.map.R
@@ -74,11 +81,13 @@ import se.onemanstudio.playaroundwithai.feature.maps.MapConstants.STOCKHOLM_LAT
 import se.onemanstudio.playaroundwithai.feature.maps.MapConstants.STOCKHOLM_LNG
 import se.onemanstudio.playaroundwithai.feature.maps.states.MapError
 import se.onemanstudio.playaroundwithai.feature.maps.states.MapUiState
+import se.onemanstudio.playaroundwithai.feature.maps.states.SuggestedPlacesError
 import se.onemanstudio.playaroundwithai.feature.maps.views.CustomMarkerIcon
 import se.onemanstudio.playaroundwithai.feature.maps.views.FilterChip
 import se.onemanstudio.playaroundwithai.feature.maps.views.MarkerInfoCard
 import se.onemanstudio.playaroundwithai.feature.maps.views.PathModeBar
 import se.onemanstudio.playaroundwithai.feature.maps.views.SideControls
+import se.onemanstudio.playaroundwithai.feature.maps.views.SuggestedPlaceInfoCard
 
 private const val CAMERA_PADDING = 150
 
@@ -97,6 +106,8 @@ fun MapScreen(viewModel: MapViewModel = hiltViewModel()) {
     val cameraPositionState = rememberCameraPositionState {
         position = CameraPosition.fromLatLngZoom(stockholm, MapConstants.MAX_ZOOM_LEVEL)
     }
+
+    val snackbarHostState = remember { SnackbarHostState() }
 
     var hasLocationPermission by remember { mutableStateOf(false) }
     var userLocation by remember { mutableStateOf<LatLng?>(null) }
@@ -142,6 +153,22 @@ fun MapScreen(viewModel: MapViewModel = hiltViewModel()) {
         }
     }
 
+    val locationErrorMessage = stringResource(R.string.ai_places_location_error)
+    val fetchErrorMessage = stringResource(R.string.ai_places_fetch_error)
+    val dismissLabel = stringResource(R.string.dismiss)
+
+    LaunchedEffect(uiState.suggestedPlacesError) {
+        val error = uiState.suggestedPlacesError ?: return@LaunchedEffect
+        val message = when (error) {
+            is SuggestedPlacesError.LocationUnavailable -> locationErrorMessage
+            is SuggestedPlacesError.FetchFailed -> fetchErrorMessage
+        }
+        val result = snackbarHostState.showSnackbar(message = message, actionLabel = dismissLabel)
+        if (result == SnackbarResult.ActionPerformed || result == SnackbarResult.Dismissed) {
+            viewModel.dismissSuggestedPlacesError()
+        }
+    }
+
     Box(modifier = Modifier.fillMaxSize()) {
         GoogleMap(
             modifier = Modifier.fillMaxSize(),
@@ -168,6 +195,7 @@ fun MapScreen(viewModel: MapViewModel = hiltViewModel()) {
             ),
             onMapClick = {
                 viewModel.selectMarker(null)
+                viewModel.selectSuggestedPlace(null)
             }
         ) {
             if (uiState.optimalRoute.isNotEmpty()) {
@@ -216,6 +244,32 @@ fun MapScreen(viewModel: MapViewModel = hiltViewModel()) {
                     }
                 }
             }
+
+            uiState.suggestedPlaces.forEach { place ->
+                key(place.name + place.lat + place.lng) {
+                    MarkerComposable(
+                        state = rememberUpdatedMarkerState(position = LatLng(place.lat, place.lng)),
+                        title = place.name,
+                        snippet = place.description,
+                        onClick = {
+                            scope.launch {
+                                cameraPositionState.animate(
+                                    update = CameraUpdateFactory.newLatLng(LatLng(place.lat, place.lng)),
+                                    durationMs = MapConstants.MOVE_TO_POINT_DURATION
+                                )
+                            }
+                            viewModel.selectSuggestedPlace(place)
+                            true
+                        }
+                    ) {
+                        CustomMarkerIcon(
+                            Icons.Filled.Stars,
+                            stringResource(id = R.string.ai_suggested_place_marker_content_description, place.name),
+                            false
+                        )
+                    }
+                }
+            }
         }
 
         AnimatedVisibility(
@@ -239,7 +293,10 @@ fun MapScreen(viewModel: MapViewModel = hiltViewModel()) {
                 .statusBarsPadding()
                 .padding(top = Dimensions.paddingMedium)
         ) {
-            Row(horizontalArrangement = Arrangement.spacedBy(Dimensions.paddingLarge)) {
+            Row(
+                horizontalArrangement = Arrangement.spacedBy(Dimensions.paddingLarge),
+                verticalAlignment = Alignment.CenterVertically
+            ) {
                 FilterChip(
                     text = stringResource(id = R.string.scooters_filter_chip_label),
                     selected = uiState.activeFilter.contains(VehicleType.SCOOTER)
@@ -248,6 +305,12 @@ fun MapScreen(viewModel: MapViewModel = hiltViewModel()) {
                     text = stringResource(id = R.string.bicycles_filter_chip_label),
                     selected = uiState.activeFilter.contains(VehicleType.BICYCLE)
                 ) { viewModel.toggleFilter(VehicleType.BICYCLE) }
+                NeoBrutalIconButton(
+                    onClick = { viewModel.getAiSuggestedPlaces(userLocation) },
+                    imageVector = Icons.Default.AutoAwesome,
+                    contentDescription = stringResource(id = R.string.ai_suggest_button_content_description),
+                    backgroundColor = MaterialTheme.colorScheme.tertiaryContainer
+                )
             }
         }
 
@@ -358,6 +421,54 @@ fun MapScreen(viewModel: MapViewModel = hiltViewModel()) {
                 }
             }
         }
+
+        AnimatedVisibility(
+            visible = uiState.focusedSuggestedPlace != null && !uiState.isPathMode,
+            enter = slideInHorizontally(
+                initialOffsetX = { it },
+                animationSpec = tween(
+                    durationMillis = AnimationConstants.ANIMATION_DURATION,
+                    easing = EaseInOutQuart
+                )
+            ),
+            exit = slideOutHorizontally(
+                targetOffsetX = { it },
+                animationSpec = tween(
+                    durationMillis = AnimationConstants.ANIMATION_DURATION,
+                    easing = EaseInOutQuart
+                )
+            ),
+            modifier = Modifier.align(Alignment.BottomCenter)
+        ) {
+            Box(
+                modifier = Modifier
+                    .navigationBarsPadding()
+                    .padding(Dimensions.paddingLarge)
+            ) {
+                uiState.focusedSuggestedPlace?.let { place ->
+                    SuggestedPlaceInfoCard(
+                        place = place,
+                        onClose = { viewModel.selectSuggestedPlace(null) }
+                    )
+                }
+            }
+        }
+
+        SnackbarHost(
+            hostState = snackbarHostState,
+            modifier = Modifier
+                .align(Alignment.BottomCenter)
+                .navigationBarsPadding()
+                .padding(Dimensions.paddingMedium),
+            snackbar = { data ->
+                Snackbar(
+                    snackbarData = data,
+                    containerColor = MaterialTheme.colorScheme.errorContainer,
+                    contentColor = MaterialTheme.colorScheme.onErrorContainer,
+                    actionColor = MaterialTheme.colorScheme.onErrorContainer
+                )
+            }
+        )
 
         LoadingState(uiState)
 
