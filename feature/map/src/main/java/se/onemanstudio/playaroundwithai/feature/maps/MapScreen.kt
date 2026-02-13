@@ -46,6 +46,8 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.unit.dp
 import androidx.core.content.ContextCompat
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import com.google.android.gms.location.LocationServices
@@ -63,20 +65,21 @@ import com.google.maps.android.compose.Polyline
 import com.google.maps.android.compose.rememberCameraPositionState
 import com.google.maps.android.compose.rememberUpdatedMarkerState
 import kotlinx.coroutines.launch
-import androidx.compose.ui.text.style.TextAlign
-import androidx.compose.ui.unit.dp
 import se.onemanstudio.playaroundwithai.core.domain.feature.map.model.VehicleType
 import se.onemanstudio.playaroundwithai.core.ui.sofa.NeoBrutalButton
 import se.onemanstudio.playaroundwithai.core.ui.theme.Dimensions
-import se.onemanstudio.playaroundwithai.feature.maps.states.MapError
 import se.onemanstudio.playaroundwithai.feature.map.R
 import se.onemanstudio.playaroundwithai.feature.maps.MapConstants.STOCKHOLM_LAT
 import se.onemanstudio.playaroundwithai.feature.maps.MapConstants.STOCKHOLM_LNG
+import se.onemanstudio.playaroundwithai.feature.maps.states.MapError
+import se.onemanstudio.playaroundwithai.feature.maps.states.MapUiState
 import se.onemanstudio.playaroundwithai.feature.maps.views.CustomMarkerIcon
 import se.onemanstudio.playaroundwithai.feature.maps.views.FilterChip
 import se.onemanstudio.playaroundwithai.feature.maps.views.MarkerInfoCard
 import se.onemanstudio.playaroundwithai.feature.maps.views.PathModeBar
 import se.onemanstudio.playaroundwithai.feature.maps.views.SideControls
+
+private const val CAMERA_PADDING = 150
 
 @SuppressLint("MissingPermission", "GoogleMapComposable")
 @OptIn(MapsComposeExperimentalApi::class)
@@ -121,7 +124,7 @@ fun MapScreen(viewModel: MapViewModel = hiltViewModel()) {
             val boundsBuilder = LatLngBounds.builder()
             allPoints.forEach { boundsBuilder.include(it) }
             cameraPositionState.animate(
-                update = CameraUpdateFactory.newLatLngBounds(boundsBuilder.build(), 150),
+                update = CameraUpdateFactory.newLatLngBounds(boundsBuilder.build(), CAMERA_PADDING),
                 durationMs = MapConstants.MOVE_TO_POINT_DURATION
             )
         }
@@ -132,7 +135,7 @@ fun MapScreen(viewModel: MapViewModel = hiltViewModel()) {
             val boundsBuilder = LatLngBounds.builder()
             uiState.optimalRoute.forEach { boundsBuilder.include(it) }
             cameraPositionState.animate(
-                update = CameraUpdateFactory.newLatLngBounds(boundsBuilder.build(), 200),
+                update = CameraUpdateFactory.newLatLngBounds(boundsBuilder.build(), CAMERA_PADDING),
                 durationMs = MapConstants.MOVE_TO_POINT_DURATION
             )
         }
@@ -355,58 +358,74 @@ fun MapScreen(viewModel: MapViewModel = hiltViewModel()) {
             }
         }
 
-        if (uiState.isLoading) {
-            Box(
-                modifier = Modifier
-                    .fillMaxSize()
-                    .background(color = MaterialTheme.colorScheme.surface.copy(alpha = 0.8f)),
-                contentAlignment = Alignment.Center,
+        LoadingState(uiState)
+
+        ErrorState(
+            uiState = uiState,
+            onRetry = { viewModel.loadMapData() }
+        )
+    }
+}
+
+@Composable
+private fun ErrorState(
+    uiState: MapUiState,
+    onRetry: () -> Unit
+) {
+    uiState.error?.let { error ->
+        Box(
+            modifier = Modifier
+                .fillMaxSize()
+                .background(color = MaterialTheme.colorScheme.surface.copy(alpha = 0.9f)),
+            contentAlignment = Alignment.Center
+        ) {
+            Column(
+                horizontalAlignment = Alignment.CenterHorizontally,
+                verticalArrangement = Arrangement.Center,
+                modifier = Modifier.padding(Dimensions.paddingLarge)
             ) {
-                CircularProgressIndicator(
-                    modifier = Modifier.wrapContentSize(),
-                    color = MaterialTheme.colorScheme.primary
+                Icon(
+                    imageVector = when (error) {
+                        is MapError.NetworkError -> Icons.Rounded.WifiOff
+                        is MapError.Unknown -> Icons.Rounded.Warning
+                    },
+                    contentDescription = stringResource(R.string.map_error_icon),
+                    tint = MaterialTheme.colorScheme.error,
+                    modifier = Modifier.size(48.dp)
+                )
+                Spacer(modifier = Modifier.height(Dimensions.paddingMedium))
+                Text(
+                    text = when (error) {
+                        is MapError.NetworkError -> stringResource(R.string.map_error_network)
+                        is MapError.Unknown -> error.message ?: stringResource(R.string.map_error_unknown)
+                    },
+                    style = MaterialTheme.typography.bodyLarge,
+                    color = MaterialTheme.colorScheme.onSurface,
+                    textAlign = TextAlign.Center
+                )
+                Spacer(modifier = Modifier.height(Dimensions.paddingLarge))
+                NeoBrutalButton(
+                    text = stringResource(R.string.map_error_retry),
+                    onClick = onRetry
                 )
             }
         }
+    }
+}
 
-        uiState.error?.let { error ->
-            Box(
-                modifier = Modifier
-                    .fillMaxSize()
-                    .background(color = MaterialTheme.colorScheme.surface.copy(alpha = 0.9f)),
-                contentAlignment = Alignment.Center
-            ) {
-                Column(
-                    horizontalAlignment = Alignment.CenterHorizontally,
-                    verticalArrangement = Arrangement.Center,
-                    modifier = Modifier.padding(Dimensions.paddingLarge)
-                ) {
-                    Icon(
-                        imageVector = when (error) {
-                            is MapError.NetworkError -> Icons.Rounded.WifiOff
-                            is MapError.Unknown -> Icons.Rounded.Warning
-                        },
-                        contentDescription = stringResource(R.string.map_error_icon),
-                        tint = MaterialTheme.colorScheme.error,
-                        modifier = Modifier.size(48.dp)
-                    )
-                    Spacer(modifier = Modifier.height(Dimensions.paddingMedium))
-                    Text(
-                        text = when (error) {
-                            is MapError.NetworkError -> stringResource(R.string.map_error_network)
-                            is MapError.Unknown -> error.message ?: stringResource(R.string.map_error_unknown)
-                        },
-                        style = MaterialTheme.typography.bodyLarge,
-                        color = MaterialTheme.colorScheme.onSurface,
-                        textAlign = TextAlign.Center
-                    )
-                    Spacer(modifier = Modifier.height(Dimensions.paddingLarge))
-                    NeoBrutalButton(
-                        text = stringResource(R.string.map_error_retry),
-                        onClick = { viewModel.loadMapData() }
-                    )
-                }
-            }
+@Composable
+private fun LoadingState(uiState: MapUiState) {
+    if (uiState.isLoading) {
+        Box(
+            modifier = Modifier
+                .fillMaxSize()
+                .background(color = MaterialTheme.colorScheme.surface.copy(alpha = 0.8f)),
+            contentAlignment = Alignment.Center,
+        ) {
+            CircularProgressIndicator(
+                modifier = Modifier.wrapContentSize(),
+                color = MaterialTheme.colorScheme.primary
+            )
         }
     }
 }

@@ -29,6 +29,4 @@
     <string name="map_error_unknown">Something went wrong while loading the map.</string>
     <string name="map_error_retry">Retry</string>
     <string name="map_error_icon">Error icon</string>
-
-    <!-- AI Integration -->
 </resources>

@@ -26,13 +26,8 @@ fun CustomMarkerIcon(
     iconContentDescription: String?,
     isSelected: Boolean
 ) {
-    // 1. Determine Background Color based on selection
     val backgroundColor = if (isSelected) MaterialTheme.colorScheme.tertiary else MaterialTheme.colorScheme.surface
-
-    // 2. Determine Border Color (typically 'onSurface' handles Black/White switch)
     val borderColor = MaterialTheme.colorScheme.onSurface
-
-    // 3. Determine Icon Color (ensures contrast against the background)
     val iconColor = contentColorFor(backgroundColor)
 
     Box(
@@ -40,7 +35,6 @@ fun CustomMarkerIcon(
             .size(if (isSelected) Dimensions.iconSizeXXLarge else Dimensions.iconSizeXLarge)
             .clip(CircleShape)
             .background(backgroundColor)
-            // Use dynamic borderColor instead of Color.Black
             .border(Dimensions.neoBrutalCardStrokeWidth, borderColor, CircleShape)
             .padding(Dimensions.paddingMedium),
         contentAlignment = Alignment.Center
@@ -48,7 +42,6 @@ fun CustomMarkerIcon(
         Icon(
             imageVector = icon,
             contentDescription = iconContentDescription,
-            // Use dynamic iconColor instead of Color.Black
             tint = iconColor
         )
     }

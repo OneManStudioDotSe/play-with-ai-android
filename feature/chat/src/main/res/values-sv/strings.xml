@@ -25,7 +25,8 @@
 
     <string name="no_history_yet">Ingen historik än. Starta en konversation för att se den här!</string>
 
-    <!-- Analysis Types -->
+    <string name="label_syncing">Syncing</string>
+
     <string name="analysis_type_location">Plats</string>
     <string name="analysis_type_recipe">Recept</string>
     <string name="analysis_type_movie">Film</string>
@@ -34,7 +35,6 @@
     <string name="analysis_type_product">Produkt</string>
     <string name="analysis_type_trend">Trend</string>
 
-    <!-- New Strings -->
     <string name="preview_chat_response_light">Här är ett exempelsvar från AI:n.</string>
     <string name="preview_chat_response_dark">Det här är mörkt läge-versionen. Lägg märke till hur ytfärgen och textkontrasten anpassas</string>
 
@@ -45,12 +45,10 @@
 
     <string name="sync_failed_snackbar">%d prompt(ar) kunde inte synkroniseras till molnet</string>
 
-    <!-- Input Modes -->
     <string name="input_mode_text">Text</string>
     <string name="input_mode_image">Bild</string>
     <string name="input_mode_document">Dokument</string>
 
-    <!-- Fallback Suggestions -->
     <string name="fallback_suggestion_joke">Berätta ett skämt</string>
     <string name="fallback_suggestion_physics">Förklara kvantfysik</string>
     <string name="fallback_suggestion_roast">Grilla min kod</string>

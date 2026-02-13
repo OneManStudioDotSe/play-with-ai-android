@@ -64,6 +64,34 @@ To differentiate myself from the rest of the Android Engineers out there, I do t
 - **UX polish**: Smooth animations, easy-to-eye transitions and visual treats here and there
 - **Personality**: A unique "AI Overlord" persona for the assistant to make interactions more engaging
 
+## Architecture Highlights
+
+Beyond the high-level patterns, the project incorporates several notable architectural decisions worth highlighting:
+
+### Local-first data with background sync
+Prompt history follows a local-first strategy. Every prompt is immediately persisted to Room with a `Pending` sync status, ensuring the user never loses data regardless of connectivity. A `SyncWorker` (WorkManager) picks up pending entries when the network becomes available, uploads them to Firestore, and marks them as `Synced`. Failed uploads are retried up to 3 times before being marked as `Failed`. The sync job runs with `ExistingWorkPolicy.REPLACE` to avoid duplicate work and requires a `NetworkType.CONNECTED` constraint.
+
+### Dynamic configuration via Hilt qualifiers
+API keys, base URLs, and logging levels are injected at runtime through custom Hilt qualifiers (`@GeminiApiKey`, `@BaseUrl`, `@LoggingLevel`). A `ConfigurationModule` reads values from `BuildConfig`, which in turn are sourced from `local.properties` per build variant. This means switching between debug (verbose logging, debug API key) and release (no logging, production key) requires zero code changes — the DI graph handles it automatically.
+
+### Immutable UI state with Kotlinx Immutable Collections
+All UI state classes are annotated with `@Immutable` and use `PersistentList`/`PersistentSet` from kotlinx-collections-immutable. This guarantees that Compose can skip recompositions when state references haven't changed, resulting in measurably fewer recomposition cycles compared to using standard mutable collections.
+
+### Image processing pipeline
+Before reaching the Gemini API, images go through a multi-step pipeline: URI → Bitmap decoding (via `ImageDecoder`) → aspect-ratio-preserving downscale to max 768px → JPEG compression at 77% quality → Base64 encoding. This keeps payload sizes reasonable while preserving enough detail for the AI model to analyze.
+
+### OkHttp interceptor chain
+Network requests pass through a custom `AuthenticationInterceptor` that appends the API key as a query parameter, followed by an `HttpLoggingInterceptor` whose verbosity level is injected via DI — full body logging in debug, no logging in release. Timeouts are set to 30 seconds for connect, read, and write.
+
+### Mapper layer between data and domain
+Data transfer objects (DTOs) and Room entities are mapped to domain models through dedicated extension functions (`toDomain()`, `toEntity()`). This keeps the domain layer free of serialization annotations and database concerns, allowing it to remain a pure Kotlin module with no Android or framework dependencies.
+
+### Fake API service for development
+The map feature uses a `FakeMapApiService` that implements the same `MapApiService` interface as a real implementation would. It simulates network latency with a 1.5-second delay and generates randomized vehicle data near Stockholm. Swapping this for a real backend requires only changing the DI binding — no feature code needs to change.
+
+### Dynamic theme for the map
+The styling of the map changes depending on the light or dark mode that the app is using
+
 Core functionality:
 - **AI Chat**: Send prompts to an AI (Gemini) with support for image and document attachments
 - **Smart History**: Access and reuse previous prompts stored locally

@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
-<resources>
+<resources xmlns:tools="http://schemas.android.com/tools">
     <string name="path_mode_title">STIGLÄGE</string>
-    <string name="points_selected">%d valda punkter</string>
+    <string name="points_selected" tools:ignore="PluralsCandidate">%1$d valda punkter</string>
     <string name="total_distance">TOTALT AVSTÅND</string>
     <string name="distance_duration">%1$d m • %2$d min</string>
     <string name="go">KÖR</string>
@@ -29,6 +29,4 @@
     <string name="map_error_unknown">Något gick fel vid laddning av kartan.</string>
     <string name="map_error_retry">Försök igen</string>
     <string name="map_error_icon">Felikon</string>
-
-    <!-- AI Integration -->
 </resources>

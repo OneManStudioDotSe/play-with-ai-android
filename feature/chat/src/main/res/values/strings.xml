@@ -23,12 +23,20 @@
     <string name="error_i_couldn_t_read_the_file_content">I couldn\'t read the file content.</string>
     <string name="error_an_unknown_error_occurred">An unknown error occurred.</string>
 
-    <!-- New Strings -->
-    <string name="mime_type_all" translatable="false">*\/*</string>
-    <string name="preview_chat_response_light">Here is a sample response from the AI.</string>
-    <string name="preview_chat_response_dark">This is the dark mode version. Notice how the surface color and text contrast adapts</string>
+    <string name="no_history_yet">No history yet. Start a conversation to see it here!</string>
 
     <string name="label_syncing">Syncing</string>
+
+    <string name="analysis_type_location">Location</string>
+    <string name="analysis_type_recipe">Recipe</string>
+    <string name="analysis_type_movie">Movie</string>
+    <string name="analysis_type_song">Song</string>
+    <string name="analysis_type_personality">Personality</string>
+    <string name="analysis_type_product">Product</string>
+    <string name="analysis_type_trend">Trend</string>
+
+    <string name="preview_chat_response_light">Here is a sample response from the AI.</string>
+    <string name="preview_chat_response_dark">This is the dark mode version. Notice how the surface color and text contrast adapts</string>
 
     <string name="sync_notification_channel_name">Data Sync</string>
     <string name="sync_notification_channel_description">Shows progress of data synchronization</string>
@@ -37,29 +45,18 @@
 
     <string name="sync_failed_snackbar" tools:ignore="PluralsCandidate">%1$d prompts failed to sync to the cloud</string>
 
-    <string name="no_history_yet">No history yet. Start a conversation to see it here!</string>
 
-    <!-- Input Modes -->
     <string name="input_mode_text">Text</string>
     <string name="input_mode_image">Image</string>
     <string name="input_mode_document">Document</string>
 
-    <!-- Fallback Suggestions -->
     <string name="fallback_suggestion_joke">Tell me a joke</string>
     <string name="fallback_suggestion_physics">Explain Quantum Physics</string>
     <string name="fallback_suggestion_roast">Roast my code</string>
 
-    <!-- Date Formats -->
-    <string name="date_format_history" translatable="false">MMM dd, yyyy</string>
     <string name="history_date_at">%1$s at %2$s</string>
-    <string name="time_format_history" translatable="false">HH:mm</string>
 
-    <!-- Analysis Types -->
-    <string name="analysis_type_location">Location</string>
-    <string name="analysis_type_recipe">Recipe</string>
-    <string name="analysis_type_movie">Movie</string>
-    <string name="analysis_type_song">Song</string>
-    <string name="analysis_type_personality">Personality</string>
-    <string name="analysis_type_product">Product</string>
-    <string name="analysis_type_trend">Trend</string>
+    <string name="time_format_history" translatable="false">HH:mm</string>
+    <string name="date_format_history" translatable="false">MMM dd, yyyy</string>
+    <string name="mime_type_all" translatable="false">*\/*</string>
 </resources>

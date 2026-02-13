@@ -20,11 +20,8 @@ fun FilterChip(
     selected: Boolean,
     onClick: () -> Unit
 ) {
-    // 1. Determine colors based on state & theme
     val backgroundColor = if (selected) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.surface
     val contentColor = if (selected) MaterialTheme.colorScheme.onPrimary else MaterialTheme.colorScheme.onSurface
-
-    // 2. Dynamic border/shadow color (Black in Light Mode, White in Dark Mode)
     val outlineColor = MaterialTheme.colorScheme.onSurface
 
     Box(

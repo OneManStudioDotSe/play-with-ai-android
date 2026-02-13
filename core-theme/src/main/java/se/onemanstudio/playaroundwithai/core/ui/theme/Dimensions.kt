@@ -20,6 +20,7 @@ object Dimensions {
     val neoBrutalCardShadowOffset = 4.dp
     val neoBrutalCardStrokeWidth = 2.dp
     val minButtonHeight = 56.dp
+    val heightMini = 4.dp
     val heightMedium = 40.dp
     val segmentedButtonHeight = 48.dp
     val chipCornerRadius = 8.dp

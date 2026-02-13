@@ -1,5 +1,8 @@
 package se.onemanstudio.playaroundwithai.feature.maps.views
 
+import androidx.compose.animation.core.Animatable
+import androidx.compose.animation.core.FastOutSlowInEasing
+import androidx.compose.animation.core.tween
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -21,6 +24,8 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.vector.ImageVector
@@ -41,6 +46,15 @@ fun MarkerInfoCard(
     marker: MapItemUiModel,
     onClose: () -> Unit
 ) {
+    val animatedBattery = remember(marker.mapItem.id) { Animatable(1f) }
+
+    LaunchedEffect(marker.mapItem.id) {
+        animatedBattery.animateTo(
+            targetValue = marker.mapItem.batteryLevel.toFloat(),
+            animationSpec = tween(durationMillis = 1000, easing = FastOutSlowInEasing)
+        )
+    }
+
     NeoBrutalCard(modifier = Modifier.fillMaxWidth()) {
         Column(modifier = Modifier.padding(Dimensions.paddingLarge)) {
             Row(
@@ -94,7 +108,7 @@ fun MarkerInfoCard(
                     icon = Icons.Default.BatteryStd,
                     iconContentDescription = stringResource(id = R.string.battery_icon_content_description),
                     label = stringResource(R.string.battery),
-                    value = "${marker.mapItem.batteryLevel}%"
+                    value = "${animatedBattery.value.toInt().toString().padStart(2, '0')}%"
                 )
                 InfoStat(
                     icon = Icons.Default.QrCode,

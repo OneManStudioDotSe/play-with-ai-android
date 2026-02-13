@@ -89,7 +89,7 @@ fun SelfDismissingNotification(
                 progress = { progress },
                 modifier = Modifier
                     .fillMaxWidth()
-                    .height(4.dp),
+                    .height(Dimensions.heightMini),
                 color = MaterialTheme.colorScheme.error,
                 trackColor = MaterialTheme.colorScheme.surface.copy(alpha = 0.3f),
             )
