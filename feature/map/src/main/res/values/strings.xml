@@ -26,6 +26,10 @@
     <string name="exit_path_mode_button_content_description">Exit path mode</string>
     <string name="enter_path_mode_button_content_description">Enter path mode</string>
     <string name="unknown_location_notification">Current location unknown. Cannot calculate path.</string>
+    <string name="map_error_network">Could not load map data. Check your connection and try again.</string>
+    <string name="map_error_unknown">Something went wrong while loading the map.</string>
+    <string name="map_error_retry">Retry</string>
+    <string name="map_error_icon">Error icon</string>
 
     <!-- AI Integration -->
     <string name="suggest_places_button_content_description">Suggest places with AI</string>
