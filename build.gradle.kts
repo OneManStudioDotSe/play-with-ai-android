@@ -45,7 +45,7 @@ subprojects {
         config.setFrom(files("${rootProject.projectDir}/detekt.yml"))
 
         buildUponDefaultConfig = true
-        autoCorrect = true // This will auto-fix simple formatting issues
+        autoCorrect = true
     }
 
     configurations.configureEach {
