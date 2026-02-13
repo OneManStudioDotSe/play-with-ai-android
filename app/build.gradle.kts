@@ -27,12 +27,12 @@ val mapsApiKey = localProperties.getProperty("MAPS_API_KEY")
 
 android {
     namespace = "se.onemanstudio.playaroundwithai"
-    compileSdk = 36
+    compileSdk = libs.versions.compileSdk.get().toInt()
 
     defaultConfig {
         applicationId = "se.onemanstudio.playaroundwithai"
-        minSdk = 31
-        targetSdk = 36
+        minSdk = libs.versions.minSdk.get().toInt()
+        targetSdk = libs.versions.targetSdk.get().toInt()
 
         versionCode = 1
         versionName = "1.0"

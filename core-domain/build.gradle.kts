@@ -6,10 +6,10 @@ plugins {
 
 android {
     namespace = "se.onemanstudio.playaroundwithai.core.domain"
-    compileSdk = 36
+    compileSdk = libs.versions.compileSdk.get().toInt()
 
     defaultConfig {
-        minSdk = 31
+        minSdk = libs.versions.minSdk.get().toInt()
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
     }
 

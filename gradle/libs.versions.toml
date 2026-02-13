@@ -1,4 +1,9 @@
 [versions]
+# SDK
+compileSdk = "36"
+minSdk = "31"
+targetSdk = "36"
+
 # libraries
 coroutines = "1.10.2"
 material3 = "1.4.0"

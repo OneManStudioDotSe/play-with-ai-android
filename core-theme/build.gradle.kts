@@ -7,10 +7,10 @@ plugins {
 
 android {
     namespace = "se.onemanstudio.playaroundwithai.core.ui.theme"
-    compileSdk = 36
+    compileSdk = libs.versions.compileSdk.get().toInt()
 
     defaultConfig {
-        minSdk = 31
+        minSdk = libs.versions.minSdk.get().toInt()
     }
 
     buildTypes {
