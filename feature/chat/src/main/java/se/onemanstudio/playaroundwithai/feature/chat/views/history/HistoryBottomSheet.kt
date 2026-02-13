@@ -25,13 +25,13 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import se.onemanstudio.playaroundwithai.core.domain.feature.chat.model.Prompt
 import se.onemanstudio.playaroundwithai.core.ui.sofa.NeoBrutalCard
+import se.onemanstudio.playaroundwithai.core.ui.theme.Alphas
 import se.onemanstudio.playaroundwithai.core.ui.theme.Dimensions
 import se.onemanstudio.playaroundwithai.feature.chat.R
 
 private val DragHandleWidth = 32.dp
 private val DragHandleHeight = 4.dp
 private val DragHandleCornerRadius = 2.dp
-private const val DRAG_HANDLE_ALPHA = 0.4f
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -60,7 +60,7 @@ fun HistoryBottomSheet(
                             .width(DragHandleWidth)
                             .height(DragHandleHeight)
                             .background(
-                                color = MaterialTheme.colorScheme.onSurface.copy(alpha = DRAG_HANDLE_ALPHA),
+                                color = MaterialTheme.colorScheme.onSurface.copy(alpha = Alphas.medium),
                                 shape = RoundedCornerShape(DragHandleCornerRadius)
                             )
                     )

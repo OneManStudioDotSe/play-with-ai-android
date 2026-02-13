@@ -67,6 +67,7 @@ import com.google.maps.android.compose.rememberUpdatedMarkerState
 import kotlinx.coroutines.launch
 import se.onemanstudio.playaroundwithai.core.domain.feature.map.model.VehicleType
 import se.onemanstudio.playaroundwithai.core.ui.sofa.NeoBrutalButton
+import se.onemanstudio.playaroundwithai.core.ui.theme.Alphas
 import se.onemanstudio.playaroundwithai.core.ui.theme.Dimensions
 import se.onemanstudio.playaroundwithai.feature.map.R
 import se.onemanstudio.playaroundwithai.feature.maps.MapConstants.STOCKHOLM_LAT
@@ -376,7 +377,7 @@ private fun ErrorState(
         Box(
             modifier = Modifier
                 .fillMaxSize()
-                .background(color = MaterialTheme.colorScheme.surface.copy(alpha = 0.9f)),
+                .background(color = MaterialTheme.colorScheme.surface.copy(alpha = Alphas.high)),
             contentAlignment = Alignment.Center
         ) {
             Column(
@@ -419,7 +420,7 @@ private fun LoadingState(uiState: MapUiState) {
         Box(
             modifier = Modifier
                 .fillMaxSize()
-                .background(color = MaterialTheme.colorScheme.surface.copy(alpha = 0.8f)),
+                .background(color = MaterialTheme.colorScheme.surface.copy(alpha = Alphas.high)),
             contentAlignment = Alignment.Center,
         ) {
             CircularProgressIndicator(

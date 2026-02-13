@@ -31,6 +31,7 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import kotlinx.coroutines.delay
 import se.onemanstudio.playaroundwithai.core.ui.sofa.neoBrutalism
+import se.onemanstudio.playaroundwithai.core.ui.theme.Alphas
 import se.onemanstudio.playaroundwithai.core.ui.theme.Dimensions
 import se.onemanstudio.playaroundwithai.core.ui.theme.SofaAiTheme
 import se.onemanstudio.playaroundwithai.feature.map.R
@@ -91,7 +92,7 @@ fun SelfDismissingNotification(
                     .fillMaxWidth()
                     .height(Dimensions.heightMini),
                 color = MaterialTheme.colorScheme.error,
-                trackColor = MaterialTheme.colorScheme.surface.copy(alpha = 0.3f),
+                trackColor = MaterialTheme.colorScheme.surface.copy(alpha = Alphas.extraLow),
             )
         }
     }

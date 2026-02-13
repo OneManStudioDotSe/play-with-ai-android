@@ -36,6 +36,7 @@ import androidx.navigation.compose.composable
 import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
 import dagger.hilt.android.AndroidEntryPoint
+import se.onemanstudio.playaroundwithai.core.ui.theme.Alphas
 import se.onemanstudio.playaroundwithai.core.ui.theme.Dimensions
 import se.onemanstudio.playaroundwithai.core.ui.theme.SofaAiTheme
 import se.onemanstudio.playaroundwithai.feature.chat.ChatScreen
@@ -109,8 +110,8 @@ private fun SoFaApp() {
                                 selectedIconColor = MaterialTheme.colorScheme.surface,
                                 selectedTextColor = MaterialTheme.colorScheme.onSurface,
                                 indicatorColor = MaterialTheme.colorScheme.onSurface,
-                                unselectedIconColor = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.5f),
-                                unselectedTextColor = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.5f)
+                                unselectedIconColor = MaterialTheme.colorScheme.onSurface.copy(alpha = Alphas.medium),
+                                unselectedTextColor = MaterialTheme.colorScheme.onSurface.copy(alpha = Alphas.medium)
                             )
                         )
                     }
