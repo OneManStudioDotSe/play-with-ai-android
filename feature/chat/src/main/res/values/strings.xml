@@ -32,7 +32,7 @@
     <string name="error_an_unknown_error_occurred">An unknown error occurred.</string>
 
     <!-- New Strings -->
-    <string name="mime_type_all">*\/*</string>
+    <string name="mime_type_all" translatable="false">*\/*</string>
     <string name="preview_chat_response_light">Here is a sample response from the AI.</string>
     <string name="preview_chat_response_dark">This is the dark mode version. Notice how the surface color and text contrast adapts</string>
 

@@ -42,6 +42,19 @@
     <string name="analysis_type_product">Produkt</string>
     <string name="analysis_type_trend">Trend</string>
 
+    <!-- New Strings -->
+    <string name="preview_chat_response_light">Här är ett exempelsvar från AI:n.</string>
+    <string name="preview_chat_response_dark">Det här är mörkt läge-versionen. Lägg märke till hur ytfärgen och textkontrasten anpassas</string>
+
+    <string name="sync_notification_channel_name">Datasynkronisering</string>
+    <string name="sync_notification_channel_description">Visar framsteg för datasynkronisering</string>
+    <string name="sync_notification_title">Synkroniserar promptar</string>
+    <string name="sync_notification_content">Synkroniserar din prompthistorik med molnet\u2026</string>
+    <string name="sync_notification_complete">Synkronisering klar</string>
+    <string name="sync_notification_failed">Synkronisering misslyckades</string>
+
+    <string name="sync_failed_snackbar">%d prompt(ar) kunde inte synkroniseras till molnet</string>
+
     <!-- Input Modes -->
     <string name="input_mode_text">Text</string>
     <string name="input_mode_image">Bild</string>

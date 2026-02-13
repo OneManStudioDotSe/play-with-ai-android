@@ -26,6 +26,10 @@
     <string name="exit_path_mode_button_content_description">Avsluta stiglÄge</string>
     <string name="enter_path_mode_button_content_description">Gå in i stiglÄge</string>
     <string name="unknown_location_notification">Aktuell plats okänd. Kan inte beräkna stig.</string>
+    <string name="map_error_network">Kunde inte ladda kartdata. Kontrollera din anslutning och försök igen.</string>
+    <string name="map_error_unknown">Något gick fel vid laddning av kartan.</string>
+    <string name="map_error_retry">Försök igen</string>
+    <string name="map_error_icon">Felikon</string>
 
     <!-- AI Integration -->
     <string name="suggest_places_button_content_description">Föreslå platser med AI</string>

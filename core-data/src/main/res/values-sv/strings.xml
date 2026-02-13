@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="sync_notification_channel_name">Datasynkronisering</string>
+    <string name="sync_notification_channel_description">Visar framsteg för datasynkronisering</string>
+    <string name="sync_notification_title">Synkroniserar promptar</string>
+    <string name="sync_notification_content">Synkroniserar din prompthistorik med molnet\u2026</string>
+    <string name="sync_failure_notification_title">Synkronisering misslyckades</string>
+    <string name="sync_failure_notification_content">%d prompt(ar) kunde inte synkroniseras. De kommer att försökas igen nästa gång.</string>
+</resources>
