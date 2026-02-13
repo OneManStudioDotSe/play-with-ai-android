@@ -78,6 +78,13 @@ class ChatViewModel @Inject constructor(
             initialValue = emptyList()
         )
 
+    val isSyncing: StateFlow<Boolean> = getSyncStateUseCase()
+        .stateIn(
+            scope = viewModelScope,
+            started = SharingStarted.WhileSubscribed(SUBSCRIBE_TIMEOUT),
+            initialValue = false
+        )
+
     init {
         loadSuggestions()
         observeSyncFailures()

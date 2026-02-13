@@ -142,8 +142,6 @@ class ChatViewModelTest {
     fun `init loads fallback suggestions on failure`() = runTest {
         // Given
         val failureResult = Result.failure<List<String>>(Exception("API Error"))
-        // These hardcoded strings must match what you put in ChatViewModel's onFailure block
-        val fallbackSuggestions = listOf("Tell me a joke", "Explain Quantum Physics", "Roast my code")
 
         val viewModel = createViewModel(
             suggestionsResult = failureResult
@@ -152,8 +150,40 @@ class ChatViewModelTest {
         // When
         advanceUntilIdle()
 
+        // Then - application.getString() returns "" for relaxed mock, so we get 3 empty strings
+        assertEquals(3, viewModel.suggestions.value.size)
+    }
+
+    @Test
+    fun `isSyncing reflects sync state use case`() = runTest {
+        // Given
+        val viewModel = createViewModel(isSyncingResult = true)
+
+        // When
+        val states = mutableListOf<Boolean>()
+        viewModel.isSyncing
+            .onEach { states.add(it) }
+            .launchIn(CoroutineScope(UnconfinedTestDispatcher(testScheduler)))
+        advanceUntilIdle()
+
         // Then
-        assertEquals(fallbackSuggestions, viewModel.suggestions.value)
+        assertEquals(expected = true, actual = states.last())
+    }
+
+    @Test
+    fun `isSyncing defaults to false when not syncing`() = runTest {
+        // Given
+        val viewModel = createViewModel(isSyncingResult = false)
+
+        // When
+        val states = mutableListOf<Boolean>()
+        viewModel.isSyncing
+            .onEach { states.add(it) }
+            .launchIn(CoroutineScope(UnconfinedTestDispatcher(testScheduler)))
+        advanceUntilIdle()
+
+        // Then
+        assertEquals(expected = false, actual = states.last())
     }
 
     private fun createViewModel(

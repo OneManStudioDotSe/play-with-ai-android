@@ -25,6 +25,7 @@ import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Clear
 import androidx.compose.material.icons.filled.History
+import androidx.compose.material.icons.filled.Sync
 import androidx.compose.material.icons.rounded.BrokenImage
 import androidx.compose.material.icons.rounded.Description
 import androidx.compose.material.icons.rounded.Lock
@@ -80,6 +81,7 @@ fun ChatScreen(viewModel: ChatViewModel) {
 
     val isSheetOpen by viewModel.isSheetOpen.collectAsStateWithLifecycle()
     val history by viewModel.promptHistory.collectAsStateWithLifecycle()
+    val isSyncing by viewModel.isSyncing.collectAsStateWithLifecycle()
 
     var inputMode by remember { mutableStateOf(InputMode.TEXT) }
     var selectedImageUri by remember { mutableStateOf<Uri?>(null) }
@@ -133,7 +135,10 @@ fun ChatScreen(viewModel: ChatViewModel) {
             history = history,
             onDismissRequest = { viewModel.closeHistorySheet() },
             onHistoryItemClick = { selectedText ->
-                textState = TextFieldValue(selectedText)
+                val question = selectedText
+                    .removePrefix("Q: ")
+                    .substringBefore("\nA: ")
+                textState = TextFieldValue(question)
                 viewModel.closeHistorySheet()
                 keyboardController?.hide()
             }
@@ -147,6 +152,14 @@ fun ChatScreen(viewModel: ChatViewModel) {
             NeoBrutalTopAppBar(
                 title = stringResource(R.string.let_s_talk),
                 actions = {
+                    if (isSyncing) {
+                        NeoBrutalIconButton(
+                            imageVector = Icons.Default.Sync,
+                            contentDescription = stringResource(R.string.label_syncing),
+                            backgroundColor = MaterialTheme.colorScheme.secondary,
+                            onClick = {},
+                        )
+                    }
                     NeoBrutalIconButton(
                         imageVector = Icons.Default.History,
                         contentDescription = stringResource(R.string.label_prompt_history),

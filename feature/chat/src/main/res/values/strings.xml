@@ -28,6 +28,8 @@
     <string name="preview_chat_response_light">Here is a sample response from the AI.</string>
     <string name="preview_chat_response_dark">This is the dark mode version. Notice how the surface color and text contrast adapts</string>
 
+    <string name="label_syncing">Syncing</string>
+
     <string name="sync_notification_channel_name">Data Sync</string>
     <string name="sync_notification_channel_description">Shows progress of data synchronization</string>
     <string name="sync_notification_title">Syncing Prompts</string>
