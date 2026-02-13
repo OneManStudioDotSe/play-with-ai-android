@@ -3,7 +3,6 @@ package se.onemanstudio.playaroundwithai.feature.maps.states
 import androidx.compose.runtime.Immutable
 import com.google.android.gms.maps.model.LatLng
 import kotlinx.collections.immutable.PersistentList
-import kotlinx.collections.immutable.PersistentSet
 import kotlinx.collections.immutable.persistentListOf
 import kotlinx.collections.immutable.persistentSetOf
 import se.onemanstudio.playaroundwithai.core.domain.feature.map.model.VehicleType
