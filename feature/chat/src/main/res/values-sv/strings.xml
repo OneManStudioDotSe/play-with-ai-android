@@ -4,21 +4,13 @@
     <string name="label_selected_image">Vald bild</string>
     <string name="label_remove_image">Ta bort bild</string>
     <string name="label_file_icon">Filikon</string>
-    <string name="text">Text</string>
-    <string name="image">Bild</string>
-    <string name="file">Fil</string>
     <string name="label_attach_photo">Bifoga foto</string>
     <string name="label_attach_file">Bifoga fil</string>
     <string name="label_send_prompt">Skicka prompt</string>
-    <string name="dropdown_arrow">Listrutepil</string>
     <string name="label_clear_file">Rensa fil</string>
-    <string name="sample_prompt_1">Förklara kvantdatorer</string>
-    <string name="sample_prompt_2">Recept på en tårta</string>
-    <string name="sample_prompt_3">Skriv en dikt om regn</string>
     <string name="prompt_input_label">Prompt</string>
 
     <string name="prompt_history">Prompthistorik</string>
-    <string name="used_on">Användes den:</string>
     <string name="let_s_talk">Låt oss prata</string>
     <string name="label_prompt_history">Prompthistorik</string>
     <string name="label_clear_response">Rensa svar</string>
@@ -50,8 +42,6 @@
     <string name="sync_notification_channel_description">Visar framsteg för datasynkronisering</string>
     <string name="sync_notification_title">Synkroniserar promptar</string>
     <string name="sync_notification_content">Synkroniserar din prompthistorik med molnet\u2026</string>
-    <string name="sync_notification_complete">Synkronisering klar</string>
-    <string name="sync_notification_failed">Synkronisering misslyckades</string>
 
     <string name="sync_failed_snackbar">%d prompt(ar) kunde inte synkroniseras till molnet</string>
 
@@ -59,4 +49,10 @@
     <string name="input_mode_text">Text</string>
     <string name="input_mode_image">Bild</string>
     <string name="input_mode_document">Dokument</string>
+
+    <!-- Fallback Suggestions -->
+    <string name="fallback_suggestion_joke">Berätta ett skämt</string>
+    <string name="fallback_suggestion_physics">Förklara kvantfysik</string>
+    <string name="fallback_suggestion_roast">Grilla min kod</string>
+    <string name="history_date_at">%1$s på %2$s</string>
 </resources>

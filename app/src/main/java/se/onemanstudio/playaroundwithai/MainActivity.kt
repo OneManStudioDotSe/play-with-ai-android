@@ -7,9 +7,6 @@ import androidx.activity.enableEdgeToEdge
 import androidx.compose.foundation.layout.consumeWindowInsets
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Chair
-import androidx.compose.material.icons.filled.Map
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.NavigationBar
@@ -45,7 +42,6 @@ import se.onemanstudio.playaroundwithai.feature.chat.ChatScreen
 import se.onemanstudio.playaroundwithai.feature.maps.MapScreen
 import se.onemanstudio.playaroundwithai.navigation.Chat
 import se.onemanstudio.playaroundwithai.navigation.Maps
-import se.onemanstudio.playaroundwithai.navigation.NavItem
 import se.onemanstudio.playaroundwithai.navigation.navItems
 
 

@@ -1,24 +1,16 @@
 <?xml version="1.0" encoding="utf-8"?>
-<resources>
+<resources xmlns:tools="http://schemas.android.com/tools">
     <string name="analysis_type">Analysis Type</string>
     <string name="label_selected_image">Selected image</string>
     <string name="label_remove_image">Remove image</string>
     <string name="label_file_icon">File Icon</string>
-    <string name="text">Text</string>
-    <string name="image">Image</string>
-    <string name="file">File</string>
     <string name="label_attach_photo">Attach photo</string>
     <string name="label_attach_file">Attach file</string>
     <string name="label_send_prompt">Send prompt</string>
-    <string name="dropdown_arrow">Dropdown arrow</string>
     <string name="label_clear_file">Clear file</string>
-    <string name="sample_prompt_1">Explain Quantum Computing</string>
-    <string name="sample_prompt_2">Recipe for a cake</string>
-    <string name="sample_prompt_3">Write a poem about rain</string>
     <string name="prompt_input_label">Prompt</string>
 
     <string name="prompt_history">Prompt history</string>
-    <string name="used_on">Used on:</string>
     <string name="let_s_talk">Let\'s talk</string>
     <string name="label_prompt_history">Prompt History</string>
     <string name="label_clear_response">Clear response</string>
@@ -40,10 +32,8 @@
     <string name="sync_notification_channel_description">Shows progress of data synchronization</string>
     <string name="sync_notification_title">Syncing Prompts</string>
     <string name="sync_notification_content">Synchronizing your prompt history with the cloud…</string>
-    <string name="sync_notification_complete">Sync complete</string>
-    <string name="sync_notification_failed">Sync failed</string>
 
-    <string name="sync_failed_snackbar">%d prompt(s) failed to sync to the cloud</string>
+    <string name="sync_failed_snackbar" tools:ignore="PluralsCandidate">%1$d prompts failed to sync to the cloud</string>
 
     <string name="no_history_yet">No history yet. Start a conversation to see it here!</string>
 

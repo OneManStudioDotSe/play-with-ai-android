@@ -68,18 +68,18 @@ se.onemanstudio.playaroundwithai.feature.{chat,maps}
 
 ## Key Dependencies
 
-| Category | Library |
-|---|---|
-| UI | Jetpack Compose, Material3, Compose Navigation |
-| DI | Hilt 2.59.1 |
-| Network | Retrofit 3.0.0, OkHttp 5.3.2, Gson |
-| Database | Room 2.8.4 |
-| Firebase | Firestore, Firebase Auth |
-| Async | Coroutines 1.10.2 |
-| Images | Coil 2.7.0 |
-| Maps | Google Maps Compose 8.1.0 |
-| Logging | Timber |
-| Background | WorkManager |
+| Category   | Library                                        |
+|------------|------------------------------------------------|
+| UI         | Jetpack Compose, Material3, Compose Navigation |
+| DI         | Hilt 2.59.1                                    |
+| Network    | Retrofit 3.0.0, OkHttp 5.3.2, Gson             |
+| Database   | Room 2.8.4                                     |
+| Firebase   | Firestore, Firebase Auth                       |
+| Async      | Coroutines 1.10.2                              |
+| Images     | Coil 2.7.0                                     |
+| Maps       | Google Maps Compose 8.1.0                      |
+| Logging    | Timber                                         |
+| Background | WorkManager                                    |
 
 All versions managed in `gradle/libs.versions.toml`.
 

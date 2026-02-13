@@ -1,6 +1,7 @@
+@file:Suppress("AssignedValueIsNeverRead")
+
 package se.onemanstudio.playaroundwithai.feature.chat
 
-import android.annotation.SuppressLint
 import android.content.Context
 import android.content.Intent
 import android.net.Uri

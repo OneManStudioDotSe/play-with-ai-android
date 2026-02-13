@@ -12,6 +12,7 @@ import javax.inject.Singleton
 
 private const val LOG_PREVIEW_LENGTH = 50
 
+@Suppress("CanBeParameter")
 @Singleton
 class FirestoreDataSource @Inject constructor(
     private val firestore: FirebaseFirestore,
