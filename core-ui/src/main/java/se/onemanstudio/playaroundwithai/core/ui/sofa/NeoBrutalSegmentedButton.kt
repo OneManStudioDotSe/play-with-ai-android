@@ -17,34 +17,30 @@ import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
-import androidx.compose.ui.unit.dp
-import se.onemanstudio.playaroundwithai.core.domain.feature.chat.model.InputMode
 import se.onemanstudio.playaroundwithai.core.ui.theme.Dimensions
-import se.onemanstudio.playaroundwithai.core.ui.views.R
 import se.onemanstudio.playaroundwithai.core.ui.theme.SofaAiTheme
 
 @Composable
 fun NeoBrutalSegmentedButton(
-    modes: List<InputMode>,
-    selectedMode: InputMode,
-    onModeSelected: (InputMode) -> Unit,
+    labels: List<String>,
+    selectedIndex: Int,
+    onSelected: (Int) -> Unit,
     modifier: Modifier = Modifier
 ) {
     Box(
         modifier = modifier
-            .height(48.dp)
+            .height(Dimensions.segmentedButtonHeight)
             .neoBrutalism(
                 backgroundColor = MaterialTheme.colorScheme.surface,
                 borderColor = MaterialTheme.colorScheme.onSurface,
-                shadowOffset = 4.dp
+                shadowOffset = Dimensions.neoBrutalCardShadowOffset
             )
     ) {
         Row(modifier = Modifier.fillMaxSize()) {
-            modes.forEachIndexed { index, mode ->
-                val isSelected = mode == selectedMode
+            labels.forEachIndexed { index, label ->
+                val isSelected = index == selectedIndex
 
                 // Animate background color change
                 val backgroundColor by animateColorAsState(
@@ -65,15 +61,11 @@ fun NeoBrutalSegmentedButton(
                         .weight(1f)
                         .fillMaxHeight()
                         .background(backgroundColor)
-                        .clickable { onModeSelected(mode) },
+                        .clickable { onSelected(index) },
                     contentAlignment = Alignment.Center
                 ) {
                     Text(
-                        text = when (mode) {
-                            InputMode.TEXT -> stringResource(R.string.input_mode_text)
-                            InputMode.IMAGE -> stringResource(R.string.input_mode_image)
-                            InputMode.DOCUMENT -> stringResource(R.string.input_mode_document)
-                        },
+                        text = label,
                         style = MaterialTheme.typography.labelLarge,
                         fontWeight = if (isSelected) FontWeight.Black else FontWeight.Medium,
                         color = textColor
@@ -81,7 +73,7 @@ fun NeoBrutalSegmentedButton(
                 }
 
                 // Divider between items
-                if (index < modes.size - 1) {
+                if (index < labels.size - 1) {
                     VerticalDivider(
                         modifier = Modifier.fillMaxHeight(),
                         thickness = Dimensions.borderStrokeSmall,
@@ -93,14 +85,26 @@ fun NeoBrutalSegmentedButton(
     }
 }
 
-@Preview
+@Preview(name = "Light Mode")
 @Composable
-private fun SegmentedButtonPreview() {
-    SofaAiTheme {
+private fun SegmentedButtonPreview_Light() {
+    SofaAiTheme(darkTheme = false) {
         NeoBrutalSegmentedButton(
-            modes = InputMode.entries,
-            selectedMode = InputMode.TEXT,
-            onModeSelected = {}
+            labels = listOf("Text", "Image", "Document"),
+            selectedIndex = 0,
+            onSelected = {}
+        )
+    }
+}
+
+@Preview(name = "Dark Mode")
+@Composable
+private fun SegmentedButtonPreview_Dark() {
+    SofaAiTheme(darkTheme = true) {
+        NeoBrutalSegmentedButton(
+            labels = listOf("Text", "Image", "Document"),
+            selectedIndex = 1,
+            onSelected = {}
         )
     }
 }

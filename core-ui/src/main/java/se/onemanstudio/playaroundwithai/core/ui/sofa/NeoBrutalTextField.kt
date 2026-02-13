@@ -10,7 +10,6 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.input.TextFieldValue
 import androidx.compose.ui.tooling.preview.Preview
-import androidx.compose.ui.unit.dp
 import se.onemanstudio.playaroundwithai.core.ui.theme.Dimensions
 import se.onemanstudio.playaroundwithai.core.ui.theme.SofaAiTheme
 
@@ -46,7 +45,7 @@ fun NeoBrutalTextField(
                 color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.5f),
                 modifier = Modifier
                     .padding(Dimensions.paddingLarge)
-                    .padding(start = 2.dp) // Slight adjustment to align with cursor
+                    .padding(start = Dimensions.paddingExtraSmall) // Slight adjustment to align with cursor
             )
         }
     }

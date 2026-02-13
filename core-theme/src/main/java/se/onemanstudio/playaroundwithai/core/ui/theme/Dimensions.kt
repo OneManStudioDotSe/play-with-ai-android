@@ -4,6 +4,7 @@ import androidx.compose.ui.unit.dp
 
 object Dimensions {
     // Padding and Spacing
+    val none = 0.dp
     val paddingExtraSmall = 2.dp
     val paddingSmall = 4.dp
     val paddingMedium = 8.dp
@@ -21,6 +22,8 @@ object Dimensions {
     val neoBrutalCardShadowOffset = 4.dp
     val neoBrutalCardStrokeWidth = 2.dp
     val minButtonHeight = 56.dp
+    val segmentedButtonHeight = 48.dp
+    val chipCornerRadius = 8.dp
     val imagePreviewSize = 96.dp
 
     // Border Strokes
