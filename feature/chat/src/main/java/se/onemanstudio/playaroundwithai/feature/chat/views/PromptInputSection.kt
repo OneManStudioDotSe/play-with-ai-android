@@ -1,18 +1,23 @@
 package se.onemanstudio.playaroundwithai.feature.chat.views
 
+import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.core.LinearEasing
 import androidx.compose.animation.core.RepeatMode
 import androidx.compose.animation.core.animateFloat
 import androidx.compose.animation.core.infiniteRepeatable
 import androidx.compose.animation.core.rememberInfiniteTransition
 import androidx.compose.animation.core.tween
+import androidx.compose.animation.expandHorizontally
+import androidx.compose.animation.shrinkHorizontally
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.IntrinsicSize
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.navigationBarsPadding
@@ -113,8 +118,9 @@ fun PromptInputSection(
         Row(
             modifier = Modifier
                 .fillMaxWidth()
+                .height(IntrinsicSize.Max) // Force children to match heights
                 .padding(horizontal = Dimensions.paddingLarge),
-            verticalAlignment = Alignment.Top
+            verticalAlignment = Alignment.CenterVertically
         ) {
             NeoBrutalTextField(
                 value = textState,
@@ -125,16 +131,22 @@ fun PromptInputSection(
                     .padding(end = Dimensions.paddingMedium)
             )
 
-            // Attachment Buttons
-            if (inputMode != InputMode.TEXT) {
+            // Attachment Buttons (Animated)
+            AnimatedVisibility(
+                visible = inputMode != InputMode.TEXT,
+                enter = expandHorizontally(),
+                exit = shrinkHorizontally()
+            ) {
                 val icon = if (inputMode == InputMode.IMAGE) Icons.Default.AddAPhoto else Icons.Default.UploadFile
                 val desc =
                     if (inputMode == InputMode.IMAGE) stringResource(R.string.label_attach_photo) else stringResource(R.string.label_attach_file)
                 val bgColor = if (inputMode == InputMode.IMAGE) MaterialTheme.colorScheme.secondary else MaterialTheme.colorScheme.tertiary
 
                 NeoBrutalIconButton(
-                    modifier = Modifier.padding(start = Dimensions.paddingSmall, end = Dimensions.paddingLarge),
-                    size = Dimensions.iconSizeXXLarge,
+                    modifier = Modifier
+                        .fillMaxHeight()
+                        .padding(end = Dimensions.paddingMedium),
+                    size = 56.dp, // Match default height of NeoBrutalTextField with padding
                     onClick = onAttachClicked,
                     imageVector = icon,
                     contentDescription = desc,
@@ -144,7 +156,8 @@ fun PromptInputSection(
 
             // Send Button
             NeoBrutalIconButton(
-                size = Dimensions.iconSizeXXLarge,
+                modifier = Modifier.fillMaxHeight(),
+                size = 56.dp, // Match default height of NeoBrutalTextField
                 imageVector = Icons.AutoMirrored.Filled.Send,
                 contentDescription = stringResource(R.string.label_send_prompt),
                 backgroundColor = MaterialTheme.colorScheme.primary,
