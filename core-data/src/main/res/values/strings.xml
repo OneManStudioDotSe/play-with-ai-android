@@ -1,7 +1,9 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <string name="sync_notification_channel_name">Data Sync</string>
+    <string name="sync_notification_channel_name">Data sync</string>
     <string name="sync_notification_channel_description">Shows progress of data synchronization</string>
-    <string name="sync_notification_title">Syncing Prompts</string>
+    <string name="sync_notification_title">Syncing prompts</string>
     <string name="sync_notification_content">Synchronizing your prompt history with the cloud…</string>
+    <string name="sync_failure_notification_title">Sync failed</string>
+    <string name="sync_failure_notification_content">%d prompt(s) could not be synced. They will be retried next time.</string>
 </resources>

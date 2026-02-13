@@ -161,7 +161,7 @@ class ChatViewModelTest {
     ): ChatViewModel {
         val repository = mockk<GeminiRepository> {
             generateContentResult?.let { coEvery { generateContent(any(), any(), any(), any()) } returns it }
-            coEvery { generateSuggestions() } returns suggestionsResult
+            coEvery { generateConversationStarters() } returns suggestionsResult
             coEvery { savePrompt(any()) } returns Unit
             every { getPromptHistory() } returns flowOf(promptHistoryResult)
             every { isSyncing() } returns flowOf(isSyncingResult)

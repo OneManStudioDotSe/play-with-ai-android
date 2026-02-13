@@ -5,6 +5,8 @@ import se.onemanstudio.playaroundwithai.core.data.feature.map.dto.MapItemDto
 import se.onemanstudio.playaroundwithai.core.data.util.MapDataGenerator
 import javax.inject.Inject
 
+private const val FAKE_DELAY = 1_500L
+
 /**
  * A fake implementation of [MapApiService] for testing and development.
  * It simulates a network request and returns randomly generated data.
@@ -12,7 +14,7 @@ import javax.inject.Inject
 @Suppress("MagicNumber")
 class FakeMapApiService @Inject constructor() : MapApiService {
     override suspend fun getMapItems(count: Int): List<MapItemDto> {
-        delay(1_500) // simulate a backend request that takes some time to complete
+        delay(timeMillis = FAKE_DELAY) // simulate a backend request that takes some time to complete
 
         return List(count) { i ->
             MapItemDto(

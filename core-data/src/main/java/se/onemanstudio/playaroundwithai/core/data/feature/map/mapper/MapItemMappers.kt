@@ -15,8 +15,8 @@ fun MapItemDto.toDomain(): MapItem {
             VehicleTypeDto.SCOOTER -> VehicleType.SCOOTER
             VehicleTypeDto.BICYCLE -> VehicleType.BICYCLE
         },
-        batteryLevel = 100,
-        vehicleCode = "0000",
+        batteryLevel = this.batteryLevel,
+        vehicleCode = this.vehicleCode,
         nickname = this.nickname
     )
 }
