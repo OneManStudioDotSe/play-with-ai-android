@@ -9,34 +9,50 @@ import androidx.compose.runtime.Composable
 
 private val NeoBrutalistDarkColorScheme =
     darkColorScheme(
-        primary = ElectricBlue,
-        secondary = VividPink,
-        tertiary = ZestyLime,
-        background = PrimaryBlack,
-        surface = PrimaryBlack,
-        onPrimary = OffWhite,
-        onSecondary = PrimaryBlack,
-        onTertiary = PrimaryBlack,
-        onBackground = OffWhite,
-        onSurface = OffWhite,
-        error = ErrorRed,
-        onError = PrimaryBlack
+        primary = electricBlue,
+        onPrimary = offWhite,
+        primaryContainer = electricBlueContainer,
+        onPrimaryContainer = offWhite,
+        secondary = vividPink,
+        onSecondary = primaryBlack,
+        secondaryContainer = vividPinkContainer,
+        onSecondaryContainer = offWhite,
+        tertiary = zestyLime,
+        onTertiary = primaryBlack,
+        tertiaryContainer = zestyLimeContainer,
+        onTertiaryContainer = offWhite,
+        background = primaryBlack,
+        onBackground = offWhite,
+        surface = primaryBlack,
+        onSurface = offWhite,
+        error = errorRed,
+        onError = primaryBlack,
+        errorContainer = errorRedContainer,
+        onErrorContainer = offWhite
     )
 
 private val NeoBrutalistLightColorScheme =
     lightColorScheme(
-        primary = ElectricBlue,
-        secondary = VividPink,
-        tertiary = ZestyLime,
-        background = OffWhite,
-        surface = OffWhite,
-        onPrimary = OffWhite,
-        onSecondary = PrimaryBlack,
-        onTertiary = PrimaryBlack,
-        onBackground = PrimaryBlack,
-        onSurface = PrimaryBlack,
-        error = ErrorRed,
-        onError = OffWhite
+        primary = electricBlue,
+        onPrimary = offWhite,
+        primaryContainer = electricBlueContainer,
+        onPrimaryContainer = offWhite,
+        secondary = vividPink,
+        onSecondary = primaryBlack,
+        secondaryContainer = vividPinkContainer,
+        onSecondaryContainer = offWhite,
+        tertiary = zestyLime,
+        onTertiary = primaryBlack,
+        tertiaryContainer = zestyLimeContainer,
+        onTertiaryContainer = offWhite,
+        background = offWhite,
+        onBackground = primaryBlack,
+        surface = offWhite,
+        onSurface = primaryBlack,
+        error = errorRed,
+        onError = offWhite,
+        errorContainer = errorRedContainer,
+        onErrorContainer = offWhite
     )
 
 @Suppress("FunctionNaming")

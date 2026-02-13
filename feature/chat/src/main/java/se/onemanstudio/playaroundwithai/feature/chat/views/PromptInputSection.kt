@@ -103,10 +103,17 @@ fun PromptInputSection(
         Spacer(modifier = Modifier.height(Dimensions.paddingSmall))
 
         // 2. Mode Selector (Segmented Button)
+        val modeLabels = InputMode.entries.map { mode ->
+            when (mode) {
+                InputMode.TEXT -> stringResource(R.string.input_mode_text)
+                InputMode.IMAGE -> stringResource(R.string.input_mode_image)
+                InputMode.DOCUMENT -> stringResource(R.string.input_mode_document)
+            }
+        }
         NeoBrutalSegmentedButton(
-            modes = InputMode.entries,
-            selectedMode = inputMode,
-            onModeSelected = onModeChange,
+            labels = modeLabels,
+            selectedIndex = InputMode.entries.indexOf(inputMode),
+            onSelected = { index -> onModeChange(InputMode.entries[index]) },
             modifier = Modifier
                 .fillMaxWidth()
                 .padding(horizontal = Dimensions.paddingLarge)
