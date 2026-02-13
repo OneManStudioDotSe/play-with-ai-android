@@ -26,8 +26,10 @@ import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.Dp
-import androidx.compose.ui.unit.dp
 import se.onemanstudio.playaroundwithai.core.ui.theme.Dimensions
+import se.onemanstudio.playaroundwithai.core.ui.theme.disabledBackground
+import se.onemanstudio.playaroundwithai.core.ui.theme.disabledBorder
+import se.onemanstudio.playaroundwithai.core.ui.theme.disabledContent
 import se.onemanstudio.playaroundwithai.core.ui.theme.SofaAiTheme
 
 @Composable
@@ -44,12 +46,12 @@ fun NeoBrutalButton(
     val interactionSource = remember { MutableInteractionSource() }
     val isPressed by interactionSource.collectIsPressedAsState()
 
-    val shadowOffset = if (enabled) Dimensions.paddingSmall else 0.dp
-    val pressOffset = if (enabled) Dimensions.paddingSmall else 0.dp
+    val shadowOffset = if (enabled) Dimensions.paddingSmall else Dimensions.none
+    val pressOffset = if (enabled) Dimensions.paddingSmall else Dimensions.none
 
-    val activeBackgroundColor = if (enabled) backgroundColor else Color.LightGray
-    val activeContentColor = if (enabled) MaterialTheme.colorScheme.onSecondary else Color.DarkGray
-    val activeBorderColor = if (enabled) shadowColor else Color.Gray
+    val activeBackgroundColor = if (enabled) backgroundColor else disabledBackground
+    val activeContentColor = if (enabled) MaterialTheme.colorScheme.onSecondary else disabledContent
+    val activeBorderColor = if (enabled) shadowColor else disabledBorder
 
     Box(
         modifier = modifier
@@ -137,9 +139,9 @@ fun NeoBrutalIconButton(
     }
 }
 
-@Preview(name = "Light", showBackground = true, backgroundColor = 0xFFF8F8F8)
+@Preview(name = "Light")
 @Composable
-private fun NeoBrutalButtonPreview_Light() {
+private fun NeoBrutalButtonLightPreview() {
     SofaAiTheme {
         Column(
             modifier = Modifier
@@ -175,9 +177,9 @@ private fun NeoBrutalButtonPreview_Light() {
     }
 }
 
-@Preview(name = "Dark", showBackground = true, backgroundColor = 0xFF000000)
+@Preview(name = "Dark")
 @Composable
-private fun NeoBrutalButtonPreview_Dark() {
+private fun NeoBrutalButtonDarkPreview() {
     SofaAiTheme(darkTheme = true) {
         Column(
             modifier = Modifier

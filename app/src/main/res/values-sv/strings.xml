@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">Play With AI</string>
+    <string name="auth_error_message">Inloggningen misslyckades. Vissa funktioner kanske inte fungerar.</string>
+    <string name="auth_error_retry">Försök igen</string>
+</resources>

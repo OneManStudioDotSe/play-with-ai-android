@@ -14,9 +14,15 @@ import kotlinx.coroutines.test.advanceUntilIdle
 import kotlinx.coroutines.test.runTest
 import org.junit.Rule
 import org.junit.Test
-import se.onemanstudio.playaroundwithai.core.data.feature.chat.remote.dto.GeminiResponse
-import se.onemanstudio.playaroundwithai.core.data.feature.chat.repository.GeminiRepository
-import se.onemanstudio.playaroundwithai.core.data.model.Prompt
+import se.onemanstudio.playaroundwithai.core.domain.feature.chat.model.Prompt
+import se.onemanstudio.playaroundwithai.core.domain.feature.chat.repository.GeminiRepository
+import se.onemanstudio.playaroundwithai.core.domain.feature.chat.repository.PromptRepository
+import se.onemanstudio.playaroundwithai.core.domain.feature.chat.usecase.GenerateContentUseCase
+import se.onemanstudio.playaroundwithai.core.domain.feature.chat.usecase.GetFailedSyncCountUseCase
+import se.onemanstudio.playaroundwithai.core.domain.feature.chat.usecase.GetPromptHistoryUseCase
+import se.onemanstudio.playaroundwithai.core.domain.feature.chat.usecase.GetSuggestionsUseCase
+import se.onemanstudio.playaroundwithai.core.domain.feature.chat.usecase.GetSyncStateUseCase
+import se.onemanstudio.playaroundwithai.core.domain.feature.chat.usecase.SavePromptUseCase
 import se.onemanstudio.playaroundwithai.feature.chat.states.ChatError
 import se.onemanstudio.playaroundwithai.feature.chat.states.ChatUiState
 import se.onemanstudio.playaroundwithai.feature.chat.util.MainCoroutineRule
@@ -49,9 +55,8 @@ class ChatViewModelTest {
     fun `generateContent success updates state to Success`() = runTest {
         // Given
         val prompt = "What is the meaning of life?"
-        val fakeResponse = GeminiResponse(candidates = emptyList())
         val viewModel = createViewModel(
-            geminiResult = Result.success(fakeResponse)
+            generateContentResult = Result.success("Mocked AI response")
         )
         val states = mutableListOf<ChatUiState>()
 
@@ -66,7 +71,7 @@ class ChatViewModelTest {
         assertEquals(expected = ChatUiState.Initial, actual = states[0])
         assertEquals(expected = ChatUiState.Loading, actual = states[1])
         assert(states[2] is ChatUiState.Success)
-        assertEquals(expected = "No response text found.", actual = (states[2] as ChatUiState.Success).outputText)
+        assertEquals(expected = "Mocked AI response", actual = (states[2] as ChatUiState.Success).outputText)
     }
 
     @Test
@@ -75,7 +80,7 @@ class ChatViewModelTest {
         val prompt = "What is the meaning of life?"
         val exception = RuntimeException("Test error")
         val viewModel = createViewModel(
-            geminiResult = Result.failure(exception)
+            generateContentResult = Result.failure(exception)
         )
         val states = mutableListOf<ChatUiState>()
 
@@ -99,7 +104,7 @@ class ChatViewModelTest {
         val prompt = "Prompt that will be used for testing network errors"
         val exception = IOException("Oh no, no internet!")
         val viewModel = createViewModel(
-            geminiResult = Result.failure(exception)
+            generateContentResult = Result.failure(exception)
         )
         val states = mutableListOf<ChatUiState>()
 
@@ -137,8 +142,6 @@ class ChatViewModelTest {
     fun `init loads fallback suggestions on failure`() = runTest {
         // Given
         val failureResult = Result.failure<List<String>>(Exception("API Error"))
-        // These hardcoded strings must match what you put in ChatViewModel's onFailure block
-        val fallbackSuggestions = listOf("Tell me a joke", "Explain Quantum Physics", "Roast my code")
 
         val viewModel = createViewModel(
             suggestionsResult = failureResult
@@ -147,24 +150,71 @@ class ChatViewModelTest {
         // When
         advanceUntilIdle()
 
+        // Then - application.getString() returns "" for relaxed mock, so we get 3 empty strings
+        assertEquals(3, viewModel.suggestions.value.size)
+    }
+
+    @Test
+    fun `isSyncing reflects sync state use case`() = runTest {
+        // Given
+        val viewModel = createViewModel(isSyncingResult = true)
+
+        // When
+        val states = mutableListOf<Boolean>()
+        viewModel.isSyncing
+            .onEach { states.add(it) }
+            .launchIn(CoroutineScope(UnconfinedTestDispatcher(testScheduler)))
+        advanceUntilIdle()
+
         // Then
-        assertEquals(fallbackSuggestions, viewModel.suggestions.value)
+        assertEquals(expected = true, actual = states.last())
+    }
+
+    @Test
+    fun `isSyncing defaults to false when not syncing`() = runTest {
+        // Given
+        val viewModel = createViewModel(isSyncingResult = false)
+
+        // When
+        val states = mutableListOf<Boolean>()
+        viewModel.isSyncing
+            .onEach { states.add(it) }
+            .launchIn(CoroutineScope(UnconfinedTestDispatcher(testScheduler)))
+        advanceUntilIdle()
+
+        // Then
+        assertEquals(expected = false, actual = states.last())
     }
 
     private fun createViewModel(
-        geminiResult: Result<GeminiResponse>? = null,
+        generateContentResult: Result<String>? = null,
         suggestionsResult: Result<List<String>> = Result.success(emptyList()),
         promptHistoryResult: List<Prompt> = emptyList(),
+        isSyncingResult: Boolean = false,
+        failedSyncCountResult: Int = 0
     ): ChatViewModel {
-        val repository = mockk<GeminiRepository> {
-            geminiResult?.let { coEvery { generateContent(any(), any(), any(), any()) } returns it }
-            coEvery { generateSuggestions() } returns suggestionsResult
+        val geminiRepository = mockk<GeminiRepository> {
+            generateContentResult?.let { coEvery { generateContent(any(), any(), any(), any()) } returns it }
+            coEvery { generateConversationStarters() } returns suggestionsResult
+        }
+
+        val promptRepository = mockk<PromptRepository> {
             coEvery { savePrompt(any()) } returns Unit
             every { getPromptHistory() } returns flowOf(promptHistoryResult)
+            every { isSyncing() } returns flowOf(isSyncingResult)
+            every { getFailedSyncCount() } returns flowOf(failedSyncCountResult)
         }
 
         val application = mockk<Application>(relaxed = true)
 
-        return ChatViewModel(repository, application)
+        return ChatViewModel(
+            GenerateContentUseCase(geminiRepository),
+            GetSuggestionsUseCase(geminiRepository),
+            GetPromptHistoryUseCase(promptRepository),
+            GetSyncStateUseCase(promptRepository),
+            GetFailedSyncCountUseCase(promptRepository),
+            SavePromptUseCase(promptRepository),
+            application
+        )
     }
 }

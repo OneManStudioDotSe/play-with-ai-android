@@ -30,9 +30,9 @@ fun NeoBrutalCard(
     }
 }
 
-@Preview(name = "Light", showBackground = true, backgroundColor = 0xFFF8F8F8)
+@Preview(name = "Light")
 @Composable
-private fun NeoBrutalCardPreview_Light() {
+private fun NeoBrutalCardLightPreview() {
     SofaAiTheme {
         NeoBrutalCard(
             modifier = Modifier
@@ -56,9 +56,9 @@ private fun NeoBrutalCardPreview_Light() {
     }
 }
 
-@Preview(name = "Dark", showBackground = true, backgroundColor = 0xFF000000)
+@Preview(name = "Dark")
 @Composable
-private fun NeoBrutalCardPreview_Dark() {
+private fun NeoBrutalCardDarkPreview() {
     SofaAiTheme(darkTheme = true) {
         NeoBrutalCard(
             modifier = Modifier

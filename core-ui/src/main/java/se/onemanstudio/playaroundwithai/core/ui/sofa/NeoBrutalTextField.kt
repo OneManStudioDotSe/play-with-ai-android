@@ -10,7 +10,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.input.TextFieldValue
 import androidx.compose.ui.tooling.preview.Preview
-import androidx.compose.ui.unit.dp
+import se.onemanstudio.playaroundwithai.core.ui.theme.Alphas
 import se.onemanstudio.playaroundwithai.core.ui.theme.Dimensions
 import se.onemanstudio.playaroundwithai.core.ui.theme.SofaAiTheme
 
@@ -42,19 +42,19 @@ fun NeoBrutalTextField(
         if (value.text.isEmpty()) {
             Text(
                 text = placeholder,
-                style = MaterialTheme.typography.bodyLarge,
-                color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.5f),
+                style = MaterialTheme.typography.bodySmall,
+                color = MaterialTheme.colorScheme.onSurface.copy(alpha = Alphas.medium),
                 modifier = Modifier
                     .padding(Dimensions.paddingLarge)
-                    .padding(start = 2.dp) // Slight adjustment to align with cursor
+                    .padding(start = Dimensions.paddingExtraSmall) // Slight adjustment to align with cursor
             )
         }
     }
 }
 
-@Preview(name = "Light Mode")
+@Preview(name = "Light")
 @Composable
-private fun TextFieldPreviewLight() {
+private fun NeoBrutalTextFieldLightPreview() {
     SofaAiTheme(darkTheme = false) {
         NeoBrutalTextField(
             value = TextFieldValue(""),
@@ -64,9 +64,9 @@ private fun TextFieldPreviewLight() {
     }
 }
 
-@Preview(name = "Dark Mode")
+@Preview(name = "Dark")
 @Composable
-private fun TextFieldPreviewDark() {
+private fun NeoBrutalTextFieldDarkPreview() {
     SofaAiTheme(darkTheme = true) {
         NeoBrutalTextField(
             value = TextFieldValue("User Input"),

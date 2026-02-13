@@ -1,9 +1,8 @@
 package se.onemanstudio.playaroundwithai.feature.chat.views
 
+import androidx.compose.foundation.ScrollState
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.wrapContentHeight
-import androidx.compose.foundation.rememberScrollState
-import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
@@ -19,36 +18,47 @@ import kotlinx.coroutines.delay
 import se.onemanstudio.playaroundwithai.core.ui.theme.SofaAiTheme
 
 const val TYPING_DELAY = 10L
+private const val SCROLL_BOTTOM_THRESHOLD = 10
 
 @Composable
 fun TypewriterText(
     modifier: Modifier = Modifier,
-    text: String
+    text: String,
+    scrollState: ScrollState? = null
 ) {
     var displayedText by remember { mutableStateOf("") }
 
     LaunchedEffect(key1 = text) {
         displayedText = ""
         text.forEach { char ->
+            val wasAtBottom = scrollState?.let { 
+                // Using a small threshold (e.g., 10px) to handle precision issues
+                it.value >= it.maxValue - SCROLL_BOTTOM_THRESHOLD
+            } ?: false
+
             displayedText += char
             delay(TYPING_DELAY)
+            
+            // Only auto-scroll if we were already at the bottom or if it's the very first scroll
+            if (scrollState != null && (wasAtBottom || scrollState.maxValue == 0)) {
+                scrollState.animateScrollTo(scrollState.maxValue)
+            }
         }
     }
 
     Text(
         modifier = modifier
             .fillMaxWidth()
-            .wrapContentHeight()
-            ,
+            .wrapContentHeight(),
         text = displayedText,
         style = MaterialTheme.typography.bodyLarge,
         color = MaterialTheme.colorScheme.onSurface
     )
 }
 
-@Preview(showBackground = true, name = "Static Style Preview")
+@Preview(name = "Static")
 @Composable
-internal fun TypewriterText_StaticPreview() {
+private fun TypewriterTextStaticPreview() {
     SofaAiTheme {
         Surface {
             Text(
@@ -64,9 +74,9 @@ internal fun TypewriterText_StaticPreview() {
  * Interactive preview to see the animation in action.
  * Click the "Start Interactive Mode" button in the Android Studio preview pane to run it.
  */
-@Preview(showBackground = true, name = "Interactive Animation Preview")
+@Preview(name = "Interactive")
 @Composable
-internal fun TypewriterText_InteractivePreview() {
+private fun TypewriterTextInteractivePreview() {
     SofaAiTheme {
         Surface {
             TypewriterText(text = "Hello, this text will type out one letter at a time...")

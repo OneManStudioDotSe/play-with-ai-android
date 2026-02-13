@@ -10,8 +10,8 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.input.TextFieldValue
 import androidx.compose.ui.tooling.preview.Preview
-import se.onemanstudio.playaroundwithai.core.data.AnalysisType
-import se.onemanstudio.playaroundwithai.core.data.InputMode
+import se.onemanstudio.playaroundwithai.core.domain.feature.chat.model.AnalysisType
+import se.onemanstudio.playaroundwithai.core.domain.feature.chat.model.InputMode
 import se.onemanstudio.playaroundwithai.core.ui.sofa.NeoBrutalCard
 import se.onemanstudio.playaroundwithai.core.ui.theme.Dimensions
 import se.onemanstudio.playaroundwithai.core.ui.theme.SofaAiTheme
@@ -21,6 +21,7 @@ fun ChatInputArea(
     inputMode: InputMode,
     textState: TextFieldValue,
     suggestions: List<String>,
+    isSuggestionsLoading: Boolean,
     selectedImageUri: Uri?,
     selectedFileName: String?,
     analysisType: AnalysisType,
@@ -59,6 +60,7 @@ fun ChatInputArea(
                 textState = textState,
                 inputMode = inputMode,
                 suggestions = suggestions,
+                isSuggestionsLoading = isSuggestionsLoading,
                 onModeChange = onModeChange,
                 onTextChanged = onTextChanged,
                 onChipClicked = onChipClicked,
@@ -69,14 +71,15 @@ fun ChatInputArea(
     }
 }
 
-@Preview
+@Preview(name = "Text Mode")
 @Composable
-fun ChatInputAreaForTextPreview() {
+private fun ChatInputAreaTextModePreview() {
     SofaAiTheme {
         ChatInputArea(
             inputMode = InputMode.TEXT,
             textState = TextFieldValue("What is the meaning of life?"),
             suggestions = listOf("Tell me a joke", "Explain Quantum Physics", "Roast my code"),
+            isSuggestionsLoading = false,
             selectedImageUri = null,
             selectedFileName = null,
             analysisType = AnalysisType.LOCATION,
@@ -92,14 +95,15 @@ fun ChatInputAreaForTextPreview() {
     }
 }
 
-@Preview
+@Preview(name = "Image Mode")
 @Composable
-fun ChatInputAreaForImagePreview() {
+private fun ChatInputAreaImageModePreview() {
     SofaAiTheme {
         ChatInputArea(
             inputMode = InputMode.IMAGE,
             textState = TextFieldValue("What do you see at this image?"),
             suggestions = listOf("Tell me a joke", "Explain Quantum Physics", "Roast my code"),
+            isSuggestionsLoading = false,
             selectedImageUri = null,
             selectedFileName = null,
             analysisType = AnalysisType.LOCATION,
@@ -115,14 +119,15 @@ fun ChatInputAreaForImagePreview() {
     }
 }
 
-@Preview
+@Preview(name = "Document Mode")
 @Composable
-fun ChatInputAreaForDocumentPreview() {
+private fun ChatInputAreaDocumentModePreview() {
     SofaAiTheme {
         ChatInputArea(
             inputMode = InputMode.DOCUMENT,
             textState = TextFieldValue("Summarize this document in a funny way"),
             suggestions = listOf("Tell me a joke", "Explain Quantum Physics", "Roast my code"),
+            isSuggestionsLoading = false,
             selectedImageUri = null,
             selectedFileName = null,
             analysisType = AnalysisType.LOCATION,

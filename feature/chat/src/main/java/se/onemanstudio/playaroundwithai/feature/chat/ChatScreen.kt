@@ -1,10 +1,12 @@
+@file:Suppress("AssignedValueIsNeverRead")
+
 package se.onemanstudio.playaroundwithai.feature.chat
 
 import android.content.Context
+import android.content.Intent
 import android.net.Uri
 import android.provider.OpenableColumns
 import androidx.activity.compose.rememberLauncherForActivityResult
-import androidx.activity.result.PickVisualMediaRequest
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
@@ -23,6 +25,7 @@ import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Clear
 import androidx.compose.material.icons.filled.History
+import androidx.compose.material.icons.filled.Sync
 import androidx.compose.material.icons.rounded.BrokenImage
 import androidx.compose.material.icons.rounded.Description
 import androidx.compose.material.icons.rounded.Lock
@@ -32,9 +35,12 @@ import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
+import androidx.compose.material3.SnackbarDuration
+import androidx.compose.material3.SnackbarHost
+import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -48,8 +54,9 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.input.TextFieldValue
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
-import se.onemanstudio.playaroundwithai.core.data.AnalysisType
-import se.onemanstudio.playaroundwithai.core.data.InputMode
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import se.onemanstudio.playaroundwithai.core.domain.feature.chat.model.AnalysisType
+import se.onemanstudio.playaroundwithai.core.domain.feature.chat.model.InputMode
 import se.onemanstudio.playaroundwithai.core.ui.sofa.NeoBrutalIconButton
 import se.onemanstudio.playaroundwithai.core.ui.sofa.NeoBrutalTopAppBar
 import se.onemanstudio.playaroundwithai.core.ui.theme.Dimensions
@@ -66,13 +73,15 @@ import se.onemanstudio.playaroundwithai.feature.chat.views.history.HistoryBottom
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun ChatScreen(viewModel: ChatViewModel) {
-    val uiState by viewModel.uiState.collectAsState()
-    val suggestions by viewModel.suggestions.collectAsState()
+    val uiState by viewModel.uiState.collectAsStateWithLifecycle()
+    val suggestions by viewModel.suggestions.collectAsStateWithLifecycle()
+    val isSuggestionsLoading by viewModel.isSuggestionsLoading.collectAsStateWithLifecycle()
     var textState by remember { mutableStateOf(TextFieldValue("")) }
     val keyboardController = LocalSoftwareKeyboardController.current
 
-    val isSheetOpen by viewModel.isSheetOpen.collectAsState()
-    val history by viewModel.promptHistory.collectAsState()
+    val isSheetOpen by viewModel.isSheetOpen.collectAsStateWithLifecycle()
+    val history by viewModel.promptHistory.collectAsStateWithLifecycle()
+    val isSyncing by viewModel.isSyncing.collectAsStateWithLifecycle()
 
     var inputMode by remember { mutableStateOf(InputMode.TEXT) }
     var selectedImageUri by remember { mutableStateOf<Uri?>(null) }
@@ -81,23 +90,55 @@ fun ChatScreen(viewModel: ChatViewModel) {
 
     val context = LocalContext.current
     val selectedFileName = remember(selectedFileUri) { selectedFileUri?.let { getFileName(context, it) } }
+    val snackbarHostState = remember { SnackbarHostState() }
 
+    LaunchedEffect(Unit) {
+        viewModel.syncFailureEvent.collect { failedCount ->
+            snackbarHostState.showSnackbar(
+                message = context.getString(R.string.sync_failed_snackbar, failedCount),
+                duration = SnackbarDuration.Long
+            )
+        }
+    }
+
+    // Use OpenDocument instead of PickVisualMedia to allow access to Downloads and other folders
     val imagePickerLauncher = rememberLauncherForActivityResult(
-        contract = ActivityResultContracts.PickVisualMedia(),
-        onResult = { uri -> selectedImageUri = uri }
+        contract = ActivityResultContracts.OpenDocument(),
+        onResult = { uri ->
+            uri?.let {
+                context.contentResolver.takePersistableUriPermission(
+                    it,
+                    Intent.FLAG_GRANT_READ_URI_PERMISSION
+                )
+                selectedImageUri = it
+            }
+        }
     )
 
     val documentPickerLauncher = rememberLauncherForActivityResult(
         contract = ActivityResultContracts.OpenDocument(),
-        onResult = { uri -> selectedFileUri = uri }
+        onResult = { uri ->
+            uri?.let {
+                context.contentResolver.takePersistableUriPermission(
+                    it,
+                    Intent.FLAG_GRANT_READ_URI_PERMISSION
+                )
+                selectedFileUri = it
+            }
+        }
     )
+
+    val allMimeType = stringResource(R.string.mime_type_all)
 
     if (isSheetOpen) {
         HistoryBottomSheet(
             history = history,
             onDismissRequest = { viewModel.closeHistorySheet() },
             onHistoryItemClick = { selectedText ->
-                textState = TextFieldValue(selectedText)
+                val question = selectedText
+                    .removePrefix("Q: ")
+                    .substringBefore("\nA: ")
+                textState = TextFieldValue(question)
                 viewModel.closeHistorySheet()
                 keyboardController?.hide()
             }
@@ -106,10 +147,19 @@ fun ChatScreen(viewModel: ChatViewModel) {
 
     Scaffold(
         containerColor = MaterialTheme.colorScheme.background,
+        snackbarHost = { SnackbarHost(hostState = snackbarHostState) },
         topBar = {
             NeoBrutalTopAppBar(
                 title = stringResource(R.string.let_s_talk),
                 actions = {
+                    if (isSyncing) {
+                        NeoBrutalIconButton(
+                            imageVector = Icons.Default.Sync,
+                            contentDescription = stringResource(R.string.label_syncing),
+                            backgroundColor = MaterialTheme.colorScheme.secondary,
+                            onClick = {},
+                        )
+                    }
                     NeoBrutalIconButton(
                         imageVector = Icons.Default.History,
                         contentDescription = stringResource(R.string.label_prompt_history),
@@ -124,6 +174,7 @@ fun ChatScreen(viewModel: ChatViewModel) {
                 inputMode = inputMode,
                 textState = textState,
                 suggestions = suggestions,
+                isSuggestionsLoading = isSuggestionsLoading,
                 selectedImageUri = selectedImageUri,
                 selectedFileName = selectedFileName,
                 analysisType = analysisType,
@@ -139,11 +190,8 @@ fun ChatScreen(viewModel: ChatViewModel) {
                 onClearFile = { selectedFileUri = null },
                 onAttachClicked = {
                     when (inputMode) {
-                        InputMode.IMAGE -> imagePickerLauncher.launch(
-                            PickVisualMediaRequest(ActivityResultContracts.PickVisualMedia.ImageOnly)
-                        )
-
-                        InputMode.DOCUMENT -> documentPickerLauncher.launch(arrayOf("*/*"))
+                        InputMode.IMAGE -> imagePickerLauncher.launch(arrayOf("image/*"))
+                        InputMode.DOCUMENT -> documentPickerLauncher.launch(arrayOf(allMimeType))
                         InputMode.TEXT -> {}
                     }
                 },
@@ -183,16 +231,19 @@ private fun ContentState(
     state: ChatUiState.Success,
     onClearResponse: () -> Unit,
 ) {
+    val scrollState = rememberScrollState()
+    
     Box(modifier = Modifier.padding(Dimensions.paddingLarge)) {
         Box(
             modifier = Modifier
                 .padding(top = Dimensions.paddingExtraLarge)
                 .fillMaxSize()
-                .verticalScroll(rememberScrollState())
+                .verticalScroll(scrollState)
         ) {
             TypewriterText(
                 modifier = Modifier.align(Alignment.TopStart),
-                text = state.outputText
+                text = state.outputText,
+                scrollState = scrollState
             )
         }
 
@@ -284,35 +335,37 @@ fun getFileName(context: Context, uri: Uri): String? {
     return fileName
 }
 
-@Preview(name = "Content State - Light", showBackground = true)
+@Preview(name = "Content Light")
 @Composable
-private fun ContentStatePreview_Light() {
+private fun ContentStateLightPreview() {
+    val outputText = stringResource(R.string.preview_chat_response_light)
     SofaAiTheme(darkTheme = false) {
         ContentState(
             state = ChatUiState.Success(
-                outputText = "Here is a sample response from the AI."
+                outputText = outputText
             ),
             onClearResponse = {}
         )
     }
 }
 
-@Preview(name = "Content State - Dark", showBackground = true, backgroundColor = 0xFF121212)
+@Preview(name = "Content Dark")
 @Composable
-private fun ContentStatePreview_Dark() {
+private fun ContentStateDarkPreview() {
+    val outputText = stringResource(R.string.preview_chat_response_dark)
     SofaAiTheme(darkTheme = true) {
         ContentState(
             state = ChatUiState.Success(
-                outputText = "This is the dark mode version. Notice how the surface color and text contrast adapts"
+                outputText = outputText
             ),
             onClearResponse = {}
         )
     }
 }
 
-@Preview(name = "Error State - Light", showBackground = true)
+@Preview(name = "Error Light")
 @Composable
-private fun ErrorStatePreview_Light() {
+private fun ErrorStateLightPreview() {
     SofaAiTheme(darkTheme = false) {
         // Mocking an Error state (assuming your Error state takes a string or similar)
         // If your 'error' property is a specific Enum or Object, pass that instance here.
@@ -323,9 +376,9 @@ private fun ErrorStatePreview_Light() {
     }
 }
 
-@Preview(name = "Error State - Dark", showBackground = true, backgroundColor = 0xFF121212)
+@Preview(name = "Error Dark")
 @Composable
-private fun ErrorStatePreview_Dark() {
+private fun ErrorStateDarkPreview() {
     SofaAiTheme(darkTheme = true) {
         ErrorState(
             state = ChatUiState.Error(error = ChatError.Permission),

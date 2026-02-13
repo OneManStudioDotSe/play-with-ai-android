@@ -14,13 +14,15 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import se.onemanstudio.playaroundwithai.core.data.model.Prompt
+import se.onemanstudio.playaroundwithai.core.domain.feature.chat.model.Prompt
 import se.onemanstudio.playaroundwithai.core.ui.sofa.NeoBrutalCard
 import se.onemanstudio.playaroundwithai.core.ui.theme.Dimensions
 import se.onemanstudio.playaroundwithai.core.ui.theme.SofaAiTheme
+import se.onemanstudio.playaroundwithai.feature.chat.R
 import java.text.SimpleDateFormat
 import java.util.Date
 import java.util.Locale
@@ -31,7 +33,9 @@ fun HistoryItemCard(
     prompt: Prompt,
     onClick: (String) -> Unit
 ) {
-    val dateFormatter = SimpleDateFormat("MMM dd, yyyy 'at' HH:mm", Locale.getDefault())
+    val dateFormat = stringResource(R.string.date_format_history)
+    val timeFormat = stringResource(R.string.time_format_history)
+    val dateAtTimePattern = stringResource(R.string.history_date_at)
 
     NeoBrutalCard(
         modifier = modifier
@@ -52,8 +56,11 @@ fun HistoryItemCard(
             Spacer(Modifier.height(Dimensions.paddingLarge))
 
             Row(verticalAlignment = Alignment.CenterVertically) {
+                val formattedDate = SimpleDateFormat(dateFormat, Locale.getDefault()).format(prompt.timestamp)
+                val formattedTime = SimpleDateFormat(timeFormat, Locale.getDefault()).format(prompt.timestamp)
+
                 Text(
-                    text = dateFormatter.format(Date(prompt.timestamp)),
+                    text = String.format(dateAtTimePattern, formattedDate, formattedTime),
                     style = MaterialTheme.typography.labelMedium,
                     color = MaterialTheme.colorScheme.primary,
                     fontWeight = FontWeight.Bold
@@ -64,15 +71,15 @@ fun HistoryItemCard(
 }
 
 
-@Preview(name = "Light - Short Text", showBackground = true, backgroundColor = 0xFFF8F8F8)
+@Preview(name = "Light - Short Text")
 @Composable
-private fun HistoryItemCardPreview_ShortText() {
+private fun HistoryItemCardShortTextPreview() {
     SofaAiTheme {
         HistoryItemCard(
             prompt = Prompt(
                 id = 1,
                 text = "What is neo-brutalism?",
-                timestamp = System.currentTimeMillis() - 1000 * 60 * 5 // 5 minutes ago
+                timestamp = Date(System.currentTimeMillis() - 1000 * 60 * 5) // 5 minutes ago
             ),
             onClick = {},
             modifier = Modifier.padding(Dimensions.paddingLarge)
@@ -80,15 +87,15 @@ private fun HistoryItemCardPreview_ShortText() {
     }
 }
 
-@Preview(name = "Dark - Long Text", showBackground = true, backgroundColor = 0xFF000000)
+@Preview(name = "Dark - Long Text")
 @Composable
-private fun HistoryItemCardPreview_LongText() {
+private fun HistoryItemCardLongTextPreview() {
     SofaAiTheme(darkTheme = true) {
         HistoryItemCard(
             prompt = Prompt(
                 id = 2,
                 text = "Can you please give me a very detailed and long explanation of how Jetpack Compose works?",
-                timestamp = System.currentTimeMillis() - 1000 * 60 * 60 * 24 * 3 // 3 days ago
+                timestamp = Date(System.currentTimeMillis() - 1000 * 60 * 60 * 24 * 3) // 3 days ago
             ),
             onClick = {},
             modifier = Modifier.padding(Dimensions.paddingLarge)
@@ -96,15 +103,15 @@ private fun HistoryItemCardPreview_LongText() {
     }
 }
 
-@Preview(name = "Constrained Width", showBackground = true)
+@Preview(name = "Constrained Width")
 @Composable
-private fun HistoryItemCardPreview_Constrained() {
+private fun HistoryItemCardConstrainedPreview() {
     SofaAiTheme {
         HistoryItemCard(
             prompt = Prompt(
                 id = 3,
                 text = "This is a prompt that should be long enough to wrap or truncate when the width is constrained.",
-                timestamp = System.currentTimeMillis() - 1000 * 60 * 60
+                timestamp = Date(System.currentTimeMillis() - 1000 * 60 * 60)
             ),
             onClick = {},
             modifier = Modifier

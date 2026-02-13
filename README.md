@@ -2,111 +2,104 @@
 
 Welcome to my showcase app. Here you can see and dig deep into my preferred way of working. 
 
-My approach is a holistic one: Work in a clean, simple and scalable way that spans beyond the basic coding. 
-I look at every project from all the angles that matter:
-- Coding
-- Design
-- Performance
-- Scalability
+Think of this as my digital sandbox—a place where serious Android engineering shakes hands with a slightly sassy 'AI Overlord.' 
+Whether you're chatting with Gemini, analyzing documents, or scouting for scooters on the map, this app is built to show how the 
+latest tech can be both powerful and surprisingly fun. 🚀
+
+My approach is a holistic one: Work in a clean, simple and scalable way that spans beyond the basic coding. These are my principles:
+- Simple coding
+- Consistent design
+- Two-way performance
+- Meaningful scalability
 - Future-proofing
-- The little extra
+- Those little extra things
 
-## Coding
+## Simple coding
 I strive to write code that is clean, easy to understand and follows a cohesive and logical way of doing things.
-I use the latest and  greatest of programming guidelines when it comes to Android so expect to see Compose, Kotlin, 
-coroutines, MVVM and clean architecture. Consistent naming of files and variable, proper structure of folders and 
-properly indented and lean code are crucial as well.
+I use the latest and greatest of programming guidelines when it comes to Android:
+- **Clean Architecture**: Separation of concerns with layers that contain the logic and functionality that they are supposed to contain
+- **MVVM**: Decoupled UI logic using ViewModels
+- **Lifecycle awareness**: Efficient state collection to optimize resource consumption
+- **Kotlin coroutines**: Manage asynchronous tasks with structured concurrency
+- **Consistent naming**: Established naming conventions for files, variables, and resources
 
-## Design
-In the year 2025, an app should not be just screens with lists and details but it should also communicate an "air" 
-of personality. For that reason, every one of my apps, including this one has its own little design system that I 
-use consistently across it. A whole suite of custom fonts, text styles, color palette and UI components are utilized
-at the app in order to show the importance of a consistent design system and the modern ways to use such. Of course, 
-the whole DS is plug-n-play meaning that it is very straigh-forward to update or change it completely, indicating the
-importance of a modular codebase.
+## Consistent design
+Nowadays, an app should not be just screens with lists and details, but it should also communicate an "air" 
+of personality. For that reason, every one of my apps, including this one, has its own little design system that I 
+use consistently across it. A complete suite of custom fonts, text styles, color palette and UI components are utilized
+at the app in order to show the importance of a consistent design system and the modern way to use it. The whole DS is plug-n-play 
+meaning that it is straightforward to update or change it completely, further showing the importance of a modular codebase.
 
-## Performance
-Apart from how an app looks and feels, it is equally important for it to work smoothly and efficiently. For that 
-reason, I optimize my code to use the optimal amount of memory, avoid memory leaks, make the most out of DI, avoid 
-unnecessary libraries or permissions and "weigh" just as much as it is needed. Performance though is not only at the 
-user level but also at the developer experience, so for that, I organize the project into modules, based on the 
-functionality they hold. The modularity of the project results in optimized build times as every consequent build doesn't
-require the full build of the project 
+## Two-way performance
+Apart from how an app looks and feels, it is equally important for it to work smoothly and efficiently, both during the development and
+when the user is interacting with it. For these reasons, I follow the principles below:
+- **Compose stability**: Optimize Composables for performance by utilizing `@Immutable` UI states to minimize unnecessary recompositions
+- **Modularity**: The project is organized into modules to optimize build times and enforce clear boundaries
+- **Resource management**: Avoid memory leaks by making the most out of DI and stay away from unnecessary libraries or permissions
 
-## Scalability
+## Meaningful scalability
 Projects on Android Studio have the tendency to grow as time goes by, therefore a scalable approach to the project's 
-structure is necessary in order to keep the developer experience and maintanability of the project possible. For that
-reason, breaking a big monolith of a project into smaller modules that each one focus on one and only thing is a desired 
-approch so we don't end up with a tangled mess of a project.
-In this showcase project you can see that I have 3 core modules:
--core-data', which contains the data layer of the app that is responsible for handling data that exist at remote or local locations
--'core-theme', which contains the theme and design language of the app
--'core-ui', which contains the ui components that are specific to the theme (called 'SoFa' in this case) and other views I use
+structure is necessary in order to keep the developer experience and maintainability possible. 
+In this showcase project you can see a highly modular structure that can scale upon demand, regardless of team constellation or size: 
+- **`:core-domain`**: Pure Kotlin module holding business logic, domain models, and repository definitions
+- **`:core-data`**: Implementation of repositories, handling remote (Gemini AI) and local (Room) data sources
+- **`:core-theme`**: Centralized theme and design language (colors, typography, etc.)
+- **`:core-ui`**: Reusable UI components specific to the 'SoFa' design system
+- **`:feature:chat`**: Feature module for the AI interaction experience
+- **`:feature:map`**: Feature module for location-based services and route visualization
 
-There is also a module of modules called 'feature', inside which resides a module called 'chat' which holds the core
-functionality of the project. The idea is that every potential feature would live inside that module on its own place, 
-using only the dependencies that it needs. Such a project structure makes it much easier for multiple teams to work on the
-project, without worrying about steping on each other's code or dealing with endless git conflicts at the PRs.
+This structure allows potentially multiple teams to work on separate features without conflicts and ensures that each module only depends 
+on what it absolutely needs.
 
 ## Future-proofing
-An android app or project is in most cases part of a larger ecosystem where automations take place right in the form of 
-automated scripts, CI/CD, publishing and report generation. To illustrate the consideration of these steps, I have also 
-added support for running some basic maintenance and quality-of-code-related scripts when a PR is opened towards the 
-develop branch of this project. This makes sure that all future development will abide to the team's or company's 
-pipelines and will not break future releases.
+An android app or project is usually part of a larger ecosystem where automations take place in the form of automated scripts, 
+CI/CD pipelines, publishing and report generation. To illustrate the consideration of these steps, I have also added support for running 
+scripts for some basic maintenance and code quality when a PR is opened. This makes sure that all future development will abide to the
+team's or company's pipelines and will not break future releases.
 
 ## The little extra
-To differentiate myself from the rest of the Android Engineers out there, I do the "little extra" that adds a nice layer
-of polishing on my apps. Things like a custom app icon, this README, a splash screen at the app and a few animations here
-are there, a11y, localization, are all things that I considerable valuable as they can separate a generic app from a nice
-app. Enjoy!
+To differentiate myself from the rest of the Android Engineers out there, I do the "little extra" that adds a nice layer of polishing:
+- **Localization**: No hard-coded strings, giving an app ready for localization
+- **A11y**: Proper semantics, localized content descriptions and support for dynamic font sizes
+- **UX polish**: Smooth animations, easy-to-eye transitions and visual treats here and there
+- **Personality**: A unique "AI Overlord" persona for the assistant to make interactions more engaging
 
+## Architecture Highlights
 
-Core Functionality:
-The central part of the app is a chat screen where users can send prompts to an AI and view the generated responses.
-Users can also provide images and documents as input to the AI for analysis.
-The app keeps a history of the prompts you've used, which you can easily access and reuse.
+Beyond the high-level patterns, the project incorporates several notable architectural decisions worth highlighting:
+
+### Local-first data with background sync
+Prompt history follows a local-first strategy. Every prompt is immediately persisted to Room with a `Pending` sync status, ensuring the user never loses data regardless of connectivity. A `SyncWorker` (WorkManager) picks up pending entries when the network becomes available, uploads them to Firestore, and marks them as `Synced`. Failed uploads are retried up to 3 times before being marked as `Failed`. The sync job runs with `ExistingWorkPolicy.REPLACE` to avoid duplicate work and requires a `NetworkType.CONNECTED` constraint.
+
+### Dynamic configuration via Hilt qualifiers
+API keys, base URLs, and logging levels are injected at runtime through custom Hilt qualifiers (`@GeminiApiKey`, `@BaseUrl`, `@LoggingLevel`). A `ConfigurationModule` reads values from `BuildConfig`, which in turn are sourced from `local.properties` per build variant. This means switching between debug (verbose logging, debug API key) and release (no logging, production key) requires zero code changes — the DI graph handles it automatically.
+
+### Immutable UI state with Kotlinx Immutable Collections
+All UI state classes are annotated with `@Immutable` and use `PersistentList`/`PersistentSet` from kotlinx-collections-immutable. This guarantees that Compose can skip recompositions when state references haven't changed, resulting in measurably fewer recomposition cycles compared to using standard mutable collections.
+
+### Image processing pipeline
+Before reaching the Gemini API, images go through a multi-step pipeline: URI → Bitmap decoding (via `ImageDecoder`) → aspect-ratio-preserving downscale to max 768px → JPEG compression at 77% quality → Base64 encoding. This keeps payload sizes reasonable while preserving enough detail for the AI model to analyze.
+
+### OkHttp interceptor chain
+Network requests pass through a custom `AuthenticationInterceptor` that appends the API key as a query parameter, followed by an `HttpLoggingInterceptor` whose verbosity level is injected via DI — full body logging in debug, no logging in release. Timeouts are set to 30 seconds for connect, read, and write.
+
+### Mapper layer between data and domain
+Data transfer objects (DTOs) and Room entities are mapped to domain models through dedicated extension functions (`toDomain()`, `toEntity()`). This keeps the domain layer free of serialization annotations and database concerns, allowing it to remain a pure Kotlin module with no Android or framework dependencies.
+
+### Fake API service for development
+The map feature uses a `FakeMapApiService` that implements the same `MapApiService` interface as a real implementation would. It simulates network latency with a 1.5-second delay and generates randomized vehicle data near Stockholm. Swapping this for a real backend requires only changing the DI binding — no feature code needs to change.
+
+### Dynamic theme for the map
+The styling of the map changes depending on the light or dark mode that the app is using
+
+Core functionality:
+- **AI Chat**: Send prompts to an AI (Gemini) with support for image and document attachments
+- **Smart History**: Access and reuse previous prompts stored locally
+- **Map Interaction**: Discover and filter locations (scooters/bikes) with optimal route calculation
 
 Technical Details:
-The user interface is built entirely with Jetpack Compose, the go-to toolkit for building native Android UI.
-It uses the popular MVVM (Model-View-ViewModel) architecture pattern, which separates the UI from the business logic.
-It relies on Kotlin Coroutines for managing background tasks like making network requests to the AI service.
-It uses Retrofit and OkHttp, the standard libraries for making network calls in modern Android development.
-It is using Hilt for dependency injection, which helps in managing the dependencies between different parts of the application.
-It uses the Coil library to load and display images efficiently.
-It utilizes Room for storing data locally on the device, for the chat history.
-
-## Project Enhancement Roadmap
-
-### Add unit tests
-[ ] Write unit tests for your `ViewModels` and `Repositories`
-[ ] Write UI tests for your Jetpack Compose screens
-[ ] Create tests for critical user flows (integration tests)
-
-
-### Implement a scalable design system
-[x] Create a custom theme in a `:core:theme` module
-[x] Build a library of custom Composables for your app
-[x] Implement a dark theme and consider dynamic theming
-
-
-### Refactor to a modular architecture
-[x] Create modules like `:app`, `:core:ui`, `:core:data`, `:core:model`, `:core:domain`, `:feature:chat`, and `:feature:history`.
-
-
-### Handle Edge Cases and Errors Gracefully
-[ ] Show loading indicators where needed
-[ ] Implement a clear error handling strategy and handle errors at the UI
-[ ] Handle invalid user input
-
-
-### Tackle advanced technical challenges
-[ ] Streaming AI Responses: Stream the AI response to the UI
-[ ] Offline Support: Provide a robust offline experience using Room
-[ ] Improve Accessibility: Add content descriptions, ensure proper focus order, and check touch target sizes
-[x] Add support for detekt
-
- 
-### Automate with CI/CD and support static analysis
-[x] Set up a CI/CD pipeline using GitHub Actions.
-[x] Static Analysis: Integrate `ktlint` and `detekt`.
+- **Jetpack Compose**: Native Android UI
+- **Hilt**: Dependency Injection
+- **Retrofit & OkHttp**: Networking
+- **Room**: Local persistence
+- **Firebase**: Realtime Database, authentication, and storage

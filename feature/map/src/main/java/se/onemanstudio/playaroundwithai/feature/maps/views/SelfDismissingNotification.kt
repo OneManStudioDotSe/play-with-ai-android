@@ -31,6 +31,7 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import kotlinx.coroutines.delay
 import se.onemanstudio.playaroundwithai.core.ui.sofa.neoBrutalism
+import se.onemanstudio.playaroundwithai.core.ui.theme.Alphas
 import se.onemanstudio.playaroundwithai.core.ui.theme.Dimensions
 import se.onemanstudio.playaroundwithai.core.ui.theme.SofaAiTheme
 import se.onemanstudio.playaroundwithai.feature.map.R
@@ -89,17 +90,17 @@ fun SelfDismissingNotification(
                 progress = { progress },
                 modifier = Modifier
                     .fillMaxWidth()
-                    .height(4.dp),
+                    .height(Dimensions.heightMini),
                 color = MaterialTheme.colorScheme.error,
-                trackColor = MaterialTheme.colorScheme.surface.copy(alpha = 0.3f),
+                trackColor = MaterialTheme.colorScheme.surface.copy(alpha = Alphas.extraLow),
             )
         }
     }
 }
 
-@Preview
+@Preview(name = "Default")
 @Composable
-fun SelfDismissingNotificationPreview() {
+private fun SelfDismissingNotificationDefaultPreview() {
     SofaAiTheme {
         SelfDismissingNotification(
             message = "Location services are disabled.",
@@ -108,9 +109,9 @@ fun SelfDismissingNotificationPreview() {
     }
 }
 
-@Preview
+@Preview(name = "Long Message")
 @Composable
-fun SelfDismissingNotificationPreview_LongMessage() {
+private fun SelfDismissingNotificationLongMessagePreview() {
     SofaAiTheme {
         SelfDismissingNotification(
             message = "This is a much longer notification message to see how the layout handles more text.",

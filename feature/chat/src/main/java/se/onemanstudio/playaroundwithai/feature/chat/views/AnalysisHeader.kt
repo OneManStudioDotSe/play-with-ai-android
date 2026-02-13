@@ -1,6 +1,5 @@
 package se.onemanstudio.playaroundwithai.feature.chat.views
 
-import android.content.res.Configuration
 import android.net.Uri
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
@@ -36,7 +35,7 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import coil.compose.AsyncImage
-import se.onemanstudio.playaroundwithai.core.data.AnalysisType
+import se.onemanstudio.playaroundwithai.core.domain.feature.chat.model.AnalysisType
 import se.onemanstudio.playaroundwithai.core.ui.theme.Dimensions
 import se.onemanstudio.playaroundwithai.core.ui.theme.SofaAiTheme
 import se.onemanstudio.playaroundwithai.feature.chat.R
@@ -64,7 +63,7 @@ fun AnalysisHeader(
             onExpandedChange = { isDropdownExpanded = it }
         ) {
             OutlinedTextField(
-                value = analysisType.displayName,
+                value = stringResource(id = analysisType.asStringRes()),
                 colors = ExposedDropdownMenuDefaults.outlinedTextFieldColors(
                     focusedBorderColor = MaterialTheme.colorScheme.onSurface,
                     unfocusedBorderColor = MaterialTheme.colorScheme.onSurface
@@ -83,7 +82,7 @@ fun AnalysisHeader(
             ) {
                 AnalysisType.entries.forEach { type ->
                     DropdownMenuItem(
-                        text = { Text(type.displayName) },
+                        text = { Text(stringResource(id = type.asStringRes())) },
                         onClick = {
                             onAnalysisTypeChange(type)
                             isDropdownExpanded = false
@@ -129,9 +128,21 @@ fun AnalysisHeader(
     }
 }
 
-@Preview(showBackground = true, name = "Light")
+fun AnalysisType.asStringRes(): Int {
+    return when (this) {
+        AnalysisType.LOCATION -> R.string.analysis_type_location
+        AnalysisType.RECIPE -> R.string.analysis_type_recipe
+        AnalysisType.MOVIE -> R.string.analysis_type_movie
+        AnalysisType.SONG -> R.string.analysis_type_song
+        AnalysisType.PERSONALITY -> R.string.analysis_type_personality
+        AnalysisType.PRODUCT -> R.string.analysis_type_product
+        AnalysisType.TREND -> R.string.analysis_type_trend
+    }
+}
+
+@Preview(name = "Light")
 @Composable
-internal fun AnalysisHeaderPreview_Light() {
+private fun AnalysisHeaderLightPreview() {
     SofaAiTheme {
         AnalysisHeader(
             selectedImageUri = Uri.EMPTY,
@@ -142,9 +153,9 @@ internal fun AnalysisHeaderPreview_Light() {
     }
 }
 
-@Preview(showBackground = true, name = "Dark", uiMode = Configuration.UI_MODE_NIGHT_YES)
+@Preview(name = "Dark")
 @Composable
-internal fun AnalysisHeaderPreview_Dark() {
+private fun AnalysisHeaderDarkPreview() {
     SofaAiTheme(darkTheme = true) {
         AnalysisHeader(
             selectedImageUri = Uri.EMPTY,

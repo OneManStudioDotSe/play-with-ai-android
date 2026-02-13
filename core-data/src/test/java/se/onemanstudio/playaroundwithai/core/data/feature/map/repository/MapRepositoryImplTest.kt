@@ -8,7 +8,8 @@ import org.junit.Before
 import org.junit.Test
 import se.onemanstudio.playaroundwithai.core.data.feature.map.api.MapApiService
 import se.onemanstudio.playaroundwithai.core.data.feature.map.dto.MapItemDto
-import se.onemanstudio.playaroundwithai.core.data.feature.map.dto.VehicleType
+import se.onemanstudio.playaroundwithai.core.data.feature.map.dto.VehicleTypeDto
+import se.onemanstudio.playaroundwithai.core.domain.feature.map.model.VehicleType
 
 class MapRepositoryImplTest {
 
@@ -27,8 +28,26 @@ class MapRepositoryImplTest {
     fun `getMapItems when service returns data then repository returns mapped domain models`() = runTest {
         // GIVEN: A list of DTOs that our mock service will return
         val testDtos = listOf(
-            MapItemDto("id1", 59.32, 18.06, "Scooter 1", VehicleType.SCOOTER, 95, "S1", "Scooty"),
-            MapItemDto("id2", 59.33, 18.07, "Bike 1", VehicleType.BICYCLE, 70, "B1", "Bikey")
+            MapItemDto(
+                id = "id1",
+                lat = 59.32,
+                lng = 18.06,
+                name = "Scooter 1",
+                type = VehicleTypeDto.SCOOTER,
+                batteryLevel = 95,
+                vehicleCode = "S1",
+                nickname = "Scooty"
+            ),
+            MapItemDto(
+                id = "id2",
+                lat = 59.33,
+                lng = 18.07,
+                name = "Bike 1",
+                type = VehicleTypeDto.BICYCLE,
+                batteryLevel = 70,
+                vehicleCode = "B1",
+                nickname = "Bikey"
+            )
         )
         // Instruct the mock to return our test DTOs when getMapItems is called
         coEvery { mapApiService.getMapItems(any()) } returns testDtos

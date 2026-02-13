@@ -20,11 +20,8 @@ fun FilterChip(
     selected: Boolean,
     onClick: () -> Unit
 ) {
-    // 1. Determine colors based on state & theme
     val backgroundColor = if (selected) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.surface
     val contentColor = if (selected) MaterialTheme.colorScheme.onPrimary else MaterialTheme.colorScheme.onSurface
-
-    // 2. Dynamic border/shadow color (Black in Light Mode, White in Dark Mode)
     val outlineColor = MaterialTheme.colorScheme.onSurface
 
     Box(
@@ -47,9 +44,9 @@ fun FilterChip(
     }
 }
 
-@Preview(name = "Light - Unselected", showBackground = true)
+@Preview(name = "Light - Unselected")
 @Composable
-fun FilterChipPreview_Light() {
+private fun FilterChipUnselectedLightPreview() {
     SofaAiTheme(darkTheme = false) {
         FilterChip(
             text = "Scooters",
@@ -59,9 +56,9 @@ fun FilterChipPreview_Light() {
     }
 }
 
-@Preview(name = "Light - Selected", showBackground = true)
+@Preview(name = "Light - Selected")
 @Composable
-fun FilterChipPreviewSelected_Light() {
+private fun FilterChipSelectedLightPreview() {
     SofaAiTheme(darkTheme = false) {
         FilterChip(
             text = "Bicycles",
@@ -71,9 +68,9 @@ fun FilterChipPreviewSelected_Light() {
     }
 }
 
-@Preview(name = "Dark - Unselected", showBackground = true, backgroundColor = 0xFF121212)
+@Preview(name = "Dark - Unselected")
 @Composable
-fun FilterChipPreview_Dark() {
+private fun FilterChipUnselectedDarkPreview() {
     SofaAiTheme(darkTheme = true) {
         FilterChip(
             text = "Scooters",
@@ -83,9 +80,9 @@ fun FilterChipPreview_Dark() {
     }
 }
 
-@Preview(name = "Dark - Selected", showBackground = true, backgroundColor = 0xFF121212)
+@Preview(name = "Dark - Selected")
 @Composable
-fun FilterChipPreviewSelected_Dark() {
+private fun FilterChipSelectedDarkPreview() {
     SofaAiTheme(darkTheme = true) {
         FilterChip(
             text = "Bicycles",

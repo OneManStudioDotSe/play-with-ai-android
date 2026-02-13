@@ -1,5 +1,8 @@
 package se.onemanstudio.playaroundwithai.feature.chat.states
 
+import androidx.compose.runtime.Immutable
+
+@Immutable
 sealed interface ChatUiState {
     data object Initial : ChatUiState
     data object Loading : ChatUiState
@@ -7,6 +10,7 @@ sealed interface ChatUiState {
     data class Error(val error: ChatError) : ChatUiState
 }
 
+@Immutable
 sealed interface ChatError {
     data object NetworkMissing : ChatError
     data object Permission : ChatError

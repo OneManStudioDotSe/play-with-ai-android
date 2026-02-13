@@ -17,7 +17,6 @@ fun calculatePathDistance(start: LatLng, path: List<LatLng>): Double {
     return distance
 }
 
-@Suppress("MagicNumber")
 fun distanceBetween(p1: LatLng, p2: LatLng): Double {
     val r = 6371
     val dLat = Math.toRadians(p2.latitude - p1.latitude)

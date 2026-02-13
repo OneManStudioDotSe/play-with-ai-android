@@ -2,7 +2,6 @@ import org.jetbrains.kotlin.gradle.dsl.JvmTarget
 
 plugins {
     alias(libs.plugins.android.library)
-    alias(libs.plugins.kotlin.android)
     alias(libs.plugins.kotlin.compose)
     alias(libs.plugins.hilt)
     alias(libs.plugins.ksp)
@@ -10,10 +9,10 @@ plugins {
 
 android {
     namespace = "se.onemanstudio.playaroundwithai.feature.map"
-    compileSdk = 36
+    compileSdk = libs.versions.compileSdk.get().toInt()
 
     defaultConfig {
-        minSdk = 31
+        minSdk = libs.versions.minSdk.get().toInt()
     }
 
     buildTypes {
@@ -50,12 +49,14 @@ android {
 }
 
 dependencies {
+    implementation(project(":core-domain"))
     implementation(project(":core-data"))
     implementation(project(":core-theme"))
     implementation(project(":core-ui"))
 
     implementation(libs.material3)
     implementation(libs.androidx.material.icons.extended)
+    implementation(libs.kotlinx.collections.immutable)
 
     implementation(libs.timber)
 

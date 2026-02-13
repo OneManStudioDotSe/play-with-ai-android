@@ -1,6 +1,5 @@
 package se.onemanstudio.playaroundwithai.feature.chat.views
 
-import android.content.res.Configuration
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
@@ -56,9 +55,9 @@ fun FilePreviewHeader(
     }
 }
 
-@Preview(showBackground = true, name = "Light Mode - Normal Name")
+@Preview(name = "Light")
 @Composable
-internal fun FilePreviewHeaderPreview_Normal() {
+private fun FilePreviewHeaderLightPreview() {
     SofaAiTheme {
         FilePreviewHeader(
             fileName = "my_document.pdf",
@@ -67,9 +66,9 @@ internal fun FilePreviewHeaderPreview_Normal() {
     }
 }
 
-@Preview(showBackground = true, name = "Light Mode - Long Name")
+@Preview(name = "Light - Long Name")
 @Composable
-internal fun FilePreviewHeaderPreview_LongName() {
+private fun FilePreviewHeaderLongNamePreview() {
     SofaAiTheme {
         FilePreviewHeader(
             fileName = "this_is_a_very_long_document_name_that_should_be_truncated.docx",
@@ -78,9 +77,9 @@ internal fun FilePreviewHeaderPreview_LongName() {
     }
 }
 
-@Preview(showBackground = true, name = "Dark Mode", uiMode = Configuration.UI_MODE_NIGHT_YES)
+@Preview(name = "Dark")
 @Composable
-internal fun FilePreviewHeaderPreview_Dark() {
+private fun FilePreviewHeaderDarkPreview() {
     SofaAiTheme(darkTheme = true) {
         FilePreviewHeader(
             fileName = "report_q3_final.txt",

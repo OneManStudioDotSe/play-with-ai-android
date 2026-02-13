@@ -2,7 +2,8 @@ package se.onemanstudio.playaroundwithai.core.data.feature.chat.remote.network
 
 import okhttp3.Interceptor
 import okhttp3.Response
-import se.onemanstudio.playaroundwithai.core.data.di.GeminiApiKey
+import se.onemanstudio.playaroundwithai.core.data.di.network.GeminiApiKey
+import timber.log.Timber
 import javax.inject.Inject
 
 class AuthenticationInterceptor @Inject constructor(
@@ -21,6 +22,10 @@ class AuthenticationInterceptor @Inject constructor(
             .url(newUrl)
             .build()
 
-        return chain.proceed(newRequest)
+        Timber.d("API request: ${originalRequest.method} ${originalHttpUrl.encodedPath} (API key attached)")
+
+        val response = chain.proceed(newRequest)
+        Timber.d("API response: ${response.code} for ${originalHttpUrl.encodedPath}")
+        return response
     }
 }

@@ -14,13 +14,18 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.tooling.preview.Preview
 import com.google.android.gms.maps.CameraUpdateFactory
 import com.google.maps.android.compose.CameraPositionState
+import com.google.maps.android.compose.rememberCameraPositionState
 import kotlinx.coroutines.launch
 import se.onemanstudio.playaroundwithai.core.ui.sofa.NeoBrutalIconButton
 import se.onemanstudio.playaroundwithai.core.ui.theme.Dimensions
+import se.onemanstudio.playaroundwithai.core.ui.theme.SofaAiTheme
 import se.onemanstudio.playaroundwithai.feature.map.R
-import se.onemanstudio.playaroundwithai.feature.maps.state.MapUiState
+import se.onemanstudio.playaroundwithai.feature.maps.states.MapUiState
+
+private const val DURATION_FOR_ANIMATION = 500
 
 @Composable
 fun SideControls(
@@ -38,14 +43,14 @@ fun SideControls(
     ) {
         // zoom in
         NeoBrutalIconButton(
-            onClick = { scope.launch { cameraPositionState.animate(CameraUpdateFactory.zoomIn(), 500) } },
+            onClick = { scope.launch { cameraPositionState.animate(CameraUpdateFactory.zoomIn(), DURATION_FOR_ANIMATION) } },
             imageVector = Icons.Default.Add,
             contentDescription = stringResource(id = R.string.zoom_in_button_content_description)
         )
 
         // zoom out
         NeoBrutalIconButton(
-            onClick = { scope.launch { cameraPositionState.animate(CameraUpdateFactory.zoomOut(), 500) } },
+            onClick = { scope.launch { cameraPositionState.animate(CameraUpdateFactory.zoomOut(), DURATION_FOR_ANIMATION) } },
             imageVector = Icons.Default.Remove,
             contentDescription = stringResource(id = R.string.zoom_out_button_content_description)
         )
@@ -75,6 +80,32 @@ fun SideControls(
                 MaterialTheme.colorScheme.onSurface
             },
             onClick = { onSetPathMode(uiState.isPathMode) },
+        )
+    }
+}
+
+@Preview(showBackground = true)
+@Composable
+private fun SideControlsPreview() {
+    SofaAiTheme {
+        SideControls(
+            uiState = MapUiState(isPathMode = false),
+            cameraPositionState = rememberCameraPositionState(),
+            onMyLocationClick = {},
+            onSetPathMode = {}
+        )
+    }
+}
+
+@Preview(showBackground = true)
+@Composable
+private fun SideControlsPathModePreview() {
+    SofaAiTheme {
+        SideControls(
+            uiState = MapUiState(isPathMode = true),
+            cameraPositionState = rememberCameraPositionState(),
+            onMyLocationClick = {},
+            onSetPathMode = {}
         )
     }
 }

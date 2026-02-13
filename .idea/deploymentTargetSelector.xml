@@ -13,10 +13,10 @@
         </DropdownSelection>
         <DialogSelection />
       </SelectionState>
-      <SelectionState runConfigName="PromptsHistoryDaoTest">
+      <SelectionState runConfigName="All Tests">
         <option name="selectionMode" value="DROPDOWN" />
       </SelectionState>
-      <SelectionState runConfigName="GeminiRepositoryImplTest">
+      <SelectionState runConfigName="Tests in 'se.onemanstudio.playaroundwithai.core.data.feature.chat'">
         <option name="selectionMode" value="DROPDOWN" />
       </SelectionState>
     </selectionStates>

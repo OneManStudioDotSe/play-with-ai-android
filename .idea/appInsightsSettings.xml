@@ -22,10 +22,10 @@
             <InsightsFilterSettings>
               <option name="connection">
                 <ConnectionSetting>
-                  <option name="appId" value="PLACEHOLDER" />
-                  <option name="mobileSdkAppId" value="" />
-                  <option name="projectId" value="" />
-                  <option name="projectNumber" value="" />
+                  <option name="appId" value="se.onemanstudio.playaroundwithai" />
+                  <option name="mobileSdkAppId" value="1:617245429053:android:2b2f2cbff5fd06edb2c954" />
+                  <option name="projectId" value="play-with-ai-754cf" />
+                  <option name="projectNumber" value="617245429053" />
                 </ConnectionSetting>
               </option>
               <option name="signal" value="SIGNAL_UNSPECIFIED" />

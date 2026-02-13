@@ -4,11 +4,11 @@ import org.jetbrains.kotlin.gradle.dsl.JvmTarget
 
 plugins {
     alias(libs.plugins.android.application)
-    alias(libs.plugins.kotlin.android)
     alias(libs.plugins.kotlin.compose)
     alias(libs.plugins.kotlin.serialization)
     alias(libs.plugins.hilt)
     alias(libs.plugins.ksp)
+    alias(libs.plugins.google.services)
 }
 
 // Read the API key from local.properties
@@ -27,12 +27,12 @@ val mapsApiKey = localProperties.getProperty("MAPS_API_KEY")
 
 android {
     namespace = "se.onemanstudio.playaroundwithai"
-    compileSdk = 36
+    compileSdk = libs.versions.compileSdk.get().toInt()
 
     defaultConfig {
         applicationId = "se.onemanstudio.playaroundwithai"
-        minSdk = 31
-        targetSdk = 36
+        minSdk = libs.versions.minSdk.get().toInt()
+        targetSdk = libs.versions.targetSdk.get().toInt()
 
         versionCode = 1
         versionName = "1.0"
@@ -72,15 +72,16 @@ android {
         sourceCompatibility = JavaVersion.VERSION_17
         targetCompatibility = JavaVersion.VERSION_17
     }
+}
 
-    kotlin {
-        compilerOptions {
-            jvmTarget = JvmTarget.fromTarget("17")
-        }
+kotlin {
+    compilerOptions {
+        jvmTarget = JvmTarget.fromTarget("17")
     }
 }
 
 dependencies {
+    implementation(project(":core-domain"))
     implementation(project(":core-data"))
     implementation(project(":core-theme"))
     implementation(project(":core-ui"))
@@ -96,6 +97,15 @@ dependencies {
     implementation(libs.okhttp.logging.interceptor)
 
     implementation(libs.timber)
+
+    // Firebase
+    implementation(platform(libs.firebase.bom))
+    implementation(libs.firebase.firestore)
+    implementation(libs.firebase.auth)
+
+    // WorkManager
+    implementation(libs.androidx.work.runtime.ktx)
+    implementation(libs.androidx.hilt.work)
 
     // Hilt
     implementation(libs.hilt.android)

@@ -14,17 +14,25 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.navigationBarsPadding
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.statusBarsPadding
 import androidx.compose.foundation.layout.wrapContentSize
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.DirectionsBike
 import androidx.compose.material.icons.filled.ElectricScooter
+import androidx.compose.material.icons.rounded.Warning
+import androidx.compose.material.icons.rounded.WifiOff
 import androidx.compose.material3.CircularProgressIndicator
+import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
@@ -38,6 +46,8 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.unit.dp
 import androidx.core.content.ContextCompat
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import com.google.android.gms.location.LocationServices
@@ -55,17 +65,22 @@ import com.google.maps.android.compose.Polyline
 import com.google.maps.android.compose.rememberCameraPositionState
 import com.google.maps.android.compose.rememberUpdatedMarkerState
 import kotlinx.coroutines.launch
-import se.onemanstudio.playaroundwithai.core.data.feature.map.dto.VehicleType
+import se.onemanstudio.playaroundwithai.core.domain.feature.map.model.VehicleType
+import se.onemanstudio.playaroundwithai.core.ui.sofa.NeoBrutalButton
+import se.onemanstudio.playaroundwithai.core.ui.theme.Alphas
 import se.onemanstudio.playaroundwithai.core.ui.theme.Dimensions
 import se.onemanstudio.playaroundwithai.feature.map.R
 import se.onemanstudio.playaroundwithai.feature.maps.MapConstants.STOCKHOLM_LAT
 import se.onemanstudio.playaroundwithai.feature.maps.MapConstants.STOCKHOLM_LNG
+import se.onemanstudio.playaroundwithai.feature.maps.states.MapError
+import se.onemanstudio.playaroundwithai.feature.maps.states.MapUiState
 import se.onemanstudio.playaroundwithai.feature.maps.views.CustomMarkerIcon
 import se.onemanstudio.playaroundwithai.feature.maps.views.FilterChip
 import se.onemanstudio.playaroundwithai.feature.maps.views.MarkerInfoCard
 import se.onemanstudio.playaroundwithai.feature.maps.views.PathModeBar
-import se.onemanstudio.playaroundwithai.feature.maps.views.SelfDismissingNotification
 import se.onemanstudio.playaroundwithai.feature.maps.views.SideControls
+
+private const val CAMERA_PADDING = 150
 
 @SuppressLint("MissingPermission", "GoogleMapComposable")
 @OptIn(MapsComposeExperimentalApi::class)
@@ -85,11 +100,6 @@ fun MapScreen(viewModel: MapViewModel = hiltViewModel()) {
 
     var hasLocationPermission by remember { mutableStateOf(false) }
     var userLocation by remember { mutableStateOf<LatLng?>(null) }
-    var showLocationError by remember { mutableStateOf(false) }
-
-    val focusedMarker = uiState.focusedMarker
-    var markerToDisplay by remember { mutableStateOf(focusedMarker) }
-
 
     val permissionLauncher = rememberLauncherForActivityResult(
         contract = ActivityResultContracts.RequestPermission()
@@ -99,7 +109,6 @@ fun MapScreen(viewModel: MapViewModel = hiltViewModel()) {
         permissionLauncher.launch(Manifest.permission.ACCESS_FINE_LOCATION)
     }
 
-    // Continuously check permission status and fetch location if available
     LaunchedEffect(hasLocationPermission) {
         if (hasLocationPermission) {
             fusedLocationClient.lastLocation.addOnSuccessListener { location ->
@@ -108,19 +117,29 @@ fun MapScreen(viewModel: MapViewModel = hiltViewModel()) {
         }
     }
 
-    LaunchedEffect(uiState.optimalRoute) {
-        if (uiState.optimalRoute.isNotEmpty()) {
+    LaunchedEffect(uiState.visibleLocations) {
+        val allPoints = mutableListOf<LatLng>()
+        uiState.visibleLocations.forEach { allPoints.add(it.position) }
+
+        if (allPoints.isNotEmpty()) {
             val boundsBuilder = LatLngBounds.builder()
-            uiState.optimalRoute.forEach { boundsBuilder.include(it) }
+            allPoints.forEach { boundsBuilder.include(it) }
             cameraPositionState.animate(
-                update = CameraUpdateFactory.newLatLngBounds(boundsBuilder.build(), 200),
+                update = CameraUpdateFactory.newLatLngBounds(boundsBuilder.build(), CAMERA_PADDING),
                 durationMs = MapConstants.MOVE_TO_POINT_DURATION
             )
         }
     }
 
-    if (focusedMarker != null) {
-        markerToDisplay = focusedMarker
+    LaunchedEffect(uiState.optimalRoute) {
+        if (uiState.optimalRoute.isNotEmpty()) {
+            val boundsBuilder = LatLngBounds.builder()
+            uiState.optimalRoute.forEach { boundsBuilder.include(it) }
+            cameraPositionState.animate(
+                update = CameraUpdateFactory.newLatLngBounds(boundsBuilder.build(), CAMERA_PADDING),
+                durationMs = MapConstants.MOVE_TO_POINT_DURATION
+            )
+        }
     }
 
     Box(modifier = Modifier.fillMaxSize()) {
@@ -128,8 +147,6 @@ fun MapScreen(viewModel: MapViewModel = hiltViewModel()) {
             modifier = Modifier.fillMaxSize(),
             cameraPositionState = cameraPositionState,
             properties = MapProperties(
-                // Note: To fully support map styling in dark mode, consider switching to a dark JSON style
-                // based on isSystemInDarkTheme() if available (e.g., R.raw.custom_map_style_dark).
                 mapStyleOptions = MapStyleOptions.loadRawResourceStyle(
                     context,
                     if (isSystemInDarkTheme()) {
@@ -149,7 +166,9 @@ fun MapScreen(viewModel: MapViewModel = hiltViewModel()) {
                 zoomGesturesEnabled = true,
                 myLocationButtonEnabled = false,
             ),
-            onMapClick = { viewModel.selectMarker(null) }
+            onMapClick = {
+                viewModel.selectMarker(null)
+            }
         ) {
             if (uiState.optimalRoute.isNotEmpty()) {
                 @Suppress("COMPOSE_APPLIER_CALL_MISMATCH")
@@ -199,35 +218,6 @@ fun MapScreen(viewModel: MapViewModel = hiltViewModel()) {
             }
         }
 
-        // the notification at the top if we don't have the user's current location
-        AnimatedVisibility(
-            visible = showLocationError,
-            enter = slideInHorizontally(
-                initialOffsetX = { it },
-                animationSpec = tween(
-                    durationMillis = AnimationConstants.ANIMATION_DURATION,
-                    easing = EaseInOutQuart
-                )
-            ),
-            exit = slideOutHorizontally(
-                targetOffsetX = { it },
-                animationSpec = tween(
-                    durationMillis = AnimationConstants.ANIMATION_DURATION,
-                    easing = EaseInOutQuart
-                )
-            ),
-            modifier = Modifier
-                .align(Alignment.TopCenter)
-                .statusBarsPadding()
-                .padding(top = Dimensions.paddingLarge)
-        ) {
-            SelfDismissingNotification(
-                message = stringResource(id = R.string.unknown_location_notification),
-                onDismiss = { showLocationError = false }
-            )
-        }
-
-        // the filters for scooters and bicycles at the top
         AnimatedVisibility(
             visible = !uiState.isPathMode,
             enter = slideInHorizontally(
@@ -261,7 +251,6 @@ fun MapScreen(viewModel: MapViewModel = hiltViewModel()) {
             }
         }
 
-        // Controls on the side
         Box(
             modifier = Modifier
                 .align(Alignment.CenterEnd)
@@ -292,7 +281,6 @@ fun MapScreen(viewModel: MapViewModel = hiltViewModel()) {
                             }
                         }
                     } else {
-                        // If we don't have it, ask for it
                         permissionLauncher.launch(Manifest.permission.ACCESS_FINE_LOCATION)
                     }
                 },
@@ -300,7 +288,6 @@ fun MapScreen(viewModel: MapViewModel = hiltViewModel()) {
             )
         }
 
-        // the panel where we show info about the calculated path
         AnimatedVisibility(
             visible = uiState.isPathMode,
             enter = slideInHorizontally(
@@ -334,15 +321,12 @@ fun MapScreen(viewModel: MapViewModel = hiltViewModel()) {
                     onGoClick = {
                         if (userLocation != null) {
                             viewModel.calculateOptimalRoute(userLocation)
-                        } else {
-                            showLocationError = true
                         }
                     }
                 )
             }
         }
 
-        // the panel with the marker's info
         AnimatedVisibility(
             visible = uiState.focusedMarker != null && !uiState.isPathMode,
             enter = slideInHorizontally(
@@ -366,7 +350,7 @@ fun MapScreen(viewModel: MapViewModel = hiltViewModel()) {
                     .navigationBarsPadding()
                     .padding(Dimensions.paddingLarge)
             ) {
-                markerToDisplay?.let { marker ->
+                uiState.focusedMarker?.let { marker ->
                     MarkerInfoCard(
                         marker = marker,
                         onClose = { viewModel.selectMarker(null) }
@@ -375,18 +359,74 @@ fun MapScreen(viewModel: MapViewModel = hiltViewModel()) {
             }
         }
 
-        if (uiState.isLoading) {
-            Box(
-                modifier = Modifier
-                    .fillMaxSize()
-                    .background(color = MaterialTheme.colorScheme.surface.copy(alpha = 0.8f)),
-                contentAlignment = Alignment.Center,
+        LoadingState(uiState)
+
+        ErrorState(
+            uiState = uiState,
+            onRetry = { viewModel.loadMapData() }
+        )
+    }
+}
+
+@Composable
+private fun ErrorState(
+    uiState: MapUiState,
+    onRetry: () -> Unit
+) {
+    uiState.error?.let { error ->
+        Box(
+            modifier = Modifier
+                .fillMaxSize()
+                .background(color = MaterialTheme.colorScheme.surface.copy(alpha = Alphas.high)),
+            contentAlignment = Alignment.Center
+        ) {
+            Column(
+                horizontalAlignment = Alignment.CenterHorizontally,
+                verticalArrangement = Arrangement.Center,
+                modifier = Modifier.padding(Dimensions.paddingLarge)
             ) {
-                CircularProgressIndicator(
-                    modifier = Modifier.wrapContentSize(),
-                    color = MaterialTheme.colorScheme.primary
+                Icon(
+                    imageVector = when (error) {
+                        is MapError.NetworkError -> Icons.Rounded.WifiOff
+                        is MapError.Unknown -> Icons.Rounded.Warning
+                    },
+                    contentDescription = stringResource(R.string.map_error_icon),
+                    tint = MaterialTheme.colorScheme.error,
+                    modifier = Modifier.size(48.dp)
+                )
+                Spacer(modifier = Modifier.height(Dimensions.paddingMedium))
+                Text(
+                    text = when (error) {
+                        is MapError.NetworkError -> stringResource(R.string.map_error_network)
+                        is MapError.Unknown -> error.message ?: stringResource(R.string.map_error_unknown)
+                    },
+                    style = MaterialTheme.typography.bodyLarge,
+                    color = MaterialTheme.colorScheme.onSurface,
+                    textAlign = TextAlign.Center
+                )
+                Spacer(modifier = Modifier.height(Dimensions.paddingLarge))
+                NeoBrutalButton(
+                    text = stringResource(R.string.map_error_retry),
+                    onClick = onRetry
                 )
             }
+        }
+    }
+}
+
+@Composable
+private fun LoadingState(uiState: MapUiState) {
+    if (uiState.isLoading) {
+        Box(
+            modifier = Modifier
+                .fillMaxSize()
+                .background(color = MaterialTheme.colorScheme.surface.copy(alpha = Alphas.high)),
+            contentAlignment = Alignment.Center,
+        ) {
+            CircularProgressIndicator(
+                modifier = Modifier.wrapContentSize(),
+                color = MaterialTheme.colorScheme.primary
+            )
         }
     }
 }
