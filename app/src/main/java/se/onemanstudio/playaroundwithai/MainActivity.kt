@@ -46,23 +46,21 @@ import se.onemanstudio.playaroundwithai.feature.maps.MapScreen
 import se.onemanstudio.playaroundwithai.navigation.Chat
 import se.onemanstudio.playaroundwithai.navigation.Maps
 import se.onemanstudio.playaroundwithai.navigation.NavItem
+import se.onemanstudio.playaroundwithai.navigation.navItems
 
-val navItems = listOf(
-    NavItem(Chat, "Chat", Icons.Default.Chair),
-    NavItem(Maps, "Explore", Icons.Default.Map),
-)
 
 @AndroidEntryPoint
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+
         enableEdgeToEdge()
-        setContent { SofaApp() }
+        setContent { SoFaApp() }
     }
 }
 
 @Composable
-private fun SofaApp() {
+private fun SoFaApp() {
     val viewModel: MainViewModel = hiltViewModel()
     val authError by viewModel.authError.collectAsState()
     val snackbarHostState = remember { SnackbarHostState() }
@@ -77,6 +75,7 @@ private fun SofaApp() {
                 actionLabel = retryLabel,
                 duration = SnackbarDuration.Long
             )
+
             if (result == SnackbarResult.ActionPerformed) {
                 viewModel.retryAuth()
             }

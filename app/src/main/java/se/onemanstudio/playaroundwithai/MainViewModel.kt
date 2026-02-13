@@ -27,14 +27,11 @@ class MainViewModel @Inject constructor(
         viewModelScope.launch {
             signInAnonymouslyUseCase()
                 .onSuccess { session ->
-                    Timber.d(
-                        "Auth - Session established: userId=%s, isNewUser=%s, accountAge=%d days, provider=%s",
-                        session.userId, session.isNewUser, session.accountAgeDays, session.authProvider
-                    )
+                    Timber.d("Auth - Session established for user ${session.userId}, from provider ${session.authProvider}")
                     _authError.value = false
                 }
                 .onFailure { e ->
-                    Timber.e(e, "Anonymous sign-in failed")
+                    Timber.e(e, "Auth - Anonymous sign-in failed")
                     _authError.value = true
                 }
         }
