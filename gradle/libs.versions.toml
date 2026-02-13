@@ -3,15 +3,15 @@
 coroutines = "1.10.2"
 material3 = "1.4.0"
 materialIconsExtended = "1.7.8"
-uiTooling = "1.10.0"
-navigationCompose = "2.9.6"
-kotlinxSerialization = "1.9.0"
+uiTooling = "1.10.3"
+navigationCompose = "2.9.7"
+kotlinxSerialization = "1.10.0"
 lifecycle = "2.10.0"
 javaxInject = "1"
 kotlinxCollectionsImmutable = "0.4.0"
-firebaseBom = "33.10.0"
-workManager = "2.11.0"
-hiltWork = "1.2.0"
+firebaseBom = "34.9.0"
+workManager = "2.11.1"
+hiltWork = "1.3.0"
 
 hiltNavigationCompose = "1.3.0"
 
@@ -23,8 +23,8 @@ room = "2.8.4"
 coil = "2.7.0"
 timber = "5.0.1"
 
-mapsCompose = "7.0.0"
-playServicesMaps = "19.2.0"
+mapsCompose = "8.1.0"
+playServicesMaps = "20.0.0"
 playServicesLocation = "21.3.0"
 
 # testing
@@ -32,20 +32,20 @@ junit4 = "4.13.2"
 junitExt = "1.3.0"
 runner = "1.7.0"
 truth = "1.4.5"
-mockk = "1.14.7"
-kotlinTest = "2.3.0"
+mockk = "1.14.9"
+kotlinTest = "2.3.10"
 
 
 # plugins
-agp = "8.13.2"
-kotlin = "2.3.0"
+agp = "9.0.0"
+kotlin = "2.3.10"
 versionsCheck = "0.53.0"
-hilt = "2.57.2"
-ksp = "2.3.4"
+hilt = "2.59.1"
+ksp = "2.3.5"
 detekt = "1.23.8"
 ktlint = "14.0.1"
 material = "1.13.0"
-googleServices = "4.4.2"
+googleServices = "4.4.4"
 
 [libraries]
 
