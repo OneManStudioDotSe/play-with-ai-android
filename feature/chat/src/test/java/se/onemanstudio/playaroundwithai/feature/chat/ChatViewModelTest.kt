@@ -16,10 +16,13 @@ import org.junit.Rule
 import org.junit.Test
 import se.onemanstudio.playaroundwithai.core.domain.feature.chat.model.Prompt
 import se.onemanstudio.playaroundwithai.core.domain.feature.chat.repository.GeminiRepository
+import se.onemanstudio.playaroundwithai.core.domain.feature.chat.repository.PromptRepository
 import se.onemanstudio.playaroundwithai.core.domain.feature.chat.usecase.GenerateContentUseCase
+import se.onemanstudio.playaroundwithai.core.domain.feature.chat.usecase.GetFailedSyncCountUseCase
 import se.onemanstudio.playaroundwithai.core.domain.feature.chat.usecase.GetPromptHistoryUseCase
 import se.onemanstudio.playaroundwithai.core.domain.feature.chat.usecase.GetSuggestionsUseCase
 import se.onemanstudio.playaroundwithai.core.domain.feature.chat.usecase.GetSyncStateUseCase
+import se.onemanstudio.playaroundwithai.core.domain.feature.chat.usecase.SavePromptUseCase
 import se.onemanstudio.playaroundwithai.feature.chat.states.ChatError
 import se.onemanstudio.playaroundwithai.feature.chat.states.ChatUiState
 import se.onemanstudio.playaroundwithai.feature.chat.util.MainCoroutineRule
@@ -157,23 +160,30 @@ class ChatViewModelTest {
         generateContentResult: Result<String>? = null,
         suggestionsResult: Result<List<String>> = Result.success(emptyList()),
         promptHistoryResult: List<Prompt> = emptyList(),
-        isSyncingResult: Boolean = false
+        isSyncingResult: Boolean = false,
+        failedSyncCountResult: Int = 0
     ): ChatViewModel {
-        val repository = mockk<GeminiRepository> {
+        val geminiRepository = mockk<GeminiRepository> {
             generateContentResult?.let { coEvery { generateContent(any(), any(), any(), any()) } returns it }
             coEvery { generateConversationStarters() } returns suggestionsResult
+        }
+
+        val promptRepository = mockk<PromptRepository> {
             coEvery { savePrompt(any()) } returns Unit
             every { getPromptHistory() } returns flowOf(promptHistoryResult)
             every { isSyncing() } returns flowOf(isSyncingResult)
+            every { getFailedSyncCount() } returns flowOf(failedSyncCountResult)
         }
 
         val application = mockk<Application>(relaxed = true)
 
         return ChatViewModel(
-            GenerateContentUseCase(repository),
-            GetSuggestionsUseCase(repository),
-            GetPromptHistoryUseCase(repository),
-            GetSyncStateUseCase(repository),
+            GenerateContentUseCase(geminiRepository),
+            GetSuggestionsUseCase(geminiRepository),
+            GetPromptHistoryUseCase(promptRepository),
+            GetSyncStateUseCase(promptRepository),
+            GetFailedSyncCountUseCase(promptRepository),
+            SavePromptUseCase(promptRepository),
             application
         )
     }

@@ -13,6 +13,7 @@ import org.junit.Test
 import org.junit.runner.RunWith
 import se.onemanstudio.playaroundwithai.core.data.feature.chat.local.database.AppDatabase
 import se.onemanstudio.playaroundwithai.core.data.feature.chat.local.entity.PromptEntity
+import se.onemanstudio.playaroundwithai.core.domain.feature.chat.model.SyncStatus
 import java.io.IOException
 
 @RunWith(AndroidJUnit4::class)
@@ -40,7 +41,12 @@ class PromptsHistoryDaoTest {
     @Throws(Exception::class)
     fun insertAndGetHistory_returnsCorrectData() = runBlocking {
         // Given
-        val prompt = PromptEntity(text = "Tell me a fun fact", timestamp = System.currentTimeMillis())
+        val prompt = PromptEntity(
+            id = 1,
+            text = "Tell me a fun fact",
+            timestamp = System.currentTimeMillis(),
+            syncStatus = SyncStatus.Synced
+        )
         dao.savePrompt(prompt)
 
         // When

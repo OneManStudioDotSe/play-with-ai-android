@@ -172,8 +172,9 @@ class MapViewModelTest {
 
     @Test
     fun `toggleSelection enforces max selection limit`() = runTest {
-        // Given
-        val manyItemsDomain = (1..6).map {
+        // Given: MAX_SELECTABLE_POINTS is 8, so we need 9 items to test the limit
+        val itemCount = MapConstants.MAX_SELECTABLE_POINTS + 1
+        val manyItemsDomain = (1..itemCount).map {
             MapItem(
                 id = it.toString(), lat = 0.0, lng = 0.0, name = "Item $it", type = VehicleType.SCOOTER,
                 batteryLevel = 100, vehicleCode = "$it", nickname = "Item $it"
@@ -187,19 +188,19 @@ class MapViewModelTest {
         viewModel.setPathMode(true)
         advanceUntilIdle()
 
-        // When: Add 5 items
-        repeat(5) { i ->
+        // When: Add items up to the max
+        repeat(MapConstants.MAX_SELECTABLE_POINTS) { i ->
             viewModel.toggleSelection(manyItemsUi[i])
         }
 
-        // Then: Verify 5 selected
-        assertEquals(5, states.last().selectedLocations.size)
+        // Then: Verify max selected
+        assertEquals(MapConstants.MAX_SELECTABLE_POINTS, states.last().selectedLocations.size)
 
-        // When: Try to add 6th item
-        viewModel.toggleSelection(manyItemsUi[5])
+        // When: Try to add one more item beyond the limit
+        viewModel.toggleSelection(manyItemsUi[MapConstants.MAX_SELECTABLE_POINTS])
 
-        // Then: Still 5 items (limit is enforced)
-        assertEquals(5, states.last().selectedLocations.size)
+        // Then: Still at max (limit is enforced)
+        assertEquals(MapConstants.MAX_SELECTABLE_POINTS, states.last().selectedLocations.size)
     }
 
     @Test

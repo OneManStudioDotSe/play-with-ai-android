@@ -15,30 +15,26 @@ import org.junit.runner.RunWith
 import se.onemanstudio.playaroundwithai.core.data.feature.chat.local.dao.PromptsHistoryDao
 import se.onemanstudio.playaroundwithai.core.data.feature.chat.local.database.AppDatabase
 import se.onemanstudio.playaroundwithai.core.data.feature.chat.local.entity.PromptEntity
-import se.onemanstudio.playaroundwithai.core.data.feature.chat.remote.api.GeminiApiService
+import se.onemanstudio.playaroundwithai.core.domain.feature.chat.model.SyncStatus
+import java.util.Date
 
 @RunWith(AndroidJUnit4::class)
-class GeminiRepositoryImplTest {
+class PromptRepositoryImplTest {
 
     private lateinit var database: AppDatabase
     private lateinit var promptsHistoryDao: PromptsHistoryDao
-    private val geminiApiService: GeminiApiService = mockk(relaxed = true) // Mocked, as we're not testing the network
-    private val workManager = mockk<WorkManager>(relaxed = true) // Mocked, as we're not testing WorkManager
-    private lateinit var repository: GeminiRepositoryImpl
+    private val workManager = mockk<WorkManager>(relaxed = true)
+    private lateinit var repository: PromptRepositoryImpl
 
     @Before
     fun setup() {
-        // Create a real in-memory database
         database = Room.inMemoryDatabaseBuilder(
             ApplicationProvider.getApplicationContext(),
             AppDatabase::class.java
         ).allowMainThreadQueries().build()
 
-        // Get a real DAO instance from the database
         promptsHistoryDao = database.historyDao()
-
-        // Create the repository with a real DAO and a mock API service
-        repository = GeminiRepositoryImpl(geminiApiService, promptsHistoryDao, workManager)
+        repository = PromptRepositoryImpl(promptsHistoryDao, workManager)
     }
 
     @After
@@ -48,20 +44,19 @@ class GeminiRepositoryImplTest {
 
     @Test
     fun getPromptHistory_whenDataExists_returnsMappedDomainModels() = runBlocking {
-        // Given: We insert an Entity directly into the database using the DAO
-        val promptEntity = PromptEntity(id = 1, text = "Test prompt", timestamp = 12345L)
+        // Given
+        val promptEntity = PromptEntity(id = 1, text = "Test prompt", timestamp = 12345L, syncStatus = SyncStatus.Synced)
         promptsHistoryDao.savePrompt(promptEntity)
 
-        // When: We call the repository method
-        val promptHistoryFlow = repository.getPromptHistory()
-        val result = promptHistoryFlow.first()
+        // When
+        val result = repository.getPromptHistory().first()
 
-        // Then: The repository should have returned a correctly mapped domain model
+        // Then
         assertThat(result).hasSize(1)
         val promptDomainModel = result.first()
         assertThat(promptDomainModel.id).isEqualTo(1)
         assertThat(promptDomainModel.text).isEqualTo("Test prompt")
-        assertThat(promptDomainModel.timestamp).isEqualTo(12345L)
+        assertThat(promptDomainModel.timestamp).isEqualTo(Date(12345L))
     }
 
     @Test
@@ -71,5 +66,31 @@ class GeminiRepositoryImplTest {
 
         // Then
         assertThat(result).isEmpty()
+    }
+
+    @Test
+    fun getFailedSyncCount_returnsCorrectCount() = runBlocking {
+        // Given
+        promptsHistoryDao.savePrompt(PromptEntity(id = 1, text = "Failed 1", timestamp = 1L, syncStatus = SyncStatus.Failed))
+        promptsHistoryDao.savePrompt(PromptEntity(id = 2, text = "Failed 2", timestamp = 2L, syncStatus = SyncStatus.Failed))
+        promptsHistoryDao.savePrompt(PromptEntity(id = 3, text = "Synced", timestamp = 3L, syncStatus = SyncStatus.Synced))
+
+        // When
+        val result = repository.getFailedSyncCount().first()
+
+        // Then
+        assertThat(result).isEqualTo(2)
+    }
+
+    @Test
+    fun getFailedSyncCount_whenNoneFailed_returnsZero() = runBlocking {
+        // Given
+        promptsHistoryDao.savePrompt(PromptEntity(id = 1, text = "Synced", timestamp = 1L, syncStatus = SyncStatus.Synced))
+
+        // When
+        val result = repository.getFailedSyncCount().first()
+
+        // Then
+        assertThat(result).isEqualTo(0)
     }
 }
