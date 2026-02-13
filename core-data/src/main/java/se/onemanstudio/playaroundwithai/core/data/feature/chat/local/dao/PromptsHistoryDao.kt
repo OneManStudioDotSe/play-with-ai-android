@@ -20,4 +20,7 @@ interface PromptsHistoryDao {
 
     @Query("UPDATE prompt_history SET syncStatus = :status WHERE id = :id")
     suspend fun updateSyncStatus(id: Int, status: String)
+
+    @Query("SELECT COUNT(*) FROM prompt_history WHERE syncStatus = :status")
+    fun getCountBySyncStatus(status: String): Flow<Int>
 }

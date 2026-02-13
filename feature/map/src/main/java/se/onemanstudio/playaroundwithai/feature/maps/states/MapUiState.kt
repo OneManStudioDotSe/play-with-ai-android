@@ -10,9 +10,16 @@ import se.onemanstudio.playaroundwithai.core.domain.feature.map.model.VehicleTyp
 import se.onemanstudio.playaroundwithai.feature.maps.models.MapItemUiModel
 
 @Immutable
+sealed interface MapError {
+    data object NetworkError : MapError
+    data class Unknown(val message: String?) : MapError
+}
+
+@Immutable
 data class MapUiState(
     val isLoading: Boolean = true,
     val isPathMode: Boolean = false,
+    val error: MapError? = null,
     val allLocations: PersistentList<MapItemUiModel> = persistentListOf(),
     val visibleLocations: PersistentList<MapItemUiModel> = persistentListOf(),
     val selectedLocations: PersistentList<MapItemUiModel> = persistentListOf(),

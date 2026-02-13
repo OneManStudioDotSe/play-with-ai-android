@@ -7,10 +7,16 @@ import android.net.Uri
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import dagger.hilt.android.lifecycle.HiltViewModel
+import kotlinx.coroutines.channels.BufferOverflow
+import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.SharedFlow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.asSharedFlow
 import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.distinctUntilChanged
+import kotlinx.coroutines.flow.filter
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
@@ -19,6 +25,7 @@ import se.onemanstudio.playaroundwithai.core.domain.feature.chat.model.SyncStatu
 import se.onemanstudio.playaroundwithai.core.domain.feature.chat.usecase.GenerateContentUseCase
 import se.onemanstudio.playaroundwithai.core.domain.feature.chat.usecase.GetPromptHistoryUseCase
 import se.onemanstudio.playaroundwithai.core.domain.feature.chat.usecase.GetSuggestionsUseCase
+import se.onemanstudio.playaroundwithai.core.domain.feature.chat.usecase.GetFailedSyncCountUseCase
 import se.onemanstudio.playaroundwithai.core.domain.feature.chat.usecase.GetSyncStateUseCase
 import se.onemanstudio.playaroundwithai.core.domain.feature.chat.usecase.SavePromptUseCase
 import se.onemanstudio.playaroundwithai.feature.chat.models.Attachment
@@ -32,11 +39,13 @@ import java.util.Date
 import javax.inject.Inject
 
 @HiltViewModel
+@Suppress("LongParameterList")
 class ChatViewModel @Inject constructor(
     private val generateContentUseCase: GenerateContentUseCase,
     private val getSuggestionsUseCase: GetSuggestionsUseCase,
     private val getPromptHistoryUseCase: GetPromptHistoryUseCase,
     private val getSyncStateUseCase: GetSyncStateUseCase,
+    private val getFailedSyncCountUseCase: GetFailedSyncCountUseCase,
     private val savePromptUseCase: SavePromptUseCase,
     private val application: Application
 ) : ViewModel() {
@@ -52,6 +61,13 @@ class ChatViewModel @Inject constructor(
     private val _isSheetOpen = MutableStateFlow(false)
     val isSheetOpen = _isSheetOpen.asStateFlow()
 
+    private val _syncFailureEvent = MutableSharedFlow<Int>(
+        replay = 0,
+        extraBufferCapacity = 1,
+        onBufferOverflow = BufferOverflow.DROP_OLDEST
+    )
+    val syncFailureEvent: SharedFlow<Int> = _syncFailureEvent.asSharedFlow()
+
     val promptHistory: StateFlow<List<Prompt>> = getPromptHistoryUseCase()
         .stateIn(
             scope = viewModelScope,
@@ -61,6 +77,18 @@ class ChatViewModel @Inject constructor(
 
     init {
         loadSuggestions()
+        observeSyncFailures()
+    }
+
+    private fun observeSyncFailures() {
+        viewModelScope.launch {
+            getFailedSyncCountUseCase()
+                .distinctUntilChanged()
+                .filter { it > 0 }
+                .collect { count ->
+                    _syncFailureEvent.tryEmit(count)
+                }
+        }
     }
 
     private fun loadSuggestions() {

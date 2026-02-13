@@ -20,6 +20,7 @@ import se.onemanstudio.playaroundwithai.core.data.feature.chat.mapper.toDomain a
 import se.onemanstudio.playaroundwithai.core.data.feature.chat.mapper.toEntity as toPromptEntity
 
 private const val SYNC_WORK_NAME = "sync_prompts_work"
+private const val LOG_PREVIEW_LENGTH = 50
 
 @Singleton
 class PromptRepositoryImpl @Inject constructor(
@@ -28,7 +29,7 @@ class PromptRepositoryImpl @Inject constructor(
 ) : PromptRepository {
 
     override suspend fun savePrompt(prompt: Prompt) {
-        Timber.d("PromptRepo - Saving prompt to local DB, with text '${prompt.text.take(50)}...', syncStatus: Pending")
+        Timber.d("PromptRepo - Saving prompt to local DB, with text '${prompt.text.take(LOG_PREVIEW_LENGTH)}...', syncStatus: Pending")
         val promptWithPendingStatus = prompt.copy(syncStatus = SyncStatus.Pending)
         promptsHistoryDao.savePrompt(promptWithPendingStatus.toPromptEntity())
         Timber.d("PromptRepo - Prompt saved to Room. Scheduling background sync...")
@@ -49,6 +50,10 @@ class PromptRepositoryImpl @Inject constructor(
                 Timber.v("PromptRepo - Sync status check -> isSyncing:$syncing")
                 syncing
             }
+    }
+
+    override fun getFailedSyncCount(): Flow<Int> {
+        return promptsHistoryDao.getCountBySyncStatus(SyncStatus.Failed.name)
     }
 
     private fun scheduleSync() {

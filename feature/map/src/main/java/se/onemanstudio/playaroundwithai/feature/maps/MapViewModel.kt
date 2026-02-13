@@ -15,9 +15,12 @@ import se.onemanstudio.playaroundwithai.core.domain.feature.map.model.VehicleTyp
 import se.onemanstudio.playaroundwithai.core.domain.feature.map.usecase.GetMapItemsUseCase
 import se.onemanstudio.playaroundwithai.feature.maps.models.MapItemUiModel
 import se.onemanstudio.playaroundwithai.feature.maps.models.toUiModel
+import se.onemanstudio.playaroundwithai.feature.maps.states.MapError
 import se.onemanstudio.playaroundwithai.feature.maps.states.MapUiState
 import se.onemanstudio.playaroundwithai.feature.maps.utils.calculatePathDistance
 import se.onemanstudio.playaroundwithai.feature.maps.utils.permutations
+import timber.log.Timber
+import java.io.IOException
 import javax.inject.Inject
 import kotlin.math.roundToInt
 
@@ -36,19 +39,32 @@ class MapViewModel @Inject constructor(
         loadMapData()
     }
 
+    @Suppress("TooGenericExceptionCaught")
     fun loadMapData() {
-        _uiState.update { it.copy(isLoading = true) }
+        _uiState.update { it.copy(isLoading = true, error = null) }
 
         viewModelScope.launch {
-            val data = getMapItemsUseCase(AMOUNT_OF_POINTS_TO_GENERATE).map { it.toUiModel() }.toPersistentList()
-            _uiState.update {
-                it.copy(
-                    isLoading = false,
-                    allLocations = data,
-                    visibleLocations = data
-                )
+            try {
+                val data = getMapItemsUseCase(AMOUNT_OF_POINTS_TO_GENERATE).map { it.toUiModel() }.toPersistentList()
+                _uiState.update {
+                    it.copy(
+                        isLoading = false,
+                        allLocations = data,
+                        visibleLocations = data
+                    )
+                }
+            } catch (e: IOException) {
+                Timber.e(e, "MapViewModel - Failed to load map data (network)")
+                _uiState.update { it.copy(isLoading = false, error = MapError.NetworkError) }
+            } catch (e: Exception) {
+                Timber.e(e, "MapViewModel - Failed to load map data")
+                _uiState.update { it.copy(isLoading = false, error = MapError.Unknown(e.localizedMessage)) }
             }
         }
+    }
+
+    fun dismissError() {
+        _uiState.update { it.copy(error = null) }
     }
 
     fun setPathMode(active: Boolean) {

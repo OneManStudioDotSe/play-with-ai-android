@@ -43,6 +43,8 @@
     <string name="sync_notification_complete">Sync complete</string>
     <string name="sync_notification_failed">Sync failed</string>
 
+    <string name="sync_failed_snackbar">%d prompt(s) failed to sync to the cloud</string>
+
     <string name="no_history_yet">No history yet. Start a conversation to see it here!</string>
 
     <!-- Analysis Types -->

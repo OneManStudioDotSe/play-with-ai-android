@@ -9,4 +9,6 @@ interface PromptRepository {
     fun getPromptHistory(): Flow<List<Prompt>>
 
     fun isSyncing(): Flow<Boolean>
+
+    fun getFailedSyncCount(): Flow<Int>
 }

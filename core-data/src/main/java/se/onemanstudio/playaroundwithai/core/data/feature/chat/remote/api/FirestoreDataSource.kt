@@ -10,6 +10,8 @@ import timber.log.Timber
 import javax.inject.Inject
 import javax.inject.Singleton
 
+private const val LOG_PREVIEW_LENGTH = 50
+
 @Singleton
 class FirestoreDataSource @Inject constructor(
     private val firestore: FirebaseFirestore,
@@ -19,7 +21,7 @@ class FirestoreDataSource @Inject constructor(
 
     suspend fun savePrompt(text: String, timestamp: Long): Result<Unit> {
         val userId = auth.currentUser?.uid ?: "anonymous"
-        Timber.d("Firestore - Saving prompt at collection 'prompts' for user with id '$userId' the text: '${text.take(50)}...'")
+        Timber.d("Firestore - Saving prompt at collection 'prompts' for user with id '$userId' the text: '${text.take(LOG_PREVIEW_LENGTH)}...'")
 
         val dto = PromptFirestoreDto(
             text = text,
