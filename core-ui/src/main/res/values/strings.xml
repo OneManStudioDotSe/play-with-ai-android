@@ -1,8 +1,3 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-
-    <!-- Input Modes -->
-    <string name="input_mode_text">Text</string>
-    <string name="input_mode_image">Image</string>
-    <string name="input_mode_document">Document</string>
 </resources>

@@ -4,7 +4,9 @@
       "Bash(./gradlew:*)",
       "Bash(JAVA_HOME=\"/Applications/Android Studio.app/Contents/jbr/Contents/Home\" /Users/sotirisfalieris/Documents/Repos/Mine/play-with-ai-android/gradlew:*)",
       "Bash(export JAVA_HOME=\"/Applications/Android Studio.app/Contents/jbr/Contents/Home\")",
-      "Bash(cat:*)"
+      "Bash(cat:*)",
+      "Bash(wc:*)",
+      "Bash(/usr/libexec/java_home:*)"
     ]
   }
 }

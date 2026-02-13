@@ -47,8 +47,6 @@ android {
 }
 
 dependencies {
-    implementation(project(":core-data"))
-    implementation(project(":core-domain"))
     implementation(project(":core-theme"))
 
     implementation(libs.material3)
