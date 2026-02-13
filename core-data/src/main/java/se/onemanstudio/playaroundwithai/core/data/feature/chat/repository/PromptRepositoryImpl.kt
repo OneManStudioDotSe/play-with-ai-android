@@ -9,14 +9,15 @@ import androidx.work.WorkManager
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.map
 import se.onemanstudio.playaroundwithai.core.data.feature.chat.local.dao.PromptsHistoryDao
-import se.onemanstudio.playaroundwithai.core.data.feature.chat.remote.firebase.SyncWorker
+import se.onemanstudio.playaroundwithai.core.data.feature.chat.remote.services.SyncWorker
 import se.onemanstudio.playaroundwithai.core.domain.feature.chat.model.Prompt
 import se.onemanstudio.playaroundwithai.core.domain.feature.chat.model.SyncStatus
 import se.onemanstudio.playaroundwithai.core.domain.feature.chat.repository.PromptRepository
-import se.onemanstudio.playaroundwithai.core.data.feature.chat.mapper.toDomain as toPromptDomain
-import se.onemanstudio.playaroundwithai.core.data.feature.chat.mapper.toEntity as toPromptEntity
+import timber.log.Timber
 import javax.inject.Inject
 import javax.inject.Singleton
+import se.onemanstudio.playaroundwithai.core.data.feature.chat.mapper.toDomain as toPromptDomain
+import se.onemanstudio.playaroundwithai.core.data.feature.chat.mapper.toEntity as toPromptEntity
 
 private const val SYNC_WORK_NAME = "sync_prompts_work"
 
@@ -27,13 +28,16 @@ class PromptRepositoryImpl @Inject constructor(
 ) : PromptRepository {
 
     override suspend fun savePrompt(prompt: Prompt) {
+        Timber.d("PromptRepo - Saving prompt to local DB, with text '${prompt.text.take(50)}...', syncStatus: Pending")
         val promptWithPendingStatus = prompt.copy(syncStatus = SyncStatus.Pending)
         promptsHistoryDao.savePrompt(promptWithPendingStatus.toPromptEntity())
+        Timber.d("PromptRepo - Prompt saved to Room. Scheduling background sync...")
         scheduleSync()
     }
 
-    override fun getPromptHistory(): Flow<List<Prompt>> = 
-        promptsHistoryDao.getPromptHistory().map { list -> 
+    override fun getPromptHistory(): Flow<List<Prompt>> =
+        promptsHistoryDao.getPromptHistory().map { list ->
+            Timber.v("PromptRepo - Prompt history updated. We now have ${list.size} entries at the local DB")
             list.map { it.toPromptDomain() }
         }
 
@@ -41,7 +45,9 @@ class PromptRepositoryImpl @Inject constructor(
         return workManager
             .getWorkInfosForUniqueWorkFlow(SYNC_WORK_NAME)
             .map { workInfos ->
-                workInfos.any { it.state == WorkInfo.State.RUNNING || it.state == WorkInfo.State.ENQUEUED }
+                val syncing = workInfos.any { it.state == WorkInfo.State.RUNNING || it.state == WorkInfo.State.ENQUEUED }
+                Timber.v("PromptRepo - Sync status check -> isSyncing:$syncing")
+                syncing
             }
     }
 
@@ -55,6 +61,7 @@ class PromptRepositoryImpl @Inject constructor(
             .addTag(SYNC_WORK_NAME)
             .build()
 
+        Timber.d("PromptRepo - Enqueuing SyncWorker...")
         workManager.enqueueUniqueWork(
             SYNC_WORK_NAME,
             ExistingWorkPolicy.REPLACE,
