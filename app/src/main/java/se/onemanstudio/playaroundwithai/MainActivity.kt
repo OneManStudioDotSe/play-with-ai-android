@@ -16,10 +16,18 @@ import androidx.compose.material3.NavigationBar
 import androidx.compose.material3.NavigationBarItem
 import androidx.compose.material3.NavigationBarItemDefaults
 import androidx.compose.material3.Scaffold
+import androidx.compose.material3.SnackbarDuration
+import androidx.compose.material3.SnackbarHost
+import androidx.compose.material3.SnackbarHostState
+import androidx.compose.material3.SnackbarResult
 import androidx.compose.material3.Text
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight.Companion.Bold
 import androidx.compose.ui.text.font.FontWeight.Companion.Normal
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
@@ -52,11 +60,30 @@ class MainActivity : ComponentActivity() {
         setContent {
             // This will trigger the anonymous login
             val viewModel: MainViewModel = hiltViewModel()
+            val authError by viewModel.authError.collectAsState()
+            val snackbarHostState = remember { SnackbarHostState() }
+
+            val authErrorMessage = stringResource(R.string.auth_error_message)
+            val retryLabel = stringResource(R.string.auth_error_retry)
+
+            LaunchedEffect(authError) {
+                if (authError) {
+                    val result = snackbarHostState.showSnackbar(
+                        message = authErrorMessage,
+                        actionLabel = retryLabel,
+                        duration = SnackbarDuration.Long
+                    )
+                    if (result == SnackbarResult.ActionPerformed) {
+                        viewModel.retryAuth()
+                    }
+                }
+            }
 
             SofaAiTheme {
                 val navController = rememberNavController()
 
                 Scaffold(
+                    snackbarHost = { SnackbarHost(hostState = snackbarHostState) },
                     bottomBar = {
                         NavigationBar(
                             containerColor = Color.Transparent,

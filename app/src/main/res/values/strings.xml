@@ -1,3 +1,5 @@
 <resources>
     <string name="app_name">Play With Ai</string>
+    <string name="auth_error_message">Sign-in failed. Some features may not work.</string>
+    <string name="auth_error_retry">Retry</string>
 </resources>
