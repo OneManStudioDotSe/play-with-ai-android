@@ -4,6 +4,8 @@ import com.google.firebase.FirebaseException
 import com.google.firebase.auth.FirebaseAuth
 import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.tasks.await
+import se.onemanstudio.playaroundwithai.core.data.feature.auth.mapper.toDomain
+import se.onemanstudio.playaroundwithai.core.domain.feature.auth.model.AuthSession
 import se.onemanstudio.playaroundwithai.core.domain.feature.auth.repository.AuthRepository
 import timber.log.Timber
 import javax.inject.Inject
@@ -13,17 +15,23 @@ import javax.inject.Singleton
 class AuthRepositoryImpl @Inject constructor(
     private val firebaseAuth: FirebaseAuth
 ) : AuthRepository {
-    override suspend fun signInAnonymously(): Result<Unit> {
+    override suspend fun signInAnonymously(): Result<AuthSession> {
         return try {
-            if (!isUserSignedIn()) {
+            val session = if (!isUserSignedIn()) {
                 Timber.d("Auth - User not signed in, attempting anonymous sign-in...")
-                firebaseAuth.signInAnonymously().await()
-                Timber.d("Auth - Anonymous sign-in successful. UID: ${firebaseAuth.currentUser?.uid}")
+                val authResult = firebaseAuth.signInAnonymously().await()
+                Timber.d("Auth - Anonymous sign-in successful. UID: ${authResult.user?.uid}")
+                authResult.toDomain()
             } else {
                 Timber.d("Auth - User already signed in. UID: ${firebaseAuth.currentUser?.uid}")
+                requireNotNull(firebaseAuth.currentUser).toDomain()
             }
 
-            Result.success(Unit)
+            Timber.d(
+                "Auth - Session created: userId=%s, isNew=%s, accountAge=%d days, provider=%s",
+                session.userId, session.isNewUser, session.accountAgeDays, session.authProvider
+            )
+            Result.success(session)
         } catch (e: CancellationException) {
             throw e
         } catch (e: FirebaseException) {

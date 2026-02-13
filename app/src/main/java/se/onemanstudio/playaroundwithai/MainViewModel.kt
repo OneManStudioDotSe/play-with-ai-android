@@ -26,7 +26,11 @@ class MainViewModel @Inject constructor(
     private fun signIn() {
         viewModelScope.launch {
             signInAnonymouslyUseCase()
-                .onSuccess {
+                .onSuccess { session ->
+                    Timber.d(
+                        "Auth - Session established: userId=%s, isNewUser=%s, accountAge=%d days, provider=%s",
+                        session.userId, session.isNewUser, session.accountAgeDays, session.authProvider
+                    )
                     _authError.value = false
                 }
                 .onFailure { e ->
