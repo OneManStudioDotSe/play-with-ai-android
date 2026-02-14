@@ -1,11 +1,15 @@
 package se.onemanstudio.playaroundwithai.feature.maps
 
+import android.app.Application
+import android.net.ConnectivityManager
+import android.net.NetworkCapabilities
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.google.android.gms.maps.model.LatLng
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.collections.immutable.persistentListOf
 import kotlinx.collections.immutable.toPersistentList
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
@@ -14,6 +18,7 @@ import se.onemanstudio.playaroundwithai.core.domain.feature.map.model.SuggestedP
 import se.onemanstudio.playaroundwithai.core.domain.feature.map.model.VehicleType
 import se.onemanstudio.playaroundwithai.core.domain.feature.map.usecase.GetMapItemsUseCase
 import se.onemanstudio.playaroundwithai.core.domain.feature.map.usecase.GetSuggestedPlacesUseCase
+import se.onemanstudio.playaroundwithai.feature.map.R
 import se.onemanstudio.playaroundwithai.feature.maps.models.MapItemUiModel
 import se.onemanstudio.playaroundwithai.feature.maps.models.toUiModel
 import se.onemanstudio.playaroundwithai.feature.maps.states.MapError
@@ -28,23 +33,35 @@ import kotlin.math.roundToInt
 
 private const val AMOUNT_OF_POINTS_TO_GENERATE = 30
 private const val WALKING_SPEED_METERS_PER_MIN = 83.0 // approx 5km/h
+private const val LOADING_MESSAGE_DURATION = 3000L
 
 @HiltViewModel
 class MapViewModel @Inject constructor(
     private val getMapItemsUseCase: GetMapItemsUseCase,
     private val getSuggestedPlacesUseCase: GetSuggestedPlacesUseCase,
+    private val application: Application
 ) : ViewModel() {
 
     private val _uiState = MutableStateFlow(MapUiState())
     val uiState = _uiState.asStateFlow()
 
+    private val _currentLoadingMessage = MutableStateFlow("")
+    val currentLoadingMessage = _currentLoadingMessage.asStateFlow()
+
     init {
         loadMapData()
+        startLoadingMessageCycle()
     }
 
     @Suppress("TooGenericExceptionCaught")
     fun loadMapData() {
         _uiState.update { it.copy(isLoading = true, error = null) }
+
+        if (!isNetworkAvailable()) {
+            Timber.w("MapViewModel - No network available, cannot load map data")
+            _uiState.update { it.copy(isLoading = false, error = MapError.NetworkError) }
+            return
+        }
 
         viewModelScope.launch {
             try {
@@ -64,6 +81,13 @@ class MapViewModel @Inject constructor(
                 _uiState.update { it.copy(isLoading = false, error = MapError.Unknown(e.localizedMessage)) }
             }
         }
+    }
+
+    private fun isNetworkAvailable(): Boolean {
+        val connectivityManager = application.getSystemService(ConnectivityManager::class.java)
+        val network = connectivityManager.activeNetwork ?: return false
+        val capabilities = connectivityManager.getNetworkCapabilities(network) ?: return false
+        return capabilities.hasCapability(NetworkCapabilities.NET_CAPABILITY_INTERNET)
     }
 
     fun dismissError() {
@@ -200,5 +224,27 @@ class MapViewModel @Inject constructor(
 
     fun selectSuggestedPlace(place: SuggestedPlace?) {
         _uiState.update { it.copy(focusedMarker = null, focusedSuggestedPlace = place) }
+    }
+
+    private fun startLoadingMessageCycle() {
+        viewModelScope.launch {
+            val messages = getLoadingMessages()
+            var index = 0
+            while (true) {
+                _currentLoadingMessage.value = messages[index]
+                delay(LOADING_MESSAGE_DURATION)
+                index = (index + 1) % messages.size
+            }
+        }
+    }
+
+    private fun getLoadingMessages(): List<String> {
+        return listOf(
+            application.getString(R.string.loading_message_1),
+            application.getString(R.string.loading_message_2),
+            application.getString(R.string.loading_message_3),
+            application.getString(R.string.loading_message_4),
+            application.getString(R.string.loading_message_5)
+        )
     }
 }

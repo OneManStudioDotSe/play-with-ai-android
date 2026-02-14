@@ -36,4 +36,10 @@
     <string name="ai_places_location_error">Could not determine your location. Please enable location services.</string>
     <string name="ai_places_fetch_error">Failed to load AI suggested places. Please try again.</string>
     <string name="dismiss">Dismiss</string>
+
+    <string name="loading_message_1">Samlar kosmiska insikter…</string>
+    <string name="loading_message_2">Brygger briljanta svar…</string>
+    <string name="loading_message_3">Rådgör med den digitala oraklet…</string>
+    <string name="loading_message_4">Polerar visdomens pixlar…</string>
+    <string name="loading_message_5">Väcker datatomtarna…</string>
 </resources>

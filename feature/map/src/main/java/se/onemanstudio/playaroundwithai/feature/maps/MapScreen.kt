@@ -3,11 +3,14 @@ package se.onemanstudio.playaroundwithai.feature.maps
 import android.Manifest
 import android.annotation.SuppressLint
 import android.content.pm.PackageManager
+import android.view.HapticFeedbackConstants
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.core.EaseInOutQuart
 import androidx.compose.animation.core.tween
+import androidx.compose.animation.fadeIn
+import androidx.compose.animation.fadeOut
 import androidx.compose.animation.slideInHorizontally
 import androidx.compose.animation.slideOutHorizontally
 import androidx.compose.foundation.background
@@ -18,11 +21,13 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.navigationBarsPadding
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.statusBarsPadding
+import androidx.compose.foundation.layout.wrapContentHeight
 import androidx.compose.foundation.layout.wrapContentSize
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.DirectionsBike
@@ -51,6 +56,7 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.platform.LocalView
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
@@ -73,10 +79,10 @@ import com.google.maps.android.compose.rememberUpdatedMarkerState
 import kotlinx.coroutines.launch
 import se.onemanstudio.playaroundwithai.core.domain.feature.map.model.VehicleType
 import se.onemanstudio.playaroundwithai.core.ui.sofa.NeoBrutalButton
+import se.onemanstudio.playaroundwithai.core.ui.sofa.NeoBrutalCard
 import se.onemanstudio.playaroundwithai.core.ui.sofa.NeoBrutalIconButton
 import se.onemanstudio.playaroundwithai.core.ui.theme.Alphas
 import se.onemanstudio.playaroundwithai.core.ui.theme.Dimensions
-import se.onemanstudio.playaroundwithai.feature.map.R
 import se.onemanstudio.playaroundwithai.feature.maps.MapConstants.STOCKHOLM_LAT
 import se.onemanstudio.playaroundwithai.feature.maps.MapConstants.STOCKHOLM_LNG
 import se.onemanstudio.playaroundwithai.feature.maps.states.MapError
@@ -88,6 +94,7 @@ import se.onemanstudio.playaroundwithai.feature.maps.views.MarkerInfoCard
 import se.onemanstudio.playaroundwithai.feature.maps.views.PathModeBar
 import se.onemanstudio.playaroundwithai.feature.maps.views.SideControls
 import se.onemanstudio.playaroundwithai.feature.maps.views.SuggestedPlaceInfoCard
+import se.onemanstudio.playaroundwithai.feature.map.R as MapFeatureR
 
 private const val CAMERA_PADDING = 150
 
@@ -96,10 +103,12 @@ private const val CAMERA_PADDING = 150
 @Composable
 fun MapScreen(viewModel: MapViewModel = hiltViewModel()) {
     val context = LocalContext.current
+    val view = LocalView.current
     val fusedLocationClient = remember { LocationServices.getFusedLocationProviderClient(context) }
     val scope = rememberCoroutineScope()
 
     val uiState by viewModel.uiState.collectAsState()
+    val currentLoadingMessage by viewModel.currentLoadingMessage.collectAsState()
 
     val stockholm = LatLng(STOCKHOLM_LAT, STOCKHOLM_LNG)
 
@@ -142,8 +151,15 @@ fun MapScreen(viewModel: MapViewModel = hiltViewModel()) {
         }
     }
 
+    LaunchedEffect(uiState.suggestedPlaces) {
+        if (uiState.suggestedPlaces.isNotEmpty()) {
+            view.performHapticFeedback(HapticFeedbackConstants.CONTEXT_CLICK)
+        }
+    }
+
     LaunchedEffect(uiState.optimalRoute) {
         if (uiState.optimalRoute.isNotEmpty()) {
+            view.performHapticFeedback(HapticFeedbackConstants.CONTEXT_CLICK)
             val boundsBuilder = LatLngBounds.builder()
             uiState.optimalRoute.forEach { boundsBuilder.include(it) }
             cameraPositionState.animate(
@@ -153,9 +169,9 @@ fun MapScreen(viewModel: MapViewModel = hiltViewModel()) {
         }
     }
 
-    val locationErrorMessage = stringResource(R.string.ai_places_location_error)
-    val fetchErrorMessage = stringResource(R.string.ai_places_fetch_error)
-    val dismissLabel = stringResource(R.string.dismiss)
+    val locationErrorMessage = stringResource(MapFeatureR.string.ai_places_location_error)
+    val fetchErrorMessage = stringResource(MapFeatureR.string.ai_places_fetch_error)
+    val dismissLabel = stringResource(MapFeatureR.string.dismiss)
 
     LaunchedEffect(uiState.suggestedPlacesError) {
         val error = uiState.suggestedPlacesError ?: return@LaunchedEffect
@@ -177,9 +193,9 @@ fun MapScreen(viewModel: MapViewModel = hiltViewModel()) {
                 mapStyleOptions = MapStyleOptions.loadRawResourceStyle(
                     context,
                     if (isSystemInDarkTheme()) {
-                        R.raw.custom_map_style_dark
+                        MapFeatureR.raw.custom_map_style_dark
                     } else {
-                        R.raw.custom_map_style_light
+                        MapFeatureR.raw.custom_map_style_light
                     }
                 ),
                 isMyLocationEnabled = hasLocationPermission
@@ -238,7 +254,7 @@ fun MapScreen(viewModel: MapViewModel = hiltViewModel()) {
                     ) {
                         CustomMarkerIcon(
                             icon,
-                            stringResource(id = R.string.marker_content_description, item.name),
+                            stringResource(id = MapFeatureR.string.marker_content_description, item.name),
                             isSelected
                         )
                     }
@@ -264,7 +280,7 @@ fun MapScreen(viewModel: MapViewModel = hiltViewModel()) {
                     ) {
                         CustomMarkerIcon(
                             Icons.Filled.Stars,
-                            stringResource(id = R.string.ai_suggested_place_marker_content_description, place.name),
+                            stringResource(id = MapFeatureR.string.ai_suggested_place_marker_content_description, place.name),
                             false
                         )
                     }
@@ -298,17 +314,26 @@ fun MapScreen(viewModel: MapViewModel = hiltViewModel()) {
                 verticalAlignment = Alignment.CenterVertically
             ) {
                 FilterChip(
-                    text = stringResource(id = R.string.scooters_filter_chip_label),
+                    text = stringResource(id = MapFeatureR.string.scooters_filter_chip_label),
                     selected = uiState.activeFilter.contains(VehicleType.SCOOTER)
-                ) { viewModel.toggleFilter(VehicleType.SCOOTER) }
+                ) {
+                    view.performHapticFeedback(HapticFeedbackConstants.CONTEXT_CLICK)
+                    viewModel.toggleFilter(VehicleType.SCOOTER)
+                }
                 FilterChip(
-                    text = stringResource(id = R.string.bicycles_filter_chip_label),
+                    text = stringResource(id = MapFeatureR.string.bicycles_filter_chip_label),
                     selected = uiState.activeFilter.contains(VehicleType.BICYCLE)
-                ) { viewModel.toggleFilter(VehicleType.BICYCLE) }
+                ) {
+                    view.performHapticFeedback(HapticFeedbackConstants.CONTEXT_CLICK)
+                    viewModel.toggleFilter(VehicleType.BICYCLE)
+                }
                 NeoBrutalIconButton(
-                    onClick = { viewModel.getAiSuggestedPlaces(userLocation) },
+                    onClick = {
+                        view.performHapticFeedback(HapticFeedbackConstants.CONTEXT_CLICK)
+                        viewModel.getAiSuggestedPlaces(userLocation)
+                    },
                     imageVector = Icons.Default.AutoAwesome,
-                    contentDescription = stringResource(id = R.string.ai_suggest_button_content_description),
+                    contentDescription = stringResource(id = MapFeatureR.string.ai_suggest_button_content_description),
                     backgroundColor = MaterialTheme.colorScheme.tertiaryContainer
                 )
             }
@@ -430,14 +455,14 @@ fun MapScreen(viewModel: MapViewModel = hiltViewModel()) {
                     durationMillis = AnimationConstants.ANIMATION_DURATION,
                     easing = EaseInOutQuart
                 )
-            ),
+            ) + fadeIn(animationSpec = tween(durationMillis = AnimationConstants.ANIMATION_DURATION)),
             exit = slideOutHorizontally(
                 targetOffsetX = { it },
                 animationSpec = tween(
                     durationMillis = AnimationConstants.ANIMATION_DURATION,
                     easing = EaseInOutQuart
                 )
-            ),
+            ) + fadeOut(animationSpec = tween(durationMillis = AnimationConstants.ANIMATION_DURATION)),
             modifier = Modifier.align(Alignment.BottomCenter)
         ) {
             Box(
@@ -470,7 +495,7 @@ fun MapScreen(viewModel: MapViewModel = hiltViewModel()) {
             }
         )
 
-        LoadingState(uiState)
+        LoadingState(uiState, currentLoadingMessage)
 
         ErrorState(
             uiState = uiState,
@@ -501,15 +526,15 @@ private fun ErrorState(
                         is MapError.NetworkError -> Icons.Rounded.WifiOff
                         is MapError.Unknown -> Icons.Rounded.Warning
                     },
-                    contentDescription = stringResource(R.string.map_error_icon),
+                    contentDescription = stringResource(MapFeatureR.string.map_error_icon),
                     tint = MaterialTheme.colorScheme.error,
                     modifier = Modifier.size(48.dp)
                 )
                 Spacer(modifier = Modifier.height(Dimensions.paddingMedium))
                 Text(
                     text = when (error) {
-                        is MapError.NetworkError -> stringResource(R.string.map_error_network)
-                        is MapError.Unknown -> error.message ?: stringResource(R.string.map_error_unknown)
+                        is MapError.NetworkError -> stringResource(MapFeatureR.string.map_error_network)
+                        is MapError.Unknown -> error.message ?: stringResource(MapFeatureR.string.map_error_unknown)
                     },
                     style = MaterialTheme.typography.bodyLarge,
                     color = MaterialTheme.colorScheme.onSurface,
@@ -517,7 +542,7 @@ private fun ErrorState(
                 )
                 Spacer(modifier = Modifier.height(Dimensions.paddingLarge))
                 NeoBrutalButton(
-                    text = stringResource(R.string.map_error_retry),
+                    text = stringResource(MapFeatureR.string.map_error_retry),
                     onClick = onRetry
                 )
             }
@@ -526,7 +551,7 @@ private fun ErrorState(
 }
 
 @Composable
-private fun LoadingState(uiState: MapUiState) {
+private fun LoadingState(uiState: MapUiState, currentLoadingMessage: String) {
     if (uiState.isLoading) {
         Box(
             modifier = Modifier
@@ -534,10 +559,38 @@ private fun LoadingState(uiState: MapUiState) {
                 .background(color = MaterialTheme.colorScheme.surface.copy(alpha = Alphas.high)),
             contentAlignment = Alignment.Center,
         ) {
-            CircularProgressIndicator(
-                modifier = Modifier.wrapContentSize(),
-                color = MaterialTheme.colorScheme.primary
-            )
+            NeoBrutalCard(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .wrapContentHeight()
+                    .padding(Dimensions.paddingLarge),
+            ) {
+                Column(
+                    horizontalAlignment = Alignment.CenterHorizontally,
+                    modifier = Modifier.padding(Dimensions.paddingLarge)
+                ) {
+                    CircularProgressIndicator(
+                        modifier = Modifier.wrapContentSize(),
+                        color = MaterialTheme.colorScheme.primary
+                    )
+                    if (currentLoadingMessage.isNotEmpty()) {
+                        Spacer(modifier = Modifier.height(Dimensions.paddingMedium))
+                        AnimatedVisibility(
+                            visible = currentLoadingMessage.isNotEmpty(),
+                            enter = fadeIn(animationSpec = tween(durationMillis = AnimationConstants.ANIMATION_DURATION)),
+                            exit = fadeOut(animationSpec = tween(durationMillis = AnimationConstants.ANIMATION_DURATION))
+                        ) {
+                            Text(
+                                text = currentLoadingMessage,
+                                style = MaterialTheme.typography.bodyLarge,
+                                color = MaterialTheme.colorScheme.onSurface,
+                                textAlign = TextAlign.Center,
+                                modifier = Modifier.padding(horizontal = Dimensions.paddingLarge)
+                            )
+                        }
+                    }
+                }
+            }
         }
     }
 }

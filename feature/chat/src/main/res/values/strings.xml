@@ -63,9 +63,4 @@
     <string name="time_format_history" translatable="false">HH:mm</string>
     <string name="date_format_history" translatable="false">MMM dd, yyyy</string>
     <string name="mime_type_all" translatable="false">*\/*</string>
-    <string name="loading_message_1">Gathering cosmic insights…</string>
-    <string name="loading_message_2">Brewing brilliant responses…</string>
-    <string name="loading_message_3">Consulting the digital oracle…</string>
-    <string name="loading_message_4">Polishing pixels of wisdom…</string>
-    <string name="loading_message_5">Waking up the data elves…</string>
 </resources>
