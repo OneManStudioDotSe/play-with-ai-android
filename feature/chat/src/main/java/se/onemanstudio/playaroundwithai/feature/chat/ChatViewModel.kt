@@ -44,7 +44,7 @@ private const val SUBSCRIBE_TIMEOUT = 5000L
 private const val JPEG_QUALITY = 100
 private const val LOADING_MESSAGE_DURATION = 3000L
 
-@Suppress("CanBeParameter", "LongParameterList")
+@Suppress("CanBeParameter", "LongParameterList", "TooManyFunctions")
 @HiltViewModel
 class ChatViewModel @Inject constructor(
     private val generateContentUseCase: GenerateContentUseCase,
