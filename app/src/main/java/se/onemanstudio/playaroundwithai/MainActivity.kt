@@ -45,13 +45,13 @@ import se.onemanstudio.playaroundwithai.navigation.Chat
 import se.onemanstudio.playaroundwithai.navigation.Maps
 import se.onemanstudio.playaroundwithai.navigation.navItems
 
-
 @AndroidEntryPoint
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
         enableEdgeToEdge()
+
         setContent { SoFaApp() }
     }
 }
@@ -60,13 +60,20 @@ class MainActivity : ComponentActivity() {
 private fun SoFaApp() {
     val viewModel: MainViewModel = hiltViewModel()
     val authError by viewModel.authError.collectAsState()
+    val authRetriesExhausted by viewModel.authRetriesExhausted.collectAsState()
     val snackbarHostState = remember { SnackbarHostState() }
 
     val authErrorMessage = stringResource(R.string.auth_error_message)
     val retryLabel = stringResource(R.string.auth_error_retry)
+    val retriesExhaustedMessage = stringResource(R.string.auth_error_retries_exhausted)
 
-    LaunchedEffect(authError) {
-        if (authError) {
+    LaunchedEffect(authError, authRetriesExhausted) {
+        if (authRetriesExhausted) {
+            snackbarHostState.showSnackbar(
+                message = retriesExhaustedMessage,
+                duration = SnackbarDuration.Indefinite
+            )
+        } else if (authError) {
             val result = snackbarHostState.showSnackbar(
                 message = authErrorMessage,
                 actionLabel = retryLabel,
@@ -119,14 +126,14 @@ private fun SoFaApp() {
             }
         ) { innerPadding ->
             NavHost(
-                navController,
-                startDestination = Chat,
-                Modifier
+                modifier = Modifier
                     .fillMaxSize()
                     .padding(innerPadding)
-                    .consumeWindowInsets(innerPadding)
+                    .consumeWindowInsets(innerPadding),
+                navController = navController,
+                startDestination = Chat,
             ) {
-                composable<Chat> { ChatScreen(viewModel = hiltViewModel()) }
+                composable<Chat> { ChatScreen() }
                 composable<Maps> { MapScreen() }
             }
         }

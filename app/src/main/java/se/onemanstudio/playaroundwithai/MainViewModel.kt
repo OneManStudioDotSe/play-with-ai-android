@@ -19,26 +19,43 @@ class MainViewModel @Inject constructor(
     private val _authError = MutableStateFlow(false)
     val authError: StateFlow<Boolean> = _authError.asStateFlow()
 
+    private val _authRetriesExhausted = MutableStateFlow(false)
+    val authRetriesExhausted: StateFlow<Boolean> = _authRetriesExhausted.asStateFlow()
+
+    private var authAttemptCount = 0
+
     init {
         signIn()
     }
 
     private fun signIn() {
         viewModelScope.launch {
+            authAttemptCount++
             signInAnonymouslyUseCase()
                 .onSuccess { session ->
-                    Timber.d("Auth - Session established for user ${session.userId}, from provider ${session.authProvider}")
+                    Timber.d("Auth - Session established for user ${session.userId} from @ ${session.authProvider}")
                     _authError.value = false
+                    _authRetriesExhausted.value = false
+                    authAttemptCount = 0
                 }
                 .onFailure { e ->
-                    Timber.e(e, "Auth - Anonymous sign-in failed")
+                    Timber.e(e, "Auth - Anonymous sign-in failed (attempt $authAttemptCount/$MAX_AUTH_ATTEMPTS)")
                     _authError.value = true
+                    if (authAttemptCount >= MAX_AUTH_ATTEMPTS) {
+                        _authRetriesExhausted.value = true
+                    }
                 }
         }
     }
 
     fun retryAuth() {
+        if (_authRetriesExhausted.value) return
+
         _authError.value = false
         signIn()
+    }
+
+    companion object {
+        private const val MAX_AUTH_ATTEMPTS = 3
     }
 }

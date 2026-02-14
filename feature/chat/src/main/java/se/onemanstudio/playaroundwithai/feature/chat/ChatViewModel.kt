@@ -18,9 +18,11 @@ import kotlinx.coroutines.flow.asSharedFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.filter
+import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
+import se.onemanstudio.playaroundwithai.core.domain.feature.auth.usecase.ObserveAuthReadyUseCase
 import se.onemanstudio.playaroundwithai.core.domain.feature.chat.model.GeminiModel
 import se.onemanstudio.playaroundwithai.core.domain.feature.chat.model.Prompt
 import se.onemanstudio.playaroundwithai.core.domain.feature.chat.model.SyncStatus
@@ -53,6 +55,7 @@ class ChatViewModel @Inject constructor(
     private val getSyncStateUseCase: GetSyncStateUseCase,
     private val getFailedSyncCountUseCase: GetFailedSyncCountUseCase,
     private val savePromptUseCase: SavePromptUseCase,
+    private val observeAuthReadyUseCase: ObserveAuthReadyUseCase,
     private val application: Application
 ) : ViewModel() {
     private val _suggestions = MutableStateFlow<List<String>>(emptyList())
@@ -95,9 +98,15 @@ class ChatViewModel @Inject constructor(
         )
 
     init {
-        loadSuggestions()
+        loadSuggestionsAfterAuth()
         observeSyncFailures()
-        startLoadingMessageCycle()
+    }
+
+    private fun loadSuggestionsAfterAuth() {
+        viewModelScope.launch {
+            observeAuthReadyUseCase().first { it }
+            loadSuggestions()
+        }
     }
 
     private fun observeSyncFailures() {
@@ -239,27 +248,5 @@ class ChatViewModel @Inject constructor(
             Timber.d("Security exception decoding image: ${e.message}")
             null
         }
-    }
-
-    private fun startLoadingMessageCycle() {
-        viewModelScope.launch {
-            val messages = getLoadingMessages()
-            var index = 0
-            while (true) {
-                _currentLoadingMessage.value = messages[index]
-                delay(LOADING_MESSAGE_DURATION)
-                index = (index + 1) % messages.size
-            }
-        }
-    }
-
-    private fun getLoadingMessages(): List<String> {
-        return listOf(
-            application.getString(R.string.loading_message_1),
-            application.getString(R.string.loading_message_2),
-            application.getString(R.string.loading_message_3),
-            application.getString(R.string.loading_message_4),
-            application.getString(R.string.loading_message_5)
-        )
     }
 }

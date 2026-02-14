@@ -10,6 +10,7 @@ import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.map
 import se.onemanstudio.playaroundwithai.core.data.feature.chat.local.dao.PromptsHistoryDao
 import se.onemanstudio.playaroundwithai.core.data.feature.chat.remote.services.SyncWorker
+import se.onemanstudio.playaroundwithai.core.domain.feature.auth.repository.AuthRepository
 import se.onemanstudio.playaroundwithai.core.domain.feature.chat.model.Prompt
 import se.onemanstudio.playaroundwithai.core.domain.feature.chat.model.SyncStatus
 import se.onemanstudio.playaroundwithai.core.domain.feature.chat.repository.PromptRepository
@@ -25,15 +26,21 @@ private const val LOG_PREVIEW_LENGTH = 50
 @Singleton
 class PromptRepositoryImpl @Inject constructor(
     private val promptsHistoryDao: PromptsHistoryDao,
-    private val workManager: WorkManager
+    private val workManager: WorkManager,
+    private val authRepository: AuthRepository
 ) : PromptRepository {
 
     override suspend fun savePrompt(prompt: Prompt) {
         Timber.d("PromptRepo - Saving prompt to local DB, with text '${prompt.text.take(LOG_PREVIEW_LENGTH)}...', syncStatus: Pending")
         val promptWithPendingStatus = prompt.copy(syncStatus = SyncStatus.Pending)
         promptsHistoryDao.savePrompt(promptWithPendingStatus.toPromptEntity())
-        Timber.d("PromptRepo - Prompt saved to Room. Scheduling background sync...")
-        scheduleSync()
+
+        if (authRepository.isUserSignedIn()) {
+            Timber.d("PromptRepo - Prompt saved to Room. Scheduling background sync...")
+            scheduleSync()
+        } else {
+            Timber.w("PromptRepo - Prompt saved to Room. Skipping sync — user is not authenticated")
+        }
     }
 
     override fun getPromptHistory(): Flow<List<Prompt>> =
