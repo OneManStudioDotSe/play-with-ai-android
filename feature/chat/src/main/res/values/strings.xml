@@ -26,6 +26,10 @@
     <string name="no_history_yet">No history yet. Start a conversation to see it here!</string>
 
     <string name="label_syncing">Syncing</string>
+    <string name="model_selector" translatable="false">Model</string>
+    <string name="gemini_model_flash_preview" translatable="false">Gemini 3 Flash</string>
+    <string name="gemini_model_pro" translatable="false">Gemini 2.5 Pro</string>
+    <string name="gemini_model_flash" translatable="false">Gemini 2.5 Flash</string>
 
     <string name="analysis_type_location">Location</string>
     <string name="analysis_type_recipe">Recipe</string>
@@ -59,4 +63,9 @@
     <string name="time_format_history" translatable="false">HH:mm</string>
     <string name="date_format_history" translatable="false">MMM dd, yyyy</string>
     <string name="mime_type_all" translatable="false">*\/*</string>
+    <string name="loading_message_1">Gathering cosmic insights…</string>
+    <string name="loading_message_2">Brewing brilliant responses…</string>
+    <string name="loading_message_3">Consulting the digital oracle…</string>
+    <string name="loading_message_4">Polishing pixels of wisdom…</string>
+    <string name="loading_message_5">Waking up the data elves…</string>
 </resources>

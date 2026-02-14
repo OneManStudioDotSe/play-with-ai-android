@@ -14,6 +14,7 @@ import se.onemanstudio.playaroundwithai.core.data.feature.chat.remote.dto.Part
 import se.onemanstudio.playaroundwithai.core.data.feature.chat.remote.dto.SuggestedPlacesResponseDto
 import se.onemanstudio.playaroundwithai.core.data.feature.chat.remote.dto.toSuggestedPlaceDomain
 import se.onemanstudio.playaroundwithai.core.domain.feature.chat.model.AnalysisType
+import se.onemanstudio.playaroundwithai.core.domain.feature.chat.model.GeminiModel
 import se.onemanstudio.playaroundwithai.core.domain.feature.chat.repository.GeminiRepository
 import se.onemanstudio.playaroundwithai.core.domain.feature.map.model.SuggestedPlace
 import timber.log.Timber
@@ -45,7 +46,8 @@ class GeminiRepositoryImpl @Inject constructor(
         prompt: String,
         imageBytes: ByteArray?,
         fileText: String?,
-        analysisType: AnalysisType?
+        analysisType: AnalysisType?,
+        model: GeminiModel,
     ): Result<String> {
         return try {
             Timber.d("Gemini - Generating content for a prompt with length ${prompt.length} characters, hasImage: " +
@@ -72,8 +74,8 @@ class GeminiRepositoryImpl @Inject constructor(
             }
 
             val request = GeminiRequest(contents = listOf(Content(parts = parts)))
-            Timber.d("Gemini - Sending request to Gemini API with ${parts.size} parts...")
-            val response = apiService.generateContent(request)
+            Timber.d("Gemini - Sending request to Gemini API (model=${model.id}) with ${parts.size} parts...")
+            val response = apiService.generateContent(model.id, request)
             val text = response.extractText() ?: "No response text found."
             Timber.d("Gemini - API response received (and it is ${text.length} chars)")
             Result.success(text)
@@ -84,7 +86,7 @@ class GeminiRepositoryImpl @Inject constructor(
     }
 
     @Suppress("TooGenericExceptionCaught")
-    override suspend fun generateConversationStarters(): Result<List<String>> {
+    override suspend fun generateConversationStarters(model: GeminiModel): Result<List<String>> {
         return try {
             Timber.d("Gemini - Generating conversation starters from API...")
 
@@ -97,7 +99,7 @@ class GeminiRepositoryImpl @Inject constructor(
 
             val parts = listOf(Part(text = suggestionPrompt))
             val request = GeminiRequest(contents = listOf(Content(parts = parts)))
-            val response = apiService.generateContent(request)
+            val response = apiService.generateContent(model.id, request)
 
             val text = response.extractText() ?: ""
             val suggestions = text.split("|").map { it.trim() }.filter { it.isNotEmpty() }
@@ -118,7 +120,8 @@ class GeminiRepositoryImpl @Inject constructor(
     @Suppress("TooGenericExceptionCaught")
     override suspend fun getSuggestedPlaces(
         latitude: Double,
-        longitude: Double
+        longitude: Double,
+        model: GeminiModel,
     ): Result<List<SuggestedPlace>> {
         return try {
             Timber.d("Gemini - Getting suggested places for lat=$latitude, lng=$longitude")
@@ -126,7 +129,7 @@ class GeminiRepositoryImpl @Inject constructor(
             val prompt = buildSuggestedPlacesPrompt(latitude, longitude)
             val parts = listOf(Part(text = prompt))
             val request = GeminiRequest(contents = listOf(Content(parts = parts)))
-            val response = apiService.generateContent(request)
+            val response = apiService.generateContent(model.id, request)
 
             val rawText = response.extractText() ?: ""
             if (rawText.isBlank()) {

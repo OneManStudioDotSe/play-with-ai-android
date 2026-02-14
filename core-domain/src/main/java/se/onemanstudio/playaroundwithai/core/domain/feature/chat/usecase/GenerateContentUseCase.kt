@@ -1,6 +1,7 @@
 package se.onemanstudio.playaroundwithai.core.domain.feature.chat.usecase
 
 import se.onemanstudio.playaroundwithai.core.domain.feature.chat.model.AnalysisType
+import se.onemanstudio.playaroundwithai.core.domain.feature.chat.model.GeminiModel
 import se.onemanstudio.playaroundwithai.core.domain.feature.chat.repository.GeminiRepository
 import javax.inject.Inject
 
@@ -11,12 +12,13 @@ class GenerateContentUseCase @Inject constructor(
         prompt: String,
         imageBytes: ByteArray? = null,
         fileText: String? = null,
-        analysisType: AnalysisType? = null
+        analysisType: AnalysisType? = null,
+        model: GeminiModel = GeminiModel.FLASH_PREVIEW,
     ): Result<String> {
         if (prompt.isBlank() && imageBytes == null && fileText == null) {
             return Result.failure(IllegalArgumentException("Prompt and attachments cannot all be empty"))
         }
 
-        return repository.generateContent(prompt, imageBytes, fileText, analysisType)
+        return repository.generateContent(prompt, imageBytes, fileText, analysisType, model)
     }
 }

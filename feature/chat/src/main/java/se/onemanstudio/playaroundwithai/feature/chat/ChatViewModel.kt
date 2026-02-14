@@ -7,6 +7,7 @@ import android.net.Uri
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import dagger.hilt.android.lifecycle.HiltViewModel
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.channels.BufferOverflow
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -20,6 +21,7 @@ import kotlinx.coroutines.flow.filter
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
+import se.onemanstudio.playaroundwithai.core.domain.feature.chat.model.GeminiModel
 import se.onemanstudio.playaroundwithai.core.domain.feature.chat.model.Prompt
 import se.onemanstudio.playaroundwithai.core.domain.feature.chat.model.SyncStatus
 import se.onemanstudio.playaroundwithai.core.domain.feature.chat.usecase.GenerateContentUseCase
@@ -40,6 +42,7 @@ import javax.inject.Inject
 
 private const val SUBSCRIBE_TIMEOUT = 5000L
 private const val JPEG_QUALITY = 100
+private const val LOADING_MESSAGE_DURATION = 3000L
 
 @Suppress("CanBeParameter", "LongParameterList")
 @HiltViewModel
@@ -64,12 +67,18 @@ class ChatViewModel @Inject constructor(
     private val _isSheetOpen = MutableStateFlow(false)
     val isSheetOpen = _isSheetOpen.asStateFlow()
 
+    private val _selectedModel = MutableStateFlow(GeminiModel.FLASH_PREVIEW)
+    val selectedModel = _selectedModel.asStateFlow()
+
     private val _syncFailureEvent = MutableSharedFlow<Int>(
         replay = 0,
         extraBufferCapacity = 1,
         onBufferOverflow = BufferOverflow.DROP_OLDEST
     )
     val syncFailureEvent: SharedFlow<Int> = _syncFailureEvent.asSharedFlow()
+
+    private val _currentLoadingMessage = MutableStateFlow("")
+    val currentLoadingMessage = _currentLoadingMessage.asStateFlow()
 
     val promptHistory: StateFlow<List<Prompt>> = getPromptHistoryUseCase()
         .stateIn(
@@ -88,6 +97,7 @@ class ChatViewModel @Inject constructor(
     init {
         loadSuggestions()
         observeSyncFailures()
+        startLoadingMessageCycle()
     }
 
     private fun observeSyncFailures() {
@@ -101,10 +111,14 @@ class ChatViewModel @Inject constructor(
         }
     }
 
+    fun selectModel(model: GeminiModel) {
+        _selectedModel.value = model
+    }
+
     private fun loadSuggestions() {
         viewModelScope.launch {
             _isSuggestionsLoading.value = true
-            getSuggestionsUseCase()
+            getSuggestionsUseCase(model = _selectedModel.value)
                 .onSuccess { topics ->
                     _suggestions.update { topics }
                 }
@@ -150,7 +164,8 @@ class ChatViewModel @Inject constructor(
                 prompt = prompt,
                 imageBytes = imageBytes,
                 fileText = fileText,
-                analysisType = analysisType
+                analysisType = analysisType,
+                model = _selectedModel.value,
             ).onSuccess { responseText ->
                 _uiState.update {
                     ChatUiState.Success(responseText)
@@ -224,5 +239,27 @@ class ChatViewModel @Inject constructor(
             Timber.d("Security exception decoding image: ${e.message}")
             null
         }
+    }
+
+    private fun startLoadingMessageCycle() {
+        viewModelScope.launch {
+            val messages = getLoadingMessages()
+            var index = 0
+            while (true) {
+                _currentLoadingMessage.value = messages[index]
+                delay(LOADING_MESSAGE_DURATION)
+                index = (index + 1) % messages.size
+            }
+        }
+    }
+
+    private fun getLoadingMessages(): List<String> {
+        return listOf(
+            application.getString(R.string.loading_message_1),
+            application.getString(R.string.loading_message_2),
+            application.getString(R.string.loading_message_3),
+            application.getString(R.string.loading_message_4),
+            application.getString(R.string.loading_message_5)
+        )
     }
 }

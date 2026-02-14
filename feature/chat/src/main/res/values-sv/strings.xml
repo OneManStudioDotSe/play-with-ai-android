@@ -52,5 +52,13 @@
     <string name="fallback_suggestion_joke">Berätta ett skämt</string>
     <string name="fallback_suggestion_physics">Förklara kvantfysik</string>
     <string name="fallback_suggestion_roast">Grilla min kod</string>
+
     <string name="history_date_at">%1$s på %2$s</string>
+
+    <string name="loading_message_1">Samlar kosmiska insikter…</string>
+    <string name="loading_message_2">Brygger briljanta svar…</string>
+    <string name="loading_message_3">Rådgör med den digitala oraklet…</string>
+    <string name="loading_message_4">Polerar visdomens pixlar…</string>
+    <string name="loading_message_5">Väcker datatomtarna…</string>
+
 </resources>
