@@ -49,14 +49,6 @@ Dependencies flow: `feature → core-domain ← core-data`, `feature → core-ui
 - **Hilt** for dependency injection across all modules
 - **Compose** with `@Immutable` UI states and `PersistentList`/`PersistentSet` for stability
 
-### Key Packages
-
-```
-se.onemanstudio.playaroundwithai.core.domain.feature.{chat,auth,map}
-se.onemanstudio.playaroundwithai.core.data.feature.{chat,auth,map}.{di,local,remote,mappers}
-se.onemanstudio.playaroundwithai.feature.{chat,maps}
-```
-
 ### Patterns & Conventions
 
 - **UI states** are sealed interfaces/immutable data classes (e.g., `ChatUiState.Initial | Loading | Success | Error`)
@@ -165,17 +157,7 @@ MAPS_API_KEY=your-maps-api-key
 │  ┌──────────────────────────────┐       ┌──────────────────────────────┐        │
 │  │       :feature:chat          │       │        :feature:map          │        │
 │  │                              │       │                              │        │
-│  │  ChatScreen (Compose)        │       │  MapScreen (Compose)         │        │
-│  │       │                      │       │       │                      │        │
-│  │       ▼                      │       │       ▼                      │        │
-│  │  ChatViewModel               │       │  MapViewModel                │        │
-│  │   │  StateFlow<ChatUiState>  │       │   │  StateFlow<MapUiState>   │        │
-│  │   │   ├─ Initial             │       │   │   (locations, filters,   │        │
-│  │   │   ├─ Loading             │       │   │    route, metrics)       │        │
-│  │   │   ├─ Success             │       │   │                          │        │
-│  │   │   └─ Error               │       │   │                          │        │
 │  └───┼──────────────────────────┘       └───┼──────────────────────────┘        │
-│      │ Uses 5 use cases                     │ Uses 1 use case                   │
 └──────┼──────────────────────────────────────┼───────────────────────────────────┘
        │                                      │
        ▼                                      ▼
@@ -208,59 +190,31 @@ MAPS_API_KEY=your-maps-api-key
 │  ┌─────────────────────────────────────────────────────────────────────────┐    │
 │  │                        Repository Implementations                       │    │
 │  │                                                                         │    │
-│  │  GeminiRepositoryImpl   PromptRepositoryImpl   MapRepositoryImpl        │    │
-│  │         │                  │          │              │                  │    │
-│  │         │                  │          │              │                  │    │
-│  │  AuthRepositoryImpl        │          │              │                  │    │
-│  │         │                  │          │              │                  │    │
-│  └─────────┼──────────────────┼──────────┼──────────────┼──────────────────┘    │
-│            │                  │          │              │                       │
-│            ▼                  ▼          │              ▼                       │
+│  └─────────┼──────────────────┼─────────┼───────────────┼──────────────────┘    │
+│            │                  │         │               │                       │
+│            ▼                  ▼         │               ▼                       │
 │  ┌──────────────────────────────────┐   │    ┌─────────────────────────┐        │
 │  │       REMOTE DATA SOURCES        │   │    │   FakeMapApiService     │        │
 │  │                                  │   │    │   (Mock data generator) │        │
-│  │  ┌────────────────────────────┐  │   │    │   Simulates 1.5s delay  │        │
-│  │  │     GeminiApiService       │  │   │    │   Generates random      │        │
-│  │  │     (Retrofit)             │  │   │    │   vehicle locations     │        │
+│  │  ┌────────────────────────────┐  │   │    │                         │        │
+│  │  │     GeminiApiService       │  │   │    │                         │        │
 │  │  │                            │  │   │    └─────────────────────────┘        │
-│  │  │  POST v1beta/models/       │  │   │                                       │
-│  │  │  gemini-3-flash-preview    │  │   │                                       │
-│  │  │  :generateContent          │  │   │                                       │
 │  │  └────────────┬───────────────┘  │   │                                       │
 │  │               │                  │   │                                       │
 │  │  ┌────────────────────────────┐  │   │                                       │
 │  │  │  FirestoreDataSource       │  │   │                                       │
 │  │  │                            │  │   │                                       │
-│  │  │  Collection: "prompts"     │  │   │                                       │
-│  │  │  Doc: {text, timestamp,    │  │   │                                       │
-│  │  │        userId}             │  │   │                                       │
 │  │  └────────────┬───────────────┘  │   │                                       │
 │  │               │                  │   │                                       │
 │  │  ┌────────────────────────────┐  │   │                                       │
 │  │  │  Firebase Auth             │  │   │                                       │
-│  │  │  signInAnonymously()       │  │   │                                       │
 │  │  └────────────┬───────────────┘  │   │                                       │
 │  └───────────────┼──────────────────┘   │                                       │
 │                  │                      ▼                                       │
 │                  │    ┌──────────────────────────────────┐                      │
 │                  │    │       LOCAL DATA SOURCE          │                      │
 │                  │    │                                  │                      │
-│                  │    │   Room DB: "play_around_with_ai_db"                     │
-│                  │    │   Table: "prompt_history"        │                      │
-│                  │    │   ┌─────────────────────────┐    │                      │
-│                  │    │   │ id          (PK, auto)  │    │                      │
-│                  │    │   │ text        (String)    │    │                      │
-│                  │    │   │ timestamp   (Long)      │    │                      │
-│                  │    │   │ syncStatus  (Enum)      │    │                      │
-│                  │    │   │  ├─ Pending             │    │                      │
-│                  │    │   │  └─ Synced              │    │                      │
-│                  │    │   └─────────────────────────┘    │                      │
-│                  │    │                                  │                      │
-│                  │    │   PromptsHistoryDao:             │                      │
-│                  │    │    savePrompt()                  │                      │
-│                  │    │    getPromptHistory() → Flow     │                      │
-│                  │    │    getPromptsBySyncStatus()      │                      │
-│                  │    │    updateSyncStatus()            │                      │
+│                  │    │   Room DB: "play_with_ai_db"     |                      │
 │                  │    └──────────────────────────────────┘                      │
 │                  │                      ▲                                       │
 │                  │                      │                                       │
@@ -268,18 +222,12 @@ MAPS_API_KEY=your-maps-api-key
 │                  │    │       BACKGROUND SYNC            │                      │
 │                  │    │                                  │                      │
 │                  │    │   SyncWorker (WorkManager)       │                      │
-│                  │    │    1. Get Pending prompts (Room) │                      │
-│                  │    │    2. Upload to Firestore ───────┼──┐                   │
-│                  │    │    3. Mark as Synced (Room)      │  │                   │
-│                  │    │                                  │  │                   │
-│                  │    │   Constraints:                   │  │                   │
-│                  │    │    - Requires network            │  │                   │
-│                  │    │   Policy: REPLACE existing       │  │                   │
-│                  │    └──────────────────────────────────┘  │                   │
-│                  │                                          │                   │
-└──────────────────┼──────────────────────────────────────────┼───────────────────┘
-                   │                                          │
-                   ▼                                          ▼
+│                  │    │                                  │                      │
+│                  │    └──────────────────────────────────┘                      │
+│                  │                                                              │
+└──────────────────┼──────────────────────────────────────────────────────────────┘
+                   │                                          
+                   ▼                                          
 ┌─────────────────────────────────────────────────────────────────────────────────┐
 │                            EXTERNAL SERVICES                                    │
 │                                                                                 │
