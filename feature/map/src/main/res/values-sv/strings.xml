@@ -29,4 +29,11 @@
     <string name="map_error_unknown">Något gick fel vid laddning av kartan.</string>
     <string name="map_error_retry">Försök igen</string>
     <string name="map_error_icon">Felikon</string>
+    <string name="ai_suggest_button_content_description">Get AI suggested places</string>
+    <string name="ai_suggested_place_marker_content_description">AI suggested place: %s</string>
+    <string name="suggested_place_category">Category</string>
+    <string name="suggested_place_description">Description</string>
+    <string name="ai_places_location_error">Could not determine your location. Please enable location services.</string>
+    <string name="ai_places_fetch_error">Failed to load AI suggested places. Please try again.</string>
+    <string name="dismiss">Dismiss</string>
 </resources>

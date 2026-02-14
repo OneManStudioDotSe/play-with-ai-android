@@ -2,6 +2,7 @@
 
 package se.onemanstudio.playaroundwithai.feature.chat
 
+import android.annotation.SuppressLint
 import android.content.Context
 import android.content.Intent
 import android.net.Uri
@@ -75,6 +76,7 @@ import se.onemanstudio.playaroundwithai.feature.chat.views.ChatInputArea
 import se.onemanstudio.playaroundwithai.feature.chat.views.TypewriterText
 import se.onemanstudio.playaroundwithai.feature.chat.views.history.HistoryBottomSheet
 
+@SuppressLint("LocalContextGetResourceValueCall")
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun ChatScreen(viewModel: ChatViewModel) {
