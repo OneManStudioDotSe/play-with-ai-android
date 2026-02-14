@@ -25,16 +25,62 @@ class AuthRepositoryImplTest {
     @Before
     fun setUp() {
         firebaseAuth = mockk()
+        every { firebaseAuth.currentUser } returns null
         repository = AuthRepositoryImpl(firebaseAuth)
 
         mockkStatic("kotlinx.coroutines.tasks.TasksKt")
     }
 
     @Test
+    fun `authReady starts false when no user is signed in`() {
+        every { firebaseAuth.currentUser } returns null
+        val repo = AuthRepositoryImpl(firebaseAuth)
+        assertThat(repo.authReady.value).isFalse()
+    }
+
+    @Test
+    fun `authReady starts true when user is already signed in`() {
+        every { firebaseAuth.currentUser } returns mockk()
+        val repo = AuthRepositoryImpl(firebaseAuth)
+        assertThat(repo.authReady.value).isTrue()
+    }
+
+    @Test
+    fun `signInAnonymously sets authReady to true on success`() = runTest {
+        // GIVEN: User is not signed in
+        val metadata = mockk<FirebaseUserMetadata> {
+            every { creationTimestamp } returns 1_700_000_000_000L
+            every { lastSignInTimestamp } returns 1_700_000_060_000L
+        }
+        val firebaseUser = mockk<FirebaseUser> {
+            every { uid } returns "new-uid"
+            every { isAnonymous } returns true
+            every { this@mockk.metadata } returns metadata
+        }
+        val additionalUserInfo = mockk<AdditionalUserInfo> {
+            every { isNewUser } returns true
+            every { providerId } returns "firebase"
+        }
+        val authResult = mockk<AuthResult> {
+            every { user } returns firebaseUser
+            every { this@mockk.additionalUserInfo } returns additionalUserInfo
+        }
+        val task = mockk<Task<AuthResult>>()
+        every { firebaseAuth.signInAnonymously() } returns task
+        coEvery { task.await() } returns authResult
+
+        assertThat(repository.authReady.value).isFalse()
+
+        // WHEN
+        repository.signInAnonymously()
+
+        // THEN
+        assertThat(repository.authReady.value).isTrue()
+    }
+
+    @Test
     fun `signInAnonymously when not signed in returns AuthSession with mapped fields`() = runTest {
         // GIVEN: User is not signed in and sign-in succeeds
-        every { firebaseAuth.currentUser } returns null
-
         val metadata = mockk<FirebaseUserMetadata> {
             every { creationTimestamp } returns 1_700_000_000_000L
             every { lastSignInTimestamp } returns 1_700_000_060_000L

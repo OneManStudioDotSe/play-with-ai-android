@@ -14,6 +14,7 @@ import org.junit.Before
 import org.junit.Test
 import se.onemanstudio.playaroundwithai.core.data.feature.chat.local.dao.PromptsHistoryDao
 import se.onemanstudio.playaroundwithai.core.data.feature.chat.local.entity.PromptEntity
+import se.onemanstudio.playaroundwithai.core.domain.feature.auth.repository.AuthRepository
 import se.onemanstudio.playaroundwithai.core.domain.feature.chat.model.Prompt
 import se.onemanstudio.playaroundwithai.core.domain.feature.chat.model.SyncStatus
 import java.util.Date
@@ -22,13 +23,16 @@ class PromptRepositoryImplTest {
 
     private lateinit var dao: PromptsHistoryDao
     private lateinit var workManager: WorkManager
+    private lateinit var authRepository: AuthRepository
     private lateinit var repository: PromptRepositoryImpl
 
     @Before
     fun setUp() {
         dao = mockk(relaxed = true)
         workManager = mockk(relaxed = true)
-        repository = PromptRepositoryImpl(dao, workManager)
+        authRepository = mockk(relaxed = true)
+        every { authRepository.isUserSignedIn() } returns true
+        repository = PromptRepositoryImpl(dao, workManager, authRepository)
     }
 
     @Test
@@ -62,6 +66,20 @@ class PromptRepositoryImplTest {
 
         // THEN: WorkManager should be called to enqueue sync
         verify { workManager.enqueueUniqueWork(any(), any(), any<androidx.work.OneTimeWorkRequest>()) }
+    }
+
+    @Test
+    fun `savePrompt does not schedule sync when user is not authenticated`() = runTest {
+        // GIVEN: User is not signed in
+        every { authRepository.isUserSignedIn() } returns false
+        val prompt = Prompt(id = 0L, text = "Offline prompt", timestamp = Date(), syncStatus = SyncStatus.Pending)
+        coEvery { dao.savePrompt(any()) } returns 1L
+
+        // WHEN
+        repository.savePrompt(prompt)
+
+        // THEN: Prompt is saved locally but sync is NOT scheduled
+        verify { workManager wasNot io.mockk.Called }
     }
 
     @Test
