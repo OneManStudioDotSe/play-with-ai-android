@@ -194,8 +194,8 @@ class ChatViewModelTest {
         failedSyncCountResult: Int = 0
     ): ChatViewModel {
         val geminiRepository = mockk<GeminiRepository> {
-            generateContentResult?.let { coEvery { generateContent(any(), any(), any(), any()) } returns it }
-            coEvery { generateConversationStarters() } returns suggestionsResult
+            generateContentResult?.let { coEvery { generateContent(any(), any(), any(), any(), any()) } returns it }
+            coEvery { generateConversationStarters(any()) } returns suggestionsResult
         }
 
         val promptRepository = mockk<PromptRepository> {

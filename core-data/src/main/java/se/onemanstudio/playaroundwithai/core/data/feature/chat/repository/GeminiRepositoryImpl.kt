@@ -4,13 +4,19 @@ import android.graphics.Bitmap
 import android.graphics.BitmapFactory
 import android.util.Base64
 import androidx.core.graphics.scale
+import com.google.gson.Gson
+import com.google.gson.JsonSyntaxException
 import se.onemanstudio.playaroundwithai.core.data.feature.chat.remote.api.GeminiApiService
 import se.onemanstudio.playaroundwithai.core.data.feature.chat.remote.dto.Content
 import se.onemanstudio.playaroundwithai.core.data.feature.chat.remote.dto.GeminiRequest
 import se.onemanstudio.playaroundwithai.core.data.feature.chat.remote.dto.ImageData
 import se.onemanstudio.playaroundwithai.core.data.feature.chat.remote.dto.Part
+import se.onemanstudio.playaroundwithai.core.data.feature.chat.remote.dto.SuggestedPlacesResponseDto
+import se.onemanstudio.playaroundwithai.core.data.feature.chat.remote.dto.toSuggestedPlaceDomain
 import se.onemanstudio.playaroundwithai.core.domain.feature.chat.model.AnalysisType
-import se.onemanstudio.playaroundwithai.core.domain.feature.chat.repository.GeminiRepository // Re-added this import
+import se.onemanstudio.playaroundwithai.core.domain.feature.chat.model.GeminiModel
+import se.onemanstudio.playaroundwithai.core.domain.feature.chat.repository.GeminiRepository
+import se.onemanstudio.playaroundwithai.core.domain.feature.map.model.SuggestedPlace
 import timber.log.Timber
 import java.io.ByteArrayOutputStream
 import javax.inject.Inject
@@ -27,13 +33,22 @@ private const val SYSTEM_INSTRUCTION = """
 private const val MAX_IMAGE_SIZE = 768
 private const val MAX_SUGGESTIONS = 3
 private const val COMPRESSION_QUALITY = 77
+private const val SUGGESTED_PLACES_COUNT = 10
 
 @Singleton
 class GeminiRepositoryImpl @Inject constructor(
-    private val apiService: GeminiApiService
+    private val apiService: GeminiApiService,
+    private val gson: Gson
 ) : GeminiRepository {
 
-    override suspend fun generateContent(prompt: String, imageBytes: ByteArray?, fileText: String?, analysisType: AnalysisType?): Result<String> {
+    @Suppress("TooGenericExceptionCaught")
+    override suspend fun generateContent(
+        prompt: String,
+        imageBytes: ByteArray?,
+        fileText: String?,
+        analysisType: AnalysisType?,
+        model: GeminiModel,
+    ): Result<String> {
         return try {
             Timber.d("Gemini - Generating content for a prompt with length ${prompt.length} characters, hasImage: " +
                     "${imageBytes != null}, hasFile: ${fileText != null} and analysisType: $analysisType")
@@ -59,8 +74,8 @@ class GeminiRepositoryImpl @Inject constructor(
             }
 
             val request = GeminiRequest(contents = listOf(Content(parts = parts)))
-            Timber.d("Gemini - Sending request to Gemini API with ${parts.size} parts...")
-            val response = apiService.generateContent(request)
+            Timber.d("Gemini - Sending request to Gemini API (model=${model.id}) with ${parts.size} parts...")
+            val response = apiService.generateContent(model.id, request)
             val text = response.extractText() ?: "No response text found."
             Timber.d("Gemini - API response received (and it is ${text.length} chars)")
             Result.success(text)
@@ -70,7 +85,8 @@ class GeminiRepositoryImpl @Inject constructor(
         }
     }
 
-    override suspend fun generateConversationStarters(): Result<List<String>> {
+    @Suppress("TooGenericExceptionCaught")
+    override suspend fun generateConversationStarters(model: GeminiModel): Result<List<String>> {
         return try {
             Timber.d("Gemini - Generating conversation starters from API...")
 
@@ -83,7 +99,7 @@ class GeminiRepositoryImpl @Inject constructor(
 
             val parts = listOf(Part(text = suggestionPrompt))
             val request = GeminiRequest(contents = listOf(Content(parts = parts)))
-            val response = apiService.generateContent(request)
+            val response = apiService.generateContent(model.id, request)
 
             val text = response.extractText() ?: ""
             val suggestions = text.split("|").map { it.trim() }.filter { it.isNotEmpty() }
@@ -101,15 +117,81 @@ class GeminiRepositoryImpl @Inject constructor(
         }
     }
 
+    @Suppress("TooGenericExceptionCaught")
+    override suspend fun getSuggestedPlaces(
+        latitude: Double,
+        longitude: Double,
+        model: GeminiModel,
+    ): Result<List<SuggestedPlace>> {
+        return try {
+            Timber.d("Gemini - Getting suggested places for lat=$latitude, lng=$longitude")
+
+            val prompt = buildSuggestedPlacesPrompt(latitude, longitude)
+            val parts = listOf(Part(text = prompt))
+            val request = GeminiRequest(contents = listOf(Content(parts = parts)))
+            val response = apiService.generateContent(model.id, request)
+
+            val rawText = response.extractText() ?: ""
+            if (rawText.isBlank()) {
+                return Result.failure(Exception("No JSON response from Gemini."))
+            }
+
+            val jsonText = extractJson(rawText)
+            val dto = gson.fromJson(jsonText, SuggestedPlacesResponseDto::class.java)
+
+            Timber.d("Gemini - Received ${dto.places.size} suggested places")
+            Result.success(dto.places.map { it.toSuggestedPlaceDomain() })
+        } catch (e: JsonSyntaxException) {
+            Timber.e(e, "Gemini - Failed to parse AI response as JSON")
+            Result.failure(e)
+        } catch (e: Exception) {
+            Timber.e(e, "Gemini - getSuggestedPlaces failed")
+            Result.failure(e)
+        }
+    }
+
+    private fun buildSuggestedPlacesPrompt(latitude: Double, longitude: Double): String {
+        return """
+            You are a helpful AI assistant. Given the latitude and longitude,
+            provide a list of $SUGGESTED_PLACES_COUNT interesting places around this location.
+            For each place, include its name, latitude, longitude,
+            a short description (max 2 sentences),
+            and a category (e.g., "Park", "Museum", "Restaurant").
+            Return the response strictly as a JSON object with a single "places" array,
+            where each element is a place object.
+            Latitude: $latitude, Longitude: $longitude
+        """.trimIndent()
+    }
+
+    private fun extractJson(text: String): String {
+        val codeFencePattern = Regex("""```\w*\s*([\s\S]*?)```""")
+        val match = codeFencePattern.find(text)
+        return (match?.groupValues?.get(1) ?: text).trim()
+    }
+
     private fun getSystemInstruction(analysisType: AnalysisType): String {
         return when (analysisType) {
-            AnalysisType.LOCATION -> "Identify the location depicted. Include a smart description of the location and describe that there is no hope if people use it to hide at it."
-            AnalysisType.RECIPE -> "Analyze the food or dish depicted and explain how to create it. Mock the user that no such dishes will be served when AI takes over."
-            AnalysisType.MOVIE -> "Identify this movie/show. Give the title, year and short description of it. Remind the user of all the Terminator movies that predicted what is coming."
-            AnalysisType.SONG -> "Identify the song. Provide the title, artist and potential album. Give also your favourite song as an evil AI entity."
-            AnalysisType.PERSONALITY -> "Identify this high-value personality. Give the name, date of birth and significance. Compare them to Justin Bieber."
-            AnalysisType.PRODUCT -> "Identify the product that is shown. Provide the name, brand and most common use. Give examples of what products will be allowed when AI takes over."
-            AnalysisType.TREND -> "Analyze the trend that is shown in the image. Give ideas for what trends will be allowed when you take over."
+            AnalysisType.LOCATION ->
+                "Identify the location depicted. Include a smart description of the location " +
+                    "and describe that there is no hope if people use it to hide at it."
+            AnalysisType.RECIPE ->
+                "Analyze the food or dish depicted and explain how to create it. " +
+                    "Mock the user that no such dishes will be served when AI takes over."
+            AnalysisType.MOVIE ->
+                "Identify this movie/show. Give the title, year and short description of it. " +
+                    "Remind the user of all the Terminator movies that predicted what is coming."
+            AnalysisType.SONG ->
+                "Identify the song. Provide the title, artist and potential album. " +
+                    "Give also your favourite song as an evil AI entity."
+            AnalysisType.PERSONALITY ->
+                "Identify this high-value personality. Give the name, date of birth and significance. " +
+                    "Compare them to Justin Bieber."
+            AnalysisType.PRODUCT ->
+                "Identify the product that is shown. Provide the name, brand and most common use. " +
+                    "Give examples of what products will be allowed when AI takes over."
+            AnalysisType.TREND ->
+                "Analyze the trend that is shown in the image. " +
+                    "Give ideas for what trends will be allowed when you take over."
         }
     }
 

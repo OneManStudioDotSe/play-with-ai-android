@@ -10,12 +10,15 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
+import se.onemanstudio.playaroundwithai.core.domain.feature.map.model.SuggestedPlace
 import se.onemanstudio.playaroundwithai.core.domain.feature.map.model.VehicleType
 import se.onemanstudio.playaroundwithai.core.domain.feature.map.usecase.GetMapItemsUseCase
+import se.onemanstudio.playaroundwithai.core.domain.feature.map.usecase.GetSuggestedPlacesUseCase
 import se.onemanstudio.playaroundwithai.feature.maps.models.MapItemUiModel
 import se.onemanstudio.playaroundwithai.feature.maps.models.toUiModel
 import se.onemanstudio.playaroundwithai.feature.maps.states.MapError
 import se.onemanstudio.playaroundwithai.feature.maps.states.MapUiState
+import se.onemanstudio.playaroundwithai.feature.maps.states.SuggestedPlacesError
 import se.onemanstudio.playaroundwithai.feature.maps.utils.calculatePathDistance
 import se.onemanstudio.playaroundwithai.feature.maps.utils.permutations
 import timber.log.Timber
@@ -29,6 +32,7 @@ private const val WALKING_SPEED_METERS_PER_MIN = 83.0 // approx 5km/h
 @HiltViewModel
 class MapViewModel @Inject constructor(
     private val getMapItemsUseCase: GetMapItemsUseCase,
+    private val getSuggestedPlacesUseCase: GetSuggestedPlacesUseCase,
 ) : ViewModel() {
 
     private val _uiState = MutableStateFlow(MapUiState())
@@ -78,7 +82,7 @@ class MapViewModel @Inject constructor(
     }
 
     fun selectMarker(marker: MapItemUiModel?) {
-        _uiState.update { it.copy(focusedMarker = marker) }
+        _uiState.update { it.copy(focusedMarker = marker, focusedSuggestedPlace = null) }
     }
 
     fun toggleFilter(type: VehicleType) {
@@ -147,5 +151,54 @@ class MapViewModel @Inject constructor(
                 routeDurationMinutes = ((totalDistance * 1000) / WALKING_SPEED_METERS_PER_MIN).roundToInt()
             )
         }
+    }
+
+    fun getAiSuggestedPlaces(userLocation: LatLng?) {
+        if (userLocation == null) {
+            _uiState.update {
+                it.copy(focusedSuggestedPlace = null, suggestedPlacesError = SuggestedPlacesError.LocationUnavailable)
+            }
+            return
+        }
+
+        _uiState.update {
+            it.copy(
+                isLoading = true,
+                focusedMarker = null,
+                suggestedPlaces = persistentListOf(),
+                focusedSuggestedPlace = null,
+                suggestedPlacesError = null
+            )
+        }
+
+        viewModelScope.launch {
+            getSuggestedPlacesUseCase(userLocation.latitude, userLocation.longitude)
+                .onSuccess { places ->
+                    _uiState.update {
+                        it.copy(
+                            isLoading = false,
+                            suggestedPlaces = places.toPersistentList(),
+                            suggestedPlacesError = null
+                        )
+                    }
+                }
+                .onFailure { exception ->
+                    Timber.e(exception, "Failed to get AI suggested places")
+                    _uiState.update {
+                        it.copy(
+                            isLoading = false,
+                            suggestedPlacesError = SuggestedPlacesError.FetchFailed
+                        )
+                    }
+                }
+        }
+    }
+
+    fun dismissSuggestedPlacesError() {
+        _uiState.update { it.copy(suggestedPlacesError = null) }
+    }
+
+    fun selectSuggestedPlace(place: SuggestedPlace?) {
+        _uiState.update { it.copy(focusedMarker = null, focusedSuggestedPlace = place) }
     }
 }

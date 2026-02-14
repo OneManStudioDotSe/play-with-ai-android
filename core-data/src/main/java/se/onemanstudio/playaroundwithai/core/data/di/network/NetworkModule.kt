@@ -16,6 +16,8 @@ import se.onemanstudio.playaroundwithai.core.data.feature.map.api.MapApiService
 import java.util.concurrent.TimeUnit
 import javax.inject.Singleton
 
+private const val TIMEOUT_SECONDS = 30L
+
 @Module
 @InstallIn(SingletonComponent::class)
 object NetworkModule {
@@ -31,9 +33,9 @@ object NetworkModule {
         return OkHttpClient.Builder()
             .addInterceptor(loggingInterceptor)
             .addInterceptor(authInterceptor)
-            .connectTimeout(30, TimeUnit.SECONDS)
-            .readTimeout(30, TimeUnit.SECONDS)
-            .writeTimeout(30, TimeUnit.SECONDS)
+            .connectTimeout(TIMEOUT_SECONDS, TimeUnit.SECONDS)
+            .readTimeout(TIMEOUT_SECONDS, TimeUnit.SECONDS)
+            .writeTimeout(TIMEOUT_SECONDS, TimeUnit.SECONDS)
             .build()
     }
 

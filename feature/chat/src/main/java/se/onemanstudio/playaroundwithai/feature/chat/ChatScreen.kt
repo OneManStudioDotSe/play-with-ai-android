@@ -2,6 +2,7 @@
 
 package se.onemanstudio.playaroundwithai.feature.chat
 
+import android.annotation.SuppressLint
 import android.content.Context
 import android.content.Intent
 import android.net.Uri
@@ -23,14 +24,18 @@ import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Check
 import androidx.compose.material.icons.filled.Clear
 import androidx.compose.material.icons.filled.History
+import androidx.compose.material.icons.filled.ModelTraining
 import androidx.compose.material.icons.filled.Sync
 import androidx.compose.material.icons.rounded.BrokenImage
 import androidx.compose.material.icons.rounded.Description
 import androidx.compose.material.icons.rounded.Lock
 import androidx.compose.material.icons.rounded.Warning
 import androidx.compose.material.icons.rounded.WifiOff
+import androidx.compose.material3.DropdownMenu
+import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
@@ -56,6 +61,7 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import se.onemanstudio.playaroundwithai.core.domain.feature.chat.model.AnalysisType
+import se.onemanstudio.playaroundwithai.core.domain.feature.chat.model.GeminiModel
 import se.onemanstudio.playaroundwithai.core.domain.feature.chat.model.InputMode
 import se.onemanstudio.playaroundwithai.core.ui.sofa.NeoBrutalIconButton
 import se.onemanstudio.playaroundwithai.core.ui.sofa.NeoBrutalTopAppBar
@@ -70,6 +76,7 @@ import se.onemanstudio.playaroundwithai.feature.chat.views.ChatInputArea
 import se.onemanstudio.playaroundwithai.feature.chat.views.TypewriterText
 import se.onemanstudio.playaroundwithai.feature.chat.views.history.HistoryBottomSheet
 
+@SuppressLint("LocalContextGetResourceValueCall")
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun ChatScreen(viewModel: ChatViewModel) {
@@ -82,6 +89,7 @@ fun ChatScreen(viewModel: ChatViewModel) {
     val isSheetOpen by viewModel.isSheetOpen.collectAsStateWithLifecycle()
     val history by viewModel.promptHistory.collectAsStateWithLifecycle()
     val isSyncing by viewModel.isSyncing.collectAsStateWithLifecycle()
+    val selectedModel by viewModel.selectedModel.collectAsStateWithLifecycle()
 
     var inputMode by remember { mutableStateOf(InputMode.TEXT) }
     var selectedImageUri by remember { mutableStateOf<Uri?>(null) }
@@ -152,6 +160,41 @@ fun ChatScreen(viewModel: ChatViewModel) {
             NeoBrutalTopAppBar(
                 title = stringResource(R.string.let_s_talk),
                 actions = {
+                    var isModelMenuExpanded by remember { mutableStateOf(false) }
+
+                    Box(modifier = Modifier.padding(end = Dimensions.paddingMedium)) {
+                        NeoBrutalIconButton(
+                            imageVector = Icons.Default.ModelTraining,
+                            contentDescription = stringResource(R.string.model_selector),
+                            backgroundColor = MaterialTheme.colorScheme.primaryContainer,
+                            onClick = { isModelMenuExpanded = true },
+                        )
+                        DropdownMenu(
+                            expanded = isModelMenuExpanded,
+                            onDismissRequest = { isModelMenuExpanded = false }
+                        ) {
+                            GeminiModel.entries.forEach { model ->
+                                DropdownMenuItem(
+                                    text = { Text(stringResource(model.asStringRes())) },
+                                    onClick = {
+                                        viewModel.selectModel(model)
+                                        isModelMenuExpanded = false
+                                    },
+                                    trailingIcon = if (model == selectedModel) {
+                                        {
+                                            Icon(
+                                                imageVector = Icons.Default.Check,
+                                                contentDescription = null,
+                                                modifier = Modifier.size(Dimensions.iconSizeLarge)
+                                            )
+                                        }
+                                    } else {
+                                        null
+                                    }
+                                )
+                            }
+                        }
+                    }
                     if (isSyncing) {
                         NeoBrutalIconButton(
                             imageVector = Icons.Default.Sync,
@@ -318,6 +361,14 @@ private fun getErrorMessageAndIcon(error: ChatError): Pair<String, ImageVector> 
         is ChatError.FileNotFound -> stringResource(R.string.error_i_couldn_t_find_the_selected_file) to Icons.Rounded.BrokenImage
         is ChatError.FileRead -> stringResource(R.string.error_i_couldn_t_read_the_file_content) to Icons.Rounded.Description
         is ChatError.Unknown -> (error.message ?: stringResource(R.string.error_an_unknown_error_occurred)) to Icons.Rounded.Warning
+    }
+}
+
+fun GeminiModel.asStringRes(): Int {
+    return when (this) {
+        GeminiModel.FLASH_PREVIEW -> R.string.gemini_model_flash_preview
+        GeminiModel.PRO -> R.string.gemini_model_pro
+        GeminiModel.FLASH -> R.string.gemini_model_flash
     }
 }
 
