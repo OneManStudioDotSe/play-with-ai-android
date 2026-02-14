@@ -16,6 +16,7 @@ import se.onemanstudio.playaroundwithai.core.data.feature.chat.local.dao.Prompts
 import se.onemanstudio.playaroundwithai.core.data.feature.chat.local.database.AppDatabase
 import se.onemanstudio.playaroundwithai.core.data.feature.chat.local.entity.PromptEntity
 import se.onemanstudio.playaroundwithai.core.domain.feature.chat.model.SyncStatus
+import se.onemanstudio.playaroundwithai.core.domain.feature.auth.repository.AuthRepository // Added import
 import java.util.Date
 
 @RunWith(AndroidJUnit4::class)
@@ -24,6 +25,7 @@ class PromptRepositoryImplTest {
     private lateinit var database: AppDatabase
     private lateinit var promptsHistoryDao: PromptsHistoryDao
     private val workManager = mockk<WorkManager>(relaxed = true)
+    private val authRepository = mockk<AuthRepository>(relaxed = true) // Added mock
     private lateinit var repository: PromptRepositoryImpl
 
     @Before
@@ -34,7 +36,7 @@ class PromptRepositoryImplTest {
         ).allowMainThreadQueries().build()
 
         promptsHistoryDao = database.historyDao()
-        repository = PromptRepositoryImpl(promptsHistoryDao, workManager)
+        repository = PromptRepositoryImpl(promptsHistoryDao, workManager, authRepository) // Updated constructor
     }
 
     @After

@@ -23,6 +23,7 @@ import se.onemanstudio.playaroundwithai.core.domain.feature.chat.usecase.GetProm
 import se.onemanstudio.playaroundwithai.core.domain.feature.chat.usecase.GetSuggestionsUseCase
 import se.onemanstudio.playaroundwithai.core.domain.feature.chat.usecase.GetSyncStateUseCase
 import se.onemanstudio.playaroundwithai.core.domain.feature.chat.usecase.SavePromptUseCase
+import se.onemanstudio.playaroundwithai.core.domain.feature.auth.usecase.ObserveAuthReadyUseCase
 import se.onemanstudio.playaroundwithai.feature.chat.states.ChatError
 import se.onemanstudio.playaroundwithai.feature.chat.states.ChatUiState
 import se.onemanstudio.playaroundwithai.feature.chat.util.MainCoroutineRule
@@ -195,7 +196,7 @@ class ChatViewModelTest {
     ): ChatViewModel {
         val geminiRepository = mockk<GeminiRepository> {
             generateContentResult?.let { coEvery { generateContent(any(), any(), any(), any(), any()) } returns it }
-            coEvery { generateConversationStarters(any()) } returns suggestionsResult
+            coEvery { generateConversationStarters(any()) } returns (suggestionsResult as Result<List<String>>)
         }
 
         val promptRepository = mockk<PromptRepository> {
@@ -206,6 +207,9 @@ class ChatViewModelTest {
         }
 
         val application = mockk<Application>(relaxed = true)
+        val observeAuthReadyUseCase = mockk<ObserveAuthReadyUseCase> {
+            every { invoke() } returns flowOf<Boolean>(true)
+        }
 
         return ChatViewModel(
             GenerateContentUseCase(geminiRepository),
@@ -214,6 +218,7 @@ class ChatViewModelTest {
             GetSyncStateUseCase(promptRepository),
             GetFailedSyncCountUseCase(promptRepository),
             SavePromptUseCase(promptRepository),
+            observeAuthReadyUseCase,
             application
         )
     }
