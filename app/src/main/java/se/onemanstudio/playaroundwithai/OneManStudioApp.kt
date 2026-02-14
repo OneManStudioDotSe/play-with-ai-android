@@ -30,6 +30,7 @@ class OneManStudioApp : Application(), Configuration.Provider {
         }
 
         createNotificationChannel()
+
         Timber.d("OneManStudioApp started")
     }
 
@@ -40,8 +41,7 @@ class OneManStudioApp : Application(), Configuration.Provider {
         val channel = NotificationChannel("sync_channel", name, importance).apply {
             description = descriptionText
         }
-        val notificationManager: NotificationManager =
-            getSystemService(NOTIFICATION_SERVICE) as NotificationManager
+        val notificationManager: NotificationManager = getSystemService(NOTIFICATION_SERVICE) as NotificationManager
         notificationManager.createNotificationChannel(channel)
     }
 }

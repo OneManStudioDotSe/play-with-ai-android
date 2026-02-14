@@ -10,6 +10,7 @@ import androidx.work.ForegroundInfo
 import androidx.work.WorkerParameters
 import dagger.assisted.Assisted
 import dagger.assisted.AssistedInject
+import com.google.firebase.auth.FirebaseAuth
 import se.onemanstudio.playaroundwithai.core.data.R
 import se.onemanstudio.playaroundwithai.core.data.feature.chat.local.dao.PromptsHistoryDao
 import se.onemanstudio.playaroundwithai.core.data.feature.chat.remote.api.FirestoreDataSource
@@ -23,11 +24,17 @@ class SyncWorker @AssistedInject constructor(
     @Assisted private val context: Context,
     @Assisted params: WorkerParameters,
     private val promptsDao: PromptsHistoryDao,
-    private val firestoreDataSource: FirestoreDataSource
+    private val firestoreDataSource: FirestoreDataSource,
+    private val firebaseAuth: FirebaseAuth
 ) : CoroutineWorker(context, params) {
 
     override suspend fun doWork(): Result {
         Timber.d("SyncWorker — Started (attempt ${runAttemptCount + 1}/$MAX_RETRY_COUNT)...")
+
+        if (firebaseAuth.currentUser == null) {
+            Timber.w("SyncWorker - User is not authenticated. Skipping sync")
+            return Result.failure()
+        }
 
         val pendingPrompts = promptsDao.getPromptsBySyncStatus(SyncStatus.Pending.name)
         if (pendingPrompts.isEmpty()) {

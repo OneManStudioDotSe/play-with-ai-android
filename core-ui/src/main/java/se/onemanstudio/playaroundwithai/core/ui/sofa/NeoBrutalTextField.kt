@@ -25,9 +25,7 @@ fun NeoBrutalTextField(
         BasicTextField(
             value = value,
             onValueChange = onValueChange,
-            textStyle = MaterialTheme.typography.bodyLarge.copy(
-                color = MaterialTheme.colorScheme.onSurface
-            ),
+            textStyle = MaterialTheme.typography.bodyLarge,
             modifier = Modifier
                 .fillMaxWidth()
                 .neoBrutalism(
@@ -42,7 +40,7 @@ fun NeoBrutalTextField(
         if (value.text.isEmpty()) {
             Text(
                 text = placeholder,
-                style = MaterialTheme.typography.bodySmall,
+                style = MaterialTheme.typography.bodyLarge,
                 color = MaterialTheme.colorScheme.onSurface.copy(alpha = Alphas.medium),
                 modifier = Modifier
                     .padding(Dimensions.paddingLarge)

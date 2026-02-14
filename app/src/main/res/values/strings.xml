@@ -2,4 +2,5 @@
     <string name="app_name">Play With AI</string>
     <string name="auth_error_message">Sign-in failed. Some features may not work.</string>
     <string name="auth_error_retry">Retry</string>
+    <string name="auth_error_retries_exhausted">Sign-in failed after multiple attempts. Your prompts will not be synced to the cloud.</string>
 </resources>

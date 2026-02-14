@@ -7,6 +7,7 @@ import android.content.Context
 import android.content.Intent
 import android.net.Uri
 import android.provider.OpenableColumns
+import android.view.HapticFeedbackConstants
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.background
@@ -55,10 +56,12 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalSoftwareKeyboardController
+import androidx.compose.ui.platform.LocalView
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.input.TextFieldValue
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
+import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import se.onemanstudio.playaroundwithai.core.domain.feature.chat.model.AnalysisType
 import se.onemanstudio.playaroundwithai.core.domain.feature.chat.model.GeminiModel
@@ -79,7 +82,7 @@ import se.onemanstudio.playaroundwithai.feature.chat.views.history.HistoryBottom
 @SuppressLint("LocalContextGetResourceValueCall")
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun ChatScreen(viewModel: ChatViewModel) {
+fun ChatScreen(viewModel: ChatViewModel = hiltViewModel()) {
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
     val suggestions by viewModel.suggestions.collectAsStateWithLifecycle()
     val isSuggestionsLoading by viewModel.isSuggestionsLoading.collectAsStateWithLifecycle()
@@ -97,8 +100,17 @@ fun ChatScreen(viewModel: ChatViewModel) {
     var analysisType by remember { mutableStateOf(AnalysisType.PRODUCT) }
 
     val context = LocalContext.current
+    val view = LocalView.current
     val selectedFileName = remember(selectedFileUri) { selectedFileUri?.let { getFileName(context, it) } }
     val snackbarHostState = remember { SnackbarHostState() }
+
+    LaunchedEffect(uiState) {
+        when (uiState) {
+            is ChatUiState.Success -> view.performHapticFeedback(HapticFeedbackConstants.CONTEXT_CLICK)
+            is ChatUiState.Error -> view.performHapticFeedback(HapticFeedbackConstants.LONG_PRESS)
+            else -> {}
+        }
+    }
 
     LaunchedEffect(Unit) {
         viewModel.syncFailureEvent.collect { failedCount ->
@@ -239,6 +251,7 @@ fun ChatScreen(viewModel: ChatViewModel) {
                     }
                 },
                 onSendClicked = {
+                    view.performHapticFeedback(HapticFeedbackConstants.CONTEXT_CLICK)
                     val attachment = when (inputMode) {
                         InputMode.IMAGE -> selectedImageUri?.let { Attachment.Image(it, analysisType) }
                         InputMode.DOCUMENT -> selectedFileUri?.let { Attachment.Document(it) }
