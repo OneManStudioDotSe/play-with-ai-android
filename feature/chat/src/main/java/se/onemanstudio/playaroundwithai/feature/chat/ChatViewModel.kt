@@ -37,7 +37,7 @@ import se.onemanstudio.playaroundwithai.feature.chat.util.FileUtils
 import timber.log.Timber
 import java.io.FileNotFoundException
 import java.io.IOException
-import java.util.Date
+import java.time.Instant
 import javax.inject.Inject
 
 private const val SUBSCRIBE_TIMEOUT = 5000L
@@ -164,7 +164,7 @@ class ChatViewModel @Inject constructor(
                 savePromptUseCase(
                     Prompt(
                         text = prompt,
-                        timestamp = Date(),
+                        timestamp = Instant.now(),
                         syncStatus = SyncStatus.Pending,
                         imageAttachment = imageBytes,
                         documentAttachment = fileText
