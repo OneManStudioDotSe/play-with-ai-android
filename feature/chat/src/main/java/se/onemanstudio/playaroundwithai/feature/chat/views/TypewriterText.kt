@@ -1,5 +1,6 @@
 package se.onemanstudio.playaroundwithai.feature.chat.views
 
+import android.view.HapticFeedbackConstants
 import androidx.compose.foundation.ScrollState
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.wrapContentHeight
@@ -13,6 +14,7 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalView
 import androidx.compose.ui.tooling.preview.Preview
 import kotlinx.coroutines.delay
 import se.onemanstudio.playaroundwithai.core.ui.theme.SofaAiTheme
@@ -26,19 +28,23 @@ fun TypewriterText(
     text: String,
     scrollState: ScrollState? = null
 ) {
+    val view = LocalView.current
     var displayedText by remember { mutableStateOf("") }
 
     LaunchedEffect(key1 = text) {
         displayedText = ""
         text.forEach { char ->
-            val wasAtBottom = scrollState?.let { 
+            val wasAtBottom = scrollState?.let {
                 // Using a small threshold (e.g., 10px) to handle precision issues
                 it.value >= it.maxValue - SCROLL_BOTTOM_THRESHOLD
             } ?: false
 
             displayedText += char
+            if (!char.isWhitespace()) {
+                view.performHapticFeedback(HapticFeedbackConstants.CLOCK_TICK)
+            }
             delay(TYPING_DELAY)
-            
+
             // Only auto-scroll if we were already at the bottom or if it's the very first scroll
             if (scrollState != null && (wasAtBottom || scrollState.maxValue == 0)) {
                 scrollState.animateScrollTo(scrollState.maxValue)

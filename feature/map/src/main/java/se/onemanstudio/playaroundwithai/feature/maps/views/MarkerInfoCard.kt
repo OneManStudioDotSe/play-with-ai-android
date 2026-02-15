@@ -23,11 +23,14 @@ import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
+import android.view.HapticFeedbackConstants
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalView
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
@@ -46,13 +49,21 @@ fun MarkerInfoCard(
     marker: MapItemUiModel,
     onClose: () -> Unit
 ) {
+    val view = LocalView.current
     val animatedBattery = remember(marker.mapItem.id) { Animatable(1f) }
+    val lastTickedValue = remember(marker.mapItem.id) { mutableIntStateOf(1) }
 
     LaunchedEffect(marker.mapItem.id) {
         animatedBattery.animateTo(
             targetValue = marker.mapItem.batteryLevel.toFloat(),
             animationSpec = tween(durationMillis = 1000, easing = FastOutSlowInEasing)
         )
+    }
+
+    val currentInt = animatedBattery.value.toInt()
+    if (currentInt != lastTickedValue.intValue) {
+        lastTickedValue.intValue = currentInt
+        view.performHapticFeedback(HapticFeedbackConstants.CLOCK_TICK)
     }
 
     NeoBrutalCard(modifier = Modifier.fillMaxWidth()) {
