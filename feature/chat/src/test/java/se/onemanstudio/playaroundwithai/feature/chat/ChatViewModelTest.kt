@@ -6,6 +6,8 @@ import io.mockk.every
 import io.mockk.mockk
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.ExperimentalCoroutinesApi
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
@@ -207,9 +209,9 @@ class ChatViewModelTest {
         }
 
         val application = mockk<Application>(relaxed = true)
-        val observeAuthReadyUseCase = mockk<ObserveAuthReadyUseCase> {
-            every { invoke() } returns flowOf<Boolean>(true)
-        }
+        val authReadyFlow: StateFlow<Boolean> = MutableStateFlow(true)
+        val observeAuthReadyUseCase = mockk<ObserveAuthReadyUseCase>()
+        every { observeAuthReadyUseCase.invoke() } returns authReadyFlow
 
         return ChatViewModel(
             GenerateContentUseCase(geminiRepository),

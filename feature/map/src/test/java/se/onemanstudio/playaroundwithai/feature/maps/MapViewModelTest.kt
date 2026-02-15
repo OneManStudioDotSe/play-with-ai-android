@@ -4,16 +4,17 @@ import android.app.Application
 import android.net.ConnectivityManager
 import android.net.Network
 import android.net.NetworkCapabilities
+import androidx.lifecycle.viewModelScope
 import com.google.android.gms.maps.model.LatLng
 import io.mockk.coEvery
 import io.mockk.every
 import io.mockk.mockk
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.ExperimentalCoroutinesApi
+import kotlinx.coroutines.cancel
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.test.UnconfinedTestDispatcher
-import kotlinx.coroutines.test.advanceUntilIdle
 import kotlinx.coroutines.test.runTest
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertFalse
@@ -41,7 +42,7 @@ class MapViewModelTest {
     private val repository: MapRepository = mockk()
     private val geminiRepository: GeminiRepository = mockk()
     private val getSuggestedPlacesUseCase = GetSuggestedPlacesUseCase(geminiRepository)
-    private val application: Application = mockk() // Mock the Application object
+    private val application: Application = mockk(relaxed = true)
     private val connectivityManager: ConnectivityManager = mockk()
     private val network: Network = mockk()
     private val networkCapabilities: NetworkCapabilities = mockk()
@@ -52,7 +53,6 @@ class MapViewModelTest {
         every { connectivityManager.activeNetwork } returns network
         every { connectivityManager.getNetworkCapabilities(network) } returns networkCapabilities
         every { networkCapabilities.hasCapability(NetworkCapabilities.NET_CAPABILITY_INTERNET) } returns true
-        every { application.getString(any()) } returns "Mocked String"
     }
 
     // Test Data
@@ -73,22 +73,23 @@ class MapViewModelTest {
         val expectedUiModels = testDataDomain.map { it.toUiModel() }
 
         // When
-        val viewModel = MapViewModel(GetMapItemsUseCase(repository), getSuggestedPlacesUseCase, application) // Pass the mocked application
+        val viewModel = MapViewModel(GetMapItemsUseCase(repository), getSuggestedPlacesUseCase, application)
         val states = captureStates(viewModel)
-        advanceUntilIdle()
 
         // Then
         val finalState = states.last()
         assertFalse(finalState.isLoading)
         assertEquals(expectedUiModels, finalState.allLocations)
         assertEquals(expectedUiModels, finalState.visibleLocations)
+
+        viewModel.viewModelScope.cancel()
     }
 
     @Test
     fun `selectMarker updates focused marker`() = runTest {
         // Given
         coEvery { repository.getMapItems(any()) } returns testDataDomain
-        val viewModel = MapViewModel(GetMapItemsUseCase(repository), getSuggestedPlacesUseCase, application) // Pass the mocked application
+        val viewModel = MapViewModel(GetMapItemsUseCase(repository), getSuggestedPlacesUseCase, application)
         val states = captureStates(viewModel)
         val scooterItemUi = scooterItemDomain.toUiModel()
 
@@ -103,23 +104,23 @@ class MapViewModelTest {
 
         // Then
         assertNull(states.last().focusedMarker)
+
+        viewModel.viewModelScope.cancel()
     }
 
     @Test
     fun `setPathMode resets selection and updates mode`() = runTest {
         // Given
         coEvery { repository.getMapItems(any()) } returns testDataDomain
-        val viewModel = MapViewModel(GetMapItemsUseCase(repository), getSuggestedPlacesUseCase, application) // Pass the mocked application
+        val viewModel = MapViewModel(GetMapItemsUseCase(repository), getSuggestedPlacesUseCase, application)
         val states = captureStates(viewModel)
         val scooterItemUi = scooterItemDomain.toUiModel()
 
         // Pre-condition: Select something and be in normal mode
         viewModel.selectMarker(scooterItemUi)
-        advanceUntilIdle()
 
         // When
         viewModel.setPathMode(true)
-        advanceUntilIdle()
 
         // Then
         val state = states.last()
@@ -133,15 +134,16 @@ class MapViewModelTest {
 
         // Then
         assertFalse(states.last().isPathMode)
+
+        viewModel.viewModelScope.cancel()
     }
 
     @Test
     fun `toggleFilter filters visible locations correctly`() = runTest {
         // Given
         coEvery { repository.getMapItems(any()) } returns testDataDomain
-        val viewModel = MapViewModel(GetMapItemsUseCase(repository), getSuggestedPlacesUseCase, application) // Pass the mocked application
+        val viewModel = MapViewModel(GetMapItemsUseCase(repository), getSuggestedPlacesUseCase, application)
         val states = captureStates(viewModel)
-        advanceUntilIdle()
 
         // Initial state
         assertEquals(2, states.last().visibleLocations.size)
@@ -160,13 +162,15 @@ class MapViewModelTest {
 
         // Then: Both visible again
         assertEquals(2, states.last().visibleLocations.size)
+
+        viewModel.viewModelScope.cancel()
     }
 
     @Test
     fun `toggleSelection adds and removes items in Path Mode`() = runTest {
         // Given
         coEvery { repository.getMapItems(any()) } returns testDataDomain
-        val viewModel = MapViewModel(GetMapItemsUseCase(repository), getSuggestedPlacesUseCase, application) // Pass the mocked application
+        val viewModel = MapViewModel(GetMapItemsUseCase(repository), getSuggestedPlacesUseCase, application)
         val states = captureStates(viewModel)
         viewModel.setPathMode(true)
         val scooterItemUi = scooterItemDomain.toUiModel()
@@ -191,6 +195,8 @@ class MapViewModelTest {
         // Then
         assertEquals(1, states.last().selectedLocations.size)
         assertEquals(bikeItemUi.id, states.last().selectedLocations.first().id)
+
+        viewModel.viewModelScope.cancel()
     }
 
     @Test
@@ -206,10 +212,9 @@ class MapViewModelTest {
         coEvery { repository.getMapItems(any()) } returns manyItemsDomain
         val manyItemsUi = manyItemsDomain.map { it.toUiModel() }
 
-        val viewModel = MapViewModel(GetMapItemsUseCase(repository), getSuggestedPlacesUseCase, application) // Pass the mocked application
+        val viewModel = MapViewModel(GetMapItemsUseCase(repository), getSuggestedPlacesUseCase, application)
         val states = captureStates(viewModel)
         viewModel.setPathMode(true)
-        advanceUntilIdle()
 
         // When: Add items up to the max
         repeat(MapConstants.MAX_SELECTABLE_POINTS) { i ->
@@ -224,13 +229,15 @@ class MapViewModelTest {
 
         // Then: Still at max (limit is enforced)
         assertEquals(MapConstants.MAX_SELECTABLE_POINTS, states.last().selectedLocations.size)
+
+        viewModel.viewModelScope.cancel()
     }
 
     @Test
     fun `calculateOptimalRoute updates route state`() = runTest {
         // Given
         coEvery { repository.getMapItems(any()) } returns testDataDomain
-        val viewModel = MapViewModel(GetMapItemsUseCase(repository), getSuggestedPlacesUseCase, application) // Pass the mocked application
+        val viewModel = MapViewModel(GetMapItemsUseCase(repository), getSuggestedPlacesUseCase, application)
         val states = captureStates(viewModel)
         viewModel.setPathMode(true)
         val scooterItemUi = scooterItemDomain.toUiModel()
@@ -249,6 +256,8 @@ class MapViewModelTest {
         assertEquals(userLocation, state.optimalRoute.first())
         assertTrue(state.routeDistanceMeters > 0)
         assertTrue(state.routeDurationMinutes > 0)
+
+        viewModel.viewModelScope.cancel()
     }
 
     // --- Helper ---
