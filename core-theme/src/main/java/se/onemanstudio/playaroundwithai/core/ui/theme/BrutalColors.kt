@@ -12,6 +12,10 @@ val offWhite = Color(0xFFF8F8F8) // A slightly softer white for backgrounds
 val electricBlue = Color(0xFF0052FF)
 val vividPink = Color(0xFFFF00A8)
 val zestyLime = Color(0xFF9EFF00)
+val solarYellow = Color(0xFFFFEB3B)
+val energeticOrange = Color(0xFFFF9800)
+val cyberGreen = Color(0xFF00E676)
+val deepMagenta = Color(0xFFC2185B)
 
 // Container Colors
 val electricBlueContainer = Color(0xFF1A3A7A)
