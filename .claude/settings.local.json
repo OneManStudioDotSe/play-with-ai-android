@@ -19,7 +19,8 @@
       "WebFetch(domain:github.com)",
       "Bash(JAVA_HOME=\"/Applications/Android Studio Preview.app/Contents/jbr/Contents/Home\" /Users/sotirisfalieris/Documents/Repos/Mine/play-with-ai-android/gradlew:*)",
       "Bash(JAVA_HOME=\"/Applications/Android Studio Preview.app/Contents/jbr/Contents/Home\" ./gradlew:*)",
-      "Bash(JAVA_HOME=\"/Applications/Android Studio Preview.app/Contents/jbr/Contents/Home\" ./gradlew testDebugUnitTest:*)"
+      "Bash(JAVA_HOME=\"/Applications/Android Studio Preview.app/Contents/jbr/Contents/Home\" ./gradlew testDebugUnitTest:*)",
+      "Bash(JAVA_HOME=\"/Applications/Android Studio.app/Contents/jbr/Contents/Home\" ./gradlew lintDebug:*)"
     ]
   }
 }

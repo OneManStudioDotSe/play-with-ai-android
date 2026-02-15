@@ -13,11 +13,12 @@ class GetSuggestedPlacesUseCase @Inject constructor(
         longitude: Double,
         model: GeminiModel = GeminiModel.FLASH_PREVIEW,
     ): Result<List<SuggestedPlace>> {
-        if (latitude !in -MAX_LATITUDE..MAX_LATITUDE) {
-            return Result.failure(IllegalArgumentException("Latitude must be between -$MAX_LATITUDE and $MAX_LATITUDE, was $latitude"))
-        }
-        if (longitude !in -MAX_LONGITUDE..MAX_LONGITUDE) {
-            return Result.failure(IllegalArgumentException("Longitude must be between -$MAX_LONGITUDE and $MAX_LONGITUDE, was $longitude"))
+        if (latitude !in -MAX_LATITUDE..MAX_LATITUDE || longitude !in -MAX_LONGITUDE..MAX_LONGITUDE) {
+            val message = when {
+                latitude !in -MAX_LATITUDE..MAX_LATITUDE -> "Latitude must be between -$MAX_LATITUDE and $MAX_LATITUDE, was $latitude"
+                else -> "Longitude must be between -$MAX_LONGITUDE and $MAX_LONGITUDE, was $longitude"
+            }
+            return Result.failure(IllegalArgumentException(message))
         }
 
         return geminiRepository.getSuggestedPlaces(latitude, longitude, model)

@@ -18,7 +18,7 @@ import se.onemanstudio.playaroundwithai.core.data.feature.chat.local.entity.Prom
 import se.onemanstudio.playaroundwithai.core.domain.feature.auth.repository.AuthRepository
 import se.onemanstudio.playaroundwithai.core.domain.feature.chat.model.Prompt
 import se.onemanstudio.playaroundwithai.core.domain.feature.chat.model.SyncStatus
-import java.util.Date
+import java.time.Instant
 
 class PromptRepositoryImplTest {
 
@@ -42,7 +42,7 @@ class PromptRepositoryImplTest {
         val prompt = Prompt(
             id = 0L,
             text = "Test prompt",
-            timestamp = Date(1_700_000_000_000L),
+            timestamp = Instant.ofEpochMilli(1_700_000_000_000L),
             syncStatus = SyncStatus.Synced
         )
         val entitySlot = slot<PromptEntity>()
@@ -59,7 +59,7 @@ class PromptRepositoryImplTest {
     @Test
     fun `savePrompt schedules sync when user is authenticated`() = runTest {
         // GIVEN
-        val prompt = Prompt(id = 0L, text = "Sync me", timestamp = Date(), syncStatus = SyncStatus.Pending)
+        val prompt = Prompt(id = 0L, text = "Sync me", timestamp = Instant.now(), syncStatus = SyncStatus.Pending)
         coEvery { dao.savePrompt(any()) } returns 1L
 
         // WHEN
@@ -73,7 +73,7 @@ class PromptRepositoryImplTest {
     fun `savePrompt does not schedule sync when user is not authenticated`() = runTest {
         // GIVEN
         every { authRepository.isUserSignedIn() } returns false
-        val prompt = Prompt(id = 0L, text = "No sync", timestamp = Date(), syncStatus = SyncStatus.Pending)
+        val prompt = Prompt(id = 0L, text = "No sync", timestamp = Instant.now(), syncStatus = SyncStatus.Pending)
         coEvery { dao.savePrompt(any()) } returns 1L
 
         // WHEN
@@ -132,7 +132,7 @@ class PromptRepositoryImplTest {
     @Test
     fun `savePrompt returns inserted row id`() = runTest {
         // GIVEN
-        val prompt = Prompt(id = 0L, text = "Test", timestamp = Date(), syncStatus = SyncStatus.Pending)
+        val prompt = Prompt(id = 0L, text = "Test", timestamp = Instant.now(), syncStatus = SyncStatus.Pending)
         coEvery { dao.savePrompt(any()) } returns 42L
 
         // WHEN

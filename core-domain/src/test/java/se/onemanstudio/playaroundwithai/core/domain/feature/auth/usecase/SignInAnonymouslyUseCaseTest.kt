@@ -8,7 +8,7 @@ import org.junit.Before
 import org.junit.Test
 import se.onemanstudio.playaroundwithai.core.domain.feature.auth.model.AuthSession
 import se.onemanstudio.playaroundwithai.core.domain.feature.auth.repository.AuthRepository
-import java.util.Date
+import java.time.Instant
 
 class SignInAnonymouslyUseCaseTest {
 
@@ -29,8 +29,8 @@ class SignInAnonymouslyUseCaseTest {
             isAnonymous = true,
             isNewUser = true,
             authProvider = "firebase",
-            createdAt = Date(1_700_000_000_000L),
-            lastSignInAt = Date(1_700_000_060_000L),
+            createdAt = Instant.ofEpochMilli(1_700_000_000_000L),
+            lastSignInAt = Instant.ofEpochMilli(1_700_000_060_000L),
             sessionDuration = 60_000L,
             accountAgeDays = 10
         )

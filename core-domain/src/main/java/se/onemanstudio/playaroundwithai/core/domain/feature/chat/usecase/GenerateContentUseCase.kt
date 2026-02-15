@@ -8,6 +8,7 @@ import javax.inject.Inject
 class GenerateContentUseCase @Inject constructor(
     private val repository: GeminiRepository
 ) {
+    @Suppress("ReturnCount")
     suspend operator fun invoke(
         prompt: String,
         imageBytes: ByteArray? = null,
