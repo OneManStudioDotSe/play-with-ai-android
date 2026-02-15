@@ -51,7 +51,6 @@ import se.onemanstudio.playaroundwithai.core.ui.theme.Dimensions
 import se.onemanstudio.playaroundwithai.core.ui.theme.SofaAiTheme
 import se.onemanstudio.playaroundwithai.feature.chat.R
 
-private val InputButtonSize = 56.dp
 private val DotSize = 12.dp
 private val DotSpacing = 8.dp
 private const val DOT_DELAY_UNIT = 150
@@ -160,7 +159,7 @@ fun PromptInputSection(
                     modifier = Modifier
                         .fillMaxHeight()
                         .padding(end = Dimensions.paddingMedium),
-                    size = InputButtonSize, // Match default height of NeoBrutalTextField with padding
+                    size = Dimensions.minButtonHeight, // Match default height of NeoBrutalTextField with padding
                     onClick = onAttachClicked,
                     imageVector = icon,
                     contentDescription = desc,
@@ -170,7 +169,7 @@ fun PromptInputSection(
 
             NeoBrutalIconButton(
                 modifier = Modifier.fillMaxHeight(),
-                size = 56.dp, // Match default height of NeoBrutalTextField
+                size = Dimensions.minButtonHeight, // Match default height of NeoBrutalTextField
                 imageVector = Icons.AutoMirrored.Filled.Send,
                 contentDescription = stringResource(R.string.label_send_prompt),
                 backgroundColor = MaterialTheme.colorScheme.primary,

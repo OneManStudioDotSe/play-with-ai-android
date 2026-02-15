@@ -339,7 +339,7 @@ private fun ErrorState(
                 imageVector = errorIcon,
                 contentDescription = stringResource(R.string.label_error_icon),
                 tint = MaterialTheme.colorScheme.error,
-                modifier = Modifier.size(Dimensions.paddingExtraLarge)
+                modifier = Modifier.size(Dimensions.iconSizeXLarge)
             )
             Spacer(modifier = Modifier.height(Dimensions.paddingMedium))
             Text(

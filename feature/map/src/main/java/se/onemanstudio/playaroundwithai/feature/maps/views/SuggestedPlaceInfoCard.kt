@@ -63,7 +63,7 @@ fun SuggestedPlaceInfoCard(
                             Icon(
                                 imageVector = Icons.Default.Category,
                                 contentDescription = stringResource(R.string.suggested_place_category),
-                                modifier = Modifier.size(Dimensions.paddingLarge),
+                                modifier = Modifier.size(Dimensions.iconSizeSmall),
                                 tint = MaterialTheme.colorScheme.onSurfaceVariant
                             )
                             Spacer(modifier = Modifier.width(Dimensions.paddingSmall))

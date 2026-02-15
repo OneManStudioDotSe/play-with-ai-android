@@ -651,7 +651,7 @@ private fun ErrorState(
                         },
                         contentDescription = stringResource(MapFeatureR.string.map_error_icon),
                         tint = MaterialTheme.colorScheme.error,
-                        modifier = Modifier.size(Dimensions.paddingExtraLarge)
+                        modifier = Modifier.size(Dimensions.iconSizeXLarge)
                     )
                     Spacer(modifier = Modifier.height(Dimensions.paddingMedium))
                     Text(
@@ -672,7 +672,8 @@ private fun ErrorState(
                     Spacer(modifier = Modifier.height(Dimensions.paddingLarge))
                     NeoBrutalButton(
                         text = stringResource(MapFeatureR.string.map_error_retry),
-                        onClick = onRetry
+                        onClick = onRetry,
+                        backgroundColor = MaterialTheme.colorScheme.error
                     )
                 }
             }

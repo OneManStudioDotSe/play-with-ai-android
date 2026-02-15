@@ -11,7 +11,7 @@ import se.onemanstudio.playaroundwithai.core.ui.theme.Dimensions
 
 fun Modifier.neoBrutalism(
     backgroundColor: Color,
-    borderColor: Color = Color.Black,
+    borderColor: Color,
     borderWidth: Dp = Dimensions.neoBrutalCardStrokeWidth,
     shadowOffset: Dp = Dimensions.neoBrutalCardShadowOffset
 ): Modifier = this.then(

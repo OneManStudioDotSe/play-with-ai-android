@@ -12,6 +12,8 @@ object Dimensions {
     val paddingExtraLarge = 36.dp
 
     // Icon Sizes
+    val iconSizeSmall = 16.dp
+    val iconSizeMedium = 24.dp
     val iconSizeLarge = 32.dp
     val iconSizeXLarge = 40.dp
     val iconSizeXXLarge = 52.dp
