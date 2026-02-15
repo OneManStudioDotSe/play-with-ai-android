@@ -28,6 +28,7 @@ class SyncWorker @AssistedInject constructor(
     private val firebaseAuth: FirebaseAuth
 ) : CoroutineWorker(context, params) {
 
+    @Suppress("ReturnCount")
     override suspend fun doWork(): Result {
         Timber.d("SyncWorker — Started (attempt ${runAttemptCount + 1}/$MAX_RETRY_COUNT)...")
 

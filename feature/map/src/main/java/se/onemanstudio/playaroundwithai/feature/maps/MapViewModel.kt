@@ -1,6 +1,7 @@
 package se.onemanstudio.playaroundwithai.feature.maps
 
 import android.Manifest
+import android.annotation.SuppressLint
 import android.app.Application
 import android.net.ConnectivityManager
 import android.net.NetworkCapabilities
@@ -37,6 +38,7 @@ private const val AMOUNT_OF_POINTS_TO_GENERATE = 30
 private const val WALKING_SPEED_METERS_PER_MIN = 83.0 // approx 5km/h
 private const val LOADING_MESSAGE_DURATION = 3000L
 
+@SuppressWarnings("TooManyFunctions")
 @HiltViewModel
 class MapViewModel @Inject constructor(
     private val getMapItemsUseCase: GetMapItemsUseCase,
@@ -54,6 +56,7 @@ class MapViewModel @Inject constructor(
         startLoadingMessageCycle()
     }
 
+    @SuppressWarnings("TooGenericExceptionCaught")
     fun loadMapData(centerLat: Double, centerLng: Double) {
         _uiState.update { it.copy(isLoading = true, error = null) }
 
@@ -80,16 +83,14 @@ class MapViewModel @Inject constructor(
         }
     }
 
+    @SuppressLint("MissingPermission")
+    @SuppressWarnings("ReturnCount")
     private fun isNetworkAvailable(): Boolean {
         val connectivityManager = application.getSystemService(ConnectivityManager::class.java)
         val network = connectivityManager.activeNetwork ?: return false
         val capabilities = connectivityManager.getNetworkCapabilities(network) ?: return false
 
         return capabilities.hasCapability(NetworkCapabilities.NET_CAPABILITY_INTERNET)
-    }
-
-    fun dismissError() {
-        _uiState.update { it.copy(error = null) }
     }
 
     fun setPathMode(active: Boolean) {
