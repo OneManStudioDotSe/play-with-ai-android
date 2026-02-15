@@ -17,7 +17,9 @@ import kotlinx.coroutines.flow.filter
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.flow.update
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 import se.onemanstudio.playaroundwithai.core.domain.feature.auth.usecase.ObserveAuthReadyUseCase
 import se.onemanstudio.playaroundwithai.core.domain.feature.chat.model.Prompt
 import se.onemanstudio.playaroundwithai.core.domain.feature.chat.model.SyncStatus
@@ -137,12 +139,16 @@ class ChatViewModel @Inject constructor(
         _uiState.update { ChatUiState.Loading }
 
         viewModelScope.launch {
-            // see if we have something attached
-            val imageBytes = (attachment as? Attachment.Image)?.uri?.let { fileUtils.uriToByteArray(it) }
+            // see if we have something attached (decode/compress off main thread)
+            val imageBytes = (attachment as? Attachment.Image)?.uri?.let {
+                withContext(Dispatchers.Default) { fileUtils.uriToByteArray(it) }
+            }
             val analysisType = (attachment as? Attachment.Image)?.analysisType
 
             // read attached stuff
-            val fileResult = (attachment as? Attachment.Document)?.uri?.let { fileUtils.extractFileContent(it) }
+            val fileResult = (attachment as? Attachment.Document)?.uri?.let {
+                withContext(Dispatchers.IO) { fileUtils.extractFileContent(it) }
+            }
 
             // fail directly if something is off
             if (fileResult != null && fileResult.isFailure) {

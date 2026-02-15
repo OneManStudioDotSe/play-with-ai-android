@@ -1,11 +1,13 @@
 package se.onemanstudio.playaroundwithai.core.data.feature.chat.repository
 
+import androidx.work.BackoffPolicy
 import androidx.work.Constraints
 import androidx.work.ExistingWorkPolicy
 import androidx.work.NetworkType
 import androidx.work.OneTimeWorkRequestBuilder
 import androidx.work.WorkInfo
 import androidx.work.WorkManager
+import java.util.concurrent.TimeUnit
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.map
 import se.onemanstudio.playaroundwithai.core.data.feature.chat.local.dao.PromptsHistoryDao
@@ -98,14 +100,19 @@ class PromptRepositoryImpl @Inject constructor(
 
         val syncRequest = OneTimeWorkRequestBuilder<SyncWorker>()
             .setConstraints(constraints)
+            .setBackoffCriteria(BackoffPolicy.EXPONENTIAL, BACKOFF_DELAY_SECONDS, TimeUnit.SECONDS)
             .addTag(SYNC_WORK_NAME)
             .build()
 
         Timber.d("PromptRepo - Enqueuing SyncWorker...")
         workManager.enqueueUniqueWork(
             SYNC_WORK_NAME,
-            ExistingWorkPolicy.REPLACE,
+            ExistingWorkPolicy.APPEND_OR_REPLACE,
             syncRequest
         )
+    }
+
+    companion object {
+        private const val BACKOFF_DELAY_SECONDS = 30L
     }
 }
