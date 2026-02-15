@@ -1,11 +1,11 @@
 package se.onemanstudio.playaroundwithai.core.domain.feature.chat.model
 
-import java.util.Date
+import java.time.Instant
 
 data class Prompt(
     val id: Long = 0,
     val text: String,
-    val timestamp: Date = Date(),
+    val timestamp: Instant = Instant.now(),
     val syncStatus: SyncStatus = SyncStatus.Pending,
     val firestoreDocId: String? = null,
     val imageAttachment: ByteArray? = null,

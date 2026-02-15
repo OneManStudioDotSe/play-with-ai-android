@@ -17,7 +17,7 @@ import se.onemanstudio.playaroundwithai.core.data.feature.chat.local.database.Ap
 import se.onemanstudio.playaroundwithai.core.data.feature.chat.local.entity.PromptEntity
 import se.onemanstudio.playaroundwithai.core.domain.feature.chat.model.SyncStatus
 import se.onemanstudio.playaroundwithai.core.domain.feature.auth.repository.AuthRepository // Added import
-import java.util.Date
+import java.time.Instant
 
 @RunWith(AndroidJUnit4::class)
 class PromptRepositoryImplTest {
@@ -58,7 +58,7 @@ class PromptRepositoryImplTest {
         val promptDomainModel = result.first()
         assertThat(promptDomainModel.id).isEqualTo(1)
         assertThat(promptDomainModel.text).isEqualTo("Test prompt")
-        assertThat(promptDomainModel.timestamp).isEqualTo(Date(12345L))
+        assertThat(promptDomainModel.timestamp).isEqualTo(Instant.ofEpochMilli(12345L))
     }
 
     @Test

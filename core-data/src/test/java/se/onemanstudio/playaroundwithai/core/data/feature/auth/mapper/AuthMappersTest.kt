@@ -41,8 +41,8 @@ class AuthMappersTest {
         assertThat(session.isAnonymous).isTrue()
         assertThat(session.isNewUser).isTrue()
         assertThat(session.authProvider).isEqualTo("firebase")
-        assertThat(session.createdAt.time).isEqualTo(1_700_000_000_000L)
-        assertThat(session.lastSignInAt.time).isEqualTo(1_700_000_060_000L)
+        assertThat(session.createdAt.toEpochMilli()).isEqualTo(1_700_000_000_000L)
+        assertThat(session.lastSignInAt.toEpochMilli()).isEqualTo(1_700_000_060_000L)
         assertThat(session.sessionDuration).isEqualTo(60_000L)
     }
 
@@ -117,8 +117,8 @@ class AuthMappersTest {
         assertThat(session.userId).isEqualTo("existing-uid")
         assertThat(session.isNewUser).isFalse()
         assertThat(session.sessionDuration).isEqualTo(120_000L)
-        assertThat(session.createdAt.time).isEqualTo(1_700_000_000_000L)
-        assertThat(session.lastSignInAt.time).isEqualTo(1_700_000_120_000L)
+        assertThat(session.createdAt.toEpochMilli()).isEqualTo(1_700_000_000_000L)
+        assertThat(session.lastSignInAt.toEpochMilli()).isEqualTo(1_700_000_120_000L)
     }
 
     @Test
@@ -135,8 +135,8 @@ class AuthMappersTest {
         val session = firebaseUser.toDomain()
 
         // THEN: Timestamps default to epoch
-        assertThat(session.createdAt.time).isEqualTo(0L)
-        assertThat(session.lastSignInAt.time).isEqualTo(0L)
+        assertThat(session.createdAt.toEpochMilli()).isEqualTo(0L)
+        assertThat(session.lastSignInAt.toEpochMilli()).isEqualTo(0L)
         assertThat(session.sessionDuration).isEqualTo(0L)
     }
 }

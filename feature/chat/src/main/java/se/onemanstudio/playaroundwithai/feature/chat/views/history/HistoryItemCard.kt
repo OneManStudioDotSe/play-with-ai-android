@@ -29,8 +29,9 @@ import se.onemanstudio.playaroundwithai.core.ui.sofa.NeoBrutalCard
 import se.onemanstudio.playaroundwithai.core.ui.theme.Dimensions
 import se.onemanstudio.playaroundwithai.core.ui.theme.SofaAiTheme
 import se.onemanstudio.playaroundwithai.feature.chat.R
-import java.text.SimpleDateFormat
-import java.util.Date
+import java.time.Instant
+import java.time.ZoneId
+import java.time.format.DateTimeFormatter
 import java.util.Locale
 
 @Composable
@@ -62,8 +63,9 @@ fun HistoryItemCard(
             Spacer(Modifier.height(Dimensions.paddingLarge))
 
             Row(verticalAlignment = Alignment.CenterVertically) {
-                val formattedDate = SimpleDateFormat(dateFormat, Locale.getDefault()).format(prompt.timestamp)
-                val formattedTime = SimpleDateFormat(timeFormat, Locale.getDefault()).format(prompt.timestamp)
+                val zoneId = ZoneId.systemDefault()
+                val formattedDate = DateTimeFormatter.ofPattern(dateFormat, Locale.getDefault()).withZone(zoneId).format(prompt.timestamp)
+                val formattedTime = DateTimeFormatter.ofPattern(timeFormat, Locale.getDefault()).withZone(zoneId).format(prompt.timestamp)
 
                 Text(
                     text = String.format(dateAtTimePattern, formattedDate, formattedTime),
@@ -116,7 +118,7 @@ private fun HistoryItemCardSyncedPreview() {
             prompt = Prompt(
                 id = 1,
                 text = "What is neo-brutalism?",
-                timestamp = Date(System.currentTimeMillis() - 1000 * 60 * 5),
+                timestamp = Instant.now().minusSeconds(300),
                 syncStatus = SyncStatus.Synced
             ),
             onClick = {},
@@ -133,7 +135,7 @@ private fun HistoryItemCardPendingPreview() {
             prompt = Prompt(
                 id = 2,
                 text = "Can you please give me a very detailed and long explanation of how Jetpack Compose works?",
-                timestamp = Date(System.currentTimeMillis() - 1000 * 60 * 60 * 24 * 3),
+                timestamp = Instant.now().minusSeconds(259_200),
                 syncStatus = SyncStatus.Pending
             ),
             onClick = {},
@@ -150,7 +152,7 @@ private fun HistoryItemCardFailedPreview() {
             prompt = Prompt(
                 id = 3,
                 text = "This is a prompt that should be long enough to wrap or truncate when the width is constrained.",
-                timestamp = Date(System.currentTimeMillis() - 1000 * 60 * 60),
+                timestamp = Instant.now().minusSeconds(3_600),
                 syncStatus = SyncStatus.Failed
             ),
             onClick = {},

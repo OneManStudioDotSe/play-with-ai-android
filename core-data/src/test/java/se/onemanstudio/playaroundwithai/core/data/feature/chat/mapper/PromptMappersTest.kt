@@ -5,7 +5,7 @@ import org.junit.Test
 import se.onemanstudio.playaroundwithai.core.data.feature.chat.local.entity.PromptEntity
 import se.onemanstudio.playaroundwithai.core.domain.feature.chat.model.Prompt
 import se.onemanstudio.playaroundwithai.core.domain.feature.chat.model.SyncStatus
-import java.util.Date
+import java.time.Instant
 
 class PromptMappersTest {
 
@@ -25,7 +25,7 @@ class PromptMappersTest {
         // THEN: Int id is converted to Long, Long timestamp to Date
         assertThat(domain.id).isEqualTo(42L)
         assertThat(domain.text).isEqualTo("Hello AI")
-        assertThat(domain.timestamp).isEqualTo(Date(1_700_000_000_000L))
+        assertThat(domain.timestamp).isEqualTo(Instant.ofEpochMilli(1_700_000_000_000L))
         assertThat(domain.syncStatus).isEqualTo(SyncStatus.Synced)
     }
 
@@ -35,7 +35,7 @@ class PromptMappersTest {
         val prompt = Prompt(
             id = 7L,
             text = "World domination plan",
-            timestamp = Date(1_700_000_060_000L),
+            timestamp = Instant.ofEpochMilli(1_700_000_060_000L),
             syncStatus = SyncStatus.Pending
         )
 
@@ -55,7 +55,7 @@ class PromptMappersTest {
         val original = Prompt(
             id = 10L,
             text = "Round trip test",
-            timestamp = Date(1_700_000_000_000L),
+            timestamp = Instant.ofEpochMilli(1_700_000_000_000L),
             syncStatus = SyncStatus.Pending
         )
 
