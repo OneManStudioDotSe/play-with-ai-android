@@ -7,5 +7,6 @@ import javax.inject.Inject
 class GetMapItemsUseCase @Inject constructor(
     private val repository: MapRepository
 ) {
-    suspend operator fun invoke(count: Int): List<MapItem> = repository.getMapItems(count)
+    suspend operator fun invoke(count: Int, centerLat: Double, centerLng: Double): List<MapItem> =
+        repository.getMapItems(count, centerLat, centerLng)
 }

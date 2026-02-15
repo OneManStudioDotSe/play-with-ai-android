@@ -50,10 +50,10 @@ class MapRepositoryImplTest {
             )
         )
         // Instruct the mock to return our test DTOs when getMapItems is called
-        coEvery { mapApiService.getMapItems(any()) } returns testDtos
+        coEvery { mapApiService.getMapItems(any(), any(), any()) } returns testDtos
 
         // WHEN: We call the repository method
-        val result = repository.getMapItems(2)
+        val result = repository.getMapItems(2, 59.3293, 18.0686)
 
         // THEN: The result should be a list of correctly mapped domain models
         assertThat(result).hasSize(2)
@@ -68,10 +68,10 @@ class MapRepositoryImplTest {
     @Test
     fun `getMapItems when service returns empty list then repository returns empty list`() = runTest {
         // GIVEN: The mock service will return an empty list
-        coEvery { mapApiService.getMapItems(any()) } returns emptyList()
+        coEvery { mapApiService.getMapItems(any(), any(), any()) } returns emptyList()
 
         // WHEN: We call the repository method
-        val result = repository.getMapItems(0)
+        val result = repository.getMapItems(0, 59.3293, 18.0686)
 
         // THEN: The result should be an empty list
         assertThat(result).isEmpty()

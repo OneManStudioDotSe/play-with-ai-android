@@ -12,9 +12,9 @@ import javax.inject.Inject
 class MapRepositoryImpl @Inject constructor(
     private val mapApiService: MapApiService,
 ) : MapRepository {
-    override suspend fun getMapItems(count: Int): List<MapItem> = withContext(Dispatchers.IO) {
-        Timber.d("MapRepo - Fetching $count map items from API...")
-        val items = mapApiService.getMapItems(count).map { it.toDomain() }
+    override suspend fun getMapItems(count: Int, centerLat: Double, centerLng: Double): List<MapItem> = withContext(Dispatchers.IO) {
+        Timber.d("MapRepo - Fetching $count map items from API centered at ($centerLat, $centerLng)...")
+        val items = mapApiService.getMapItems(count, centerLat, centerLng).map { it.toDomain() }
         Timber.d("MapRepo - Received ${items.size} map items")
         items
     }

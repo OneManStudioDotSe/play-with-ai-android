@@ -12,5 +12,5 @@ interface MapApiService {
      * @param count The number of items to fetch.
      * @return A list of [MapItemDto] objects.
      */
-    suspend fun getMapItems(count: Int): List<MapItemDto>
+    suspend fun getMapItems(count: Int, centerLat: Double, centerLng: Double): List<MapItemDto>
 }

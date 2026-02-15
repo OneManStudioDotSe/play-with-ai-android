@@ -1,8 +1,10 @@
 package se.onemanstudio.playaroundwithai.feature.maps
 
+import android.Manifest
 import android.app.Application
 import android.net.ConnectivityManager
 import android.net.NetworkCapabilities
+import androidx.annotation.RequiresPermission
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.google.android.gms.maps.model.LatLng
@@ -49,12 +51,10 @@ class MapViewModel @Inject constructor(
     val currentLoadingMessage = _currentLoadingMessage.asStateFlow()
 
     init {
-        loadMapData()
         startLoadingMessageCycle()
     }
 
-    @Suppress("TooGenericExceptionCaught")
-    fun loadMapData() {
+    fun loadMapData(centerLat: Double, centerLng: Double) {
         _uiState.update { it.copy(isLoading = true, error = null) }
 
         if (!isNetworkAvailable()) {
@@ -65,13 +65,10 @@ class MapViewModel @Inject constructor(
 
         viewModelScope.launch {
             try {
-                val data = getMapItemsUseCase(AMOUNT_OF_POINTS_TO_GENERATE).map { it.toUiModel() }.toPersistentList()
+                val data = getMapItemsUseCase(AMOUNT_OF_POINTS_TO_GENERATE, centerLat, centerLng)
+                    .map { it.toUiModel() }.toPersistentList()
                 _uiState.update {
-                    it.copy(
-                        isLoading = false,
-                        allLocations = data,
-                        visibleLocations = data
-                    )
+                    it.copy(isLoading = false, allLocations = data, visibleLocations = data)
                 }
             } catch (e: IOException) {
                 Timber.e(e, "MapViewModel - Failed to load map data (network)")
@@ -87,6 +84,7 @@ class MapViewModel @Inject constructor(
         val connectivityManager = application.getSystemService(ConnectivityManager::class.java)
         val network = connectivityManager.activeNetwork ?: return false
         val capabilities = connectivityManager.getNetworkCapabilities(network) ?: return false
+
         return capabilities.hasCapability(NetworkCapabilities.NET_CAPABILITY_INTERNET)
     }
 

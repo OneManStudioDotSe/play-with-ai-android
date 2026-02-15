@@ -9,12 +9,12 @@ object MapDataGenerator {
     private const val CENTER_LNG = 18.0686
     private val nicknames = listOf("Lucas", "Björn", "Anton", "Sotiris", "Simon", "Mark", "Stefan", "Niklas", "Jonas", "Benjamin", "Aris")
 
-    fun generateRandomLat(): Double {
-        return CENTER_LAT + (Random.nextDouble() - 0.5) * 0.08
+    fun generateRandomLat(centerLat: Double = CENTER_LAT): Double {
+        return centerLat + (Random.nextDouble() - 0.5) * 0.08
     }
 
-    fun generateRandomLng(): Double {
-        return CENTER_LNG + (Random.nextDouble() - 0.5) * 0.08
+    fun generateRandomLng(centerLng: Double = CENTER_LNG): Double {
+        return centerLng + (Random.nextDouble() - 0.5) * 0.08
     }
 
     fun generateRandomVehicleType(): VehicleTypeDto {

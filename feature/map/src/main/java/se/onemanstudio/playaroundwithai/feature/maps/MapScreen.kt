@@ -17,6 +17,7 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.BoxScope
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
@@ -68,6 +69,7 @@ import com.google.android.gms.maps.model.CameraPosition
 import com.google.android.gms.maps.model.LatLng
 import com.google.android.gms.maps.model.LatLngBounds
 import com.google.android.gms.maps.model.MapStyleOptions
+import com.google.maps.android.compose.CameraPositionState
 import com.google.maps.android.compose.GoogleMap
 import com.google.maps.android.compose.MapProperties
 import com.google.maps.android.compose.MapUiSettings
@@ -77,14 +79,17 @@ import com.google.maps.android.compose.Polyline
 import com.google.maps.android.compose.rememberCameraPositionState
 import com.google.maps.android.compose.rememberUpdatedMarkerState
 import kotlinx.coroutines.launch
+import se.onemanstudio.playaroundwithai.core.domain.feature.map.model.SuggestedPlace
 import se.onemanstudio.playaroundwithai.core.domain.feature.map.model.VehicleType
 import se.onemanstudio.playaroundwithai.core.ui.sofa.NeoBrutalButton
 import se.onemanstudio.playaroundwithai.core.ui.sofa.NeoBrutalCard
 import se.onemanstudio.playaroundwithai.core.ui.sofa.NeoBrutalIconButton
 import se.onemanstudio.playaroundwithai.core.ui.theme.Alphas
 import se.onemanstudio.playaroundwithai.core.ui.theme.Dimensions
+import se.onemanstudio.playaroundwithai.core.ui.theme.energeticOrange
 import se.onemanstudio.playaroundwithai.feature.maps.MapConstants.STOCKHOLM_LAT
 import se.onemanstudio.playaroundwithai.feature.maps.MapConstants.STOCKHOLM_LNG
+import se.onemanstudio.playaroundwithai.feature.maps.models.MapItemUiModel
 import se.onemanstudio.playaroundwithai.feature.maps.states.MapError
 import se.onemanstudio.playaroundwithai.feature.maps.states.MapUiState
 import se.onemanstudio.playaroundwithai.feature.maps.states.SuggestedPlacesError
@@ -104,6 +109,7 @@ private const val CAMERA_PADDING = 150
 fun MapScreen(viewModel: MapViewModel = hiltViewModel()) {
     val context = LocalContext.current
     val view = LocalView.current
+
     val fusedLocationClient = remember { LocationServices.getFusedLocationProviderClient(context) }
     val scope = rememberCoroutineScope()
 
@@ -119,20 +125,45 @@ fun MapScreen(viewModel: MapViewModel = hiltViewModel()) {
     val snackbarHostState = remember { SnackbarHostState() }
 
     var hasLocationPermission by remember { mutableStateOf(false) }
+    var permissionChecked by remember { mutableStateOf(false) }
     var userLocation by remember { mutableStateOf<LatLng?>(null) }
+    var dataLoaded by remember { mutableStateOf(false) }
 
     val permissionLauncher = rememberLauncherForActivityResult(
         contract = ActivityResultContracts.RequestPermission()
-    ) { isGranted -> hasLocationPermission = isGranted }
+    ) { isGranted ->
+        hasLocationPermission = isGranted
+        permissionChecked = true
+    }
 
     LaunchedEffect(Unit) {
         permissionLauncher.launch(Manifest.permission.ACCESS_FINE_LOCATION)
     }
 
-    LaunchedEffect(hasLocationPermission) {
+    LaunchedEffect(permissionChecked) {
+        if (!permissionChecked) return@LaunchedEffect
+
         if (hasLocationPermission) {
-            fusedLocationClient.lastLocation.addOnSuccessListener { location ->
-                location?.let { userLocation = LatLng(it.latitude, it.longitude) }
+            fusedLocationClient.lastLocation
+                .addOnSuccessListener { location ->
+                    location?.let { userLocation = LatLng(it.latitude, it.longitude) }
+                    if (!dataLoaded) {
+                        val lat = userLocation?.latitude ?: STOCKHOLM_LAT
+                        val lng = userLocation?.longitude ?: STOCKHOLM_LNG
+                        viewModel.loadMapData(lat, lng)
+                        dataLoaded = true
+                    }
+                }
+                .addOnFailureListener {
+                    if (!dataLoaded) {
+                        viewModel.loadMapData(STOCKHOLM_LAT, STOCKHOLM_LNG)
+                        dataLoaded = true
+                    }
+                }
+        } else {
+            if (!dataLoaded) {
+                viewModel.loadMapData(STOCKHOLM_LAT, STOCKHOLM_LNG)
+                dataLoaded = true
             }
         }
     }
@@ -288,228 +319,315 @@ fun MapScreen(viewModel: MapViewModel = hiltViewModel()) {
             }
         }
 
-        AnimatedVisibility(
-            visible = !uiState.isPathMode,
-            enter = slideInHorizontally(
-                initialOffsetX = { -it * 2 },
-                animationSpec = tween(
-                    durationMillis = AnimationConstants.ANIMATION_DURATION,
-                    easing = EaseInOutQuart
-                )
-            ),
-            exit = slideOutHorizontally(
-                targetOffsetX = { -it * 2 },
-                animationSpec = tween(
-                    durationMillis = AnimationConstants.ANIMATION_DURATION,
-                    easing = EaseInOutQuart
-                )
-            ),
-            modifier = Modifier
-                .align(Alignment.TopCenter)
-                .statusBarsPadding()
-                .padding(top = Dimensions.paddingMedium)
-        ) {
-            Row(
-                horizontalArrangement = Arrangement.spacedBy(Dimensions.paddingLarge),
-                verticalAlignment = Alignment.CenterVertically
-            ) {
-                FilterChip(
-                    text = stringResource(id = MapFeatureR.string.scooters_filter_chip_label),
-                    selected = uiState.activeFilter.contains(VehicleType.SCOOTER)
-                ) {
-                    view.performHapticFeedback(HapticFeedbackConstants.CONTEXT_CLICK)
-                    viewModel.toggleFilter(VehicleType.SCOOTER)
-                }
-                FilterChip(
-                    text = stringResource(id = MapFeatureR.string.bicycles_filter_chip_label),
-                    selected = uiState.activeFilter.contains(VehicleType.BICYCLE)
-                ) {
-                    view.performHapticFeedback(HapticFeedbackConstants.CONTEXT_CLICK)
-                    viewModel.toggleFilter(VehicleType.BICYCLE)
-                }
-                NeoBrutalIconButton(
-                    onClick = {
-                        view.performHapticFeedback(HapticFeedbackConstants.CONTEXT_CLICK)
-                        viewModel.getAiSuggestedPlaces(userLocation)
-                    },
-                    imageVector = Icons.Default.AutoAwesome,
-                    contentDescription = stringResource(id = MapFeatureR.string.ai_suggest_button_content_description),
-                    backgroundColor = MaterialTheme.colorScheme.tertiaryContainer
-                )
-            }
-        }
-
-        Box(
-            modifier = Modifier
-                .align(Alignment.CenterEnd)
-                .padding(Dimensions.paddingLarge)
-        ) {
-            SideControls(
-                uiState = uiState,
-                cameraPositionState = cameraPositionState,
-                onMyLocationClick = {
-                    val hasPermission = ContextCompat.checkSelfPermission(
-                        context,
-                        Manifest.permission.ACCESS_FINE_LOCATION
-                    ) == PackageManager.PERMISSION_GRANTED
-
-                    if (hasPermission) {
-                        fusedLocationClient.lastLocation.addOnSuccessListener { location ->
-                            location?.let {
-                                val userLatLng = LatLng(it.latitude, it.longitude)
-                                scope.launch {
-                                    cameraPositionState.animate(
-                                        update = CameraUpdateFactory.newLatLngZoom(
-                                            userLatLng,
-                                            MapConstants.MAX_ZOOM_LEVEL
-                                        ),
-                                        durationMs = MapConstants.MOVE_TO_POINT_DURATION
-                                    )
-                                }
-                            }
-                        }
-                    } else {
-                        permissionLauncher.launch(Manifest.permission.ACCESS_FINE_LOCATION)
-                    }
-                },
-                onSetPathMode = { viewModel.setPathMode(!uiState.isPathMode) }
-            )
-        }
-
-        AnimatedVisibility(
-            visible = uiState.isPathMode,
-            enter = slideInHorizontally(
-                initialOffsetX = { it },
-                animationSpec = tween(
-                    durationMillis = AnimationConstants.ANIMATION_DURATION,
-                    easing = EaseInOutQuart
-                )
-            ),
-            exit = slideOutHorizontally(
-                targetOffsetX = { it },
-                animationSpec = tween(
-                    durationMillis = AnimationConstants.ANIMATION_DURATION,
-                    easing = EaseInOutQuart
-                )
-            ),
-            modifier = Modifier
-                .align(Alignment.BottomCenter)
-                .navigationBarsPadding()
-                .padding(Dimensions.paddingMedium)
-        ) {
-            Box(
-                modifier = Modifier
-                    .navigationBarsPadding()
-                    .padding(Dimensions.paddingLarge)
-            ) {
-                PathModeBar(
-                    count = uiState.selectedLocations.size,
-                    distance = uiState.routeDistanceMeters,
-                    duration = uiState.routeDurationMinutes,
-                    onGoClick = {
-                        if (userLocation != null) {
-                            viewModel.calculateOptimalRoute(userLocation)
-                        }
-                    }
-                )
-            }
-        }
-
-        AnimatedVisibility(
-            visible = uiState.focusedMarker != null && !uiState.isPathMode,
-            enter = slideInHorizontally(
-                initialOffsetX = { it },
-                animationSpec = tween(
-                    durationMillis = AnimationConstants.ANIMATION_DURATION,
-                    easing = EaseInOutQuart
-                )
-            ),
-            exit = slideOutHorizontally(
-                targetOffsetX = { it },
-                animationSpec = tween(
-                    durationMillis = AnimationConstants.ANIMATION_DURATION,
-                    easing = EaseInOutQuart
-                )
-            ),
-            modifier = Modifier.align(Alignment.BottomCenter)
-        ) {
-            Box(
-                modifier = Modifier
-                    .navigationBarsPadding()
-                    .padding(Dimensions.paddingLarge)
-            ) {
-                uiState.focusedMarker?.let { marker ->
-                    MarkerInfoCard(
-                        marker = marker,
-                        onClose = { viewModel.selectMarker(null) }
-                    )
-                }
-            }
-        }
-
-        AnimatedVisibility(
-            visible = uiState.focusedSuggestedPlace != null && !uiState.isPathMode,
-            enter = slideInHorizontally(
-                initialOffsetX = { it },
-                animationSpec = tween(
-                    durationMillis = AnimationConstants.ANIMATION_DURATION,
-                    easing = EaseInOutQuart
-                )
-            ) + fadeIn(animationSpec = tween(durationMillis = AnimationConstants.ANIMATION_DURATION)),
-            exit = slideOutHorizontally(
-                targetOffsetX = { it },
-                animationSpec = tween(
-                    durationMillis = AnimationConstants.ANIMATION_DURATION,
-                    easing = EaseInOutQuart
-                )
-            ) + fadeOut(animationSpec = tween(durationMillis = AnimationConstants.ANIMATION_DURATION)),
-            modifier = Modifier.align(Alignment.BottomCenter)
-        ) {
-            Box(
-                modifier = Modifier
-                    .navigationBarsPadding()
-                    .padding(Dimensions.paddingLarge)
-            ) {
-                uiState.focusedSuggestedPlace?.let { place ->
-                    SuggestedPlaceInfoCard(
-                        place = place,
-                        onClose = { viewModel.selectSuggestedPlace(null) }
-                    )
-                }
-            }
-        }
-
-        SnackbarHost(
-            hostState = snackbarHostState,
-            modifier = Modifier
-                .align(Alignment.BottomCenter)
-                .navigationBarsPadding()
-                .padding(Dimensions.paddingMedium),
-            snackbar = { data ->
-                Snackbar(
-                    snackbarData = data,
-                    containerColor = MaterialTheme.colorScheme.errorContainer,
-                    contentColor = MaterialTheme.colorScheme.onErrorContainer,
-                    actionColor = MaterialTheme.colorScheme.onErrorContainer
-                )
-            }
+        TopActions(
+            uiState = uiState,
+            onToggleFilter = { type -> viewModel.toggleFilter(type) },
+            onSuggestPlaces = { viewModel.getAiSuggestedPlaces(userLocation) },
         )
 
-        LoadingState(uiState, currentLoadingMessage)
+        MapControls(
+            uiState = uiState,
+            cameraPositionState = cameraPositionState,
+            onMyLocationClick = {
+                val hasPermission = ContextCompat.checkSelfPermission(
+                    context,
+                    Manifest.permission.ACCESS_FINE_LOCATION
+                ) == PackageManager.PERMISSION_GRANTED
+
+                if (hasPermission) {
+                    fusedLocationClient.lastLocation.addOnSuccessListener { location ->
+                        location?.let {
+                            val userLatLng = LatLng(it.latitude, it.longitude)
+                            scope.launch {
+                                cameraPositionState.animate(
+                                    update = CameraUpdateFactory.newLatLngZoom(
+                                        userLatLng,
+                                        MapConstants.MAX_ZOOM_LEVEL
+                                    ),
+                                    durationMs = MapConstants.MOVE_TO_POINT_DURATION
+                                )
+                            }
+                        }
+                    }
+                } else {
+                    permissionLauncher.launch(Manifest.permission.ACCESS_FINE_LOCATION)
+                }
+            },
+            onSetPathMode = { isCurrentlyPathMode -> viewModel.setPathMode(!isCurrentlyPathMode) },
+        )
+
+        PathModePanel(
+            isVisible = uiState.isPathMode,
+            selectedCount = uiState.selectedLocations.size,
+            distanceMeters = uiState.routeDistanceMeters,
+            durationMinutes = uiState.routeDurationMinutes,
+            onGoClick = {
+                if (userLocation != null) {
+                    viewModel.calculateOptimalRoute(userLocation)
+                }
+            },
+        )
+
+        MarkerInfoPanel(
+            marker = uiState.focusedMarker,
+            isPathMode = uiState.isPathMode,
+            onClose = { viewModel.selectMarker(null) },
+        )
+
+        SuggestedPlaceInfoPanel(
+            place = uiState.focusedSuggestedPlace,
+            isPathMode = uiState.isPathMode,
+            onClose = { viewModel.selectSuggestedPlace(null) },
+        )
+
+        SnackbarContainer(snackbarHostState)
+
+        LoadingState(
+            isLoading = uiState.isLoading,
+            currentLoadingMessage = currentLoadingMessage
+        )
 
         ErrorState(
-            uiState = uiState,
-            onRetry = { viewModel.loadMapData() }
+            error = uiState.error,
+            onRetry = {
+                val lat = userLocation?.latitude ?: STOCKHOLM_LAT
+                val lng = userLocation?.longitude ?: STOCKHOLM_LNG
+                viewModel.loadMapData(lat, lng)
+            }
         )
     }
 }
 
 @Composable
-private fun ErrorState(
+private fun BoxScope.MapControls(
     uiState: MapUiState,
+    cameraPositionState: CameraPositionState,
+    onMyLocationClick: () -> Unit,
+    onSetPathMode: (Boolean) -> Unit,
+) {
+    Box(
+        modifier = Modifier
+            .align(Alignment.CenterEnd)
+            .padding(Dimensions.paddingLarge)
+    ) {
+        SideControls(
+            uiState = uiState,
+            cameraPositionState = cameraPositionState,
+            onMyLocationClick = onMyLocationClick,
+            onSetPathMode = onSetPathMode,
+        )
+    }
+}
+
+@Composable
+private fun BoxScope.TopActions(
+    uiState: MapUiState,
+    onToggleFilter: (VehicleType) -> Unit,
+    onSuggestPlaces: () -> Unit,
+) {
+    val view = LocalView.current
+
+    AnimatedVisibility(
+        visible = !uiState.isPathMode,
+        enter = slideInHorizontally(
+            initialOffsetX = { -it * 2 },
+            animationSpec = tween(
+                durationMillis = AnimationConstants.ANIMATION_DURATION,
+                easing = EaseInOutQuart
+            )
+        ),
+        exit = slideOutHorizontally(
+            targetOffsetX = { -it * 2 },
+            animationSpec = tween(
+                durationMillis = AnimationConstants.ANIMATION_DURATION,
+                easing = EaseInOutQuart
+            )
+        ),
+        modifier = Modifier
+            .align(Alignment.TopCenter)
+            .statusBarsPadding()
+            .padding(top = Dimensions.paddingMedium)
+    ) {
+        Row(
+            horizontalArrangement = Arrangement.spacedBy(Dimensions.paddingLarge),
+            verticalAlignment = Alignment.CenterVertically
+        ) {
+            FilterChip(
+                text = stringResource(id = MapFeatureR.string.scooters_filter_chip_label),
+                selected = uiState.activeFilter.contains(VehicleType.SCOOTER)
+            ) {
+                view.performHapticFeedback(HapticFeedbackConstants.CONTEXT_CLICK)
+                onToggleFilter(VehicleType.SCOOTER)
+            }
+
+            FilterChip(
+                text = stringResource(id = MapFeatureR.string.bicycles_filter_chip_label),
+                selected = uiState.activeFilter.contains(VehicleType.BICYCLE)
+            ) {
+                view.performHapticFeedback(HapticFeedbackConstants.CONTEXT_CLICK)
+                onToggleFilter(VehicleType.BICYCLE)
+            }
+
+            NeoBrutalIconButton(
+                backgroundColor = energeticOrange,
+                imageVector = Icons.Default.AutoAwesome,
+                contentDescription = stringResource(id = MapFeatureR.string.ai_suggest_button_content_description),
+                onClick = {
+                    view.performHapticFeedback(HapticFeedbackConstants.CONTEXT_CLICK)
+                    onSuggestPlaces()
+                },
+            )
+        }
+    }
+}
+
+@Composable
+private fun BoxScope.PathModePanel(
+    isVisible: Boolean,
+    selectedCount: Int,
+    distanceMeters: Int,
+    durationMinutes: Int,
+    onGoClick: () -> Unit,
+) {
+    AnimatedVisibility(
+        modifier = Modifier
+            .align(Alignment.BottomCenter)
+            .navigationBarsPadding()
+            .padding(Dimensions.paddingMedium),
+        visible = isVisible,
+        enter = slideInHorizontally(
+            initialOffsetX = { it },
+            animationSpec = tween(
+                durationMillis = AnimationConstants.ANIMATION_DURATION,
+                easing = EaseInOutQuart
+            )
+        ),
+        exit = slideOutHorizontally(
+            targetOffsetX = { it },
+            animationSpec = tween(
+                durationMillis = AnimationConstants.ANIMATION_DURATION,
+                easing = EaseInOutQuart
+            )
+        )
+    ) {
+        Box(
+            modifier = Modifier
+                .navigationBarsPadding()
+                .padding(Dimensions.paddingLarge)
+        ) {
+            PathModeBar(
+                count = selectedCount,
+                distance = distanceMeters,
+                duration = durationMinutes,
+                onGoClick = onGoClick,
+            )
+        }
+    }
+}
+
+@Composable
+private fun BoxScope.MarkerInfoPanel(
+    marker: MapItemUiModel?,
+    isPathMode: Boolean,
+    onClose: () -> Unit,
+) {
+    AnimatedVisibility(
+        modifier = Modifier.align(Alignment.BottomCenter),
+        visible = marker != null && !isPathMode,
+        enter = slideInHorizontally(
+            initialOffsetX = { it },
+            animationSpec = tween(
+                durationMillis = AnimationConstants.ANIMATION_DURATION,
+                easing = EaseInOutQuart
+            )
+        ),
+        exit = slideOutHorizontally(
+            targetOffsetX = { it },
+            animationSpec = tween(
+                durationMillis = AnimationConstants.ANIMATION_DURATION,
+                easing = EaseInOutQuart
+            )
+        )
+    ) {
+        Box(
+            modifier = Modifier
+                .navigationBarsPadding()
+                .padding(Dimensions.paddingLarge)
+        ) {
+            marker?.let {
+                MarkerInfoCard(
+                    marker = it,
+                    onClose = onClose,
+                )
+            }
+        }
+    }
+}
+
+@Composable
+private fun BoxScope.SuggestedPlaceInfoPanel(
+    place: SuggestedPlace?,
+    isPathMode: Boolean,
+    onClose: () -> Unit,
+) {
+    AnimatedVisibility(
+        modifier = Modifier.align(Alignment.BottomCenter),
+        visible = place != null && !isPathMode,
+        enter = slideInHorizontally(
+            initialOffsetX = { it },
+            animationSpec = tween(
+                durationMillis = AnimationConstants.ANIMATION_DURATION,
+                easing = EaseInOutQuart
+            )
+        ) + fadeIn(animationSpec = tween(durationMillis = AnimationConstants.ANIMATION_DURATION)),
+        exit = slideOutHorizontally(
+            targetOffsetX = { it },
+            animationSpec = tween(
+                durationMillis = AnimationConstants.ANIMATION_DURATION,
+                easing = EaseInOutQuart
+            )
+        ) + fadeOut(animationSpec = tween(durationMillis = AnimationConstants.ANIMATION_DURATION)),
+    ) {
+        Box(
+            modifier = Modifier
+                .navigationBarsPadding()
+                .padding(Dimensions.paddingLarge)
+        ) {
+            place?.let {
+                SuggestedPlaceInfoCard(
+                    place = it,
+                    onClose = onClose,
+                )
+            }
+        }
+    }
+}
+
+@Composable
+private fun BoxScope.SnackbarContainer(snackbarHostState: SnackbarHostState) {
+    SnackbarHost(
+        hostState = snackbarHostState,
+        modifier = Modifier
+            .align(Alignment.BottomCenter)
+            .navigationBarsPadding()
+            .padding(Dimensions.paddingMedium),
+        snackbar = { data ->
+            Snackbar(
+                snackbarData = data,
+                containerColor = MaterialTheme.colorScheme.errorContainer,
+                contentColor = MaterialTheme.colorScheme.onErrorContainer,
+                actionColor = MaterialTheme.colorScheme.onErrorContainer
+            )
+        }
+    )
+}
+
+@Composable
+private fun ErrorState(
+    error: MapError?,
     onRetry: () -> Unit
 ) {
-    uiState.error?.let { error ->
+    error?.let { error ->
         Box(
             modifier = Modifier
                 .fillMaxSize()
@@ -551,8 +669,11 @@ private fun ErrorState(
 }
 
 @Composable
-private fun LoadingState(uiState: MapUiState, currentLoadingMessage: String) {
-    if (uiState.isLoading) {
+private fun LoadingState(
+    isLoading: Boolean,
+    currentLoadingMessage: String
+) {
+    if (isLoading) {
         Box(
             modifier = Modifier
                 .fillMaxSize()
@@ -573,6 +694,7 @@ private fun LoadingState(uiState: MapUiState, currentLoadingMessage: String) {
                         modifier = Modifier.wrapContentSize(),
                         color = MaterialTheme.colorScheme.primary
                     )
+
                     if (currentLoadingMessage.isNotEmpty()) {
                         Spacer(modifier = Modifier.height(Dimensions.paddingMedium))
                         AnimatedVisibility(
