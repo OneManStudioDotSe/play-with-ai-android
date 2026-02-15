@@ -18,7 +18,8 @@ class FirestoreDataSource @Inject constructor(
     private val auth: FirebaseAuth
 ) {
     suspend fun savePrompt(text: String, timestamp: Long): Result<String> {
-        val userId = auth.currentUser?.uid ?: "anonymous"
+        val userId = auth.currentUser?.uid
+            ?: return Result.failure(IllegalStateException("User must be authenticated to sync prompts"))
         val userPromptsCollection = firestore.collection("users").document(userId).collection("prompts")
 
         Timber.d("Firestore - Saving prompt at 'users/$userId/prompts' with text: '${text.take(LOG_PREVIEW_LENGTH)}...'")
@@ -41,7 +42,8 @@ class FirestoreDataSource @Inject constructor(
     }
 
     suspend fun updatePrompt(docId: String, text: String): Result<Unit> {
-        val userId = auth.currentUser?.uid ?: "anonymous"
+        val userId = auth.currentUser?.uid
+            ?: return Result.failure(IllegalStateException("User must be authenticated to sync prompts"))
         val docRef = firestore.collection("users").document(userId).collection("prompts").document(docId)
 
         Timber.d("Firestore - Updating prompt at 'users/$userId/prompts/$docId' with text: '${text.take(LOG_PREVIEW_LENGTH)}...'")
