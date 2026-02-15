@@ -19,6 +19,19 @@ class GenerateContentUseCase @Inject constructor(
             return Result.failure(IllegalArgumentException("Prompt and attachments cannot all be empty"))
         }
 
+        if (prompt.length > MAX_PROMPT_LENGTH) {
+            return Result.failure(IllegalArgumentException("Prompt exceeds maximum length of $MAX_PROMPT_LENGTH characters"))
+        }
+
+        if (fileText != null && fileText.length > MAX_FILE_TEXT_LENGTH) {
+            return Result.failure(IllegalArgumentException("File content exceeds maximum length of $MAX_FILE_TEXT_LENGTH characters"))
+        }
+
         return repository.generateContent(prompt, imageBytes, fileText, analysisType, model)
+    }
+
+    companion object {
+        const val MAX_PROMPT_LENGTH = 50_000
+        const val MAX_FILE_TEXT_LENGTH = 100_000
     }
 }
