@@ -68,8 +68,8 @@ To differentiate myself from the rest of the Android Engineers out there, I do t
 
 Beyond the high-level patterns, the project incorporates several notable architectural decisions worth highlighting:
 
-### Local-first data with background sync
-Prompt history follows a local-first strategy. Every prompt is immediately persisted to Room with a `Pending` sync status, ensuring the user never loses data regardless of connectivity. A `SyncWorker` (WorkManager) picks up pending entries when the network becomes available, uploads them to Firestore, and marks them as `Synced`. Failed uploads are retried up to 3 times before being marked as `Failed`. The sync job runs with `ExistingWorkPolicy.REPLACE` to avoid duplicate work and requires a `NetworkType.CONNECTED` constraint.
+### Local-first data with two-phase background sync
+Prompt history follows a local-first strategy with a two-phase sync to Firestore. When the user sends a prompt, the question is immediately persisted to Room with a `Pending` sync status and a `SyncWorker` (WorkManager) is enqueued to create a new Firestore document. The auto-generated Firestore document ID is stored back in Room (`firestoreDocId`). Once the AI responds, the local entry is updated with the full Q&A text, its status is reset to `Pending`, and a second sync is scheduled — this time the worker detects the existing `firestoreDocId` and updates the same Firestore document rather than creating a new one. A race condition guard (`markSyncedIfTextMatches`) ensures the worker only marks an entry as `Synced` if the text hasn't changed during the sync, preventing stale data. Failed uploads are retried up to 3 times before being marked as `Failed`. Each user's prompts are stored under `/users/{userId}/prompts/` in Firestore.
 
 ### Dynamic configuration via Hilt qualifiers
 API keys, base URLs, and logging levels are injected at runtime through custom Hilt qualifiers (`@GeminiApiKey`, `@BaseUrl`, `@LoggingLevel`). A `ConfigurationModule` reads values from `BuildConfig`, which in turn are sourced from `local.properties` per build variant. This means switching between debug (verbose logging, debug API key) and release (no logging, production key) requires zero code changes — the DI graph handles it automatically.
@@ -94,7 +94,7 @@ The styling of the map changes depending on the light or dark mode that the app 
 
 Core functionality:
 - **AI Chat**: Send prompts to an AI (Gemini) with support for image and document attachments
-- **Smart History**: Access and reuse previous prompts stored locally
+- **Smart History**: Access and reuse previous Q&A entries stored locally and synced to Firestore
 - **Map Interaction**: Discover and filter locations (scooters/bikes) with optimal route calculation
 
 Technical Details:
@@ -102,4 +102,4 @@ Technical Details:
 - **Hilt**: Dependency Injection
 - **Retrofit & OkHttp**: Networking
 - **Room**: Local persistence
-- **Firebase**: Realtime Database, authentication, and storage
+- **Firebase**: Firestore (user-scoped prompt sync), Firebase Auth (anonymous sign-in)

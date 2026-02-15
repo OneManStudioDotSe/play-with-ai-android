@@ -168,6 +168,7 @@ MAPS_API_KEY=your-maps-api-key
 │  ┌──────────────────────┐  ┌──────────────────────┐  ┌───────────────────────┐  │
 │  │ GenerateContentUC    │  │ GetPromptHistoryUC   │  │ GetMapItemsUC         │  │
 │  │ GenerateSuggestionsUC│  │ SavePromptUC         │  │                       │  │
+│  │                      │  │ UpdatePromptTextUC   │  │                       │  │
 │  │                      │  │ IsSyncingUC          │  │                       │  │
 │  └──────────┬───────────┘  └──────────┬───────────┘  └───────────┬───────────┘  │
 │             │                         │                          │              │
@@ -214,7 +215,7 @@ MAPS_API_KEY=your-maps-api-key
 │                  │    ┌──────────────────────────────────┐                      │
 │                  │    │       LOCAL DATA SOURCE          │                      │
 │                  │    │                                  │                      │
-│                  │    │   Room DB: "play_with_ai_db"     |                      │
+│                  │    │   Room DB: "play_with_ai_db" v2  |                      │
 │                  │    └──────────────────────────────────┘                      │
 │                  │                      ▲                                       │
 │                  │                      │                                       │
@@ -243,9 +244,10 @@ MAPS_API_KEY=your-maps-api-key
 │                                                                                 │
 │  ┌──────────────────────────────────────────────────────────────────────────┐   │
 │  │  Firebase Firestore                                                      │   │
-│  │  Collection: "prompts"                                                   │   │
-│  │  Document: { text: String, timestamp: Long, userId: String }             │   │
-│  │  Operations: add (write only, no reads from Firestore)                   │   │
+│  │  Path: /users/{userId}/prompts/{autoDocId}                               │   │
+│  │  Document: { text: String, timestamp: Long }                             │   │
+│  │  Operations: add (create), update (update text with AI answer)           │   │
+│  │  userId is encoded in the document path, not stored as a field           │   │
 │  └──────────────────────────────────────────────────────────────────────────┘   │
 │                                                                                 │
 │  ┌──────────────────────────────────────────────────────────────────────────┐   │
@@ -302,7 +304,7 @@ ChatViewModel receives Result
   ├─ Success → ChatUiState.Success(response)
   └─ Failure → ChatUiState.Error(message)
 
-  (In parallel)
+  (Save & Sync — runs in parallel with Gemini API call)
   │
   ▼
 SavePromptUseCase.invoke(prompt)
@@ -310,15 +312,39 @@ SavePromptUseCase.invoke(prompt)
   ▼
 PromptRepositoryImpl.savePrompt()
   ├─ Set syncStatus = Pending
-  ├─ INSERT INTO prompt_history (Room)
-  └─ Enqueue SyncWorker (WorkManager, requires network)
+  ├─ INSERT INTO prompt_history (Room) — returns insertedId
+  └─ Enqueue SyncWorker (if authenticated)
        │
-       ▼ (when network available)
+       ▼ (Phase 1: sync question to Firestore)
      SyncWorker.doWork()
        ├─ SELECT * FROM prompt_history WHERE syncStatus = 'Pending'
-       ├─ For each: Firestore.collection("prompts").add({text, timestamp, userId})
-       ├─ UPDATE prompt_history SET syncStatus = 'Synced' WHERE id = ?
+       ├─ firestoreDocId is NULL → CREATE:
+       │    ├─ Firestore /users/{userId}/prompts/.add({text, timestamp})
+       │    ├─ Store returned docId → UPDATE prompt_history SET firestoreDocId = ?
+       │    └─ Mark Synced only if text unchanged (race condition protection)
        └─ Return success / retry
+
+  (After Gemini API responds successfully)
+  │
+  ▼
+UpdatePromptTextUseCase.invoke(savedId, "Q: prompt\nA: response")
+  │
+  ▼
+PromptRepositoryImpl.updatePromptText()
+  ├─ UPDATE prompt_history SET text = 'Q: ...\nA: ...' WHERE id = ?
+  ├─ UPDATE prompt_history SET syncStatus = 'Pending' WHERE id = ?
+  └─ Enqueue SyncWorker again (if authenticated)
+       │
+       ▼ (Phase 2: update Firestore document with full Q&A)
+     SyncWorker.doWork()
+       ├─ SELECT * FROM prompt_history WHERE syncStatus = 'Pending'
+       ├─ firestoreDocId is NOT NULL → UPDATE:
+       │    ├─ Firestore /users/{userId}/prompts/{docId}.update("text", ...)
+       │    └─ Mark Synced only if text unchanged (race condition protection)
+       └─ Return success / retry
+
+  Race condition: If AI responds while Phase 1 is still running,
+  markSyncedIfTextMatches returns 0 (text changed) → stays Pending → Phase 2 handles it
 ```
 
 ### Map Feature — Data Flow
