@@ -60,7 +60,6 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalView
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextAlign
-import androidx.compose.ui.unit.dp
 import androidx.core.content.ContextCompat
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import com.google.android.gms.location.LocationServices
@@ -634,35 +633,48 @@ private fun ErrorState(
                 .background(color = MaterialTheme.colorScheme.surface.copy(alpha = Alphas.high)),
             contentAlignment = Alignment.Center
         ) {
-            Column(
-                horizontalAlignment = Alignment.CenterHorizontally,
-                verticalArrangement = Arrangement.Center,
-                modifier = Modifier.padding(Dimensions.paddingLarge)
+            NeoBrutalCard(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .wrapContentHeight()
+                    .padding(Dimensions.paddingLarge),
             ) {
-                Icon(
-                    imageVector = when (error) {
-                        is MapError.NetworkError -> Icons.Rounded.WifiOff
-                        is MapError.Unknown -> Icons.Rounded.Warning
-                    },
-                    contentDescription = stringResource(MapFeatureR.string.map_error_icon),
-                    tint = MaterialTheme.colorScheme.error,
-                    modifier = Modifier.size(48.dp)
-                )
-                Spacer(modifier = Modifier.height(Dimensions.paddingMedium))
-                Text(
-                    text = when (error) {
-                        is MapError.NetworkError -> stringResource(MapFeatureR.string.map_error_network)
-                        is MapError.Unknown -> error.message ?: stringResource(MapFeatureR.string.map_error_unknown)
-                    },
-                    style = MaterialTheme.typography.bodyLarge,
-                    color = MaterialTheme.colorScheme.onSurface,
-                    textAlign = TextAlign.Center
-                )
-                Spacer(modifier = Modifier.height(Dimensions.paddingLarge))
-                NeoBrutalButton(
-                    text = stringResource(MapFeatureR.string.map_error_retry),
-                    onClick = onRetry
-                )
+                Column(
+                    horizontalAlignment = Alignment.CenterHorizontally,
+                    verticalArrangement = Arrangement.Center,
+                    modifier = Modifier.padding(Dimensions.paddingLarge)
+                ) {
+                    Icon(
+                        imageVector = when (error) {
+                            is MapError.NetworkError -> Icons.Rounded.WifiOff
+                            is MapError.Unknown -> Icons.Rounded.Warning
+                        },
+                        contentDescription = stringResource(MapFeatureR.string.map_error_icon),
+                        tint = MaterialTheme.colorScheme.error,
+                        modifier = Modifier.size(Dimensions.paddingExtraLarge)
+                    )
+                    Spacer(modifier = Modifier.height(Dimensions.paddingMedium))
+                    Text(
+                        text = stringResource(MapFeatureR.string.map_error_title),
+                        style = MaterialTheme.typography.titleMedium,
+                        color = MaterialTheme.colorScheme.onSurface
+                    )
+                    Spacer(modifier = Modifier.height(Dimensions.paddingSmall))
+                    Text(
+                        text = when (error) {
+                            is MapError.NetworkError -> stringResource(MapFeatureR.string.map_error_network)
+                            is MapError.Unknown -> error.message ?: stringResource(MapFeatureR.string.map_error_unknown)
+                        },
+                        style = MaterialTheme.typography.bodyMedium,
+                        color = MaterialTheme.colorScheme.onSurface,
+                        textAlign = TextAlign.Center
+                    )
+                    Spacer(modifier = Modifier.height(Dimensions.paddingLarge))
+                    NeoBrutalButton(
+                        text = stringResource(MapFeatureR.string.map_error_retry),
+                        onClick = onRetry
+                    )
+                }
             }
         }
     }

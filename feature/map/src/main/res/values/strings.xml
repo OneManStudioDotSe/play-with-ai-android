@@ -28,6 +28,7 @@
     <string name="map_error_network">Could not load map data. Check your connection and try again.</string>
     <string name="map_error_unknown">Something went wrong while loading the map.</string>
     <string name="map_error_retry">Retry</string>
+    <string name="map_error_title">Oops!</string>
     <string name="map_error_icon">Error icon</string>
     <string name="ai_suggest_button_content_description">Get AI suggested places</string>
     <string name="ai_suggested_place_marker_content_description">AI suggested place: %s</string>

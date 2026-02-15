@@ -10,7 +10,6 @@ import android.provider.OpenableColumns
 import android.view.HapticFeedbackConstants
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
-import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -22,7 +21,6 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.wrapContentSize
 import androidx.compose.foundation.rememberScrollState
-import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Check
@@ -66,6 +64,7 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import se.onemanstudio.playaroundwithai.core.domain.feature.chat.model.AnalysisType
 import se.onemanstudio.playaroundwithai.core.domain.feature.chat.model.GeminiModel
 import se.onemanstudio.playaroundwithai.core.domain.feature.chat.model.InputMode
+import se.onemanstudio.playaroundwithai.core.ui.sofa.NeoBrutalCard
 import se.onemanstudio.playaroundwithai.core.ui.sofa.NeoBrutalIconButton
 import se.onemanstudio.playaroundwithai.core.ui.sofa.NeoBrutalTopAppBar
 import se.onemanstudio.playaroundwithai.core.ui.theme.Dimensions
@@ -174,13 +173,24 @@ fun ChatScreen(viewModel: ChatViewModel = hiltViewModel()) {
                 actions = {
                     var isModelMenuExpanded by remember { mutableStateOf(false) }
 
-                    Box(modifier = Modifier.padding(end = Dimensions.paddingMedium)) {
+                    if (isSyncing) {
+                        NeoBrutalIconButton(
+                            modifier = Modifier.padding(horizontal = Dimensions.paddingSmall),
+                            imageVector = Icons.Default.Sync,
+                            contentDescription = stringResource(R.string.label_syncing),
+                            backgroundColor = MaterialTheme.colorScheme.secondary,
+                            onClick = {},
+                        )
+                    }
+
+                    Box(modifier = Modifier.padding(horizontal = Dimensions.paddingSmall)) {
                         NeoBrutalIconButton(
                             imageVector = Icons.Default.ModelTraining,
                             contentDescription = stringResource(R.string.model_selector),
                             backgroundColor = MaterialTheme.colorScheme.primaryContainer,
                             onClick = { isModelMenuExpanded = true },
                         )
+
                         DropdownMenu(
                             expanded = isModelMenuExpanded,
                             onDismissRequest = { isModelMenuExpanded = false }
@@ -207,15 +217,9 @@ fun ChatScreen(viewModel: ChatViewModel = hiltViewModel()) {
                             }
                         }
                     }
-                    if (isSyncing) {
-                        NeoBrutalIconButton(
-                            imageVector = Icons.Default.Sync,
-                            contentDescription = stringResource(R.string.label_syncing),
-                            backgroundColor = MaterialTheme.colorScheme.secondary,
-                            onClick = {},
-                        )
-                    }
+
                     NeoBrutalIconButton(
+                        modifier = Modifier.padding(horizontal = Dimensions.paddingSmall),
                         imageVector = Icons.Default.History,
                         contentDescription = stringResource(R.string.label_prompt_history),
                         backgroundColor = MaterialTheme.colorScheme.tertiary,
@@ -321,20 +325,15 @@ private fun ErrorState(
 ) {
     val (errorMsg, errorIcon) = getErrorMessageAndIcon(state.error)
 
-    Box(
+    NeoBrutalCard(
         modifier = Modifier
             .fillMaxWidth()
-            .padding(Dimensions.paddingLarge)
-            .background(
-                color = MaterialTheme.colorScheme.errorContainer,
-                shape = RoundedCornerShape(Dimensions.paddingMedium)
-            )
             .padding(Dimensions.paddingLarge),
-        contentAlignment = Alignment.Center
     ) {
         Column(
             horizontalAlignment = Alignment.CenterHorizontally,
-            verticalArrangement = Arrangement.Center
+            verticalArrangement = Arrangement.Center,
+            modifier = Modifier.padding(Dimensions.paddingLarge)
         ) {
             Icon(
                 imageVector = errorIcon,
@@ -346,13 +345,13 @@ private fun ErrorState(
             Text(
                 text = stringResource(R.string.oops),
                 style = MaterialTheme.typography.titleMedium,
-                color = MaterialTheme.colorScheme.onErrorContainer
+                color = MaterialTheme.colorScheme.onSurface
             )
             Spacer(modifier = Modifier.height(Dimensions.paddingSmall))
             Text(
                 text = errorMsg,
                 style = MaterialTheme.typography.bodyMedium,
-                color = MaterialTheme.colorScheme.onErrorContainer,
+                color = MaterialTheme.colorScheme.onSurface,
                 textAlign = TextAlign.Center
             )
             Spacer(modifier = Modifier.height(Dimensions.paddingLarge))
