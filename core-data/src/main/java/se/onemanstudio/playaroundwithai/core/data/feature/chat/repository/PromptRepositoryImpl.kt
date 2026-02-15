@@ -30,16 +30,44 @@ class PromptRepositoryImpl @Inject constructor(
     private val authRepository: AuthRepository
 ) : PromptRepository {
 
-    override suspend fun savePrompt(prompt: Prompt) {
+    override suspend fun savePrompt(prompt: Prompt): Long {
         Timber.d("PromptRepo - Saving prompt to local DB, with text '${prompt.text.take(LOG_PREVIEW_LENGTH)}...', syncStatus: Pending")
         val promptWithPendingStatus = prompt.copy(syncStatus = SyncStatus.Pending)
-        promptsHistoryDao.savePrompt(promptWithPendingStatus.toPromptEntity())
+        val insertedId = promptsHistoryDao.savePrompt(promptWithPendingStatus.toPromptEntity())
+        Timber.d("PromptRepo - Prompt saved to Room (id=$insertedId)")
 
         if (authRepository.isUserSignedIn()) {
-            Timber.d("PromptRepo - Prompt saved to Room. Scheduling background sync...")
+            Timber.d("PromptRepo - Scheduling immediate sync for the question...")
             scheduleSync()
         } else {
-            Timber.w("PromptRepo - Prompt saved to Room. Skipping sync — user is not authenticated")
+            Timber.w("PromptRepo - Skipping sync — user is not authenticated")
+        }
+
+        return insertedId
+    }
+
+    override suspend fun updatePromptText(id: Long, text: String) {
+        Timber.d("PromptRepo - Updating prompt text for id=$id, text='${text.take(LOG_PREVIEW_LENGTH)}...'")
+        promptsHistoryDao.updatePromptText(id.toInt(), text)
+        promptsHistoryDao.updateSyncStatus(id.toInt(), SyncStatus.Pending.name)
+
+        if (authRepository.isUserSignedIn()) {
+            Timber.d("PromptRepo - Text updated. Scheduling sync for the complete Q&A...")
+            scheduleSync()
+        } else {
+            Timber.w("PromptRepo - Text updated. Skipping sync — user is not authenticated")
+        }
+    }
+
+    override suspend fun retryPendingSyncs() {
+        Timber.d("PromptRepo - Retrying failed syncs: resetting Failed → Pending")
+        promptsHistoryDao.updateAllSyncStatuses(SyncStatus.Failed.name, SyncStatus.Pending.name)
+
+        if (authRepository.isUserSignedIn()) {
+            Timber.d("PromptRepo - Re-enqueuing SyncWorker for failed prompts")
+            scheduleSync()
+        } else {
+            Timber.w("PromptRepo - Skipping sync retry — user is not authenticated")
         }
     }
 

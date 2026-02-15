@@ -2,6 +2,7 @@ package se.onemanstudio.playaroundwithai.feature.chat
 
 import android.app.Application
 import io.mockk.coEvery
+import io.mockk.coVerify
 import io.mockk.every
 import io.mockk.mockk
 import kotlinx.coroutines.CoroutineScope
@@ -24,10 +25,14 @@ import se.onemanstudio.playaroundwithai.core.domain.feature.chat.usecase.GetFail
 import se.onemanstudio.playaroundwithai.core.domain.feature.chat.usecase.GetPromptHistoryUseCase
 import se.onemanstudio.playaroundwithai.core.domain.feature.chat.usecase.GetSuggestionsUseCase
 import se.onemanstudio.playaroundwithai.core.domain.feature.chat.usecase.GetSyncStateUseCase
+import se.onemanstudio.playaroundwithai.core.domain.feature.chat.usecase.RetryPendingSyncsUseCase
 import se.onemanstudio.playaroundwithai.core.domain.feature.chat.usecase.SavePromptUseCase
+import se.onemanstudio.playaroundwithai.core.domain.feature.chat.usecase.UpdatePromptTextUseCase
 import se.onemanstudio.playaroundwithai.core.domain.feature.auth.usecase.ObserveAuthReadyUseCase
+import se.onemanstudio.playaroundwithai.feature.chat.models.SnackbarEvent
 import se.onemanstudio.playaroundwithai.feature.chat.states.ChatError
 import se.onemanstudio.playaroundwithai.feature.chat.states.ChatUiState
+import se.onemanstudio.playaroundwithai.feature.chat.util.FileUtils
 import se.onemanstudio.playaroundwithai.feature.chat.util.MainCoroutineRule
 import java.io.IOException
 import kotlin.test.assertEquals
@@ -189,26 +194,131 @@ class ChatViewModelTest {
         assertEquals(expected = false, actual = states.last())
     }
 
+    @Test
+    fun `generateContent saves question first then updates with response`() = runTest {
+        // Given
+        val prompt = "Test question"
+        val response = "Test response"
+        val promptRepository = mockk<PromptRepository> {
+            coEvery { savePrompt(any()) } returns 1L
+            coEvery { updatePromptText(any(), any()) } returns Unit
+            every { getPromptHistory() } returns flowOf(emptyList())
+            every { isSyncing() } returns flowOf(false)
+            every { getFailedSyncCount() } returns flowOf(0)
+        }
+        val viewModel = createViewModel(
+            generateContentResult = Result.success(response),
+            promptRepository = promptRepository
+        )
+
+        // When
+        viewModel.generateContent(prompt, null)
+        advanceUntilIdle()
+
+        // Then
+        coVerify { promptRepository.savePrompt(match { it.text == prompt }) }
+        coVerify { promptRepository.updatePromptText(1L, "Q: $prompt\nA: $response") }
+    }
+
+    @Test
+    fun `generateContent emits LocalSaveFailed when save throws`() = runTest {
+        // Given
+        val prompt = "Test question"
+        val promptRepository = mockk<PromptRepository> {
+            coEvery { savePrompt(any()) } throws RuntimeException("DB error")
+            every { getPromptHistory() } returns flowOf(emptyList())
+            every { isSyncing() } returns flowOf(false)
+            every { getFailedSyncCount() } returns flowOf(0)
+        }
+        val viewModel = createViewModel(
+            generateContentResult = Result.success("response"),
+            promptRepository = promptRepository
+        )
+        val events = mutableListOf<SnackbarEvent>()
+
+        // When
+        viewModel.snackbarEvent
+            .onEach { events.add(it) }
+            .launchIn(CoroutineScope(UnconfinedTestDispatcher(testScheduler)))
+        viewModel.generateContent(prompt, null)
+        advanceUntilIdle()
+
+        // Then
+        assert(events.any { it is SnackbarEvent.LocalSaveFailed })
+    }
+
+    @Test
+    fun `generateContent emits LocalUpdateFailed when update throws`() = runTest {
+        // Given
+        val prompt = "Test question"
+        val promptRepository = mockk<PromptRepository> {
+            coEvery { savePrompt(any()) } returns 1L
+            coEvery { updatePromptText(any(), any()) } throws RuntimeException("DB error")
+            every { getPromptHistory() } returns flowOf(emptyList())
+            every { isSyncing() } returns flowOf(false)
+            every { getFailedSyncCount() } returns flowOf(0)
+        }
+        val viewModel = createViewModel(
+            generateContentResult = Result.success("response"),
+            promptRepository = promptRepository
+        )
+        val events = mutableListOf<SnackbarEvent>()
+
+        // When
+        viewModel.snackbarEvent
+            .onEach { events.add(it) }
+            .launchIn(CoroutineScope(UnconfinedTestDispatcher(testScheduler)))
+        viewModel.generateContent(prompt, null)
+        advanceUntilIdle()
+
+        // Then
+        assert(events.any { it is SnackbarEvent.LocalUpdateFailed })
+    }
+
+    @Test
+    fun `retryFailedSyncs calls use case`() = runTest {
+        // Given
+        val promptRepository = mockk<PromptRepository> {
+            coEvery { savePrompt(any()) } returns 1L
+            coEvery { retryPendingSyncs() } returns Unit
+            every { getPromptHistory() } returns flowOf(emptyList())
+            every { isSyncing() } returns flowOf(false)
+            every { getFailedSyncCount() } returns flowOf(0)
+        }
+        val viewModel = createViewModel(promptRepository = promptRepository)
+
+        // When
+        viewModel.retryFailedSyncs()
+        advanceUntilIdle()
+
+        // Then
+        coVerify { promptRepository.retryPendingSyncs() }
+    }
+
     private fun createViewModel(
         generateContentResult: Result<String>? = null,
         suggestionsResult: Result<List<String>> = Result.success(emptyList()),
         promptHistoryResult: List<Prompt> = emptyList(),
         isSyncingResult: Boolean = false,
-        failedSyncCountResult: Int = 0
+        failedSyncCountResult: Int = 0,
+        promptRepository: PromptRepository? = null
     ): ChatViewModel {
         val geminiRepository = mockk<GeminiRepository> {
             generateContentResult?.let { coEvery { generateContent(any(), any(), any(), any(), any()) } returns it }
-            coEvery { generateConversationStarters(any()) } returns (suggestionsResult as Result<List<String>>)
+            coEvery { generateConversationStarters(any()) } returns suggestionsResult
         }
 
-        val promptRepository = mockk<PromptRepository> {
-            coEvery { savePrompt(any()) } returns Unit
+        val effectivePromptRepository = promptRepository ?: mockk<PromptRepository> {
+            coEvery { savePrompt(any()) } returns 1L
+            coEvery { updatePromptText(any(), any()) } returns Unit
+            coEvery { retryPendingSyncs() } returns Unit
             every { getPromptHistory() } returns flowOf(promptHistoryResult)
             every { isSyncing() } returns flowOf(isSyncingResult)
             every { getFailedSyncCount() } returns flowOf(failedSyncCountResult)
         }
 
         val application = mockk<Application>(relaxed = true)
+        val fileUtils = mockk<FileUtils>(relaxed = true)
         val authReadyFlow: StateFlow<Boolean> = MutableStateFlow(true)
         val observeAuthReadyUseCase = mockk<ObserveAuthReadyUseCase>()
         every { observeAuthReadyUseCase.invoke() } returns authReadyFlow
@@ -216,11 +326,14 @@ class ChatViewModelTest {
         return ChatViewModel(
             GenerateContentUseCase(geminiRepository),
             GetSuggestionsUseCase(geminiRepository),
-            GetPromptHistoryUseCase(promptRepository),
-            GetSyncStateUseCase(promptRepository),
-            GetFailedSyncCountUseCase(promptRepository),
-            SavePromptUseCase(promptRepository),
+            GetPromptHistoryUseCase(effectivePromptRepository),
+            GetSyncStateUseCase(effectivePromptRepository),
+            GetFailedSyncCountUseCase(effectivePromptRepository),
+            SavePromptUseCase(effectivePromptRepository),
+            UpdatePromptTextUseCase(effectivePromptRepository),
+            RetryPendingSyncsUseCase(effectivePromptRepository),
             observeAuthReadyUseCase,
+            fileUtils,
             application
         )
     }

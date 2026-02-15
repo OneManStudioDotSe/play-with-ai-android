@@ -8,9 +8,9 @@ import androidx.hilt.work.HiltWorker
 import androidx.work.CoroutineWorker
 import androidx.work.ForegroundInfo
 import androidx.work.WorkerParameters
+import com.google.firebase.auth.FirebaseAuth
 import dagger.assisted.Assisted
 import dagger.assisted.AssistedInject
-import com.google.firebase.auth.FirebaseAuth
 import se.onemanstudio.playaroundwithai.core.data.R
 import se.onemanstudio.playaroundwithai.core.data.feature.chat.local.dao.PromptsHistoryDao
 import se.onemanstudio.playaroundwithai.core.data.feature.chat.remote.api.FirestoreDataSource
@@ -48,14 +48,29 @@ class SyncWorker @AssistedInject constructor(
 
         var allSuccessful = true
         pendingPrompts.forEach { entity ->
-            Timber.d("SyncWorker - Syncing prompt with id ${entity.id} to Firestore...")
-            val syncResult = firestoreDataSource.savePrompt(entity.text, entity.timestamp)
-            if (syncResult.isSuccess) {
-                promptsDao.updateSyncStatus(entity.id, SyncStatus.Synced.name)
-                Timber.d("SyncWorker - prompt with id ${entity.id} was synced successfully!")
+            val hasFirestoreDoc = entity.firestoreDocId != null
+            Timber.d("SyncWorker - Syncing prompt id=${entity.id} (${if (hasFirestoreDoc) "UPDATE" else "CREATE"})...")
+
+            val success = if (hasFirestoreDoc) {
+                val result = firestoreDataSource.updatePrompt(entity.firestoreDocId!!, entity.text)
+                result.isSuccess
+            } else {
+                val result = firestoreDataSource.savePrompt(entity.text, entity.timestamp)
+                if (result.isSuccess) {
+                    val docId = result.getOrNull()!!
+                    promptsDao.updateFirestoreDocId(entity.id, docId)
+                }
+                result.isSuccess
+            }
+
+            if (success) {
+                val rowsUpdated = promptsDao.markSyncedIfTextMatches(entity.id, entity.text, SyncStatus.Synced.name)
+                if (rowsUpdated > 0) {
+                    Timber.d("SyncWorker - Prompt id=${entity.id} marked as Synced")
+                }
             } else {
                 allSuccessful = false
-                Timber.e(syncResult.exceptionOrNull(), "SyncWorker - failed to sync prompt with id ${entity.id} :/")
+                Timber.e("SyncWorker - Failed to sync prompt id=${entity.id}")
             }
         }
 
@@ -64,10 +79,12 @@ class SyncWorker @AssistedInject constructor(
                 Timber.d("SyncWorker completed — all ${pendingPrompts.size} prompt(s) synced successfully")
                 Result.success()
             }
+
             runAttemptCount < MAX_RETRY_COUNT - 1 -> {
                 Timber.w("SyncWorker - Attempt ${runAttemptCount + 1} failed, will retry")
                 Result.retry()
             }
+
             else -> {
                 Timber.e("SyncWorker - All $MAX_RETRY_COUNT attempts exhausted. Marking remaining prompts as Failed")
                 val stillPending = promptsDao.getPromptsBySyncStatus(SyncStatus.Pending.name)

@@ -6,6 +6,11 @@ import android.app.NotificationManager
 import androidx.hilt.work.HiltWorkerFactory
 import androidx.work.Configuration
 import dagger.hilt.android.HiltAndroidApp
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.SupervisorJob
+import kotlinx.coroutines.launch
+import se.onemanstudio.playaroundwithai.core.domain.feature.chat.usecase.RetryPendingSyncsUseCase
 import se.onemanstudio.playaroundwithai.feature.chat.R
 import timber.log.Timber
 import javax.inject.Inject
@@ -15,6 +20,11 @@ class OneManStudioApp : Application(), Configuration.Provider {
 
     @Inject
     lateinit var workerFactory: HiltWorkerFactory
+
+    @Inject
+    lateinit var retryPendingSyncsUseCase: RetryPendingSyncsUseCase
+
+    private val applicationScope = CoroutineScope(SupervisorJob() + Dispatchers.IO)
 
     override val workManagerConfiguration: Configuration
         get() = Configuration.Builder()
@@ -30,8 +40,21 @@ class OneManStudioApp : Application(), Configuration.Provider {
         }
 
         createNotificationChannel()
+        retryFailedSyncs()
 
         Timber.d("OneManStudioApp started")
+    }
+
+    @SuppressWarnings("TooGenericExceptionCaught")
+    private fun retryFailedSyncs() {
+        applicationScope.launch {
+            try {
+                retryPendingSyncsUseCase()
+                Timber.d("OneManStudioApp - Retried failed syncs on startup")
+            } catch (e: Exception) {
+                Timber.e(e, "OneManStudioApp - Failed to retry syncs on startup")
+            }
+        }
     }
 
     private fun createNotificationChannel() {

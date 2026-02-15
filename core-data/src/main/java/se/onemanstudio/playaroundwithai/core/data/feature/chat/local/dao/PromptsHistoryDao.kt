@@ -23,4 +23,19 @@ interface PromptsHistoryDao {
 
     @Query("SELECT COUNT(*) FROM prompt_history WHERE syncStatus = :status")
     fun getCountBySyncStatus(status: String): Flow<Int>
+
+    @Query("UPDATE prompt_history SET text = :text WHERE id = :id")
+    suspend fun updatePromptText(id: Int, text: String)
+
+    @Query("UPDATE prompt_history SET syncStatus = :newStatus WHERE syncStatus = :oldStatus")
+    suspend fun updateAllSyncStatuses(oldStatus: String, newStatus: String)
+
+    @Query("UPDATE prompt_history SET firestoreDocId = :docId WHERE id = :id")
+    suspend fun updateFirestoreDocId(id: Int, docId: String)
+
+    @Query("SELECT * FROM prompt_history WHERE id = :id")
+    suspend fun getPromptById(id: Int): PromptEntity?
+
+    @Query("UPDATE prompt_history SET syncStatus = :newStatus WHERE id = :id AND text = :expectedText")
+    suspend fun markSyncedIfTextMatches(id: Int, expectedText: String, newStatus: String): Int
 }

@@ -3,6 +3,7 @@ package se.onemanstudio.playaroundwithai.core.data.feature.chat.repository
 import androidx.work.WorkManager
 import com.google.common.truth.Truth.assertThat
 import io.mockk.coEvery
+import io.mockk.coVerify
 import io.mockk.every
 import io.mockk.mockk
 import io.mockk.slot
@@ -56,7 +57,7 @@ class PromptRepositoryImplTest {
     }
 
     @Test
-    fun `savePrompt schedules sync work after saving`() = runTest {
+    fun `savePrompt schedules sync when user is authenticated`() = runTest {
         // GIVEN
         val prompt = Prompt(id = 0L, text = "Sync me", timestamp = Date(), syncStatus = SyncStatus.Pending)
         coEvery { dao.savePrompt(any()) } returns 1L
@@ -64,22 +65,23 @@ class PromptRepositoryImplTest {
         // WHEN
         repository.savePrompt(prompt)
 
-        // THEN: WorkManager should be called to enqueue sync
+        // THEN: Sync is scheduled immediately so the question reaches Firestore
         verify { workManager.enqueueUniqueWork(any(), any(), any<androidx.work.OneTimeWorkRequest>()) }
     }
 
     @Test
     fun `savePrompt does not schedule sync when user is not authenticated`() = runTest {
-        // GIVEN: User is not signed in
+        // GIVEN
         every { authRepository.isUserSignedIn() } returns false
-        val prompt = Prompt(id = 0L, text = "Offline prompt", timestamp = Date(), syncStatus = SyncStatus.Pending)
+        val prompt = Prompt(id = 0L, text = "No sync", timestamp = Date(), syncStatus = SyncStatus.Pending)
         coEvery { dao.savePrompt(any()) } returns 1L
 
         // WHEN
         repository.savePrompt(prompt)
 
         // THEN: Prompt is saved locally but sync is NOT scheduled
-        verify { workManager wasNot io.mockk.Called }
+        coVerify { dao.savePrompt(any()) }
+        verify(exactly = 0) { workManager.enqueueUniqueWork(any(), any(), any<androidx.work.OneTimeWorkRequest>()) }
     }
 
     @Test
@@ -125,5 +127,76 @@ class PromptRepositoryImplTest {
 
         // THEN
         assertThat(count).isEqualTo(3)
+    }
+
+    @Test
+    fun `savePrompt returns inserted row id`() = runTest {
+        // GIVEN
+        val prompt = Prompt(id = 0L, text = "Test", timestamp = Date(), syncStatus = SyncStatus.Pending)
+        coEvery { dao.savePrompt(any()) } returns 42L
+
+        // WHEN
+        val result = repository.savePrompt(prompt)
+
+        // THEN
+        assertThat(result).isEqualTo(42L)
+    }
+
+    @Test
+    fun `updatePromptText updates text resets sync status and schedules sync`() = runTest {
+        // GIVEN
+        coEvery { dao.updatePromptText(5, "Updated text") } returns Unit
+        coEvery { dao.updateSyncStatus(5, SyncStatus.Pending.name) } returns Unit
+
+        // WHEN
+        repository.updatePromptText(5L, "Updated text")
+
+        // THEN
+        coVerify { dao.updatePromptText(5, "Updated text") }
+        coVerify { dao.updateSyncStatus(5, SyncStatus.Pending.name) }
+        verify { workManager.enqueueUniqueWork(any(), any(), any<androidx.work.OneTimeWorkRequest>()) }
+    }
+
+    @Test
+    fun `updatePromptText does not schedule sync when user is not authenticated`() = runTest {
+        // GIVEN
+        every { authRepository.isUserSignedIn() } returns false
+        coEvery { dao.updatePromptText(5, "Updated text") } returns Unit
+        coEvery { dao.updateSyncStatus(5, SyncStatus.Pending.name) } returns Unit
+
+        // WHEN
+        repository.updatePromptText(5L, "Updated text")
+
+        // THEN: Text and status are updated but sync is NOT scheduled
+        coVerify { dao.updatePromptText(5, "Updated text") }
+        coVerify { dao.updateSyncStatus(5, SyncStatus.Pending.name) }
+        verify(exactly = 0) { workManager.enqueueUniqueWork(any(), any(), any<androidx.work.OneTimeWorkRequest>()) }
+    }
+
+    @Test
+    fun `retryPendingSyncs resets Failed to Pending and schedules sync`() = runTest {
+        // GIVEN
+        coEvery { dao.updateAllSyncStatuses(SyncStatus.Failed.name, SyncStatus.Pending.name) } returns Unit
+
+        // WHEN
+        repository.retryPendingSyncs()
+
+        // THEN
+        coVerify { dao.updateAllSyncStatuses(SyncStatus.Failed.name, SyncStatus.Pending.name) }
+        verify { workManager.enqueueUniqueWork(any(), any(), any<androidx.work.OneTimeWorkRequest>()) }
+    }
+
+    @Test
+    fun `retryPendingSyncs does not schedule sync when user is not authenticated`() = runTest {
+        // GIVEN
+        every { authRepository.isUserSignedIn() } returns false
+        coEvery { dao.updateAllSyncStatuses(any(), any()) } returns Unit
+
+        // WHEN
+        repository.retryPendingSyncs()
+
+        // THEN: Status is updated but sync is NOT scheduled
+        coVerify { dao.updateAllSyncStatuses(SyncStatus.Failed.name, SyncStatus.Pending.name) }
+        verify(exactly = 0) { workManager.enqueueUniqueWork(any(), any(), any<androidx.work.OneTimeWorkRequest>()) }
     }
 }

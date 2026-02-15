@@ -23,18 +23,14 @@ import androidx.compose.foundation.layout.wrapContentSize
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Check
 import androidx.compose.material.icons.filled.Clear
 import androidx.compose.material.icons.filled.History
-import androidx.compose.material.icons.filled.ModelTraining
 import androidx.compose.material.icons.filled.Sync
 import androidx.compose.material.icons.rounded.BrokenImage
 import androidx.compose.material.icons.rounded.Description
 import androidx.compose.material.icons.rounded.Lock
 import androidx.compose.material.icons.rounded.Warning
 import androidx.compose.material.icons.rounded.WifiOff
-import androidx.compose.material3.DropdownMenu
-import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
@@ -42,6 +38,7 @@ import androidx.compose.material3.Scaffold
 import androidx.compose.material3.SnackbarDuration
 import androidx.compose.material3.SnackbarHost
 import androidx.compose.material3.SnackbarHostState
+import androidx.compose.material3.SnackbarResult
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
@@ -62,7 +59,6 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import se.onemanstudio.playaroundwithai.core.domain.feature.chat.model.AnalysisType
-import se.onemanstudio.playaroundwithai.core.domain.feature.chat.model.GeminiModel
 import se.onemanstudio.playaroundwithai.core.domain.feature.chat.model.InputMode
 import se.onemanstudio.playaroundwithai.core.ui.sofa.NeoBrutalCard
 import se.onemanstudio.playaroundwithai.core.ui.sofa.NeoBrutalIconButton
@@ -70,6 +66,7 @@ import se.onemanstudio.playaroundwithai.core.ui.sofa.NeoBrutalTopAppBar
 import se.onemanstudio.playaroundwithai.core.ui.theme.Dimensions
 import se.onemanstudio.playaroundwithai.core.ui.theme.SofaAiTheme
 import se.onemanstudio.playaroundwithai.feature.chat.models.Attachment
+import se.onemanstudio.playaroundwithai.feature.chat.models.SnackbarEvent
 import se.onemanstudio.playaroundwithai.feature.chat.states.ChatError
 import se.onemanstudio.playaroundwithai.feature.chat.states.ChatUiState
 import se.onemanstudio.playaroundwithai.feature.chat.views.AmoebaShapeAnimation
@@ -88,10 +85,9 @@ fun ChatScreen(viewModel: ChatViewModel = hiltViewModel()) {
     var textState by remember { mutableStateOf(TextFieldValue("")) }
     val keyboardController = LocalSoftwareKeyboardController.current
 
-    val isSheetOpen by viewModel.isSheetOpen.collectAsStateWithLifecycle()
+    var isSheetOpen by remember { mutableStateOf(false) }
     val history by viewModel.promptHistory.collectAsStateWithLifecycle()
     val isSyncing by viewModel.isSyncing.collectAsStateWithLifecycle()
-    val selectedModel by viewModel.selectedModel.collectAsStateWithLifecycle()
 
     var inputMode by remember { mutableStateOf(InputMode.TEXT) }
     var selectedImageUri by remember { mutableStateOf<Uri?>(null) }
@@ -112,11 +108,33 @@ fun ChatScreen(viewModel: ChatViewModel = hiltViewModel()) {
     }
 
     LaunchedEffect(Unit) {
-        viewModel.syncFailureEvent.collect { failedCount ->
-            snackbarHostState.showSnackbar(
-                message = context.getString(R.string.sync_failed_snackbar, failedCount),
-                duration = SnackbarDuration.Long
-            )
+        viewModel.snackbarEvent.collect { event ->
+            when (event) {
+                is SnackbarEvent.LocalSaveFailed -> {
+                    snackbarHostState.showSnackbar(
+                        message = event.message,
+                        duration = SnackbarDuration.Long
+                    )
+                }
+
+                is SnackbarEvent.LocalUpdateFailed -> {
+                    snackbarHostState.showSnackbar(
+                        message = event.message,
+                        duration = SnackbarDuration.Long
+                    )
+                }
+
+                is SnackbarEvent.SyncFailed -> {
+                    val result = snackbarHostState.showSnackbar(
+                        message = context.getString(R.string.sync_failed_snackbar, event.failedCount),
+                        actionLabel = context.getString(R.string.sync_retry_action),
+                        duration = SnackbarDuration.Long
+                    )
+                    if (result == SnackbarResult.ActionPerformed) {
+                        viewModel.retryFailedSyncs()
+                    }
+                }
+            }
         }
     }
 
@@ -152,13 +170,17 @@ fun ChatScreen(viewModel: ChatViewModel = hiltViewModel()) {
     if (isSheetOpen) {
         HistoryBottomSheet(
             history = history,
-            onDismissRequest = { viewModel.closeHistorySheet() },
+            onDismissRequest = { isSheetOpen = false },
             onHistoryItemClick = { selectedText ->
-                val question = selectedText
-                    .removePrefix("Q: ")
-                    .substringBefore("\nA: ")
-                textState = TextFieldValue(question)
-                viewModel.closeHistorySheet()
+                if (selectedText.startsWith("Q: ") && selectedText.contains("\nA: ")) {
+                    val question = selectedText.removePrefix("Q: ").substringBefore("\nA: ")
+                    val answer = selectedText.substringAfter("\nA: ")
+                    textState = TextFieldValue(question)
+                    viewModel.restoreAnswer(answer)
+                } else {
+                    textState = TextFieldValue(selectedText)
+                }
+                isSheetOpen = false
                 keyboardController?.hide()
             }
         )
@@ -171,8 +193,6 @@ fun ChatScreen(viewModel: ChatViewModel = hiltViewModel()) {
             NeoBrutalTopAppBar(
                 title = stringResource(R.string.let_s_talk),
                 actions = {
-                    var isModelMenuExpanded by remember { mutableStateOf(false) }
-
                     if (isSyncing) {
                         NeoBrutalIconButton(
                             modifier = Modifier.padding(horizontal = Dimensions.paddingSmall),
@@ -183,47 +203,12 @@ fun ChatScreen(viewModel: ChatViewModel = hiltViewModel()) {
                         )
                     }
 
-                    Box(modifier = Modifier.padding(horizontal = Dimensions.paddingSmall)) {
-                        NeoBrutalIconButton(
-                            imageVector = Icons.Default.ModelTraining,
-                            contentDescription = stringResource(R.string.model_selector),
-                            backgroundColor = MaterialTheme.colorScheme.primaryContainer,
-                            onClick = { isModelMenuExpanded = true },
-                        )
-
-                        DropdownMenu(
-                            expanded = isModelMenuExpanded,
-                            onDismissRequest = { isModelMenuExpanded = false }
-                        ) {
-                            GeminiModel.entries.forEach { model ->
-                                DropdownMenuItem(
-                                    text = { Text(stringResource(model.asStringRes())) },
-                                    onClick = {
-                                        viewModel.selectModel(model)
-                                        isModelMenuExpanded = false
-                                    },
-                                    trailingIcon = if (model == selectedModel) {
-                                        {
-                                            Icon(
-                                                imageVector = Icons.Default.Check,
-                                                contentDescription = null,
-                                                modifier = Modifier.size(Dimensions.iconSizeLarge)
-                                            )
-                                        }
-                                    } else {
-                                        null
-                                    }
-                                )
-                            }
-                        }
-                    }
-
                     NeoBrutalIconButton(
-                        modifier = Modifier.padding(horizontal = Dimensions.paddingSmall),
+                        modifier = Modifier.padding(start = Dimensions.paddingSmall),
                         imageVector = Icons.Default.History,
                         contentDescription = stringResource(R.string.label_prompt_history),
                         backgroundColor = MaterialTheme.colorScheme.tertiary,
-                        onClick = { viewModel.openHistorySheet() },
+                        onClick = { isSheetOpen = true },
                     )
                 }
             )
@@ -292,7 +277,7 @@ private fun ContentState(
     onClearResponse: () -> Unit,
 ) {
     val scrollState = rememberScrollState()
-    
+
     Box(modifier = Modifier.padding(Dimensions.paddingLarge)) {
         Box(
             modifier = Modifier
@@ -309,6 +294,7 @@ private fun ContentState(
 
         NeoBrutalIconButton(
             modifier = Modifier
+                .padding(end = Dimensions.paddingExtraSmall)
                 .align(Alignment.TopEnd)
                 .wrapContentSize(),
             onClick = { onClearResponse() },
@@ -373,14 +359,6 @@ private fun getErrorMessageAndIcon(error: ChatError): Pair<String, ImageVector> 
         is ChatError.FileNotFound -> stringResource(R.string.error_i_couldn_t_find_the_selected_file) to Icons.Rounded.BrokenImage
         is ChatError.FileRead -> stringResource(R.string.error_i_couldn_t_read_the_file_content) to Icons.Rounded.Description
         is ChatError.Unknown -> (error.message ?: stringResource(R.string.error_an_unknown_error_occurred)) to Icons.Rounded.Warning
-    }
-}
-
-fun GeminiModel.asStringRes(): Int {
-    return when (this) {
-        GeminiModel.FLASH_PREVIEW -> R.string.gemini_model_flash_preview
-        GeminiModel.PRO -> R.string.gemini_model_pro
-        GeminiModel.FLASH -> R.string.gemini_model_flash
     }
 }
 

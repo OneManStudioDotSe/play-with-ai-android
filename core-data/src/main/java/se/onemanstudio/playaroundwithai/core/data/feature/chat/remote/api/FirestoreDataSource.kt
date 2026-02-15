@@ -12,32 +12,48 @@ import javax.inject.Singleton
 
 private const val LOG_PREVIEW_LENGTH = 50
 
-@Suppress("CanBeParameter")
 @Singleton
 class FirestoreDataSource @Inject constructor(
     private val firestore: FirebaseFirestore,
     private val auth: FirebaseAuth
 ) {
-    private val promptsCollection = firestore.collection("prompts")
-
-    suspend fun savePrompt(text: String, timestamp: Long): Result<Unit> {
+    suspend fun savePrompt(text: String, timestamp: Long): Result<String> {
         val userId = auth.currentUser?.uid ?: "anonymous"
-        Timber.d("Firestore - Saving prompt at collection 'prompts' for user with id '$userId' the text: '${text.take(LOG_PREVIEW_LENGTH)}...'")
+        val userPromptsCollection = firestore.collection("users").document(userId).collection("prompts")
+
+        Timber.d("Firestore - Saving prompt at 'users/$userId/prompts' with text: '${text.take(LOG_PREVIEW_LENGTH)}...'")
 
         val dto = PromptFirestoreDto(
             text = text,
-            timestamp = timestamp,
-            userId = userId
+            timestamp = timestamp
         )
 
         return try {
-            val docRef = promptsCollection.add(dto).await()
-            Timber.d("Firestore - Prompt saved at documentId ${docRef.id}")
-            Result.success(Unit)
+            val docRef = userPromptsCollection.add(dto).await()
+            Timber.d("Firestore - Prompt saved at users/$userId/prompts/${docRef.id}")
+            Result.success(docRef.id)
         } catch (e: CancellationException) {
             throw e
         } catch (e: FirebaseException) {
             Timber.e(e, "Firestore - Failed to save prompt")
+            Result.failure(e)
+        }
+    }
+
+    suspend fun updatePrompt(docId: String, text: String): Result<Unit> {
+        val userId = auth.currentUser?.uid ?: "anonymous"
+        val docRef = firestore.collection("users").document(userId).collection("prompts").document(docId)
+
+        Timber.d("Firestore - Updating prompt at 'users/$userId/prompts/$docId' with text: '${text.take(LOG_PREVIEW_LENGTH)}...'")
+
+        return try {
+            docRef.update("text", text).await()
+            Timber.d("Firestore - Prompt updated at users/$userId/prompts/$docId")
+            Result.success(Unit)
+        } catch (e: CancellationException) {
+            throw e
+        } catch (e: FirebaseException) {
+            Timber.e(e, "Firestore - Failed to update prompt $docId")
             Result.failure(e)
         }
     }

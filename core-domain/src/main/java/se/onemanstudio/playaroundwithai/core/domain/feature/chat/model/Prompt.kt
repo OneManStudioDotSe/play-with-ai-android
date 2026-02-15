@@ -7,6 +7,7 @@ data class Prompt(
     val text: String,
     val timestamp: Date = Date(),
     val syncStatus: SyncStatus = SyncStatus.Pending,
+    val firestoreDocId: String? = null,
     val imageAttachment: ByteArray? = null,
     val documentAttachment: String? = null
 ) {
@@ -20,6 +21,7 @@ data class Prompt(
         if (text != other.text) return false
         if (timestamp != other.timestamp) return false
         if (syncStatus != other.syncStatus) return false
+        if (firestoreDocId != other.firestoreDocId) return false
         if (imageAttachment != null) {
             if (other.imageAttachment == null) return false
             if (!imageAttachment.contentEquals(other.imageAttachment)) return false
@@ -35,6 +37,7 @@ data class Prompt(
         result = 31 * result + text.hashCode()
         result = 31 * result + timestamp.hashCode()
         result = 31 * result + syncStatus.hashCode()
+        result = 31 * result + (firestoreDocId?.hashCode() ?: 0)
         result = 31 * result + (imageAttachment?.contentHashCode() ?: 0)
         result = 31 * result + (documentAttachment?.hashCode() ?: 0)
         return result

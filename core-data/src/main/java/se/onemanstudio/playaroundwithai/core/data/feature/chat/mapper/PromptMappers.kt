@@ -9,7 +9,8 @@ fun PromptEntity.toDomain(): Prompt {
         id = this.id.toLong(),
         text = this.text,
         timestamp = Date(this.timestamp),
-        syncStatus = this.syncStatus
+        syncStatus = this.syncStatus,
+        firestoreDocId = this.firestoreDocId
     )
 }
 
@@ -18,6 +19,7 @@ fun Prompt.toEntity(): PromptEntity {
         id = this.id.toInt(),
         text = this.text,
         timestamp = this.timestamp.time,
-        syncStatus = this.syncStatus
+        syncStatus = this.syncStatus,
+        firestoreDocId = this.firestoreDocId
     )
 }

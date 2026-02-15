@@ -48,7 +48,14 @@
     <string name="sync_notification_content">Synchronizing your prompt history with the cloud…</string>
 
     <string name="sync_failed_snackbar" tools:ignore="PluralsCandidate">%1$d prompts failed to sync to the cloud</string>
+    <string name="sync_retry_action">Retry</string>
 
+    <string name="local_save_failed">Failed to save your prompt locally</string>
+    <string name="local_update_failed">Failed to save the AI response locally</string>
+
+    <string name="sync_status_pending">Pending sync</string>
+    <string name="sync_status_synced">Synced</string>
+    <string name="sync_status_failed">Sync failed</string>
 
     <string name="input_mode_text">Text</string>
     <string name="input_mode_image">Image</string>

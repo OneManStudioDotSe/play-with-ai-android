@@ -10,5 +10,6 @@ data class PromptEntity(
     val id: Int,
     val text: String,
     val timestamp: Long = System.currentTimeMillis(),
-    val syncStatus: SyncStatus
+    val syncStatus: SyncStatus,
+    val firestoreDocId: String? = null
 )

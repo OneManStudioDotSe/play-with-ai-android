@@ -35,7 +35,7 @@ class AuthRepositoryImpl @Inject constructor(
             }
 
             Timber.d(
-                "Auth - Session created: userId=%s, isNew=%s, accountAge=%d days, provider=%s",
+                "Auth - Session created for %s (isNew: %s, %d days old, from %s)",
                 session.userId, session.isNewUser, session.accountAgeDays, session.authProvider
             )
             _authReady.value = true

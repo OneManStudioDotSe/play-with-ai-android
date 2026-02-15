@@ -7,7 +7,13 @@ import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.outlined.CloudDone
+import androidx.compose.material.icons.outlined.CloudOff
+import androidx.compose.material.icons.outlined.CloudUpload
+import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -18,6 +24,7 @@ import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import se.onemanstudio.playaroundwithai.core.domain.feature.chat.model.Prompt
+import se.onemanstudio.playaroundwithai.core.domain.feature.chat.model.SyncStatus
 import se.onemanstudio.playaroundwithai.core.ui.sofa.NeoBrutalCard
 import se.onemanstudio.playaroundwithai.core.ui.theme.Dimensions
 import se.onemanstudio.playaroundwithai.core.ui.theme.SofaAiTheme
@@ -63,21 +70,54 @@ fun HistoryItemCard(
                     style = MaterialTheme.typography.labelMedium,
                     color = MaterialTheme.colorScheme.primary
                 )
+
+                Spacer(Modifier.weight(1f))
+
+                SyncStatusIcon(syncStatus = prompt.syncStatus)
             }
         }
     }
 }
 
 
-@Preview(name = "Light - Short Text")
 @Composable
-private fun HistoryItemCardShortTextPreview() {
+private fun SyncStatusIcon(syncStatus: SyncStatus) {
+    val (icon, tint, description) = when (syncStatus) {
+        SyncStatus.Pending -> Triple(
+            Icons.Outlined.CloudUpload,
+            MaterialTheme.colorScheme.primary,
+            stringResource(R.string.sync_status_pending)
+        )
+        SyncStatus.Synced -> Triple(
+            Icons.Outlined.CloudDone,
+            MaterialTheme.colorScheme.primary,
+            stringResource(R.string.sync_status_synced)
+        )
+        SyncStatus.Failed -> Triple(
+            Icons.Outlined.CloudOff,
+            MaterialTheme.colorScheme.error,
+            stringResource(R.string.sync_status_failed)
+        )
+    }
+
+    Icon(
+        imageVector = icon,
+        contentDescription = description,
+        tint = tint,
+        modifier = Modifier.size(Dimensions.iconSizeSmall)
+    )
+}
+
+@Preview(name = "Light - Synced")
+@Composable
+private fun HistoryItemCardSyncedPreview() {
     SofaAiTheme {
         HistoryItemCard(
             prompt = Prompt(
                 id = 1,
                 text = "What is neo-brutalism?",
-                timestamp = Date(System.currentTimeMillis() - 1000 * 60 * 5) // 5 minutes ago
+                timestamp = Date(System.currentTimeMillis() - 1000 * 60 * 5),
+                syncStatus = SyncStatus.Synced
             ),
             onClick = {},
             modifier = Modifier.padding(Dimensions.paddingLarge)
@@ -85,15 +125,16 @@ private fun HistoryItemCardShortTextPreview() {
     }
 }
 
-@Preview(name = "Dark - Long Text")
+@Preview(name = "Dark - Pending")
 @Composable
-private fun HistoryItemCardLongTextPreview() {
+private fun HistoryItemCardPendingPreview() {
     SofaAiTheme(darkTheme = true) {
         HistoryItemCard(
             prompt = Prompt(
                 id = 2,
                 text = "Can you please give me a very detailed and long explanation of how Jetpack Compose works?",
-                timestamp = Date(System.currentTimeMillis() - 1000 * 60 * 60 * 24 * 3) // 3 days ago
+                timestamp = Date(System.currentTimeMillis() - 1000 * 60 * 60 * 24 * 3),
+                syncStatus = SyncStatus.Pending
             ),
             onClick = {},
             modifier = Modifier.padding(Dimensions.paddingLarge)
@@ -101,15 +142,16 @@ private fun HistoryItemCardLongTextPreview() {
     }
 }
 
-@Preview(name = "Constrained Width")
+@Preview(name = "Light - Failed")
 @Composable
-private fun HistoryItemCardConstrainedPreview() {
+private fun HistoryItemCardFailedPreview() {
     SofaAiTheme {
         HistoryItemCard(
             prompt = Prompt(
                 id = 3,
                 text = "This is a prompt that should be long enough to wrap or truncate when the width is constrained.",
-                timestamp = Date(System.currentTimeMillis() - 1000 * 60 * 60)
+                timestamp = Date(System.currentTimeMillis() - 1000 * 60 * 60),
+                syncStatus = SyncStatus.Failed
             ),
             onClick = {},
             modifier = Modifier

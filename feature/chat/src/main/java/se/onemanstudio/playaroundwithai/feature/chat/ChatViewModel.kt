@@ -1,9 +1,6 @@
 package se.onemanstudio.playaroundwithai.feature.chat
 
 import android.app.Application
-import android.graphics.Bitmap
-import android.graphics.ImageDecoder
-import android.net.Uri
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -22,27 +19,28 @@ import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import se.onemanstudio.playaroundwithai.core.domain.feature.auth.usecase.ObserveAuthReadyUseCase
-import se.onemanstudio.playaroundwithai.core.domain.feature.chat.model.GeminiModel
 import se.onemanstudio.playaroundwithai.core.domain.feature.chat.model.Prompt
 import se.onemanstudio.playaroundwithai.core.domain.feature.chat.model.SyncStatus
 import se.onemanstudio.playaroundwithai.core.domain.feature.chat.usecase.GenerateContentUseCase
+import se.onemanstudio.playaroundwithai.core.domain.feature.chat.usecase.GetFailedSyncCountUseCase
 import se.onemanstudio.playaroundwithai.core.domain.feature.chat.usecase.GetPromptHistoryUseCase
 import se.onemanstudio.playaroundwithai.core.domain.feature.chat.usecase.GetSuggestionsUseCase
-import se.onemanstudio.playaroundwithai.core.domain.feature.chat.usecase.GetFailedSyncCountUseCase
 import se.onemanstudio.playaroundwithai.core.domain.feature.chat.usecase.GetSyncStateUseCase
+import se.onemanstudio.playaroundwithai.core.domain.feature.chat.usecase.RetryPendingSyncsUseCase
 import se.onemanstudio.playaroundwithai.core.domain.feature.chat.usecase.SavePromptUseCase
+import se.onemanstudio.playaroundwithai.core.domain.feature.chat.usecase.UpdatePromptTextUseCase
 import se.onemanstudio.playaroundwithai.feature.chat.models.Attachment
+import se.onemanstudio.playaroundwithai.feature.chat.models.SnackbarEvent
 import se.onemanstudio.playaroundwithai.feature.chat.states.ChatError
 import se.onemanstudio.playaroundwithai.feature.chat.states.ChatUiState
+import se.onemanstudio.playaroundwithai.feature.chat.util.FileUtils
 import timber.log.Timber
-import java.io.ByteArrayOutputStream
 import java.io.FileNotFoundException
 import java.io.IOException
 import java.util.Date
 import javax.inject.Inject
 
 private const val SUBSCRIBE_TIMEOUT = 5000L
-private const val JPEG_QUALITY = 100
 
 @Suppress("CanBeParameter", "LongParameterList", "TooManyFunctions")
 @HiltViewModel
@@ -53,7 +51,10 @@ class ChatViewModel @Inject constructor(
     private val getSyncStateUseCase: GetSyncStateUseCase,
     private val getFailedSyncCountUseCase: GetFailedSyncCountUseCase,
     private val savePromptUseCase: SavePromptUseCase,
+    private val updatePromptTextUseCase: UpdatePromptTextUseCase,
+    private val retryPendingSyncsUseCase: RetryPendingSyncsUseCase,
     private val observeAuthReadyUseCase: ObserveAuthReadyUseCase,
+    private val fileUtils: FileUtils,
     private val application: Application
 ) : ViewModel() {
     private val _suggestions = MutableStateFlow<List<String>>(emptyList())
@@ -65,21 +66,12 @@ class ChatViewModel @Inject constructor(
     private val _uiState = MutableStateFlow<ChatUiState>(ChatUiState.Initial)
     val uiState = _uiState.asStateFlow()
 
-    private val _isSheetOpen = MutableStateFlow(false)
-    val isSheetOpen = _isSheetOpen.asStateFlow()
-
-    private val _selectedModel = MutableStateFlow(GeminiModel.FLASH_PREVIEW)
-    val selectedModel = _selectedModel.asStateFlow()
-
-    private val _syncFailureEvent = MutableSharedFlow<Int>(
+    private val _snackbarEvent = MutableSharedFlow<SnackbarEvent>(
         replay = 0,
         extraBufferCapacity = 1,
         onBufferOverflow = BufferOverflow.DROP_OLDEST
     )
-    val syncFailureEvent: SharedFlow<Int> = _syncFailureEvent.asSharedFlow()
-
-    private val _currentLoadingMessage = MutableStateFlow("")
-    val currentLoadingMessage = _currentLoadingMessage.asStateFlow()
+    val snackbarEvent: SharedFlow<SnackbarEvent> = _snackbarEvent.asSharedFlow()
 
     val promptHistory: StateFlow<List<Prompt>> = getPromptHistoryUseCase()
         .stateIn(
@@ -113,19 +105,15 @@ class ChatViewModel @Inject constructor(
                 .distinctUntilChanged()
                 .filter { it > 0 }
                 .collect { count ->
-                    _syncFailureEvent.tryEmit(count)
+                    _snackbarEvent.tryEmit(SnackbarEvent.SyncFailed(count))
                 }
         }
-    }
-
-    fun selectModel(model: GeminiModel) {
-        _selectedModel.value = model
     }
 
     private fun loadSuggestions() {
         viewModelScope.launch {
             _isSuggestionsLoading.value = true
-            getSuggestionsUseCase(model = _selectedModel.value)
+            getSuggestionsUseCase()
                 .onSuccess { topics ->
                     _suggestions.update { topics }
                 }
@@ -139,53 +127,75 @@ class ChatViewModel @Inject constructor(
                         )
                     }
                 }
+
             _isSuggestionsLoading.value = false
         }
     }
 
+    @Suppress("TooGenericExceptionCaught", "LongMethod")
     fun generateContent(prompt: String, attachment: Attachment?) {
         _uiState.update { ChatUiState.Loading }
 
         viewModelScope.launch {
             // see if we have something attached
-            val imageBytes = (attachment as? Attachment.Image)?.uri?.toByteArray()
+            val imageBytes = (attachment as? Attachment.Image)?.uri?.let { fileUtils.uriToByteArray(it) }
             val analysisType = (attachment as? Attachment.Image)?.analysisType
 
             // read attached stuff
-            val fileResult = (attachment as? Attachment.Document)?.uri?.let { extractFileContent(it) }
+            val fileResult = (attachment as? Attachment.Document)?.uri?.let { fileUtils.extractFileContent(it) }
 
             // fail directly if something is off
             if (fileResult != null && fileResult.isFailure) {
-                val error = when (val e = fileResult.exceptionOrNull()) {
+                val error = when (fileResult.exceptionOrNull()) {
                     is FileNotFoundException -> ChatError.FileNotFound
                     is SecurityException -> ChatError.Permission
                     else -> ChatError.FileRead
                 }
+
                 _uiState.update { ChatUiState.Error(error) }
+
                 return@launch
             }
 
             val fileText = fileResult?.getOrNull()
+
+            // Save question to local DB immediately (before calling the API)
+            val savedId = try {
+                savePromptUseCase(
+                    Prompt(
+                        text = prompt,
+                        timestamp = Date(),
+                        syncStatus = SyncStatus.Pending,
+                        imageAttachment = imageBytes,
+                        documentAttachment = fileText
+                    )
+                )
+            } catch (e: Exception) {
+                Timber.e(e, "ChatVM - Failed to save prompt to local DB")
+                _snackbarEvent.tryEmit(
+                    SnackbarEvent.LocalSaveFailed(application.getString(R.string.local_save_failed))
+                )
+                null
+            }
 
             generateContentUseCase(
                 prompt = prompt,
                 imageBytes = imageBytes,
                 fileText = fileText,
                 analysisType = analysisType,
-                model = _selectedModel.value,
             ).onSuccess { responseText ->
-                _uiState.update {
-                    ChatUiState.Success(responseText)
-                }
-                viewModelScope.launch {
-                    val promptToSave = Prompt(
-                        text = "Q: $prompt\nA: $responseText",
-                        timestamp = Date(),
-                        syncStatus = SyncStatus.Pending,
-                        imageAttachment = imageBytes,
-                        documentAttachment = fileText
-                    )
-                    savePromptUseCase(promptToSave)
+                _uiState.update { ChatUiState.Success(responseText) }
+
+                // Update the saved entry with the full Q&A text
+                if (savedId != null) {
+                    try {
+                        updatePromptTextUseCase(savedId, "Q: $prompt\nA: $responseText")
+                    } catch (e: Exception) {
+                        Timber.e(e, "ChatVM - Failed to update prompt text in local DB")
+                        _snackbarEvent.tryEmit(
+                            SnackbarEvent.LocalUpdateFailed(application.getString(R.string.local_update_failed))
+                        )
+                    }
                 }
             }.onFailure { exception ->
                 val error = when (exception) {
@@ -193,58 +203,23 @@ class ChatViewModel @Inject constructor(
                     is SecurityException -> ChatError.Permission
                     else -> ChatError.Unknown(exception.localizedMessage)
                 }
+
                 _uiState.update { ChatUiState.Error(error) }
             }
         }
     }
 
+    fun retryFailedSyncs() {
+        viewModelScope.launch {
+            retryPendingSyncsUseCase()
+        }
+    }
+
+    fun restoreAnswer(answer: String) {
+        _uiState.update { ChatUiState.Success(answer) }
+    }
+
     fun clearResponse() {
         _uiState.update { ChatUiState.Initial }
-    }
-
-    fun openHistorySheet() {
-        _isSheetOpen.value = true
-    }
-
-    fun closeHistorySheet() {
-        _isSheetOpen.value = false
-    }
-
-    private fun extractFileContent(uri: Uri): Result<String> {
-        return try {
-            val content = readTextFromUri(uri)
-            Result.success(content)
-        } catch (e: FileNotFoundException) {
-            Result.failure(e)
-        } catch (e: IOException) {
-            Result.failure(e)
-        } catch (e: SecurityException) {
-            Result.failure(e)
-        }
-    }
-
-    // Helper function that throws exceptions naturally
-    @Throws(IOException::class, SecurityException::class)
-    private fun readTextFromUri(uri: Uri): String {
-        return application.contentResolver.openInputStream(uri)?.use { inputStream ->
-            inputStream.bufferedReader().use { reader ->
-                reader.readText()
-            }
-        } ?: throw FileNotFoundException("Could not open input stream for URI: $uri")
-    }
-
-    private fun Uri.toByteArray(): ByteArray? {
-        return try {
-            val bitmap = ImageDecoder.decodeBitmap(ImageDecoder.createSource(application.contentResolver, this))
-            val bos = ByteArrayOutputStream()
-            bitmap.compress(Bitmap.CompressFormat.JPEG, JPEG_QUALITY, bos)
-            bos.toByteArray()
-        } catch (e: IOException) {
-            Timber.d("Error decoding image: ${e.message}")
-            null
-        } catch (e: SecurityException) {
-            Timber.d("Security exception decoding image: ${e.message}")
-            null
-        }
     }
 }
