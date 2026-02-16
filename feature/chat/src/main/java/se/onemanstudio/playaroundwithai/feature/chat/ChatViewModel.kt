@@ -21,6 +21,7 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import se.onemanstudio.playaroundwithai.core.domain.feature.auth.usecase.ObserveAuthReadyUseCase
+import se.onemanstudio.playaroundwithai.core.domain.feature.config.model.ApiKeyAvailability
 import se.onemanstudio.playaroundwithai.core.domain.feature.chat.model.Prompt
 import se.onemanstudio.playaroundwithai.core.domain.feature.chat.model.SyncStatus
 import se.onemanstudio.playaroundwithai.core.domain.feature.chat.usecase.GenerateContentUseCase
@@ -56,6 +57,7 @@ class ChatViewModel @Inject constructor(
     private val updatePromptTextUseCase: UpdatePromptTextUseCase,
     private val retryPendingSyncsUseCase: RetryPendingSyncsUseCase,
     private val observeAuthReadyUseCase: ObserveAuthReadyUseCase,
+    private val apiKeyAvailability: ApiKeyAvailability,
     private val fileUtils: FileUtils,
     private val application: Application
 ) : ViewModel() {
@@ -90,8 +92,12 @@ class ChatViewModel @Inject constructor(
         )
 
     init {
-        loadSuggestionsAfterAuth()
-        observeSyncFailures()
+        if (!apiKeyAvailability.isGeminiKeyAvailable) {
+            _uiState.update { ChatUiState.Error(ChatError.ApiKeyMissing) }
+        } else {
+            loadSuggestionsAfterAuth()
+            observeSyncFailures()
+        }
     }
 
     private fun loadSuggestionsAfterAuth() {
@@ -136,6 +142,11 @@ class ChatViewModel @Inject constructor(
 
     @Suppress("TooGenericExceptionCaught", "LongMethod")
     fun generateContent(prompt: String, attachment: Attachment?) {
+        if (!apiKeyAvailability.isGeminiKeyAvailable) {
+            _uiState.update { ChatUiState.Error(ChatError.ApiKeyMissing) }
+            return
+        }
+
         _uiState.update { ChatUiState.Loading }
 
         viewModelScope.launch {

@@ -29,6 +29,7 @@ import se.onemanstudio.playaroundwithai.core.domain.feature.chat.usecase.RetryPe
 import se.onemanstudio.playaroundwithai.core.domain.feature.chat.usecase.SavePromptUseCase
 import se.onemanstudio.playaroundwithai.core.domain.feature.chat.usecase.UpdatePromptTextUseCase
 import se.onemanstudio.playaroundwithai.core.domain.feature.auth.usecase.ObserveAuthReadyUseCase
+import se.onemanstudio.playaroundwithai.core.domain.feature.config.model.ApiKeyAvailability
 import se.onemanstudio.playaroundwithai.feature.chat.models.SnackbarEvent
 import se.onemanstudio.playaroundwithai.feature.chat.states.ChatError
 import se.onemanstudio.playaroundwithai.feature.chat.states.ChatUiState
@@ -295,13 +296,53 @@ class ChatViewModelTest {
         coVerify { promptRepository.retryPendingSyncs() }
     }
 
+    @Test
+    fun `missing Gemini API key sets ApiKeyMissing error on init`() = runTest {
+        // Given
+        val viewModel = createViewModel(
+            apiKeyAvailability = ApiKeyAvailability(isGeminiKeyAvailable = false, isMapsKeyAvailable = true)
+        )
+        val states = mutableListOf<ChatUiState>()
+
+        // When
+        viewModel.uiState
+            .onEach { states.add(it) }
+            .launchIn(CoroutineScope(UnconfinedTestDispatcher(testScheduler)))
+        advanceUntilIdle()
+
+        // Then
+        assertEquals(ChatUiState.Error(ChatError.ApiKeyMissing), states.last())
+    }
+
+    @Test
+    fun `generateContent returns ApiKeyMissing when Gemini key is missing`() = runTest {
+        // Given
+        val viewModel = createViewModel(
+            generateContentResult = Result.success("response"),
+            apiKeyAvailability = ApiKeyAvailability(isGeminiKeyAvailable = false, isMapsKeyAvailable = true)
+        )
+        val states = mutableListOf<ChatUiState>()
+
+        // When
+        viewModel.uiState
+            .onEach { states.add(it) }
+            .launchIn(CoroutineScope(UnconfinedTestDispatcher(testScheduler)))
+        viewModel.generateContent("test", null)
+        advanceUntilIdle()
+
+        // Then - should stay as ApiKeyMissing, never go to Loading
+        assert(states.none { it is ChatUiState.Loading })
+        assertEquals(ChatUiState.Error(ChatError.ApiKeyMissing), states.last())
+    }
+
     private fun createViewModel(
         generateContentResult: Result<String>? = null,
         suggestionsResult: Result<List<String>> = Result.success(emptyList()),
         promptHistoryResult: List<Prompt> = emptyList(),
         isSyncingResult: Boolean = false,
         failedSyncCountResult: Int = 0,
-        promptRepository: PromptRepository? = null
+        promptRepository: PromptRepository? = null,
+        apiKeyAvailability: ApiKeyAvailability = ApiKeyAvailability(isGeminiKeyAvailable = true, isMapsKeyAvailable = true)
     ): ChatViewModel {
         val geminiRepository = mockk<GeminiRepository> {
             generateContentResult?.let { coEvery { generateContent(any(), any(), any(), any(), any()) } returns it }
@@ -333,6 +374,7 @@ class ChatViewModelTest {
             UpdatePromptTextUseCase(effectivePromptRepository),
             RetryPendingSyncsUseCase(effectivePromptRepository),
             observeAuthReadyUseCase,
+            apiKeyAvailability,
             fileUtils,
             application
         )

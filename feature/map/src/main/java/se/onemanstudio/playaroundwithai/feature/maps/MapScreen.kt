@@ -37,6 +37,7 @@ import androidx.compose.material.icons.automirrored.filled.DirectionsBike
 import androidx.compose.material.icons.filled.AutoAwesome
 import androidx.compose.material.icons.filled.ElectricScooter
 import androidx.compose.material.icons.filled.Stars
+import androidx.compose.material.icons.rounded.VpnKey
 import androidx.compose.material.icons.rounded.Warning
 import androidx.compose.material.icons.rounded.WifiOff
 import androidx.compose.material3.CircularProgressIndicator
@@ -685,6 +686,7 @@ private fun ErrorState(
                 ) {
                     Icon(
                         imageVector = when (error) {
+                            is MapError.ApiKeyMissing -> Icons.Rounded.VpnKey
                             is MapError.NetworkError -> Icons.Rounded.WifiOff
                             is MapError.Unknown -> Icons.Rounded.Warning
                         },
@@ -701,6 +703,7 @@ private fun ErrorState(
                     Spacer(modifier = Modifier.height(Dimensions.paddingSmall))
                     Text(
                         text = when (error) {
+                            is MapError.ApiKeyMissing -> stringResource(MapFeatureR.string.error_maps_api_key_missing)
                             is MapError.NetworkError -> stringResource(MapFeatureR.string.map_error_network)
                             is MapError.Unknown -> error.message ?: stringResource(MapFeatureR.string.map_error_unknown)
                         },
@@ -708,12 +711,14 @@ private fun ErrorState(
                         color = MaterialTheme.colorScheme.onSurface,
                         textAlign = TextAlign.Center
                     )
-                    Spacer(modifier = Modifier.height(Dimensions.paddingLarge))
-                    NeoBrutalButton(
-                        text = stringResource(MapFeatureR.string.map_error_retry),
-                        onClick = onRetry,
-                        backgroundColor = MaterialTheme.colorScheme.error
-                    )
+                    if (error !is MapError.ApiKeyMissing) {
+                        Spacer(modifier = Modifier.height(Dimensions.paddingLarge))
+                        NeoBrutalButton(
+                            text = stringResource(MapFeatureR.string.map_error_retry),
+                            onClick = onRetry,
+                            backgroundColor = MaterialTheme.colorScheme.error
+                        )
+                    }
                 }
             }
         }

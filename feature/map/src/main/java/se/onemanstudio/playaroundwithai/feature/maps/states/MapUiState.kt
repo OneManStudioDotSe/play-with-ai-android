@@ -11,6 +11,7 @@ import se.onemanstudio.playaroundwithai.feature.maps.models.MapItemUiModel
 
 @Immutable
 sealed interface MapError {
+    data object ApiKeyMissing : MapError
     data object NetworkError : MapError
     data class Unknown(val message: String?) : MapError
 }

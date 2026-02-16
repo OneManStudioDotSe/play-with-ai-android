@@ -9,6 +9,8 @@ import se.onemanstudio.playaroundwithai.core.data.BuildConfig
 import se.onemanstudio.playaroundwithai.core.data.di.network.BaseUrl
 import se.onemanstudio.playaroundwithai.core.data.di.network.GeminiApiKey
 import se.onemanstudio.playaroundwithai.core.data.di.network.LoggingLevel
+import se.onemanstudio.playaroundwithai.core.data.di.network.MapsApiKey
+import se.onemanstudio.playaroundwithai.core.domain.feature.config.model.ApiKeyAvailability
 import javax.inject.Singleton
 
 @Module
@@ -18,6 +20,21 @@ object ConfigurationModule {
     @Singleton
     @GeminiApiKey
     fun provideGeminiApiKey(): String = BuildConfig.GEMINI_API_KEY
+
+    @Provides
+    @Singleton
+    @MapsApiKey
+    fun provideMapsApiKey(): String = BuildConfig.MAPS_API_KEY
+
+    @Provides
+    @Singleton
+    fun provideApiKeyAvailability(
+        @GeminiApiKey geminiApiKey: String,
+        @MapsApiKey mapsApiKey: String,
+    ): ApiKeyAvailability = ApiKeyAvailability(
+        isGeminiKeyAvailable = geminiApiKey.isNotBlank(),
+        isMapsKeyAvailable = mapsApiKey.isNotBlank(),
+    )
 
     @Provides
     @Singleton

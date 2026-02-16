@@ -15,6 +15,7 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
+import se.onemanstudio.playaroundwithai.core.domain.feature.config.model.ApiKeyAvailability
 import se.onemanstudio.playaroundwithai.core.domain.feature.map.model.MapItem
 import se.onemanstudio.playaroundwithai.core.domain.feature.map.model.SuggestedPlace
 import se.onemanstudio.playaroundwithai.core.domain.feature.map.model.VehicleType
@@ -42,6 +43,7 @@ private const val LOADING_MESSAGE_DURATION = 3000L
 class MapViewModel @Inject constructor(
     private val getMapItemsUseCase: GetMapItemsUseCase,
     private val getSuggestedPlacesUseCase: GetSuggestedPlacesUseCase,
+    private val apiKeyAvailability: ApiKeyAvailability,
     private val application: Application
 ) : ViewModel() {
 
@@ -57,6 +59,11 @@ class MapViewModel @Inject constructor(
 
     @SuppressWarnings("TooGenericExceptionCaught")
     fun loadMapData(centerLat: Double, centerLng: Double) {
+        if (!apiKeyAvailability.isMapsKeyAvailable) {
+            _uiState.update { it.copy(isLoading = false, error = MapError.ApiKeyMissing) }
+            return
+        }
+
         _uiState.update { it.copy(isLoading = true, error = null) }
 
         if (!isNetworkAvailable()) {
@@ -218,6 +225,11 @@ class MapViewModel @Inject constructor(
     }
 
     fun getAiSuggestedPlaces(userLocation: LatLng?) {
+        if (!apiKeyAvailability.isGeminiKeyAvailable) {
+            _uiState.update { it.copy(suggestedPlacesError = SuggestedPlacesError.FetchFailed) }
+            return
+        }
+
         if (userLocation == null) {
             _uiState.update {
                 it.copy(focusedSuggestedPlace = null, suggestedPlacesError = SuggestedPlacesError.LocationUnavailable)
