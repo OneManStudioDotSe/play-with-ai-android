@@ -1,8 +1,24 @@
-# play-with-ai-android
+# Play with AI - Sotiris edition
 
-A showcase Android app where serious engineering meets a sassy AI Overlord. Chat with Gemini, analyze documents, or scout for scooters on the map — built to show how modern Android tech can be both powerful and fun. 🚀
+A **showcase** Android app where serious engineering meets a sassy AI Overlord.
 
-My principles:
+Chat with Gemini, analyze documents, or plan a tour around your location by visiting interesting places and use e-scooters and e-bikes.
+
+## How it looks
+
+|                       Chat                       |                  Image analysis                  |                   AI response                    |                  Prompt history                  |
+|:------------------------------------------------:|:------------------------------------------------:|:------------------------------------------------:|:------------------------------------------------:|
+| <img src="screenshots/screen1.png" width="180"/> | <img src="screenshots/screen4.png" width="180"/> | <img src="screenshots/screen5.png" width="180"/> | <img src="screenshots/screen2.png" width="180"/> |
+
+|                   Map overview                   |                  AI suggestions                  |                  Path selection                  |                 Calculated route                  |
+|:------------------------------------------------:|:------------------------------------------------:|:------------------------------------------------:|:-------------------------------------------------:|
+| <img src="screenshots/screen6.png" width="180"/> | <img src="screenshots/screen8.png" width="180"/> | <img src="screenshots/screen9.png" width="180"/> | <img src="screenshots/screen10.png" width="180"/> |
+
+## The idea
+
+This app was built to showcase how modern Android tech can be both powerful and fun. 🚀
+
+My principles during the development of this project are the following:
 - Simple coding
 - Consistent design
 - Two-way performance
@@ -13,11 +29,12 @@ My principles:
 ## Simple coding
 
 Clean, readable code following modern Android guidelines:
-- **Clean Architecture**: Strict layer separation (domain → data → presentation)
+- **Clean architecture**: Strict layer separation (domain → data → presentation)
 - **MVVM**: Decoupled UI logic using ViewModels
 - **Lifecycle awareness**: Efficient state collection to optimize resource consumption
 - **Kotlin coroutines**: Structured concurrency for async tasks
 - **Consistent naming**: Established conventions for files, variables, and resources
+- **AI-assisted flow**: Make the most of the superpowers that AI gives to developers to speed up the tedious part of development
 
 ## Consistent design
 
@@ -62,7 +79,6 @@ Prompts are persisted to Room immediately, then synced to Firestore via `SyncWor
 2. **Phase 2**: AI responds → local entry updated with full Q&A → worker updates the same Firestore doc
 
 Key safeguards:
-- **Race condition guard**: `markSyncedIfTextMatches` only marks `Synced` if text hasn't changed during sync
 - **Retry policy**: Up to 3 attempts with exponential backoff (30s initial), then marked `Failed`
 - **Work policy**: `APPEND_OR_REPLACE` avoids canceling in-progress syncs
 - **Auth enforcement**: `FirestoreDataSource` rejects unauthenticated requests immediately
@@ -125,3 +141,36 @@ Map styling adapts automatically to the app's light or dark mode.
 ./gradlew detekt                 # Static analysis (Detekt)
 ./gradlew lintDebug              # Android lint
 ```
+
+## Firebase setup (optional)
+
+The app uses Firebase for **anonymous authentication** and **Firestore cloud sync** of prompt history. These features are optional — without Firebase, the app runs fully with all chat and map functionality, storing prompts locally only.
+
+### Setting up your own Firebase project
+
+1. Go to the [Firebase Console](https://console.firebase.google.com/) and create a new project
+2. Add an Android app with package name `se.onemanstudio.playaroundwithai`
+3. Download the generated `google-services.json` and place it in the `app/` directory (replacing the existing one)
+4. In the Firebase Console, enable:
+   - **Authentication → Sign-in method → Anonymous** (toggle on)
+   - **Firestore Database → Create database** (start in test mode or configure rules below)
+
+### Firestore security rules
+
+```
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+    match /users/{userId}/prompts/{promptId} {
+      allow read, write: if request.auth != null && request.auth.uid == userId;
+    }
+  }
+}
+```
+
+### Without Firebase
+
+If you skip Firebase setup, the app degrades gracefully:
+- A non-blocking snackbar informs you that cloud sync is unavailable
+- All prompts are saved locally to Room and persist across sessions
+- AI chat, image/document analysis, and the full map experience work normally

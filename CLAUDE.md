@@ -142,6 +142,31 @@ GEMINI_API_KEY_RELEASE=your-gemini-api-key
 MAPS_API_KEY=your-maps-api-key
 ```
 
+### 3. Firebase (optional — for cloud sync)
+
+Firebase provides anonymous authentication and Firestore cloud sync for prompt history. Without it, the app runs fully with local-only storage.
+
+**To set up your own Firebase project:**
+
+1. Go to the [Firebase Console](https://console.firebase.google.com/) and create a new project
+2. Add an Android app with package name `se.onemanstudio.playaroundwithai`
+3. Download `google-services.json` and place it in `app/` (replacing the existing one)
+4. Enable **Authentication → Anonymous** and **Firestore Database**
+
+**Firestore security rules:**
+```
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+    match /users/{userId}/prompts/{promptId} {
+      allow read, write: if request.auth != null && request.auth.uid == userId;
+    }
+  }
+}
+```
+
+**Graceful degradation:** If Firebase is unavailable or not configured, a non-blocking snackbar informs the user. All prompts are saved locally to Room. AI chat, image/document analysis, and the full map experience work normally.
+
 ### CI
 
 - CI injects these via GitHub Secrets (environment variables with the same names)
