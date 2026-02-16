@@ -26,6 +26,65 @@ My principles during the development of this project are the following:
 - Future-proofing
 - Those little extra things
 
+
+## Core functionality
+
+- **AI Chat**: Prompts to Gemini with image and document attachment support
+- **Smart History**: Local Q&A history synced to Firestore
+- **Map Interaction**: Discover and filter vehicles with optimal route calculation
+
+## Technical stack
+
+- **Jetpack Compose** · **Hilt** · **Retrofit & OkHttp** · **Room** · **Firebase** (Firestore + Auth) · **WorkManager** · **Google Maps Compose**
+
+## Build & Run
+
+```bash
+# Prerequisites: JDK 17, Android SDK 36
+# API keys required in local.properties:
+#   MAPS_API_KEY=<your-key>
+#   GEMINI_API_KEY_DEBUG=<your-key>
+
+./gradlew assembleDebug          # Build debug APK
+./gradlew installDebug           # Install on connected device
+./gradlew testDebugUnitTest      # Run unit tests
+./gradlew detekt                 # Static analysis (Detekt)
+./gradlew lintDebug              # Android lint
+```
+
+## Firebase setup (optional)
+
+The app uses Firebase for **anonymous authentication** and **Firestore cloud sync** of prompt history. These features are optional — without Firebase, the app runs fully with all chat and map functionality, storing prompts locally only.
+
+### Setting up your own Firebase project
+
+1. Go to the [Firebase Console](https://console.firebase.google.com/) and create a new project
+2. Add an Android app with package name `se.onemanstudio.playaroundwithai`
+3. Download the generated `google-services.json` and place it in the `app/` directory (replacing the existing one)
+4. In the Firebase Console, enable:
+   - **Authentication → Sign-in method → Anonymous** (toggle on)
+   - **Firestore Database → Create database** (start in test mode or configure rules below)
+
+### Firestore security rules
+
+```
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+    match /users/{userId}/prompts/{promptId} {
+      allow read, write: if request.auth != null && request.auth.uid == userId;
+    }
+  }
+}
+```
+
+### Without Firebase
+
+If you skip Firebase setup, the app degrades gracefully:
+- A non-blocking snackbar informs you that cloud sync is unavailable
+- All prompts are saved locally to Room and persist across sessions
+- AI chat, image/document analysis, and the full map experience work normally
+
 ## Simple coding
 
 Clean, readable code following modern Android guidelines:
@@ -116,61 +175,3 @@ Dedicated `toDomain()` / `toEntity()` extensions keep the domain layer free of s
 ### Dynamic theme for the map
 
 Map styling adapts automatically to the app's light or dark mode.
-
-## Core functionality
-
-- **AI Chat**: Prompts to Gemini with image and document attachment support
-- **Smart History**: Local Q&A history synced to Firestore
-- **Map Interaction**: Discover and filter vehicles with optimal route calculation
-
-## Technical stack
-
-- **Jetpack Compose** · **Hilt** · **Retrofit & OkHttp** · **Room** · **Firebase** (Firestore + Auth) · **WorkManager** · **Google Maps Compose**
-
-## Build & Run
-
-```bash
-# Prerequisites: JDK 17, Android SDK 36
-# API keys required in local.properties:
-#   MAPS_API_KEY=<your-key>
-#   GEMINI_API_KEY_DEBUG=<your-key>
-
-./gradlew assembleDebug          # Build debug APK
-./gradlew installDebug           # Install on connected device
-./gradlew testDebugUnitTest      # Run unit tests
-./gradlew detekt                 # Static analysis (Detekt)
-./gradlew lintDebug              # Android lint
-```
-
-## Firebase setup (optional)
-
-The app uses Firebase for **anonymous authentication** and **Firestore cloud sync** of prompt history. These features are optional — without Firebase, the app runs fully with all chat and map functionality, storing prompts locally only.
-
-### Setting up your own Firebase project
-
-1. Go to the [Firebase Console](https://console.firebase.google.com/) and create a new project
-2. Add an Android app with package name `se.onemanstudio.playaroundwithai`
-3. Download the generated `google-services.json` and place it in the `app/` directory (replacing the existing one)
-4. In the Firebase Console, enable:
-   - **Authentication → Sign-in method → Anonymous** (toggle on)
-   - **Firestore Database → Create database** (start in test mode or configure rules below)
-
-### Firestore security rules
-
-```
-rules_version = '2';
-service cloud.firestore {
-  match /databases/{database}/documents {
-    match /users/{userId}/prompts/{promptId} {
-      allow read, write: if request.auth != null && request.auth.uid == userId;
-    }
-  }
-}
-```
-
-### Without Firebase
-
-If you skip Firebase setup, the app degrades gracefully:
-- A non-blocking snackbar informs you that cloud sync is unavailable
-- All prompts are saved locally to Room and persist across sessions
-- AI chat, image/document analysis, and the full map experience work normally
