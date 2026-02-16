@@ -27,6 +27,7 @@ import androidx.compose.material.icons.filled.Clear
 import androidx.compose.material.icons.filled.History
 import androidx.compose.material.icons.filled.Sync
 import androidx.compose.material.icons.rounded.BrokenImage
+import androidx.compose.material.icons.rounded.VpnKey
 import androidx.compose.material.icons.rounded.Description
 import androidx.compose.material.icons.rounded.Lock
 import androidx.compose.material.icons.rounded.Warning
@@ -214,7 +215,10 @@ fun ChatScreen(viewModel: ChatViewModel = hiltViewModel()) {
             )
         },
         bottomBar = {
-            ChatInputArea(
+            val isApiKeyMissing = uiState is ChatUiState.Error &&
+                (uiState as ChatUiState.Error).error is ChatError.ApiKeyMissing
+
+            if (!isApiKeyMissing) ChatInputArea(
                 inputMode = inputMode,
                 textState = textState,
                 suggestions = suggestions,
@@ -340,13 +344,15 @@ private fun ErrorState(
                 color = MaterialTheme.colorScheme.onSurface,
                 textAlign = TextAlign.Center
             )
-            Spacer(modifier = Modifier.height(Dimensions.paddingLarge))
-            NeoBrutalIconButton(
-                onClick = { onClearResponse() },
-                imageVector = Icons.Default.Clear,
-                contentDescription = stringResource(R.string.label_dismiss_error),
-                backgroundColor = MaterialTheme.colorScheme.error
-            )
+            if (state.error !is ChatError.ApiKeyMissing) {
+                Spacer(modifier = Modifier.height(Dimensions.paddingLarge))
+                NeoBrutalIconButton(
+                    onClick = { onClearResponse() },
+                    imageVector = Icons.Default.Clear,
+                    contentDescription = stringResource(R.string.label_dismiss_error),
+                    backgroundColor = MaterialTheme.colorScheme.error
+                )
+            }
         }
     }
 }
@@ -354,6 +360,7 @@ private fun ErrorState(
 @Composable
 private fun getErrorMessageAndIcon(error: ChatError): Pair<String, ImageVector> {
     return when (error) {
+        is ChatError.ApiKeyMissing -> stringResource(R.string.error_gemini_api_key_missing) to Icons.Rounded.VpnKey
         is ChatError.NetworkMissing -> stringResource(R.string.error_no_internet_connection_please_check_your_network) to Icons.Rounded.WifiOff
         is ChatError.Permission -> stringResource(R.string.error_i_don_t_have_permission_to_access_that_file) to Icons.Rounded.Lock
         is ChatError.FileNotFound -> stringResource(R.string.error_i_couldn_t_find_the_selected_file) to Icons.Rounded.BrokenImage

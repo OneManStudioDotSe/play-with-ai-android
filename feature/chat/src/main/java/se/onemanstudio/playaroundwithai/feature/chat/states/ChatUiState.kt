@@ -12,6 +12,7 @@ sealed interface ChatUiState {
 
 @Immutable
 sealed interface ChatError {
+    data object ApiKeyMissing : ChatError
     data object NetworkMissing : ChatError
     data object Permission : ChatError
     data object FileNotFound : ChatError

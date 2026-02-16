@@ -22,6 +22,7 @@
     <string name="error_i_couldn_t_find_the_selected_file">I couldn\'t find the selected file.</string>
     <string name="error_i_couldn_t_read_the_file_content">I couldn\'t read the file content.</string>
     <string name="error_an_unknown_error_occurred">An unknown error occurred.</string>
+    <string name="error_gemini_api_key_missing" translatable="false">Gemini API key not configured.\n\nAdd GEMINI_API_KEY_DEBUG to your local.properties file.\nSee the project README for setup instructions.</string>
 
     <string name="no_history_yet">No history yet. Start a conversation to see it here!</string>
 

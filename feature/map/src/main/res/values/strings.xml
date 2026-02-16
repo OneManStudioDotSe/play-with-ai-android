@@ -27,6 +27,7 @@
     <string name="enter_path_mode_button_content_description">Enter path mode</string>
     <string name="map_error_network">Could not load map data. Check your connection and try again.</string>
     <string name="map_error_unknown">Something went wrong while loading the map.</string>
+    <string name="error_maps_api_key_missing" translatable="false">Maps API key not configured.\n\nAdd MAPS_API_KEY to your local.properties file.\nSee the project README for setup instructions.</string>
     <string name="map_error_retry">Retry</string>
     <string name="map_error_title">Oops!</string>
     <string name="map_error_icon">Error icon</string>

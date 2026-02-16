@@ -26,6 +26,10 @@ val geminiKeyRelease = localProperties.getProperty("GEMINI_API_KEY_RELEASE")
     ?: System.getenv("GEMINI_API_KEY_RELEASE")
     ?: ""
 
+val mapsApiKey = localProperties.getProperty("MAPS_API_KEY")
+    ?: System.getenv("MAPS_API_KEY")
+    ?: ""
+
 android {
     namespace = "se.onemanstudio.playaroundwithai.core.data"
     compileSdk = libs.versions.compileSdk.get().toInt()
@@ -43,12 +47,14 @@ android {
         debug {
             isMinifyEnabled = false
             buildConfigField("String", "GEMINI_API_KEY", "\"$geminiKeyDebug\"")
+            buildConfigField("String", "MAPS_API_KEY", "\"$mapsApiKey\"")
             buildConfigField("String", "BASE_URL", "\"https://generativelanguage.googleapis.com/\"")
         }
         release {
             isMinifyEnabled = false
             proguardFiles(getDefaultProguardFile("proguard-android-optimize.txt"), "proguard-rules.pro")
             buildConfigField("String", "GEMINI_API_KEY", "\"$geminiKeyRelease\"")
+            buildConfigField("String", "MAPS_API_KEY", "\"$mapsApiKey\"")
             buildConfigField("String", "BASE_URL", "\"https://generativelanguage.googleapis.com/\"")
         }
     }

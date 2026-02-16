@@ -24,6 +24,8 @@ import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
 import se.onemanstudio.playaroundwithai.core.domain.feature.chat.repository.GeminiRepository
+import se.onemanstudio.playaroundwithai.core.domain.feature.config.model.ApiKeyAvailability
+import se.onemanstudio.playaroundwithai.feature.maps.states.MapError
 import se.onemanstudio.playaroundwithai.core.domain.feature.map.model.VehicleType
 import se.onemanstudio.playaroundwithai.core.domain.feature.map.repository.MapRepository
 import se.onemanstudio.playaroundwithai.core.domain.feature.map.model.MapItem
@@ -73,7 +75,7 @@ class MapViewModelTest {
         val expectedUiModels = testDataDomain.map { it.toUiModel() }
 
         // When
-        val viewModel = MapViewModel(GetMapItemsUseCase(repository), getSuggestedPlacesUseCase, application)
+        val viewModel = createViewModel()
         val states = captureStates(viewModel)
         viewModel.loadMapData(TEST_CENTER_LAT, TEST_CENTER_LNG)
 
@@ -90,7 +92,7 @@ class MapViewModelTest {
     fun `selectMarker updates focused marker`() = runTest {
         // Given
         coEvery { repository.getMapItems(any(), any(), any()) } returns testDataDomain
-        val viewModel = MapViewModel(GetMapItemsUseCase(repository), getSuggestedPlacesUseCase, application)
+        val viewModel = createViewModel()
         val states = captureStates(viewModel)
         viewModel.loadMapData(TEST_CENTER_LAT, TEST_CENTER_LNG)
         val scooterItemUi = scooterItemDomain.toUiModel()
@@ -114,7 +116,7 @@ class MapViewModelTest {
     fun `setPathMode resets selection and updates mode`() = runTest {
         // Given
         coEvery { repository.getMapItems(any(), any(), any()) } returns testDataDomain
-        val viewModel = MapViewModel(GetMapItemsUseCase(repository), getSuggestedPlacesUseCase, application)
+        val viewModel = createViewModel()
         val states = captureStates(viewModel)
         viewModel.loadMapData(TEST_CENTER_LAT, TEST_CENTER_LNG)
         val scooterItemUi = scooterItemDomain.toUiModel()
@@ -145,7 +147,7 @@ class MapViewModelTest {
     fun `toggleFilter filters visible locations correctly`() = runTest {
         // Given
         coEvery { repository.getMapItems(any(), any(), any()) } returns testDataDomain
-        val viewModel = MapViewModel(GetMapItemsUseCase(repository), getSuggestedPlacesUseCase, application)
+        val viewModel = createViewModel()
         val states = captureStates(viewModel)
         viewModel.loadMapData(TEST_CENTER_LAT, TEST_CENTER_LNG)
 
@@ -174,7 +176,7 @@ class MapViewModelTest {
     fun `toggleSelection adds and removes items in Path Mode`() = runTest {
         // Given
         coEvery { repository.getMapItems(any(), any(), any()) } returns testDataDomain
-        val viewModel = MapViewModel(GetMapItemsUseCase(repository), getSuggestedPlacesUseCase, application)
+        val viewModel = createViewModel()
         val states = captureStates(viewModel)
         viewModel.loadMapData(TEST_CENTER_LAT, TEST_CENTER_LNG)
         viewModel.setPathMode(true)
@@ -217,7 +219,7 @@ class MapViewModelTest {
         coEvery { repository.getMapItems(any(), any(), any()) } returns manyItemsDomain
         val manyItemsUi = manyItemsDomain.map { it.toUiModel() }
 
-        val viewModel = MapViewModel(GetMapItemsUseCase(repository), getSuggestedPlacesUseCase, application)
+        val viewModel = createViewModel()
         val states = captureStates(viewModel)
         viewModel.loadMapData(TEST_CENTER_LAT, TEST_CENTER_LNG)
         viewModel.setPathMode(true)
@@ -243,7 +245,7 @@ class MapViewModelTest {
     fun `calculateOptimalRoute updates route state`() = runTest {
         // Given
         coEvery { repository.getMapItems(any(), any(), any()) } returns testDataDomain
-        val viewModel = MapViewModel(GetMapItemsUseCase(repository), getSuggestedPlacesUseCase, application)
+        val viewModel = createViewModel()
         val states = captureStates(viewModel)
         viewModel.loadMapData(TEST_CENTER_LAT, TEST_CENTER_LNG)
         viewModel.setPathMode(true)
@@ -267,7 +269,33 @@ class MapViewModelTest {
         viewModel.viewModelScope.cancel()
     }
 
-    // --- Helper ---
+    @Test
+    fun `loadMapData sets ApiKeyMissing when Maps key is missing`() = runTest {
+        // Given
+        coEvery { repository.getMapItems(any(), any(), any()) } returns testDataDomain
+        val viewModel = createViewModel(
+            apiKeyAvailability = ApiKeyAvailability(isGeminiKeyAvailable = true, isMapsKeyAvailable = false)
+        )
+        val states = captureStates(viewModel)
+
+        // When
+        viewModel.loadMapData(TEST_CENTER_LAT, TEST_CENTER_LNG)
+
+        // Then
+        val finalState = states.last()
+        assertFalse(finalState.isLoading)
+        assertEquals(MapError.ApiKeyMissing, finalState.error)
+
+        viewModel.viewModelScope.cancel()
+    }
+
+    // --- Helpers ---
+    private fun createViewModel(
+        apiKeyAvailability: ApiKeyAvailability = ApiKeyAvailability(isGeminiKeyAvailable = true, isMapsKeyAvailable = true)
+    ): MapViewModel {
+        return MapViewModel(GetMapItemsUseCase(repository), getSuggestedPlacesUseCase, apiKeyAvailability, application)
+    }
+
     private fun captureStates(viewModel: MapViewModel): List<MapUiState> {
         val list = mutableListOf<MapUiState>()
         viewModel.uiState
