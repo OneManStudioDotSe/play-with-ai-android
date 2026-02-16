@@ -167,9 +167,11 @@ MAPS_API_KEY=your-maps-api-key
 │                                                                                 │
 │  ┌──────────────────────┐  ┌──────────────────────┐  ┌───────────────────────┐  │
 │  │ GenerateContentUC    │  │ GetPromptHistoryUC   │  │ GetMapItemsUC         │  │
-│  │ GenerateSuggestionsUC│  │ SavePromptUC         │  │                       │  │
+│  │ GetSuggestionsUC     │  │ SavePromptUC         │  │ GetSuggestedPlacesUC  │  │
 │  │                      │  │ UpdatePromptTextUC   │  │                       │  │
-│  │                      │  │ IsSyncingUC          │  │                       │  │
+│  │                      │  │ GetSyncStateUC       │  │                       │  │
+│  │                      │  │ GetFailedSyncCountUC │  │                       │  │
+│  │                      │  │ RetryPendingSyncsUC  │  │                       │  │
 │  └──────────┬───────────┘  └──────────┬───────────┘  └───────────┬───────────┘  │
 │             │                         │                          │              │
 │             ▼                         ▼                          ▼              │
@@ -215,7 +217,7 @@ MAPS_API_KEY=your-maps-api-key
 │                  │    ┌──────────────────────────────────┐                      │
 │                  │    │       LOCAL DATA SOURCE          │                      │
 │                  │    │                                  │                      │
-│                  │    │   Room DB: "play_with_ai_db" v2  |                      │
+│                  │    │   Room DB: "play_with_ai_db" v3  │                      │
 │                  │    └──────────────────────────────────┘                      │
 │                  │                      ▲                                       │
 │                  │                      │                                       │
@@ -274,11 +276,13 @@ User types prompt (+ optional image/document)
   ▼
 ChatViewModel.generateContent(prompt, imageUri?, documentUri?)
   │
-  ├─ Image? → ContentResolver → decode → scale to max 768px → JPEG @ 77% → Base64
-  ├─ Document? → ContentResolver → read text content
+  ├─ Image? → withContext(Default) → decode → scale to max 768px → JPEG @ 77% → Base64
+  ├─ Document? → withContext(IO) → read text content
   │
   ▼
 GenerateContentUseCase.invoke(prompt, imageBytes?, fileText?, analysisType?)
+  ├─ Validate: prompt not blank (unless attachment present)
+  ├─ Validate: prompt ≤ 50K chars, fileText ≤ 100K chars
   │
   ▼
 GeminiRepositoryImpl.generateContent()

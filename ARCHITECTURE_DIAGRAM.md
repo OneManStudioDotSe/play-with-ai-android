@@ -17,7 +17,7 @@
 │  │   │   ├─ Success             │       │   │                          │        │
 │  │   │   └─ Error               │       │   │                          │        │
 │  └───┼──────────────────────────┘       └───┼──────────────────────────┘        │
-│      │ Uses 5 use cases                     │ Uses 1 use case                   │
+│      │ Uses 9 use cases                     │ Uses 2 use cases                  │
 └──────┼──────────────────────────────────────┼───────────────────────────────────┘
        │                                      │
        ▼                                      ▼
@@ -27,9 +27,11 @@
 │                                                                                 │
 │  ┌──────────────────────┐  ┌──────────────────────┐  ┌───────────────────────┐  │
 │  │ GenerateContentUC    │  │ GetPromptHistoryUC   │  │ GetMapItemsUC         │  │
-│  │ GenerateSuggestionsUC│  │ SavePromptUC         │  │                       │  │
+│  │ GetSuggestionsUC     │  │ SavePromptUC         │  │ GetSuggestedPlacesUC  │  │
 │  │                      │  │ UpdatePromptTextUC   │  │                       │  │
-│  │                      │  │ IsSyncingUC          │  │                       │  │
+│  │                      │  │ GetSyncStateUC       │  │                       │  │
+│  │                      │  │ GetFailedSyncCountUC │  │                       │  │
+│  │                      │  │ RetryPendingSyncsUC  │  │                       │  │
 │  └──────────┬───────────┘  └──────────┬───────────┘  └───────────┬───────────┘  │
 │             │                         │                          │              │
 │             ▼                         ▼                          ▼              │
@@ -89,7 +91,7 @@
 │                  │    ┌──────────────────────────────────┐                      │
 │                  │    │       LOCAL DATA SOURCE          │                      │
 │                  │    │                                  │                      │
-│                  │    │   Room DB: "play_with_ai_db" v2  │                      |
+│                  │    │   Room DB: "play_with_ai_db" v3  │                      │
 │                  │    │   Table: "prompt_history"        │                      │
 │                  │    │   ┌─────────────────────────┐    │                      │
 │                  │    │   │ id             (PK,auto)│    │                      │
@@ -99,7 +101,11 @@
 │                  │    │   │  ├─ Pending             │    │                      │
 │                  │    │   │  ├─ Synced              │    │                      │
 │                  │    │   │  └─ Failed              │    │                      │
-│                  │    │   │ firestoreDocId.         │    │                      │
+│                  │    │   │ firestoreDocId (String) │    │                      │
+│                  │    │   │                         │    │                      │
+│                  │    │   │ Indexes:                │    │                      │
+│                  │    │   │  syncStatus,            │    │                      │
+│                  │    │   │  firestoreDocId         │    │                      │
 │                  │    │   └─────────────────────────┘    │                      │
 │                  │    │                                  │                      │
 │                  │    │   PromptsHistoryDao:             │                      │
@@ -126,7 +132,8 @@
 │                  │    │                                  │  │                   │
 │                  │    │   Constraints:                   │  │                   │
 │                  │    │    - Requires network            │  │                   │
-│                  │    │   Policy: REPLACE existing       │  │                   │
+│                  │    │   Policy: APPEND_OR_REPLACE      │  │                   │
+│                  │    │   Backoff: Exponential (30s)     │  │                   │
 │                  │    └──────────────────────────────────┘  │                   │
 │                  │                                          │                   │
 └──────────────────┼──────────────────────────────────────────┼───────────────────┘
@@ -177,11 +184,13 @@ User types prompt (+ optional image/document)
   ▼
 ChatViewModel.generateContent(prompt, imageUri?, documentUri?)
   │
-  ├─ Image? → ContentResolver → decode → scale to max 768px → JPEG @ 77% → Base64
-  ├─ Document? → ContentResolver → read text content
+  ├─ Image? → withContext(Default) → decode → scale to max 768px → JPEG @ 77% → Base64
+  ├─ Document? → withContext(IO) → read text content
   │
   ▼
 GenerateContentUseCase.invoke(prompt, imageBytes?, fileText?, analysisType?)
+  ├─ Validate: prompt not blank (unless attachment present)
+  ├─ Validate: prompt ≤ 50K chars, fileText ≤ 100K chars
   │
   ▼
 GeminiRepositoryImpl.generateContent()
