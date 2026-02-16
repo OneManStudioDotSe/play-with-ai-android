@@ -1,12 +1,8 @@
 # play-with-ai-android
 
-Welcome to my showcase app. Here you can see and dig deep into my preferred way of working. 
+A showcase Android app where serious engineering meets a sassy AI Overlord. Chat with Gemini, analyze documents, or scout for scooters on the map — built to show how modern Android tech can be both powerful and fun. 🚀
 
-Think of this as my digital sandbox—a place where serious Android engineering shakes hands with a slightly sassy 'AI Overlord.' 
-Whether you're chatting with Gemini, analyzing documents, or scouting for scooters on the map, this app is built to show how the 
-latest tech can be both powerful and surprisingly fun. 🚀
-
-My approach is a holistic one: Work in a clean, simple and scalable way that spans beyond the basic coding. These are my principles:
+My principles:
 - Simple coding
 - Consistent design
 - Two-way performance
@@ -15,95 +11,117 @@ My approach is a holistic one: Work in a clean, simple and scalable way that spa
 - Those little extra things
 
 ## Simple coding
-I strive to write code that is clean, easy to understand and follows a cohesive and logical way of doing things.
-I use the latest and greatest of programming guidelines when it comes to Android:
-- **Clean Architecture**: Separation of concerns with layers that contain the logic and functionality that they are supposed to contain
+
+Clean, readable code following modern Android guidelines:
+- **Clean Architecture**: Strict layer separation (domain → data → presentation)
 - **MVVM**: Decoupled UI logic using ViewModels
 - **Lifecycle awareness**: Efficient state collection to optimize resource consumption
-- **Kotlin coroutines**: Manage asynchronous tasks with structured concurrency
-- **Consistent naming**: Established naming conventions for files, variables, and resources
+- **Kotlin coroutines**: Structured concurrency for async tasks
+- **Consistent naming**: Established conventions for files, variables, and resources
 
 ## Consistent design
-Nowadays, an app should not be just screens with lists and details, but it should also communicate an "air" 
-of personality. For that reason, every one of my apps, including this one, has its own little design system that I 
-use consistently across it. A complete suite of custom fonts, text styles, color palette and UI components are utilized
-at the app in order to show the importance of a consistent design system and the modern way to use it. The whole DS is plug-n-play 
-meaning that it is straightforward to update or change it completely, further showing the importance of a modular codebase.
+
+Every app deserves personality. This one has its own plug-n-play design system ("SoFa") — custom fonts, text styles, color palette and UI components — all modular and easy to swap out entirely.
 
 ## Two-way performance
-Apart from how an app looks and feels, it is equally important for it to work smoothly and efficiently, both during the development and
-when the user is interacting with it. For these reasons, I follow the principles below:
-- **Compose stability**: Optimize Composables for performance by utilizing `@Immutable` UI states to minimize unnecessary recompositions
-- **Modularity**: The project is organized into modules to optimize build times and enforce clear boundaries
-- **Resource management**: Avoid memory leaks by making the most out of DI and stay away from unnecessary libraries or permissions
+
+Smooth for both the developer and the user:
+- **Compose stability**: `@Immutable` UI states minimize unnecessary recompositions
+- **Modularity**: Module-per-feature structure optimizes build times and enforces clear boundaries
+- **Resource management**: DI-driven lifecycle management, no unnecessary libraries or permissions
 
 ## Meaningful scalability
-Projects on Android Studio have the tendency to grow as time goes by, therefore a scalable approach to the project's 
-structure is necessary in order to keep the developer experience and maintainability possible. 
 
-In this showcase project you can see a highly modular structure that can scale upon demand, regardless of team constellation or size: 
-- **`:core-domain`**: Pure Kotlin module holding business logic, domain models, and repository definitions
-- **`:core-data`**: Implementation of repositories, handling remote (Gemini AI) and local (Room) data sources
-- **`:core-theme`**: Centralized theme and design language (colors, typography, etc.)
-- **`:core-ui`**: Reusable UI components specific to the 'SoFa' design system
-- **`:feature:chat`**: Feature module for the AI interaction experience
-- **`:feature:map`**: Feature module for location-based services and route visualization
+A highly modular structure that scales regardless of team size:
+- **`:core-domain`**: Pure Kotlin — business logic, domain models, repository interfaces
+- **`:core-data`**: Repository implementations, Room DB, Retrofit, Firebase
+- **`:core-theme`**: Centralized design system (colors, typography)
+- **`:core-ui`**: Reusable Compose components
+- **`:feature:chat`**: AI chat experience
+- **`:feature:map`**: Location-based services and route visualization
 
-This structure allows potentially multiple teams to work on separate features without conflicts and ensures that each module only depends 
-on what it absolutely needs.
+Each module only depends on what it needs. Multiple teams can work on separate features without conflicts.
 
 ## Future-proofing
-An android app or project is usually part of a larger ecosystem where automations take place in the form of automated scripts, 
-CI/CD pipelines, publishing and report generation. To illustrate the consideration of these steps, I have also added support for running 
-scripts for some basic maintenance and code quality when a PR is opened. This makes sure that all future development will abide to the
-team's or company's pipelines and will not break future releases.
+
+CI/CD pipeline with GitHub Actions runs Detekt, Lint, builds, and unit tests on every PR — ensuring code quality standards are maintained across all future development.
 
 ## The little extra
-To differentiate myself from the rest of the Android Engineers out there, I do the "little extra" that adds a nice layer of polishing:
-- **Localization**: No hard-coded strings, giving an app ready for localization
-- **A11y**: Proper semantics, localized content descriptions and support for dynamic font sizes
-- **UX polish**: Smooth animations, easy-to-eye transitions and visual treats here and there
-- **Personality**: A unique "AI Overlord" persona for the AI assistant to make interactions more engaging
+
+- **Localization**: No hard-coded strings — ready for multi-language support
+- **A11y**: Proper semantics, content descriptions, dynamic font sizes
+- **UX polish**: Smooth animations and visual transitions throughout
+- **Personality**: A unique "AI Overlord" persona for engaging interactions
 
 ## Architecture highlights
 
-Beyond the high-level patterns, the project incorporates several notable architectural decisions worth highlighting:
-
 ### Local-first data with two-phase background sync
-Prompt history follows a local-first strategy with a two-phase sync to Firestore. When the user sends a prompt, the question is immediately persisted to Room with a `Pending` sync status and a `SyncWorker` (WorkManager) is enqueued to create a new Firestore document. The auto-generated Firestore document ID is stored back in Room (`firestoreDocId`). Once the AI responds, the local entry is updated with the full Q&A text, its status is reset to `Pending`, and a second sync is scheduled — this time the worker detects the existing `firestoreDocId` and updates the same Firestore document rather than creating a new one. A race condition guard (`markSyncedIfTextMatches`) ensures the worker only marks an entry as `Synced` if the text hasn't changed during the sync, preventing stale data. Failed uploads are retried up to 3 times with exponential backoff (starting at 30 seconds) before being marked as `Failed`. The work policy uses `APPEND_OR_REPLACE` to avoid canceling in-progress syncs when new ones are enqueued. The `FirestoreDataSource` enforces authentication — unauthenticated requests fail immediately rather than falling back to anonymous data. The Room database indexes `syncStatus` and `firestoreDocId` columns for efficient querying by the sync worker. Each user's prompts are stored under `/users/{userId}/prompts/` in Firestore.
+
+Prompts are persisted to Room immediately, then synced to Firestore via `SyncWorker` in two phases:
+1. **Phase 1**: User sends prompt → saved locally with `Pending` status → worker creates Firestore doc and stores the returned `firestoreDocId`
+2. **Phase 2**: AI responds → local entry updated with full Q&A → worker updates the same Firestore doc
+
+Key safeguards:
+- **Race condition guard**: `markSyncedIfTextMatches` only marks `Synced` if text hasn't changed during sync
+- **Retry policy**: Up to 3 attempts with exponential backoff (30s initial), then marked `Failed`
+- **Work policy**: `APPEND_OR_REPLACE` avoids canceling in-progress syncs
+- **Auth enforcement**: `FirestoreDataSource` rejects unauthenticated requests immediately
+- **DB indexes**: `syncStatus` and `firestoreDocId` indexed for efficient worker queries
+- **Scoping**: Prompts stored under `/users/{userId}/prompts/` in Firestore
 
 ### Dynamic configuration via Hilt qualifiers
-API keys, base URLs, and logging levels are injected at runtime through custom Hilt qualifiers (`@GeminiApiKey`, `@BaseUrl`, `@LoggingLevel`). A `ConfigurationModule` reads values from `BuildConfig`, which in turn are sourced from `local.properties` per build variant. This means switching between debug (verbose logging, debug API key) and release (no logging, production key) requires zero code changes — the DI graph handles it automatically.
+
+API keys, base URLs, and logging levels injected at runtime through `@GeminiApiKey`, `@BaseUrl`, `@LoggingLevel` qualifiers. Debug vs release configuration (verbose logging, different API keys) requires zero code changes.
 
 ### Immutable UI state with Kotlinx Immutable Collections
-All UI state classes are annotated with `@Immutable` and use `PersistentList`/`PersistentSet` from kotlinx-collections-immutable. This guarantees that Compose can skip recompositions when state references haven't changed, resulting in measurably fewer recomposition cycles compared to using standard mutable collections.
+
+All UI states use `@Immutable` with `PersistentList`/`PersistentSet`, allowing Compose to skip recompositions when state references haven't changed.
 
 ### Image processing pipeline
-Before reaching the Gemini API, images go through a multi-step pipeline: URI → Bitmap decoding (via `ImageDecoder`) → aspect-ratio-preserving downscale to max 768px → JPEG compression at 77% quality → Base64 encoding. This keeps payload sizes reasonable while preserving enough detail for the AI model to analyze. Image decoding and scaling runs on `Dispatchers.Default` while file reading runs on `Dispatchers.IO`, keeping the main thread free.
+
+Images go through: URI → `ImageDecoder` → downscale to max 768px → JPEG @ 77% → Base64. Decoding runs on `Dispatchers.Default`, file reading on `Dispatchers.IO` — keeping the main thread free.
 
 ### OkHttp interceptor chain
-Network requests pass through a custom `AuthenticationInterceptor` that appends the API key as a query parameter, followed by an `HttpLoggingInterceptor` whose verbosity level is injected via DI — full body logging in debug, no logging in release. Timeouts are set to 30 seconds for connect, read, and write.
+
+`AuthenticationInterceptor` appends the API key as a query param, followed by `HttpLoggingInterceptor` (full body in debug, none in release). Timeouts: 30s connect/read/write.
 
 ### Use case input validation
-Use cases enforce boundary validation before delegating to repositories. `GenerateContentUseCase` rejects blank prompts (when no attachments are present) and enforces maximum lengths for prompt text (50K chars) and file content (100K chars). `GetMapItemsUseCase` validates count ranges and coordinate bounds. `GetSuggestedPlacesUseCase` validates latitude/longitude ranges. `SavePromptUseCase` and `UpdatePromptTextUseCase` enforce non-blank text and valid IDs. This ensures invalid data is caught at the domain boundary with clear error messages, consistent with Clean Architecture's principle of enforcing business rules in the domain layer.
+
+Use cases validate inputs before delegating to repositories — blank prompts, max lengths (50K prompt, 100K file), coordinate bounds, valid IDs. Invalid data is caught at the domain boundary with clear error messages.
 
 ### Mapper layer between data and domain
-Data transfer objects (DTOs) and Room entities are mapped to domain models through dedicated extension functions (`toDomain()`, `toEntity()`). This keeps the domain layer free of serialization annotations and database concerns, allowing it to remain a pure Kotlin module with no Android or framework dependencies. Domain models use `java.time.Instant` for timestamps (available without desugaring at minSdk 31), with mappers handling the conversion to/from `Long` epoch millis for Room storage.
+
+Dedicated `toDomain()` / `toEntity()` extensions keep the domain layer free of serialization annotations and database concerns. Domain models use `java.time.Instant` for timestamps, with mappers converting to/from `Long` epoch millis for Room.
 
 ### Fake API service for development
-The map feature uses a `FakeMapApiService` that implements the same `MapApiService` interface as a real implementation would. It simulates network latency with a 1.5-second delay and generates randomized vehicle data near Stockholm. Swapping this for a real backend requires only changing the DI binding — no feature code needs to change.
+
+`FakeMapApiService` implements the real `MapApiService` interface with simulated latency and randomized vehicle data. Swapping for a real backend requires only changing the DI binding.
 
 ### Dynamic theme for the map
-The styling of the map changes depending on the light or dark mode that the app is using
 
-Core functionality:
-- **AI Chat**: Send prompts to an AI (Gemini) with support for image and document attachments
-- **Smart History**: Access and reuse previous Q&A entries stored locally and synced to Firestore
-- **Map Interaction**: Discover and filter locations (scooters/bikes) with optimal route calculation
+Map styling adapts automatically to the app's light or dark mode.
 
-Technical Details:
-- **Jetpack Compose**: Native Android UI
-- **Hilt**: Dependency Injection
-- **Retrofit & OkHttp**: Networking
-- **Room**: Local persistence
-- **Firebase**: Firestore (user-scoped prompt sync), Firebase Auth (anonymous sign-in)
+## Core functionality
+
+- **AI Chat**: Prompts to Gemini with image and document attachment support
+- **Smart History**: Local Q&A history synced to Firestore
+- **Map Interaction**: Discover and filter vehicles with optimal route calculation
+
+## Technical stack
+
+- **Jetpack Compose** · **Hilt** · **Retrofit & OkHttp** · **Room** · **Firebase** (Firestore + Auth) · **WorkManager** · **Google Maps Compose**
+
+## Build & Run
+
+```bash
+# Prerequisites: JDK 17, Android SDK 36
+# API keys required in local.properties:
+#   MAPS_API_KEY=<your-key>
+#   GEMINI_API_KEY_DEBUG=<your-key>
+
+./gradlew assembleDebug          # Build debug APK
+./gradlew installDebug           # Install on connected device
+./gradlew testDebugUnitTest      # Run unit tests
+./gradlew detekt                 # Static analysis (Detekt)
+./gradlew lintDebug              # Android lint
+```

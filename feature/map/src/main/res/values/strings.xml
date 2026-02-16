@@ -33,14 +33,15 @@
     <string name="ai_suggest_button_content_description">Get AI suggested places</string>
     <string name="ai_suggested_place_marker_content_description">AI suggested place: %s</string>
     <string name="suggested_place_category">Category</string>
-    <string name="suggested_place_description">Description</string>
     <string name="ai_places_location_error">Could not determine your location. Please enable location services.</string>
     <string name="ai_places_fetch_error">Failed to load AI suggested places. Please try again.</string>
     <string name="dismiss">Dismiss</string>
 
-    <string name="loading_message_1">Gathering cosmic insights…</string>
-    <string name="loading_message_2">Brewing brilliant responses…</string>
-    <string name="loading_message_3">Consulting the digital oracle…</string>
-    <string name="loading_message_4">Polishing pixels of wisdom…</string>
-    <string name="loading_message_5">Waking up the data elves…</string>
+    <string name="path_mode_hint">Tap any marker to add it to your route. Plan a scooter pub crawl or a scenic bike tour!</string>
+
+    <string name="loading_message_1">Gathering insights…</string>
+    <string name="loading_message_2">Brewing responses…</string>
+    <string name="loading_message_3">Consulting the oracle…</string>
+    <string name="loading_message_4">Polishing pixels…</string>
+    <string name="loading_message_5">Waking up the AI…</string>
 </resources>

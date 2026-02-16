@@ -1,11 +1,9 @@
 package se.onemanstudio.playaroundwithai.feature.maps
 
-import android.Manifest
 import android.annotation.SuppressLint
 import android.app.Application
 import android.net.ConnectivityManager
 import android.net.NetworkCapabilities
-import androidx.annotation.RequiresPermission
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.google.android.gms.maps.model.LatLng
@@ -17,6 +15,7 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
+import se.onemanstudio.playaroundwithai.core.domain.feature.map.model.MapItem
 import se.onemanstudio.playaroundwithai.core.domain.feature.map.model.SuggestedPlace
 import se.onemanstudio.playaroundwithai.core.domain.feature.map.model.VehicleType
 import se.onemanstudio.playaroundwithai.core.domain.feature.map.usecase.GetMapItemsUseCase
@@ -98,8 +97,11 @@ class MapViewModel @Inject constructor(
             it.copy(
                 isPathMode = active,
                 focusedMarker = null,
+                focusedSuggestedPlace = null,
                 selectedLocations = persistentListOf(),
                 optimalRoute = persistentListOf(),
+                routeDistanceMeters = 0,
+                routeDurationMinutes = 0,
             )
         }
     }
@@ -142,6 +144,45 @@ class MapViewModel @Inject constructor(
                     (currentSelected + location.copy(isSelected = true)).toPersistentList()
                 } else {
                     currentSelected // Limit reached, do not add
+                }
+            }
+            state.copy(
+                selectedLocations = newSelected,
+                optimalRoute = persistentListOf(),
+                routeDistanceMeters = 0
+            )
+        }
+    }
+
+    fun toggleSuggestedPlaceSelection(place: SuggestedPlace) {
+        if (!_uiState.value.isPathMode) return
+
+        val syntheticId = "suggested_${place.name}_${place.lat}_${place.lng}"
+        val syntheticUiModel = MapItemUiModel(
+            mapItem = MapItem(
+                id = syntheticId,
+                lat = place.lat,
+                lng = place.lng,
+                name = place.name,
+                type = VehicleType.SCOOTER,
+                batteryLevel = 0,
+                vehicleCode = "",
+                nickname = place.name
+            ),
+            isSelected = true
+        )
+
+        _uiState.update { state ->
+            val currentSelected = state.selectedLocations
+            val isAlreadySelected = currentSelected.any { it.id == syntheticId }
+
+            val newSelected = if (isAlreadySelected) {
+                currentSelected.filter { it.id != syntheticId }.toPersistentList()
+            } else {
+                if (currentSelected.size < MapConstants.MAX_SELECTABLE_POINTS) {
+                    (currentSelected + syntheticUiModel).toPersistentList()
+                } else {
+                    currentSelected
                 }
             }
             state.copy(

@@ -6,6 +6,7 @@ import android.content.pm.PackageManager
 import android.view.HapticFeedbackConstants
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
+import androidx.compose.animation.AnimatedContent
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.core.EaseInOutQuart
 import androidx.compose.animation.core.tween
@@ -13,6 +14,7 @@ import androidx.compose.animation.fadeIn
 import androidx.compose.animation.fadeOut
 import androidx.compose.animation.slideInHorizontally
 import androidx.compose.animation.slideOutHorizontally
+import androidx.compose.animation.togetherWith
 import androidx.compose.foundation.background
 import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.foundation.layout.Arrangement
@@ -293,10 +295,16 @@ fun MapScreen(viewModel: MapViewModel = hiltViewModel()) {
 
             uiState.suggestedPlaces.forEach { place ->
                 key(place.name + place.lat + place.lng) {
+                    val syntheticId = "suggested_${place.name}_${place.lat}_${place.lng}"
+                    val isSelected = uiState.focusedSuggestedPlace == place ||
+                        uiState.selectedLocations.any { it.id == syntheticId }
+
                     MarkerComposable(
+                        keys = arrayOf<Any>(place.name, place.lat, place.lng, isSelected),
                         state = rememberUpdatedMarkerState(position = LatLng(place.lat, place.lng)),
                         title = place.name,
                         snippet = place.description,
+                        zIndex = if (isSelected) 10f else 2f,
                         onClick = {
                             scope.launch {
                                 cameraPositionState.animate(
@@ -304,14 +312,18 @@ fun MapScreen(viewModel: MapViewModel = hiltViewModel()) {
                                     durationMs = MapConstants.MOVE_TO_POINT_DURATION
                                 )
                             }
-                            viewModel.selectSuggestedPlace(place)
+                            if (uiState.isPathMode) {
+                                viewModel.toggleSuggestedPlaceSelection(place)
+                            } else {
+                                viewModel.selectSuggestedPlace(place)
+                            }
                             true
                         }
                     ) {
                         CustomMarkerIcon(
                             Icons.Filled.Stars,
                             stringResource(id = MapFeatureR.string.ai_suggested_place_marker_content_description, place.name),
-                            false
+                            isSelected
                         )
                     }
                 }
@@ -323,6 +335,8 @@ fun MapScreen(viewModel: MapViewModel = hiltViewModel()) {
             onToggleFilter = { type -> viewModel.toggleFilter(type) },
             onSuggestPlaces = { viewModel.getAiSuggestedPlaces(userLocation) },
         )
+
+        PathModeHint(isVisible = uiState.isPathMode)
 
         MapControls(
             uiState = uiState,
@@ -475,6 +489,31 @@ private fun BoxScope.TopActions(
                     view.performHapticFeedback(HapticFeedbackConstants.CONTEXT_CLICK)
                     onSuggestPlaces()
                 },
+            )
+        }
+    }
+}
+
+@Composable
+private fun BoxScope.PathModeHint(isVisible: Boolean) {
+    AnimatedVisibility(
+        visible = isVisible,
+        enter = fadeIn(animationSpec = tween(durationMillis = AnimationConstants.ANIMATION_DURATION)),
+        exit = fadeOut(animationSpec = tween(durationMillis = AnimationConstants.ANIMATION_DURATION)),
+        modifier = Modifier
+            .align(Alignment.TopCenter)
+            .statusBarsPadding()
+            .padding(top = Dimensions.paddingMedium)
+    ) {
+        NeoBrutalCard(
+            modifier = Modifier.padding(horizontal = Dimensions.paddingLarge)
+        ) {
+            Text(
+                text = stringResource(id = MapFeatureR.string.path_mode_hint),
+                style = MaterialTheme.typography.labelSmall,
+                color = MaterialTheme.colorScheme.onSurface,
+                textAlign = TextAlign.Center,
+                modifier = Modifier.padding(Dimensions.paddingLarge)
             )
         }
     }
@@ -701,7 +740,9 @@ private fun LoadingState(
             ) {
                 Column(
                     horizontalAlignment = Alignment.CenterHorizontally,
-                    modifier = Modifier.padding(Dimensions.paddingLarge)
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(Dimensions.paddingLarge)
                 ) {
                     CircularProgressIndicator(
                         modifier = Modifier.wrapContentSize(),
@@ -709,14 +750,19 @@ private fun LoadingState(
                     )
 
                     if (currentLoadingMessage.isNotEmpty()) {
-                        Spacer(modifier = Modifier.height(Dimensions.paddingMedium))
-                        AnimatedVisibility(
-                            visible = currentLoadingMessage.isNotEmpty(),
-                            enter = fadeIn(animationSpec = tween(durationMillis = AnimationConstants.ANIMATION_DURATION)),
-                            exit = fadeOut(animationSpec = tween(durationMillis = AnimationConstants.ANIMATION_DURATION))
-                        ) {
+                        Spacer(modifier = Modifier.height(Dimensions.paddingExtraLarge))
+                        AnimatedContent(
+                            targetState = currentLoadingMessage,
+                            transitionSpec = {
+                                fadeIn(animationSpec = tween(durationMillis = AnimationConstants.ANIMATION_DURATION))
+                                    .togetherWith(
+                                        fadeOut(animationSpec = tween(durationMillis = AnimationConstants.ANIMATION_DURATION))
+                                    )
+                            },
+                            label = "loadingMessageTransition"
+                        ) { message ->
                             Text(
-                                text = currentLoadingMessage,
+                                text = message,
                                 style = MaterialTheme.typography.bodyLarge,
                                 color = MaterialTheme.colorScheme.onSurface,
                                 textAlign = TextAlign.Center,

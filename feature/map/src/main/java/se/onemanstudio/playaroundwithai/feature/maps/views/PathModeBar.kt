@@ -3,8 +3,10 @@ package se.onemanstudio.playaroundwithai.feature.maps.views
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.width
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.PlayArrow
 import androidx.compose.material.icons.filled.Refresh
@@ -61,6 +63,8 @@ fun PathModeBar(
                     )
                 }
             }
+
+            Spacer(modifier = Modifier.width(Dimensions.paddingLarge))
 
             NeoBrutalButton(
                 text = if (isRouteCalculated) stringResource(R.string.recalculate) else stringResource(R.string.go),

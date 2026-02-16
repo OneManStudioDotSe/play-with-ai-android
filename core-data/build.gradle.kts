@@ -10,6 +10,7 @@ plugins {
 
 // Read the API key from local.properties
 val localProperties = Properties()
+@Suppress("HasPlatformType")
 val localPropertiesFile = rootProject.file("local.properties")
 
 // only load file if it exists

@@ -22,6 +22,7 @@ import kotlinx.coroutines.launch
 import se.onemanstudio.playaroundwithai.core.ui.sofa.NeoBrutalIconButton
 import se.onemanstudio.playaroundwithai.core.ui.theme.Dimensions
 import se.onemanstudio.playaroundwithai.core.ui.theme.SofaAiTheme
+import se.onemanstudio.playaroundwithai.core.ui.theme.solarYellow
 import se.onemanstudio.playaroundwithai.feature.map.R
 import se.onemanstudio.playaroundwithai.feature.maps.states.MapUiState
 
@@ -72,13 +73,9 @@ fun SideControls(
             backgroundColor = if (uiState.isPathMode) {
                 MaterialTheme.colorScheme.errorContainer
             } else {
-                MaterialTheme.colorScheme.primaryContainer
+                solarYellow
             },
-            shadowColor = if (uiState.isPathMode) {
-                MaterialTheme.colorScheme.error
-            } else {
-                MaterialTheme.colorScheme.onSurface
-            },
+            shadowColor =  MaterialTheme.colorScheme.onSurface,
             onClick = { onSetPathMode(uiState.isPathMode) },
         )
     }
