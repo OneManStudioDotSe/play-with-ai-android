@@ -34,7 +34,7 @@ private const val AMOUNT_OF_POINTS_TO_GENERATE = 30
 private const val WALKING_SPEED_METERS_PER_MIN = 83.0 // approx 5km/h
 private const val LOADING_MESSAGE_DURATION = 3000L
 
-@SuppressWarnings("TooManyFunctions")
+@Suppress("TooManyFunctions")
 @HiltViewModel
 class MapViewModel @Inject constructor(
     private val getMapItemsUseCase: GetMapItemsUseCase,
@@ -50,7 +50,7 @@ class MapViewModel @Inject constructor(
         startLoadingMessageCycle()
     }
 
-    @SuppressWarnings("TooGenericExceptionCaught")
+    @Suppress("TooGenericExceptionCaught")
     fun loadMapData(centerLat: Double, centerLng: Double) {
         if (!apiKeyAvailability.isMapsKeyAvailable) {
             _uiState.update { it.copy(isLoading = false, error = MapError.ApiKeyMissing) }
