@@ -6,6 +6,8 @@ import android.util.Base64
 import androidx.core.graphics.scale
 import com.google.gson.Gson
 import com.google.gson.JsonSyntaxException
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.withContext
 import se.onemanstudio.playaroundwithai.core.data.feature.chat.remote.api.GeminiApiService
 import se.onemanstudio.playaroundwithai.core.data.feature.chat.remote.dto.Content
 import se.onemanstudio.playaroundwithai.core.data.feature.chat.remote.dto.GeminiRequest
@@ -48,8 +50,8 @@ class GeminiRepositoryImpl @Inject constructor(
         fileText: String?,
         analysisType: AnalysisType?,
         model: GeminiModel,
-    ): Result<String> {
-        return try {
+    ): Result<String> = withContext(Dispatchers.IO) {
+        try {
             Timber.d("Gemini - Generating content for a prompt with length ${prompt.length} characters, hasImage: " +
                     "${imageBytes != null}, hasFile: ${fileText != null} and analysisType: $analysisType")
 
@@ -86,8 +88,8 @@ class GeminiRepositoryImpl @Inject constructor(
     }
 
     @Suppress("TooGenericExceptionCaught")
-    override suspend fun generateConversationStarters(model: GeminiModel): Result<List<String>> {
-        return try {
+    override suspend fun generateConversationStarters(model: GeminiModel): Result<List<String>> = withContext(Dispatchers.IO) {
+        try {
             Timber.d("Gemini - Generating conversation starters from API...")
 
             val suggestionPrompt = """
@@ -122,8 +124,8 @@ class GeminiRepositoryImpl @Inject constructor(
         latitude: Double,
         longitude: Double,
         model: GeminiModel,
-    ): Result<List<SuggestedPlace>> {
-        return try {
+    ): Result<List<SuggestedPlace>> = withContext(Dispatchers.IO) {
+        try {
             Timber.d("Gemini - Getting suggested places for lat=$latitude, lng=$longitude")
 
             val prompt = buildSuggestedPlacesPrompt(latitude, longitude)
@@ -133,7 +135,7 @@ class GeminiRepositoryImpl @Inject constructor(
 
             val rawText = response.extractText() ?: ""
             if (rawText.isBlank()) {
-                return Result.failure(Exception("No JSON response from Gemini."))
+                return@withContext Result.failure(Exception("No JSON response from Gemini."))
             }
 
             val jsonText = extractJson(rawText)
