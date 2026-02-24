@@ -1,28 +1,31 @@
 package se.onemanstudio.playaroundwithai.feature.maps
 
+import se.onemanstudio.playaroundwithai.feature.map.R
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.google.android.gms.maps.model.LatLng
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.collections.immutable.persistentListOf
 import kotlinx.collections.immutable.toPersistentList
+import kotlinx.coroutines.Job
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
+import kotlinx.coroutines.isActive
 import kotlinx.coroutines.launch
-import se.onemanstudio.playaroundwithai.core.domain.feature.config.model.ApiKeyAvailability
-import se.onemanstudio.playaroundwithai.core.domain.feature.map.model.MapItem
-import se.onemanstudio.playaroundwithai.core.domain.feature.map.model.SuggestedPlace
-import se.onemanstudio.playaroundwithai.core.domain.feature.map.model.VehicleType
-import se.onemanstudio.playaroundwithai.core.domain.feature.map.usecase.GetMapItemsUseCase
-import se.onemanstudio.playaroundwithai.core.domain.feature.map.usecase.GetSuggestedPlacesUseCase
+import se.onemanstudio.playaroundwithai.core.config.model.ApiKeyAvailability
+import se.onemanstudio.playaroundwithai.feature.maps.domain.model.MapItem
+import se.onemanstudio.playaroundwithai.feature.maps.domain.model.SuggestedPlace
+import se.onemanstudio.playaroundwithai.feature.maps.domain.model.VehicleType
+import se.onemanstudio.playaroundwithai.feature.maps.domain.usecase.GetMapItemsUseCase
+import se.onemanstudio.playaroundwithai.feature.maps.domain.usecase.GetSuggestedPlacesUseCase
 import se.onemanstudio.playaroundwithai.feature.maps.models.MapItemUiModel
 import se.onemanstudio.playaroundwithai.feature.maps.models.toUiModel
 import se.onemanstudio.playaroundwithai.feature.maps.states.MapError
 import se.onemanstudio.playaroundwithai.feature.maps.states.MapUiState
 import se.onemanstudio.playaroundwithai.feature.maps.states.SuggestedPlacesError
-import se.onemanstudio.playaroundwithai.feature.maps.util.ResourceProvider
+import se.onemanstudio.playaroundwithai.feature.maps.util.NetworkMonitor
 import se.onemanstudio.playaroundwithai.feature.maps.utils.calculatePathDistance
 import se.onemanstudio.playaroundwithai.feature.maps.utils.permutations
 import timber.log.Timber
@@ -40,15 +43,13 @@ class MapViewModel @Inject constructor(
     private val getMapItemsUseCase: GetMapItemsUseCase,
     private val getSuggestedPlacesUseCase: GetSuggestedPlacesUseCase,
     private val apiKeyAvailability: ApiKeyAvailability,
-    private val resourceProvider: ResourceProvider
+    private val networkMonitor: NetworkMonitor,
 ) : ViewModel() {
 
     private val _uiState = MutableStateFlow(MapUiState())
     val uiState = _uiState.asStateFlow()
 
-    init {
-        startLoadingMessageCycle()
-    }
+    private var loadingMessageJob: Job? = null
 
     @Suppress("TooGenericExceptionCaught")
     fun loadMapData(centerLat: Double, centerLng: Double) {
@@ -58,9 +59,11 @@ class MapViewModel @Inject constructor(
         }
 
         _uiState.update { it.copy(isLoading = true, error = null) }
+        startLoadingMessageCycle()
 
-        if (!resourceProvider.isNetworkAvailable()) {
+        if (!networkMonitor.isNetworkAvailable()) {
             Timber.w("MapViewModel - No network available, cannot load map data")
+            stopLoadingMessageCycle()
             _uiState.update { it.copy(isLoading = false, error = MapError.NetworkError) }
             return
         }
@@ -69,14 +72,17 @@ class MapViewModel @Inject constructor(
             try {
                 val data = getMapItemsUseCase(AMOUNT_OF_POINTS_TO_GENERATE, centerLat, centerLng)
                     .map { it.toUiModel() }.toPersistentList()
+                stopLoadingMessageCycle()
                 _uiState.update {
                     it.copy(isLoading = false, allLocations = data, visibleLocations = data)
                 }
             } catch (e: IOException) {
                 Timber.e(e, "MapViewModel - Failed to load map data (network)")
+                stopLoadingMessageCycle()
                 _uiState.update { it.copy(isLoading = false, error = MapError.NetworkError) }
             } catch (e: Exception) {
                 Timber.e(e, "MapViewModel - Failed to load map data")
+                stopLoadingMessageCycle()
                 _uiState.update { it.copy(isLoading = false, error = MapError.Unknown(e.localizedMessage)) }
             }
         }
@@ -229,10 +235,12 @@ class MapViewModel @Inject constructor(
                 suggestedPlacesError = null
             )
         }
+        startLoadingMessageCycle()
 
         viewModelScope.launch {
             getSuggestedPlacesUseCase(userLocation.latitude, userLocation.longitude)
                 .onSuccess { places ->
+                    stopLoadingMessageCycle()
                     _uiState.update {
                         it.copy(
                             isLoading = false,
@@ -243,6 +251,7 @@ class MapViewModel @Inject constructor(
                 }
                 .onFailure { exception ->
                     Timber.e(exception, "Failed to get AI suggested places")
+                    stopLoadingMessageCycle()
                     _uiState.update {
                         it.copy(
                             isLoading = false,
@@ -262,14 +271,29 @@ class MapViewModel @Inject constructor(
     }
 
     private fun startLoadingMessageCycle() {
-        viewModelScope.launch {
-            val messages = resourceProvider.getLoadingMessages()
+        loadingMessageJob?.cancel()
+        loadingMessageJob = viewModelScope.launch {
             var index = 0
-            while (true) {
-                _uiState.update { it.copy(loadingMessage = messages[index]) }
+            while (isActive) {
+                _uiState.update { it.copy(loadingMessageResId = LOADING_MESSAGE_RES_IDS[index]) }
                 delay(LOADING_MESSAGE_DURATION)
-                index = (index + 1) % messages.size
+                index = (index + 1) % LOADING_MESSAGE_RES_IDS.size
             }
         }
+    }
+
+    private fun stopLoadingMessageCycle() {
+        loadingMessageJob?.cancel()
+        loadingMessageJob = null
+    }
+
+    companion object {
+        private val LOADING_MESSAGE_RES_IDS = listOf(
+            R.string.loading_message_1,
+            R.string.loading_message_2,
+            R.string.loading_message_3,
+            R.string.loading_message_4,
+            R.string.loading_message_5,
+        )
     }
 }

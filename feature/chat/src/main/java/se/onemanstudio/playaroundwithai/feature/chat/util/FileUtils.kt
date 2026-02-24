@@ -2,6 +2,7 @@ package se.onemanstudio.playaroundwithai.feature.chat.util
 
 import android.content.Context
 import android.net.Uri
+import dagger.hilt.android.qualifiers.ApplicationContext
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 import timber.log.Timber
@@ -10,7 +11,7 @@ import java.io.IOException
 import javax.inject.Inject
 
 class FileUtils @Inject constructor(
-    private val context: Context
+    @ApplicationContext private val context: Context
 ) {
     suspend fun extractFileContent(uri: Uri): Result<String> = withContext(Dispatchers.IO) {
         try {

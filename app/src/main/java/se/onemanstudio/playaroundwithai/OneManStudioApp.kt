@@ -10,7 +10,7 @@ import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.SupervisorJob
 import kotlinx.coroutines.launch
-import se.onemanstudio.playaroundwithai.core.domain.feature.chat.usecase.RetryPendingSyncsUseCase
+import se.onemanstudio.playaroundwithai.feature.chat.domain.usecase.RetryPendingSyncsUseCase
 import se.onemanstudio.playaroundwithai.feature.chat.R
 import timber.log.Timber
 import javax.inject.Inject

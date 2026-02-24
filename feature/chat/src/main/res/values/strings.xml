@@ -43,6 +43,8 @@
     <string name="sync_notification_channel_description">Shows progress of data synchronization</string>
     <string name="sync_notification_title">Syncing Prompts</string>
     <string name="sync_notification_content">Synchronizing your prompt history with the cloud…</string>
+    <string name="sync_failure_notification_title">Sync failed</string>
+    <string name="sync_failure_notification_content" tools:ignore="PluralsCandidate">%1$d prompts could not be synced. They will be retried next time.</string>
 
     <string name="sync_failed_snackbar" tools:ignore="PluralsCandidate">%1$d prompts failed to sync to the cloud</string>
     <string name="sync_retry_action">Retry</string>

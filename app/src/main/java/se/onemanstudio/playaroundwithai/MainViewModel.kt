@@ -8,7 +8,7 @@ import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
-import se.onemanstudio.playaroundwithai.core.domain.feature.auth.usecase.SignInAnonymouslyUseCase
+import se.onemanstudio.playaroundwithai.core.auth.usecase.SignInAnonymouslyUseCase
 import timber.log.Timber
 import javax.inject.Inject
 

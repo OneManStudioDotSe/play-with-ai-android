@@ -109,14 +109,15 @@ Smooth for both the developer and the user:
 ## Meaningful scalability
 
 A highly modular structure that scales regardless of team size:
-- **`:core-domain`**: Pure Kotlin — business logic, domain models, repository interfaces
-- **`:core-data`**: Repository implementations, Room DB, Retrofit, Firebase
-- **`:core-theme`**: Centralized design system (colors, typography)
-- **`:core-ui`**: Reusable Compose components
-- **`:feature:chat`**: AI chat experience
-- **`:feature:map`**: Location-based services and route visualization
+- **`:core:network`**: Shared networking — Retrofit, OkHttp, GeminiApiService, DTOs, interceptor
+- **`:core:auth`**: Firebase Auth, AuthRepository, auth use cases
+- **`:core:config`**: API key management, BuildConfig fields, Hilt qualifier annotations
+- **`:core:theme`**: Centralized design system (colors, typography)
+- **`:core:ui`**: Reusable Compose components
+- **`:feature:chat`**: Complete chat feature — domain, data, and presentation layers (Room, Firestore, WorkManager)
+- **`:feature:map`**: Complete map feature — domain, data, and presentation layers (fake API, route calculation)
 
-Each module only depends on what it needs. Multiple teams can work on separate features without conflicts.
+Each feature module is self-contained with its own domain models, repository interfaces, use case classes, and data layer implementations. Shared infrastructure (networking, auth, config) lives in focused core modules. Multiple teams can work on separate features without conflicts.
 
 ## Future-proofing
 

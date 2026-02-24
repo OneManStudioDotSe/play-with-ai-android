@@ -17,25 +17,24 @@ import kotlinx.coroutines.test.advanceUntilIdle
 import kotlinx.coroutines.test.runTest
 import org.junit.Rule
 import org.junit.Test
-import se.onemanstudio.playaroundwithai.core.domain.feature.chat.model.Prompt
-import se.onemanstudio.playaroundwithai.core.domain.feature.chat.repository.GeminiRepository
-import se.onemanstudio.playaroundwithai.core.domain.feature.chat.repository.PromptRepository
-import se.onemanstudio.playaroundwithai.core.domain.feature.chat.usecase.AskAiUseCase
-import se.onemanstudio.playaroundwithai.core.domain.feature.chat.usecase.GetFailedSyncCountUseCase
-import se.onemanstudio.playaroundwithai.core.domain.feature.chat.usecase.GetPromptHistoryUseCase
-import se.onemanstudio.playaroundwithai.core.domain.feature.chat.usecase.GetSuggestionsUseCase
-import se.onemanstudio.playaroundwithai.core.domain.feature.chat.usecase.GetSyncStateUseCase
-import se.onemanstudio.playaroundwithai.core.domain.feature.chat.usecase.RetryPendingSyncsUseCase
-import se.onemanstudio.playaroundwithai.core.domain.feature.chat.usecase.SavePromptUseCase
-import se.onemanstudio.playaroundwithai.core.domain.feature.chat.usecase.UpdatePromptTextUseCase
-import se.onemanstudio.playaroundwithai.core.domain.feature.auth.usecase.ObserveAuthReadyUseCase
-import se.onemanstudio.playaroundwithai.core.domain.feature.config.model.ApiKeyAvailability
+import se.onemanstudio.playaroundwithai.feature.chat.domain.model.Prompt
+import se.onemanstudio.playaroundwithai.feature.chat.domain.repository.ChatGeminiRepository
+import se.onemanstudio.playaroundwithai.feature.chat.domain.repository.PromptRepository
+import se.onemanstudio.playaroundwithai.feature.chat.domain.usecase.AskAiUseCase
+import se.onemanstudio.playaroundwithai.feature.chat.domain.usecase.GetFailedSyncCountUseCase
+import se.onemanstudio.playaroundwithai.feature.chat.domain.usecase.GetPromptHistoryUseCase
+import se.onemanstudio.playaroundwithai.feature.chat.domain.usecase.GetSuggestionsUseCase
+import se.onemanstudio.playaroundwithai.feature.chat.domain.usecase.GetSyncStateUseCase
+import se.onemanstudio.playaroundwithai.feature.chat.domain.usecase.RetryPendingSyncsUseCase
+import se.onemanstudio.playaroundwithai.feature.chat.domain.usecase.SavePromptUseCase
+import se.onemanstudio.playaroundwithai.feature.chat.domain.usecase.UpdatePromptTextUseCase
+import se.onemanstudio.playaroundwithai.core.auth.usecase.ObserveAuthReadyUseCase
+import se.onemanstudio.playaroundwithai.core.config.model.ApiKeyAvailability
 import se.onemanstudio.playaroundwithai.feature.chat.models.SnackbarEvent
 import se.onemanstudio.playaroundwithai.feature.chat.states.ChatError
 import se.onemanstudio.playaroundwithai.feature.chat.states.ChatUiState
 import se.onemanstudio.playaroundwithai.feature.chat.util.FileUtils
 import se.onemanstudio.playaroundwithai.feature.chat.util.MainCoroutineRule
-import se.onemanstudio.playaroundwithai.feature.chat.util.ResourceProvider
 import java.io.IOException
 import kotlin.test.assertEquals
 
@@ -152,19 +151,19 @@ class ChatViewModelTest {
     }
 
     @Test
-    fun `init loads fallback suggestions on failure`() = runTest {
+    fun `init sets fallback flag on suggestions failure`() = runTest {
         // Given
         val failureResult = Result.failure<List<String>>(Exception("API Error"))
 
         val viewModel = createViewModel(
-            suggestionsResult = failureResult
+            suggestionsResult = failureResult,
         )
 
         // When
         advanceUntilIdle()
 
-        // Then - resourceProvider.getFallbackSuggestions() returns emptyList for relaxed mock
-        assertEquals(3, viewModel.screenState.value.suggestions.size)
+        // Then - ViewModel signals the UI to show fallback suggestions
+        assertEquals(true, viewModel.screenState.value.useFallbackSuggestions)
     }
 
     @Test
@@ -350,9 +349,9 @@ class ChatViewModelTest {
         isSyncingResult: Boolean = false,
         failedSyncCountResult: Int = 0,
         promptRepository: PromptRepository? = null,
-        apiKeyAvailability: ApiKeyAvailability = ApiKeyAvailability(isGeminiKeyAvailable = true, isMapsKeyAvailable = true)
+        apiKeyAvailability: ApiKeyAvailability = ApiKeyAvailability(isGeminiKeyAvailable = true, isMapsKeyAvailable = true),
     ): ChatViewModel {
-        val geminiRepository = mockk<GeminiRepository> {
+        val geminiRepository = mockk<ChatGeminiRepository> {
             generateContentResult?.let { coEvery { getAiResponse(any(), any(), any(), any(), any()) } returns it }
             coEvery { generateConversationStarters(any()) } returns suggestionsResult
         }
@@ -366,7 +365,6 @@ class ChatViewModelTest {
             every { getFailedSyncCount() } returns flowOf(failedSyncCountResult)
         }
 
-        val resourceProvider = mockk<ResourceProvider>(relaxed = true)
         val fileUtils = mockk<FileUtils>(relaxed = true)
         val authReadyFlow: StateFlow<Boolean> = MutableStateFlow(true)
         val observeAuthReadyUseCase = mockk<ObserveAuthReadyUseCase>()
@@ -384,7 +382,6 @@ class ChatViewModelTest {
             observeAuthReadyUseCase,
             apiKeyAvailability,
             fileUtils,
-            resourceProvider
         )
     }
 }

@@ -1,7 +1,7 @@
 package se.onemanstudio.playaroundwithai.feature.chat.states
 
 import androidx.compose.runtime.Immutable
-import se.onemanstudio.playaroundwithai.core.domain.feature.chat.model.Prompt
+import se.onemanstudio.playaroundwithai.feature.chat.domain.model.Prompt
 
 @Immutable
 sealed interface ChatUiState {
@@ -25,6 +25,7 @@ sealed interface ChatError {
 data class ChatScreenState(
     val chatState: ChatUiState = ChatUiState.Initial,
     val suggestions: List<String> = emptyList(),
+    val useFallbackSuggestions: Boolean = false,
     val isSuggestionsLoading: Boolean = false,
     val promptHistory: List<Prompt> = emptyList(),
     val isSyncing: Boolean = false,

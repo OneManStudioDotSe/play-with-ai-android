@@ -82,10 +82,9 @@ kotlin {
 }
 
 dependencies {
-    implementation(project(":core-domain"))
-    implementation(project(":core-data"))
-    implementation(project(":core-theme"))
-    implementation(project(":core-ui"))
+    implementation(project(":core:auth"))
+    implementation(project(":core:theme"))
+    implementation(project(":core:ui"))
     implementation(project(":feature:chat"))
     implementation(project(":feature:map"))
 

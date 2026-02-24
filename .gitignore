@@ -17,3 +17,6 @@ local.properties
 /feature/map/build
 /.idea
 /core-domain/build
+/core/network/build
+/core/config/build
+/core/auth/build

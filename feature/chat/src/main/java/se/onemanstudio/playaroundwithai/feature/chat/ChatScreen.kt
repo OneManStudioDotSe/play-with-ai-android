@@ -1,5 +1,3 @@
-@file:Suppress("AssignedValueIsNeverRead")
-
 package se.onemanstudio.playaroundwithai.feature.chat
 
 import android.annotation.SuppressLint
@@ -59,8 +57,8 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
-import se.onemanstudio.playaroundwithai.core.domain.feature.chat.model.AnalysisType
-import se.onemanstudio.playaroundwithai.core.domain.feature.chat.model.InputMode
+import se.onemanstudio.playaroundwithai.feature.chat.domain.model.AnalysisType
+import se.onemanstudio.playaroundwithai.feature.chat.domain.model.InputMode
 import se.onemanstudio.playaroundwithai.core.ui.sofa.NeoBrutalCard
 import se.onemanstudio.playaroundwithai.core.ui.sofa.NeoBrutalIconButton
 import se.onemanstudio.playaroundwithai.core.ui.sofa.NeoBrutalTopAppBar
@@ -82,7 +80,15 @@ import se.onemanstudio.playaroundwithai.feature.chat.views.history.HistoryBottom
 fun ChatScreen(viewModel: ChatViewModel = hiltViewModel()) {
     val screenState by viewModel.screenState.collectAsStateWithLifecycle()
     val uiState = screenState.chatState
-    val suggestions = screenState.suggestions
+    val suggestions = if (screenState.useFallbackSuggestions) {
+        listOf(
+            stringResource(R.string.fallback_suggestion_joke),
+            stringResource(R.string.fallback_suggestion_physics),
+            stringResource(R.string.fallback_suggestion_roast)
+        )
+    } else {
+        screenState.suggestions
+    }
     val isSuggestionsLoading = screenState.isSuggestionsLoading
     val history = screenState.promptHistory
     val isSyncing = screenState.isSyncing
@@ -115,14 +121,14 @@ fun ChatScreen(viewModel: ChatViewModel = hiltViewModel()) {
             when (event) {
                 is SnackbarEvent.LocalSaveFailed -> {
                     snackbarHostState.showSnackbar(
-                        message = event.message,
+                        message = context.getString(R.string.local_save_failed),
                         duration = SnackbarDuration.Long
                     )
                 }
 
                 is SnackbarEvent.LocalUpdateFailed -> {
                     snackbarHostState.showSnackbar(
-                        message = event.message,
+                        message = context.getString(R.string.local_update_failed),
                         duration = SnackbarDuration.Long
                     )
                 }
@@ -371,19 +377,15 @@ private fun getErrorMessageAndIcon(error: ChatError): Pair<String, ImageVector> 
     }
 }
 
-fun getFileName(context: Context, uri: Uri): String? {
-    var fileName: String? = null
-    val cursor = context.contentResolver.query(uri, null, null, null, null)
-    cursor?.use {
-        if (it.moveToFirst()) {
-            val nameIndex = it.getColumnIndex(OpenableColumns.DISPLAY_NAME)
-            if (nameIndex != -1) {
-                fileName = it.getString(nameIndex)
-            }
+fun getFileName(context: Context, uri: Uri): String? =
+    context.contentResolver.query(uri, null, null, null, null)?.use { cursor ->
+        if (cursor.moveToFirst()) {
+            val nameIndex = cursor.getColumnIndex(OpenableColumns.DISPLAY_NAME)
+            if (nameIndex != -1) cursor.getString(nameIndex) else null
+        } else {
+            null
         }
     }
-    return fileName
-}
 
 @Preview(name = "Content Light")
 @Composable

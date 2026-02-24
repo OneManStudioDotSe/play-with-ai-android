@@ -25,7 +25,7 @@
 
     <string name="no_history_yet">Ingen historik än. Starta en konversation för att se den här!</string>
 
-    <string name="label_syncing">Syncing</string>
+    <string name="label_syncing">Synkroniserar</string>
 
     <string name="analysis_type_location">Plats</string>
     <string name="analysis_type_recipe">Recept</string>
@@ -42,6 +42,8 @@
     <string name="sync_notification_channel_description">Visar framsteg för datasynkronisering</string>
     <string name="sync_notification_title">Synkroniserar promptar</string>
     <string name="sync_notification_content">Synkroniserar din prompthistorik med molnet\u2026</string>
+    <string name="sync_failure_notification_title">Synkronisering misslyckades</string>
+    <string name="sync_failure_notification_content">%d prompt(ar) kunde inte synkroniseras. De kommer att försökas igen nästa gång.</string>
 
     <string name="sync_failed_snackbar">%d prompt(ar) kunde inte synkroniseras till molnet</string>
     <string name="sync_retry_action">Försök igen</string>

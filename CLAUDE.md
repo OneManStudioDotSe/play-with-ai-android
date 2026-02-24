@@ -30,22 +30,23 @@
 
 ```
 :app                    → Application entry point, navigation, main activity
-:core-domain            → Pure Kotlin: domain models, repository interfaces, use cases
-:core-data              → Repository implementations, Room DB, Retrofit, Firebase, DI modules
-:core-theme             → Design system: colors, typography ("SoFa" design language)
-:core-ui                → Reusable Compose UI components
-:feature:chat           → AI chat screen, ViewModel, UI states
-:feature:map            → Map/vehicle screen, ViewModel, UI states
+:core:network           → OkHttp, Retrofit, Gson, GeminiApiService, DTOs, interceptor, GeminiModel
+:core:auth              → Firebase Auth, AuthRepository (interface+impl), auth use cases, AuthSession
+:core:config            → ApiKeyAvailability, ConfigurationModule, qualifier annotations, BuildConfig
+:core:theme             → Design system: colors, typography ("SoFa" design language)
+:core:ui                → Reusable Compose UI components
+:feature:chat           → ALL chat: domain + data + presentation (Room, Firestore, WorkManager, sync)
+:feature:map            → ALL map: domain + data + presentation (fake API, route calculation)
 ```
 
-Dependencies flow: `feature → core-domain ← core-data`, `feature → core-ui → core-theme`
+Dependencies flow: `feature → core:network + core:config + core:auth`, `feature → core:ui → core:theme`
 
 ## Architecture
 
-- **Clean Architecture** with strict layer separation (domain → data → presentation)
+- **Clean Architecture** with domain/data/presentation layers co-located per feature
 - **MVVM** with ViewModels managing UI state via `StateFlow`
-- **Repository pattern** — interfaces in `:core-domain`, implementations in `:core-data`
-- **Use cases** — one class per operation (e.g., `GenerateContentUseCase`, `GetMapItemsUseCase`)
+- **Repository pattern** — interfaces and implementations within each feature module
+- **Use cases** — one class per operation (e.g., `AskAiUseCase`, `GetMapItemsUseCase`)
 - **Hilt** for dependency injection across all modules
 - **Compose** with `@Immutable` UI states and `PersistentList`/`PersistentSet` for stability
 
@@ -108,7 +109,7 @@ The app requires two API keys to function. Both are stored in `local.properties`
    GEMINI_API_KEY_RELEASE=your-gemini-api-key-here
    ```
 
-The key is read in `core-data/build.gradle.kts` and exposed via `BuildConfig.GEMINI_API_KEY`. It is injected at runtime through Hilt using the `@GeminiApiKey` qualifier.
+The key is read in `core/config/build.gradle.kts` and exposed via `BuildConfig.GEMINI_API_KEY`. It is injected at runtime through Hilt using the `@GeminiApiKey` qualifier.
 
 ### 2. Google Maps API Key (required for map feature)
 
@@ -176,121 +177,86 @@ service cloud.firestore {
 ## Architecture Diagram — API Endpoints, Services & Data Flow
 
 ```
-┌─────────────────────────────────────────────────────────────────────────────────┐
-│                              PRESENTATION LAYER                                 │
-│                                                                                 │
-│  ┌──────────────────────────────┐       ┌──────────────────────────────┐        │
-│  │       :feature:chat          │       │        :feature:map          │        │
-│  │                              │       │                              │        │
-│  └───┼──────────────────────────┘       └───┼──────────────────────────┘        │
-└──────┼──────────────────────────────────────┼───────────────────────────────────┘
-       │                                      │
-       ▼                                      ▼
-┌─────────────────────────────────────────────────────────────────────────────────┐
-│                                DOMAIN LAYER                                     │
-│                              :core-domain                                       │
-│                                                                                 │
-│  ┌──────────────────────┐  ┌──────────────────────┐  ┌───────────────────────┐  │
-│  │ GenerateContentUC    │  │ GetPromptHistoryUC   │  │ GetMapItemsUC         │  │
-│  │ GetSuggestionsUC     │  │ SavePromptUC         │  │ GetSuggestedPlacesUC  │  │
-│  │                      │  │ UpdatePromptTextUC   │  │                       │  │
-│  │                      │  │ GetSyncStateUC       │  │                       │  │
-│  │                      │  │ GetFailedSyncCountUC │  │                       │  │
-│  │                      │  │ RetryPendingSyncsUC  │  │                       │  │
-│  └──────────┬───────────┘  └──────────┬───────────┘  └───────────┬───────────┘  │
-│             │                         │                          │              │
-│             ▼                         ▼                          ▼              │
-│  ┌──────────────────────┐  ┌──────────────────────┐  ┌───────────────────────┐  │
-│  │ GeminiRepository     │  │ PromptRepository     │  │ MapRepository         │  │
-│  │ (interface)          │  │ (interface)          │  │ (interface)           │  │
-│  └──────────┬───────────┘  └──────────┬───────────┘  └───────────┬───────────┘  │
-│             │                         │                          │              │
-│             │          ┌──────────────┤                          │              │
-│             │          │  AuthRepository (interface)             │              │
-│             │          │              │                          │              │
-└─────────────┼──────────┼──────────────┼──────────────────────────┼──────────────┘
-              │          │              │                          │
-              ▼          ▼              ▼                          ▼
-┌─────────────────────────────────────────────────────────────────────────────────┐
-│                                 DATA LAYER                                      │
-│                               :core-data                                        │
-│                                                                                 │
-│  ┌─────────────────────────────────────────────────────────────────────────┐    │
-│  │                        Repository Implementations                       │    │
-│  │                                                                         │    │
-│  └─────────┼──────────────────┼─────────┼───────────────┼──────────────────┘    │
-│            │                  │         │               │                       │
-│            ▼                  ▼         │               ▼                       │
-│  ┌──────────────────────────────────┐   │    ┌─────────────────────────┐        │
-│  │       REMOTE DATA SOURCES        │   │    │   FakeMapApiService     │        │
-│  │                                  │   │    │   (Mock data generator) │        │
-│  │  ┌────────────────────────────┐  │   │    │                         │        │
-│  │  │     GeminiApiService       │  │   │    │                         │        │
-│  │  │                            │  │   │    └─────────────────────────┘        │
-│  │  └────────────┬───────────────┘  │   │                                       │
-│  │               │                  │   │                                       │
-│  │  ┌────────────────────────────┐  │   │                                       │
-│  │  │  FirestoreDataSource       │  │   │                                       │
-│  │  │                            │  │   │                                       │
-│  │  └────────────┬───────────────┘  │   │                                       │
-│  │               │                  │   │                                       │
-│  │  ┌────────────────────────────┐  │   │                                       │
-│  │  │  Firebase Auth             │  │   │                                       │
-│  │  └────────────┬───────────────┘  │   │                                       │
-│  └───────────────┼──────────────────┘   │                                       │
-│                  │                      ▼                                       │
-│                  │    ┌──────────────────────────────────┐                      │
-│                  │    │       LOCAL DATA SOURCE          │                      │
-│                  │    │                                  │                      │
-│                  │    │   Room DB: "play_with_ai_db" v3  │                      │
-│                  │    └──────────────────────────────────┘                      │
-│                  │                      ▲                                       │
-│                  │                      │                                       │
-│                  │    ┌─────────────────┴────────────────┐                      │
-│                  │    │       BACKGROUND SYNC            │                      │
-│                  │    │                                  │                      │
-│                  │    │   SyncWorker (WorkManager)       │                      │
-│                  │    │                                  │                      │
-│                  │    └──────────────────────────────────┘                      │
-│                  │                                                              │
-└──────────────────┼──────────────────────────────────────────────────────────────┘
-                   │                                          
-                   ▼                                          
-┌─────────────────────────────────────────────────────────────────────────────────┐
-│                            EXTERNAL SERVICES                                    │
-│                                                                                 │
-│  ┌──────────────────────────────────────────────────────────────────────────┐   │
-│  │  Google Gemini API                                                       │   │
-│  │  Base: https://generativelanguage.googleapis.com/                        │   │
-│  │  Endpoint: POST /v1beta/models/gemini-3-flash-preview:generateContent    │   │
-│  │  Auth: ?key={GEMINI_API_KEY} (query param via AuthenticationInterceptor) │   │
-│  │                                                                          │   │
-│  │  Request:  { contents: [{ parts: [{ text, inlineData? }] }] }            │   │
-│  │  Response: { candidates: [{ content: { parts: [{ text }] } }] }          │   │
-│  └──────────────────────────────────────────────────────────────────────────┘   │
-│                                                                                 │
-│  ┌──────────────────────────────────────────────────────────────────────────┐   │
-│  │  Firebase Firestore                                                      │   │
-│  │  Path: /users/{userId}/prompts/{autoDocId}                               │   │
-│  │  Document: { text: String, timestamp: Long }                             │   │
-│  │  Operations: add (create), update (update text with AI answer)           │   │
-│  │  userId is encoded in the document path, not stored as a field           │   │
-│  └──────────────────────────────────────────────────────────────────────────┘   │
-│                                                                                 │
-│  ┌──────────────────────────────────────────────────────────────────────────┐   │
-│  │  Firebase Auth                                                           │   │
-│  │  Method: Anonymous sign-in                                               │   │
-│  │  Purpose: Identify user for Firestore documents                          │   │
-│  └──────────────────────────────────────────────────────────────────────────┘   │
-│                                                                                 │
-│  ┌──────────────────────────────────────────────────────────────────────────┐   │
-│  │  Google Maps SDK                                                         │   │
-│  │  Auth: MAPS_API_KEY (manifest placeholder)                               │   │
-│  │  Services: Map tiles, markers, polylines, camera                         │   │
-│  │  Location: FusedLocationProviderClient (last known location)             │   │
-│  └──────────────────────────────────────────────────────────────────────────┘   │
-│                                                                                 │
-└─────────────────────────────────────────────────────────────────────────────────┘
+┌──────────────────────────────────────────────────────────────────────────────────┐
+│                          FEATURE MODULES (domain + data + presentation)           │
+│                                                                                  │
+│  ┌─────────────────────────────────┐    ┌─────────────────────────────────────┐  │
+│  │        :feature:chat            │    │          :feature:map               │  │
+│  │                                 │    │                                     │  │
+│  │  Presentation:                  │    │  Presentation:                      │  │
+│  │    ChatViewModel, ChatScreen    │    │    MapViewModel, MapScreen          │  │
+│  │                                 │    │                                     │  │
+│  │  Domain:                        │    │  Domain:                            │  │
+│  │    AskAiUseCase                 │    │    GetMapItemsUseCase               │  │
+│  │    GetSuggestionsUseCase        │    │    GetSuggestedPlacesUseCase        │  │
+│  │    SavePromptUseCase            │    │    MapRepository (interface)        │  │
+│  │    ChatGeminiRepository (intf)  │    │    MapGeminiRepository (interface)  │  │
+│  │    PromptRepository (interface) │    │                                     │  │
+│  │                                 │    │  Data:                              │  │
+│  │  Data:                          │    │    MapRepositoryImpl                │  │
+│  │    ChatGeminiRepositoryImpl     │    │    MapGeminiRepositoryImpl          │  │
+│  │    PromptRepositoryImpl         │    │    FakeMapApiService                │  │
+│  │    Room DB, FirestoreDataSource │    │    MapDataGenerator                 │  │
+│  │    SyncWorker (WorkManager)     │    │                                     │  │
+│  └────────────┬────────────────────┘    └──────────────┬──────────────────────┘  │
+│               │                                        │                        │
+└───────────────┼────────────────────────────────────────┼────────────────────────┘
+                │                                        │
+                ▼                                        ▼
+┌──────────────────────────────────────────────────────────────────────────────────┐
+│                              SHARED CORE MODULES                                 │
+│                                                                                  │
+│  ┌──────────────────┐  ┌──────────────────┐  ┌───────────────────────────────┐  │
+│  │   :core:network   │  │   :core:auth     │  │       :core:config            │  │
+│  │                   │  │                  │  │                               │  │
+│  │  GeminiApiService │  │  AuthRepository  │  │  ApiKeyAvailability           │  │
+│  │  GeminiModel      │  │  AuthSession     │  │  @GeminiApiKey, @BaseUrl      │  │
+│  │  DTOs, Interceptor│  │  Firebase Auth   │  │  ConfigurationModule          │  │
+│  │  NetworkModule     │  │  Auth Use Cases  │  │  BuildConfig fields           │  │
+│  └──────────────────┘  └──────────────────┘  └───────────────────────────────┘  │
+│                                                                                  │
+│  ┌──────────────────┐  ┌──────────────────┐                                     │
+│  │   :core:theme     │  │    :core:ui      │                                     │
+│  │  Colors, Typo     │  │  Compose widgets │                                     │
+│  └──────────────────┘  └──────────────────┘                                     │
+└──────────────────────────────────────────────────────────────────────────────────┘
+                │
+                ▼
+┌──────────────────────────────────────────────────────────────────────────────────┐
+│                            EXTERNAL SERVICES                                     │
+│                                                                                  │
+│  ┌──────────────────────────────────────────────────────────────────────────┐    │
+│  │  Google Gemini API                                                       │    │
+│  │  Base: https://generativelanguage.googleapis.com/                        │    │
+│  │  Endpoint: POST /v1beta/models/gemini-3-flash-preview:generateContent    │    │
+│  │  Auth: ?key={GEMINI_API_KEY} (query param via AuthenticationInterceptor) │    │
+│  │                                                                          │    │
+│  │  Request:  { contents: [{ parts: [{ text, inlineData? }] }] }            │    │
+│  │  Response: { candidates: [{ content: { parts: [{ text }] } }] }          │    │
+│  └──────────────────────────────────────────────────────────────────────────┘    │
+│                                                                                  │
+│  ┌──────────────────────────────────────────────────────────────────────────┐    │
+│  │  Firebase Firestore                                                      │    │
+│  │  Path: /users/{userId}/prompts/{autoDocId}                               │    │
+│  │  Document: { text: String, timestamp: Long }                             │    │
+│  │  Operations: add (create), update (update text with AI answer)           │    │
+│  │  userId is encoded in the document path, not stored as a field           │    │
+│  └──────────────────────────────────────────────────────────────────────────┘    │
+│                                                                                  │
+│  ┌──────────────────────────────────────────────────────────────────────────┐    │
+│  │  Firebase Auth                                                           │    │
+│  │  Method: Anonymous sign-in                                               │    │
+│  │  Purpose: Identify user for Firestore documents                          │    │
+│  └──────────────────────────────────────────────────────────────────────────┘    │
+│                                                                                  │
+│  ┌──────────────────────────────────────────────────────────────────────────┐    │
+│  │  Google Maps SDK                                                         │    │
+│  │  Auth: MAPS_API_KEY (manifest placeholder)                               │    │
+│  │  Services: Map tiles, markers, polylines, camera                         │    │
+│  │  Location: FusedLocationProviderClient (last known location)             │    │
+│  └──────────────────────────────────────────────────────────────────────────┘    │
+│                                                                                  │
+└──────────────────────────────────────────────────────────────────────────────────┘
 ```
 
 ### Chat Feature — Request/Response Flow
@@ -305,12 +271,12 @@ ChatViewModel.generateContent(prompt, imageUri?, documentUri?)
   ├─ Document? → withContext(IO) → read text content
   │
   ▼
-GenerateContentUseCase.invoke(prompt, imageBytes?, fileText?, analysisType?)
+AskAiUseCase.invoke(prompt, imageBytes?, fileText?, analysisType?)
   ├─ Validate: prompt not blank (unless attachment present)
   ├─ Validate: prompt ≤ 50K chars, fileText ≤ 100K chars
   │
   ▼
-GeminiRepositoryImpl.generateContent()
+ChatGeminiRepositoryImpl.getAiResponse()
   │
   ├─ Prepend system instruction ("AI Overlord" persona, max 42 words)
   ├─ Append file content if present

@@ -1,9 +1,5 @@
 package se.onemanstudio.playaroundwithai.feature.maps
 
-import android.app.Application
-import android.net.ConnectivityManager
-import android.net.Network
-import android.net.NetworkCapabilities
 import androidx.lifecycle.viewModelScope
 import com.google.android.gms.maps.model.LatLng
 import io.mockk.coEvery
@@ -23,17 +19,18 @@ import org.junit.Assert.assertTrue
 import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
-import se.onemanstudio.playaroundwithai.core.domain.feature.chat.repository.GeminiRepository
-import se.onemanstudio.playaroundwithai.core.domain.feature.config.model.ApiKeyAvailability
+import se.onemanstudio.playaroundwithai.core.config.model.ApiKeyAvailability
+import se.onemanstudio.playaroundwithai.feature.maps.domain.model.MapItem
+import se.onemanstudio.playaroundwithai.feature.maps.domain.model.VehicleType
+import se.onemanstudio.playaroundwithai.feature.maps.domain.repository.MapGeminiRepository
+import se.onemanstudio.playaroundwithai.feature.maps.domain.repository.MapRepository
+import se.onemanstudio.playaroundwithai.feature.maps.domain.usecase.GetMapItemsUseCase
+import se.onemanstudio.playaroundwithai.feature.maps.domain.usecase.GetSuggestedPlacesUseCase
 import se.onemanstudio.playaroundwithai.feature.maps.states.MapError
-import se.onemanstudio.playaroundwithai.core.domain.feature.map.model.VehicleType
-import se.onemanstudio.playaroundwithai.core.domain.feature.map.repository.MapRepository
-import se.onemanstudio.playaroundwithai.core.domain.feature.map.model.MapItem
-import se.onemanstudio.playaroundwithai.core.domain.feature.map.usecase.GetMapItemsUseCase
-import se.onemanstudio.playaroundwithai.core.domain.feature.map.usecase.GetSuggestedPlacesUseCase
 import se.onemanstudio.playaroundwithai.feature.maps.models.toUiModel
 import se.onemanstudio.playaroundwithai.feature.maps.states.MapUiState
 import se.onemanstudio.playaroundwithai.feature.maps.util.MainCoroutineRule
+import se.onemanstudio.playaroundwithai.feature.maps.util.NetworkMonitor
 
 @OptIn(ExperimentalCoroutinesApi::class)
 class MapViewModelTest {
@@ -42,19 +39,13 @@ class MapViewModelTest {
     val mainDispatcherRule = MainCoroutineRule(UnconfinedTestDispatcher())
 
     private val repository: MapRepository = mockk()
-    private val geminiRepository: GeminiRepository = mockk()
-    private val getSuggestedPlacesUseCase = GetSuggestedPlacesUseCase(geminiRepository)
-    private val application: Application = mockk(relaxed = true)
-    private val connectivityManager: ConnectivityManager = mockk()
-    private val network: Network = mockk()
-    private val networkCapabilities: NetworkCapabilities = mockk()
+    private val mapGeminiRepository: MapGeminiRepository = mockk()
+    private val getSuggestedPlacesUseCase = GetSuggestedPlacesUseCase(mapGeminiRepository)
+    private val networkMonitor: NetworkMonitor = mockk()
 
     @Before
     fun setup() {
-        every { application.getSystemService(ConnectivityManager::class.java) } returns connectivityManager
-        every { connectivityManager.activeNetwork } returns network
-        every { connectivityManager.getNetworkCapabilities(network) } returns networkCapabilities
-        every { networkCapabilities.hasCapability(NetworkCapabilities.NET_CAPABILITY_INTERNET) } returns true
+        every { networkMonitor.isNetworkAvailable() } returns true
     }
 
     // Test Data
@@ -293,7 +284,7 @@ class MapViewModelTest {
     private fun createViewModel(
         apiKeyAvailability: ApiKeyAvailability = ApiKeyAvailability(isGeminiKeyAvailable = true, isMapsKeyAvailable = true)
     ): MapViewModel {
-        return MapViewModel(GetMapItemsUseCase(repository), getSuggestedPlacesUseCase, apiKeyAvailability, application)
+        return MapViewModel(GetMapItemsUseCase(repository), getSuggestedPlacesUseCase, apiKeyAvailability, networkMonitor)
     }
 
     private fun captureStates(viewModel: MapViewModel): List<MapUiState> {

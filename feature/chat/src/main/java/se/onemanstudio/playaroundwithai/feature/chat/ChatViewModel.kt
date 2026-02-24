@@ -9,30 +9,28 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharedFlow
 import kotlinx.coroutines.flow.asSharedFlow
 import kotlinx.coroutines.flow.asStateFlow
-import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.filter
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
-import se.onemanstudio.playaroundwithai.core.domain.feature.auth.usecase.ObserveAuthReadyUseCase
-import se.onemanstudio.playaroundwithai.core.domain.feature.config.model.ApiKeyAvailability
-import se.onemanstudio.playaroundwithai.core.domain.feature.chat.model.Prompt
-import se.onemanstudio.playaroundwithai.core.domain.feature.chat.model.SyncStatus
-import se.onemanstudio.playaroundwithai.core.domain.feature.chat.usecase.AskAiUseCase
-import se.onemanstudio.playaroundwithai.core.domain.feature.chat.usecase.GetFailedSyncCountUseCase
-import se.onemanstudio.playaroundwithai.core.domain.feature.chat.usecase.GetPromptHistoryUseCase
-import se.onemanstudio.playaroundwithai.core.domain.feature.chat.usecase.GetSuggestionsUseCase
-import se.onemanstudio.playaroundwithai.core.domain.feature.chat.usecase.GetSyncStateUseCase
-import se.onemanstudio.playaroundwithai.core.domain.feature.chat.usecase.RetryPendingSyncsUseCase
-import se.onemanstudio.playaroundwithai.core.domain.feature.chat.usecase.SavePromptUseCase
-import se.onemanstudio.playaroundwithai.core.domain.feature.chat.usecase.UpdatePromptTextUseCase
+import se.onemanstudio.playaroundwithai.core.auth.usecase.ObserveAuthReadyUseCase
+import se.onemanstudio.playaroundwithai.core.config.model.ApiKeyAvailability
+import se.onemanstudio.playaroundwithai.feature.chat.domain.model.Prompt
+import se.onemanstudio.playaroundwithai.feature.chat.domain.model.SyncStatus
+import se.onemanstudio.playaroundwithai.feature.chat.domain.usecase.AskAiUseCase
+import se.onemanstudio.playaroundwithai.feature.chat.domain.usecase.GetFailedSyncCountUseCase
+import se.onemanstudio.playaroundwithai.feature.chat.domain.usecase.GetPromptHistoryUseCase
+import se.onemanstudio.playaroundwithai.feature.chat.domain.usecase.GetSuggestionsUseCase
+import se.onemanstudio.playaroundwithai.feature.chat.domain.usecase.GetSyncStateUseCase
+import se.onemanstudio.playaroundwithai.feature.chat.domain.usecase.RetryPendingSyncsUseCase
+import se.onemanstudio.playaroundwithai.feature.chat.domain.usecase.SavePromptUseCase
+import se.onemanstudio.playaroundwithai.feature.chat.domain.usecase.UpdatePromptTextUseCase
 import se.onemanstudio.playaroundwithai.feature.chat.models.Attachment
 import se.onemanstudio.playaroundwithai.feature.chat.models.SnackbarEvent
 import se.onemanstudio.playaroundwithai.feature.chat.states.ChatError
 import se.onemanstudio.playaroundwithai.feature.chat.states.ChatScreenState
 import se.onemanstudio.playaroundwithai.feature.chat.states.ChatUiState
 import se.onemanstudio.playaroundwithai.feature.chat.util.FileUtils
-import se.onemanstudio.playaroundwithai.feature.chat.util.ResourceProvider
 import timber.log.Timber
 import java.io.FileNotFoundException
 import java.io.IOException
@@ -53,7 +51,6 @@ class ChatViewModel @Inject constructor(
     private val observeAuthReadyUseCase: ObserveAuthReadyUseCase,
     private val apiKeyAvailability: ApiKeyAvailability,
     private val fileUtils: FileUtils,
-    private val resourceProvider: ResourceProvider
 ) : ViewModel() {
 
     private val _screenState = MutableStateFlow(ChatScreenState())
@@ -104,7 +101,6 @@ class ChatViewModel @Inject constructor(
     private fun observeSyncFailures() {
         viewModelScope.launch {
             getFailedSyncCountUseCase()
-                .distinctUntilChanged()
                 .filter { it > 0 }
                 .collect { count ->
                     _snackbarEvent.tryEmit(SnackbarEvent.SyncFailed(count))
@@ -120,7 +116,7 @@ class ChatViewModel @Inject constructor(
                     _screenState.update { it.copy(suggestions = topics) }
                 }
                 .onFailure {
-                    _screenState.update { it.copy(suggestions = resourceProvider.getFallbackSuggestions()) }
+                    _screenState.update { it.copy(useFallbackSuggestions = true) }
                 }
 
             _screenState.update { it.copy(isSuggestionsLoading = false) }
@@ -172,9 +168,7 @@ class ChatViewModel @Inject constructor(
                 )
             } catch (e: Exception) {
                 Timber.e(e, "ChatVM - Failed to save prompt to local DB")
-                _snackbarEvent.tryEmit(
-                    SnackbarEvent.LocalSaveFailed(resourceProvider.getLocalSaveFailedMessage())
-                )
+                _snackbarEvent.tryEmit(SnackbarEvent.LocalSaveFailed)
                 null
             }
 
@@ -191,9 +185,7 @@ class ChatViewModel @Inject constructor(
                         updatePromptTextUseCase(savedId, "Q: $prompt\nA: $responseText")
                     } catch (e: Exception) {
                         Timber.e(e, "ChatVM - Failed to update prompt text in local DB")
-                        _snackbarEvent.tryEmit(
-                            SnackbarEvent.LocalUpdateFailed(resourceProvider.getLocalUpdateFailedMessage())
-                        )
+                        _snackbarEvent.tryEmit(SnackbarEvent.LocalUpdateFailed)
                     }
                 }
             }.onFailure { exception ->

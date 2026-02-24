@@ -1,7 +1,7 @@
 package se.onemanstudio.playaroundwithai.feature.chat.models
 
 import android.net.Uri
-import se.onemanstudio.playaroundwithai.core.domain.feature.chat.model.AnalysisType
+import se.onemanstudio.playaroundwithai.feature.chat.domain.model.AnalysisType
 
 sealed class Attachment {
     data class Image(val uri: Uri, val analysisType: AnalysisType) : Attachment()

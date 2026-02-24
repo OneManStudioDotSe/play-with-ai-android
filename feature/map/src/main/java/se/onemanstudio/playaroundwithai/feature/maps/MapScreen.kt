@@ -81,8 +81,8 @@ import com.google.maps.android.compose.Polyline
 import com.google.maps.android.compose.rememberCameraPositionState
 import com.google.maps.android.compose.rememberUpdatedMarkerState
 import kotlinx.coroutines.launch
-import se.onemanstudio.playaroundwithai.core.domain.feature.map.model.SuggestedPlace
-import se.onemanstudio.playaroundwithai.core.domain.feature.map.model.VehicleType
+import se.onemanstudio.playaroundwithai.feature.maps.domain.model.SuggestedPlace
+import se.onemanstudio.playaroundwithai.feature.maps.domain.model.VehicleType
 import se.onemanstudio.playaroundwithai.core.ui.sofa.NeoBrutalButton
 import se.onemanstudio.playaroundwithai.core.ui.sofa.NeoBrutalCard
 import se.onemanstudio.playaroundwithai.core.ui.sofa.NeoBrutalIconButton
@@ -116,7 +116,11 @@ fun MapScreen(viewModel: MapViewModel = hiltViewModel()) {
     val scope = rememberCoroutineScope()
 
     val uiState by viewModel.uiState.collectAsState()
-    val currentLoadingMessage = uiState.loadingMessage
+    val currentLoadingMessage = if (uiState.loadingMessageResId != 0) {
+        stringResource(uiState.loadingMessageResId)
+    } else {
+        ""
+    }
 
     val stockholm = LatLng(STOCKHOLM_LAT, STOCKHOLM_LNG)
 

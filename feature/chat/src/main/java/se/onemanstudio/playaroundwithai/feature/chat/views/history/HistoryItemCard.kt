@@ -23,8 +23,8 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import se.onemanstudio.playaroundwithai.core.domain.feature.chat.model.Prompt
-import se.onemanstudio.playaroundwithai.core.domain.feature.chat.model.SyncStatus
+import se.onemanstudio.playaroundwithai.feature.chat.domain.model.Prompt
+import se.onemanstudio.playaroundwithai.feature.chat.domain.model.SyncStatus
 import se.onemanstudio.playaroundwithai.core.ui.sofa.NeoBrutalCard
 import se.onemanstudio.playaroundwithai.core.ui.theme.Dimensions
 import se.onemanstudio.playaroundwithai.core.ui.theme.SofaAiTheme

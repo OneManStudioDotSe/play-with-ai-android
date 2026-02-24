@@ -1,12 +1,13 @@
 package se.onemanstudio.playaroundwithai.feature.maps.states
 
+import androidx.annotation.StringRes
 import androidx.compose.runtime.Immutable
 import com.google.android.gms.maps.model.LatLng
 import kotlinx.collections.immutable.PersistentList
 import kotlinx.collections.immutable.persistentListOf
 import kotlinx.collections.immutable.persistentSetOf
-import se.onemanstudio.playaroundwithai.core.domain.feature.map.model.SuggestedPlace
-import se.onemanstudio.playaroundwithai.core.domain.feature.map.model.VehicleType
+import se.onemanstudio.playaroundwithai.feature.maps.domain.model.SuggestedPlace
+import se.onemanstudio.playaroundwithai.feature.maps.domain.model.VehicleType
 import se.onemanstudio.playaroundwithai.feature.maps.models.MapItemUiModel
 
 @Immutable
@@ -38,5 +39,5 @@ data class MapUiState(
     val suggestedPlaces: PersistentList<SuggestedPlace> = persistentListOf(),
     val focusedSuggestedPlace: SuggestedPlace? = null,
     val suggestedPlacesError: SuggestedPlacesError? = null,
-    val loadingMessage: String = ""
+    @StringRes val loadingMessageResId: Int = 0
 )
