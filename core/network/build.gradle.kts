@@ -8,6 +8,7 @@ plugins {
 
 android {
     namespace = "se.onemanstudio.playaroundwithai.core.network"
+
     compileSdk = libs.versions.compileSdk.get().toInt()
 
     defaultConfig {

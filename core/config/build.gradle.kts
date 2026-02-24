@@ -31,6 +31,7 @@ val mapsApiKey = localProperties.getProperty("MAPS_API_KEY")
 
 android {
     namespace = "se.onemanstudio.playaroundwithai.core.config"
+
     compileSdk = libs.versions.compileSdk.get().toInt()
 
     defaultConfig {

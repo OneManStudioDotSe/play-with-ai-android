@@ -7,17 +7,11 @@ plugins {
 
 android {
     namespace = "se.onemanstudio.playaroundwithai.core.ui.theme"
+
     compileSdk = libs.versions.compileSdk.get().toInt()
 
     defaultConfig {
         minSdk = libs.versions.minSdk.get().toInt()
-    }
-
-    buildTypes {
-        release {
-            isMinifyEnabled = false
-            proguardFiles(getDefaultProguardFile("proguard-android-optimize.txt"), "proguard-rules.pro")
-        }
     }
 
     packaging {
