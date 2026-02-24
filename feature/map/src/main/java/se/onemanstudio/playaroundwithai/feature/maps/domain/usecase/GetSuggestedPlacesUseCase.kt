@@ -1,6 +1,5 @@
 package se.onemanstudio.playaroundwithai.feature.maps.domain.usecase
 
-import se.onemanstudio.playaroundwithai.core.network.model.GeminiModel
 import se.onemanstudio.playaroundwithai.feature.maps.domain.model.SuggestedPlace
 import se.onemanstudio.playaroundwithai.feature.maps.domain.repository.MapGeminiRepository
 import javax.inject.Inject
@@ -14,7 +13,6 @@ class GetSuggestedPlacesUseCase @Inject constructor(
     suspend operator fun invoke(
         latitude: Double,
         longitude: Double,
-        model: GeminiModel = GeminiModel.FLASH_PREVIEW,
     ): Result<List<SuggestedPlace>> {
         if (latitude !in -MAX_LATITUDE..MAX_LATITUDE || longitude !in -MAX_LONGITUDE..MAX_LONGITUDE) {
             val message = when {
@@ -24,6 +22,6 @@ class GetSuggestedPlacesUseCase @Inject constructor(
             return Result.failure(IllegalArgumentException(message))
         }
 
-        return mapGeminiRepository.getSuggestedPlaces(latitude, longitude, model)
+        return mapGeminiRepository.getSuggestedPlaces(latitude, longitude)
     }
 }

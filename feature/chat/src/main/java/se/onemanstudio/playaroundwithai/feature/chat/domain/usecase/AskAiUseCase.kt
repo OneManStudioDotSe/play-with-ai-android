@@ -1,6 +1,5 @@
 package se.onemanstudio.playaroundwithai.feature.chat.domain.usecase
 
-import se.onemanstudio.playaroundwithai.core.network.model.GeminiModel
 import se.onemanstudio.playaroundwithai.feature.chat.domain.model.AnalysisType
 import se.onemanstudio.playaroundwithai.feature.chat.domain.repository.ChatGeminiRepository
 import javax.inject.Inject
@@ -17,7 +16,6 @@ class AskAiUseCase @Inject constructor(
         imageBytes: ByteArray? = null,
         fileText: String? = null,
         analysisType: AnalysisType? = null,
-        model: GeminiModel = GeminiModel.FLASH_PREVIEW,
     ): Result<String> {
         if (prompt.isBlank() && imageBytes == null && fileText == null) {
             return Result.failure(IllegalArgumentException("Prompt and attachments cannot all be empty"))
@@ -31,6 +29,6 @@ class AskAiUseCase @Inject constructor(
             return Result.failure(IllegalArgumentException("File content exceeds maximum length of $MAX_FILE_TEXT_LENGTH characters"))
         }
 
-        return repository.getAiResponse(prompt, imageBytes, fileText, analysisType, model)
+        return repository.getAiResponse(prompt, imageBytes, fileText, analysisType)
     }
 }

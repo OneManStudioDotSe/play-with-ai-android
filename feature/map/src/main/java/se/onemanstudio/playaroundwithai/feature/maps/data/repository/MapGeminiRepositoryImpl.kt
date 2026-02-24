@@ -14,7 +14,6 @@ import se.onemanstudio.playaroundwithai.core.network.api.GeminiApiService
 import se.onemanstudio.playaroundwithai.core.network.dto.Content
 import se.onemanstudio.playaroundwithai.core.network.dto.GeminiRequest
 import se.onemanstudio.playaroundwithai.core.network.dto.Part
-import se.onemanstudio.playaroundwithai.core.network.model.GeminiModel
 import timber.log.Timber
 import javax.inject.Inject
 import javax.inject.Singleton
@@ -30,7 +29,6 @@ class MapGeminiRepositoryImpl @Inject constructor(
     override suspend fun getSuggestedPlaces(
         latitude: Double,
         longitude: Double,
-        model: GeminiModel,
     ): Result<List<SuggestedPlace>> = withContext(Dispatchers.IO) {
         try {
             Timber.d("Gemini - Getting suggested places for lat=$latitude, lng=$longitude")
@@ -38,7 +36,7 @@ class MapGeminiRepositoryImpl @Inject constructor(
             val prompt = buildSuggestedPlacesPrompt(latitude, longitude)
             val parts = listOf(Part(text = prompt))
             val request = GeminiRequest(contents = listOf(Content(parts = parts)))
-            val response = apiService.generateContent(model.id, request)
+            val response = apiService.generateContent(request)
 
             val rawText = response.extractText() ?: ""
             if (rawText.isBlank()) {

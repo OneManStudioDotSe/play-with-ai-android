@@ -14,7 +14,6 @@ import se.onemanstudio.playaroundwithai.core.network.dto.Content
 import se.onemanstudio.playaroundwithai.core.network.dto.GeminiRequest
 import se.onemanstudio.playaroundwithai.core.network.dto.ImageData
 import se.onemanstudio.playaroundwithai.core.network.dto.Part
-import se.onemanstudio.playaroundwithai.core.network.model.GeminiModel
 import se.onemanstudio.playaroundwithai.feature.chat.domain.model.AnalysisType
 import se.onemanstudio.playaroundwithai.feature.chat.domain.repository.ChatGeminiRepository
 import timber.log.Timber
@@ -44,7 +43,6 @@ class ChatGeminiRepositoryImpl @Inject constructor(
         imageBytes: ByteArray?,
         fileText: String?,
         analysisType: AnalysisType?,
-        model: GeminiModel,
     ): Result<String> = withContext(Dispatchers.IO) {
         try {
             Timber.d("Gemini - Generating content for a prompt with length ${prompt.length} characters, hasImage: " +
@@ -71,8 +69,8 @@ class ChatGeminiRepositoryImpl @Inject constructor(
             }
 
             val request = GeminiRequest(contents = listOf(Content(parts = parts)))
-            Timber.d("Gemini - Sending request to Gemini API (model=${model.id}) with ${parts.size} parts...")
-            val response = apiService.generateContent(model.id, request)
+            Timber.d("Gemini - Sending request to Gemini API with ${parts.size} parts...")
+            val response = apiService.generateContent(request)
             val text = response.extractText() ?: "No response text found."
             Timber.d("Gemini - API response received (and it is ${text.length} chars)")
             Result.success(text)
@@ -88,7 +86,7 @@ class ChatGeminiRepositoryImpl @Inject constructor(
         }
     }
 
-    override suspend fun generateConversationStarters(model: GeminiModel): Result<List<String>> = withContext(Dispatchers.IO) {
+    override suspend fun generateConversationStarters(): Result<List<String>> = withContext(Dispatchers.IO) {
         try {
             Timber.d("Gemini - Generating conversation starters from API...")
 
@@ -101,7 +99,7 @@ class ChatGeminiRepositoryImpl @Inject constructor(
 
             val parts = listOf(Part(text = suggestionPrompt))
             val request = GeminiRequest(contents = listOf(Content(parts = parts)))
-            val response = apiService.generateContent(model.id, request)
+            val response = apiService.generateContent(request)
 
             val text = response.extractText() ?: ""
             val suggestions = text.split("|").map { it.trim() }.filter { it.isNotEmpty() }

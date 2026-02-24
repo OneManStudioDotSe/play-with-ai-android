@@ -6,7 +6,6 @@ import io.mockk.mockk
 import kotlinx.coroutines.test.runTest
 import org.junit.Before
 import org.junit.Test
-import se.onemanstudio.playaroundwithai.core.network.model.GeminiModel
 import se.onemanstudio.playaroundwithai.feature.maps.domain.model.SuggestedPlace
 import se.onemanstudio.playaroundwithai.feature.maps.domain.repository.MapGeminiRepository
 
@@ -33,7 +32,7 @@ class GetSuggestedPlacesUseCaseTest {
                 description = "Maritime museum with a 17th-century warship", category = "Museum"
             )
         )
-        coEvery { mapGeminiRepository.getSuggestedPlaces(59.3293, 18.0686, GeminiModel.FLASH_PREVIEW) } returns Result.success(expectedPlaces)
+        coEvery { mapGeminiRepository.getSuggestedPlaces(59.3293, 18.0686) } returns Result.success(expectedPlaces)
 
         val result = useCase(latitude = 59.3293, longitude = 18.0686)
 
@@ -83,7 +82,7 @@ class GetSuggestedPlacesUseCaseTest {
     @Test
     fun `invoke when repository fails propagates failure`() = runTest {
         val expectedException = RuntimeException("API request failed")
-        coEvery { mapGeminiRepository.getSuggestedPlaces(59.3293, 18.0686, GeminiModel.FLASH_PREVIEW) } returns Result.failure(expectedException)
+        coEvery { mapGeminiRepository.getSuggestedPlaces(59.3293, 18.0686) } returns Result.failure(expectedException)
 
         val result = useCase(latitude = 59.3293, longitude = 18.0686)
 

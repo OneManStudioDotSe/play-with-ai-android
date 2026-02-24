@@ -3,6 +3,9 @@ package se.onemanstudio.playaroundwithai.feature.chat.di
 import android.content.Context
 import androidx.room.Room
 import androidx.work.WorkManager
+import com.google.firebase.Firebase
+import com.google.firebase.firestore.FirebaseFirestore
+import com.google.firebase.firestore.firestore
 import dagger.Binds
 import dagger.Module
 import dagger.Provides
@@ -41,6 +44,10 @@ object ChatDataModule {
     fun provideWorkManager(@ApplicationContext context: Context): WorkManager {
         return WorkManager.getInstance(context)
     }
+
+    @Provides
+    @Singleton
+    fun provideFirestore(): FirebaseFirestore = Firebase.firestore
 }
 
 @Module

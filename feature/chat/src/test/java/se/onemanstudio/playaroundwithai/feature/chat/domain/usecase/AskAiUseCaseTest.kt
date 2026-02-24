@@ -7,7 +7,6 @@ import io.mockk.mockk
 import kotlinx.coroutines.test.runTest
 import org.junit.Before
 import org.junit.Test
-import se.onemanstudio.playaroundwithai.core.network.model.GeminiModel
 import se.onemanstudio.playaroundwithai.feature.chat.domain.repository.ChatGeminiRepository
 
 class AskAiUseCaseTest {
@@ -27,7 +26,7 @@ class AskAiUseCaseTest {
         val prompt = "Tell me a joke"
         val expectedResponse = "Why did the chicken cross the road?"
         coEvery {
-            geminiRepository.getAiResponse(prompt, null, null, null, GeminiModel.FLASH_PREVIEW)
+            geminiRepository.getAiResponse(prompt, null, null, null)
         } returns Result.success(expectedResponse)
 
         // WHEN
@@ -36,7 +35,7 @@ class AskAiUseCaseTest {
         // THEN
         assertThat(result.isSuccess).isTrue()
         assertThat(result.getOrThrow()).isEqualTo(expectedResponse)
-        coVerify(exactly = 1) { geminiRepository.getAiResponse(prompt, null, null, null, GeminiModel.FLASH_PREVIEW) }
+        coVerify(exactly = 1) { geminiRepository.getAiResponse(prompt, null, null, null) }
     }
 
     @Test
@@ -58,7 +57,7 @@ class AskAiUseCaseTest {
         // GIVEN: A blank prompt but with image bytes attached
         val imageBytes = byteArrayOf(1, 2, 3)
         coEvery {
-            geminiRepository.getAiResponse("", imageBytes, null, null, GeminiModel.FLASH_PREVIEW)
+            geminiRepository.getAiResponse("", imageBytes, null, null)
         } returns Result.success("Image analysis result")
 
         // WHEN
@@ -67,7 +66,7 @@ class AskAiUseCaseTest {
         // THEN
         assertThat(result.isSuccess).isTrue()
         assertThat(result.getOrThrow()).isEqualTo("Image analysis result")
-        coVerify(exactly = 1) { geminiRepository.getAiResponse("", imageBytes, null, null, GeminiModel.FLASH_PREVIEW) }
+        coVerify(exactly = 1) { geminiRepository.getAiResponse("", imageBytes, null, null) }
     }
 
     @Test
@@ -75,7 +74,7 @@ class AskAiUseCaseTest {
         // GIVEN: A blank prompt but with file text attached
         val fileText = "Some document content"
         coEvery {
-            geminiRepository.getAiResponse("", null, fileText, null, GeminiModel.FLASH_PREVIEW)
+            geminiRepository.getAiResponse("", null, fileText, null)
         } returns Result.success("File analysis result")
 
         // WHEN
@@ -84,7 +83,7 @@ class AskAiUseCaseTest {
         // THEN
         assertThat(result.isSuccess).isTrue()
         assertThat(result.getOrThrow()).isEqualTo("File analysis result")
-        coVerify(exactly = 1) { geminiRepository.getAiResponse("", null, fileText, null, GeminiModel.FLASH_PREVIEW) }
+        coVerify(exactly = 1) { geminiRepository.getAiResponse("", null, fileText, null) }
     }
 
     @Test
@@ -125,7 +124,7 @@ class AskAiUseCaseTest {
         val prompt = "Tell me a joke"
         val expectedException = RuntimeException("API error")
         coEvery {
-            geminiRepository.getAiResponse(prompt, null, null, null, GeminiModel.FLASH_PREVIEW)
+            geminiRepository.getAiResponse(prompt, null, null, null)
         } returns Result.failure(expectedException)
 
         // WHEN
