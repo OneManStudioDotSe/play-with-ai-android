@@ -1,18 +1,13 @@
 package se.onemanstudio.playaroundwithai.feature.chat.util
 
 import android.content.Context
-import android.graphics.Bitmap
-import android.graphics.ImageDecoder
 import android.net.Uri
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 import timber.log.Timber
-import java.io.ByteArrayOutputStream
 import java.io.FileNotFoundException
 import java.io.IOException
 import javax.inject.Inject
-
-private const val JPEG_QUALITY = 100
 
 class FileUtils @Inject constructor(
     private val context: Context
@@ -30,7 +25,6 @@ class FileUtils @Inject constructor(
         }
     }
 
-    @Throws(IOException::class, SecurityException::class)
     private fun readTextFromUri(uri: Uri): String {
         return context.contentResolver.openInputStream(uri)?.use { inputStream ->
             inputStream.bufferedReader().use { reader ->
@@ -39,17 +33,14 @@ class FileUtils @Inject constructor(
         } ?: throw FileNotFoundException("Could not open input stream for URI: $uri")
     }
 
-    suspend fun uriToByteArray(uri: Uri): ByteArray? = withContext(Dispatchers.Default) {
+    suspend fun uriToByteArray(uri: Uri): ByteArray? = withContext(Dispatchers.IO) {
         try {
-            val bitmap = ImageDecoder.decodeBitmap(ImageDecoder.createSource(context.contentResolver, uri))
-            val bos = ByteArrayOutputStream()
-            bitmap.compress(Bitmap.CompressFormat.JPEG, JPEG_QUALITY, bos)
-            bos.toByteArray()
+            context.contentResolver.openInputStream(uri)?.use { it.readBytes() }
         } catch (e: IOException) {
-            Timber.d("Error decoding image: ${e.message}")
+            Timber.d("Error reading image: ${e.message}")
             null
         } catch (e: SecurityException) {
-            Timber.d("Security exception decoding image: ${e.message}")
+            Timber.d("Security exception reading image: ${e.message}")
             null
         }
     }
