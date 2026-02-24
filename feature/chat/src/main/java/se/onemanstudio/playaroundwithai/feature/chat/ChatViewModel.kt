@@ -7,14 +7,11 @@ import kotlinx.coroutines.channels.BufferOverflow
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharedFlow
-import kotlinx.coroutines.flow.SharingStarted
-import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asSharedFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.filter
 import kotlinx.coroutines.flow.first
-import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import se.onemanstudio.playaroundwithai.core.domain.feature.auth.usecase.ObserveAuthReadyUseCase
@@ -32,6 +29,7 @@ import se.onemanstudio.playaroundwithai.core.domain.feature.chat.usecase.UpdateP
 import se.onemanstudio.playaroundwithai.feature.chat.models.Attachment
 import se.onemanstudio.playaroundwithai.feature.chat.models.SnackbarEvent
 import se.onemanstudio.playaroundwithai.feature.chat.states.ChatError
+import se.onemanstudio.playaroundwithai.feature.chat.states.ChatScreenState
 import se.onemanstudio.playaroundwithai.feature.chat.states.ChatUiState
 import se.onemanstudio.playaroundwithai.feature.chat.util.FileUtils
 import se.onemanstudio.playaroundwithai.feature.chat.util.ResourceProvider
@@ -41,15 +39,13 @@ import java.io.IOException
 import java.time.Instant
 import javax.inject.Inject
 
-private const val SUBSCRIBE_TIMEOUT = 5000L
-
-@Suppress("CanBeParameter", "LongParameterList", "TooManyFunctions")
+@Suppress("LongParameterList")
 @HiltViewModel
 class ChatViewModel @Inject constructor(
     private val askAiUseCase: AskAiUseCase,
     private val getSuggestionsUseCase: GetSuggestionsUseCase,
-    private val getPromptHistoryUseCase: GetPromptHistoryUseCase,
-    private val getSyncStateUseCase: GetSyncStateUseCase,
+    getPromptHistoryUseCase: GetPromptHistoryUseCase,
+    getSyncStateUseCase: GetSyncStateUseCase,
     private val getFailedSyncCountUseCase: GetFailedSyncCountUseCase,
     private val savePromptUseCase: SavePromptUseCase,
     private val updatePromptTextUseCase: UpdatePromptTextUseCase,
@@ -59,14 +55,9 @@ class ChatViewModel @Inject constructor(
     private val fileUtils: FileUtils,
     private val resourceProvider: ResourceProvider
 ) : ViewModel() {
-    private val _suggestions = MutableStateFlow<List<String>>(emptyList())
-    val suggestions = _suggestions.asStateFlow()
 
-    private val _isSuggestionsLoading = MutableStateFlow(false)
-    val isSuggestionsLoading = _isSuggestionsLoading.asStateFlow()
-
-    private val _uiState = MutableStateFlow<ChatUiState>(ChatUiState.Initial)
-    val uiState = _uiState.asStateFlow()
+    private val _screenState = MutableStateFlow(ChatScreenState())
+    val screenState = _screenState.asStateFlow()
 
     private val _snackbarEvent = MutableSharedFlow<SnackbarEvent>(
         replay = 0,
@@ -75,26 +66,31 @@ class ChatViewModel @Inject constructor(
     )
     val snackbarEvent: SharedFlow<SnackbarEvent> = _snackbarEvent.asSharedFlow()
 
-    val promptHistory: StateFlow<List<Prompt>> = getPromptHistoryUseCase()
-        .stateIn(
-            scope = viewModelScope,
-            started = SharingStarted.WhileSubscribed(SUBSCRIBE_TIMEOUT),
-            initialValue = emptyList()
-        )
-
-    val isSyncing: StateFlow<Boolean> = getSyncStateUseCase()
-        .stateIn(
-            scope = viewModelScope,
-            started = SharingStarted.WhileSubscribed(SUBSCRIBE_TIMEOUT),
-            initialValue = false
-        )
-
     init {
         if (!apiKeyAvailability.isGeminiKeyAvailable) {
-            _uiState.update { ChatUiState.Error(ChatError.ApiKeyMissing) }
+            _screenState.update { it.copy(chatState = ChatUiState.Error(ChatError.ApiKeyMissing)) }
         } else {
             loadSuggestionsAfterAuth()
             observeSyncFailures()
+        }
+
+        observePromptHistory(getPromptHistoryUseCase)
+        observeSyncState(getSyncStateUseCase)
+    }
+
+    private fun observePromptHistory(getPromptHistoryUseCase: GetPromptHistoryUseCase) {
+        viewModelScope.launch {
+            getPromptHistoryUseCase().collect { history ->
+                _screenState.update { it.copy(promptHistory = history) }
+            }
+        }
+    }
+
+    private fun observeSyncState(getSyncStateUseCase: GetSyncStateUseCase) {
+        viewModelScope.launch {
+            getSyncStateUseCase().collect { syncing ->
+                _screenState.update { it.copy(isSyncing = syncing) }
+            }
         }
     }
 
@@ -118,42 +114,38 @@ class ChatViewModel @Inject constructor(
 
     private fun loadSuggestions() {
         viewModelScope.launch {
-            _isSuggestionsLoading.update { true }
+            _screenState.update { it.copy(isSuggestionsLoading = true) }
             getSuggestionsUseCase()
                 .onSuccess { topics ->
-                    _suggestions.update { topics }
+                    _screenState.update { it.copy(suggestions = topics) }
                 }
                 .onFailure {
-                    // Fallback to static ones if API fails
-                    _suggestions.update { resourceProvider.getFallbackSuggestions() }
+                    _screenState.update { it.copy(suggestions = resourceProvider.getFallbackSuggestions()) }
                 }
 
-            _isSuggestionsLoading.update { false }
+            _screenState.update { it.copy(isSuggestionsLoading = false) }
         }
     }
 
     @Suppress("TooGenericExceptionCaught", "LongMethod")
     fun sendPrompt(prompt: String, attachment: Attachment?) {
         if (!apiKeyAvailability.isGeminiKeyAvailable) {
-            _uiState.update { ChatUiState.Error(ChatError.ApiKeyMissing) }
+            _screenState.update { it.copy(chatState = ChatUiState.Error(ChatError.ApiKeyMissing)) }
             return
         }
 
-        _uiState.update { ChatUiState.Loading }
+        _screenState.update { it.copy(chatState = ChatUiState.Loading) }
 
         viewModelScope.launch {
-            // see if we have something attached (decode/compress off main thread)
             val imageBytes = (attachment as? Attachment.Image)?.uri?.let {
                 fileUtils.uriToByteArray(it)
             }
             val analysisType = (attachment as? Attachment.Image)?.analysisType
 
-            // read attached stuff
             val fileResult = (attachment as? Attachment.Document)?.uri?.let {
                 fileUtils.extractFileContent(it)
             }
 
-            // fail directly if something is off
             if (fileResult != null && fileResult.isFailure) {
                 val error = when (fileResult.exceptionOrNull()) {
                     is FileNotFoundException -> ChatError.FileNotFound
@@ -161,14 +153,13 @@ class ChatViewModel @Inject constructor(
                     else -> ChatError.FileRead
                 }
 
-                _uiState.update { ChatUiState.Error(error) }
+                _screenState.update { it.copy(chatState = ChatUiState.Error(error)) }
 
                 return@launch
             }
 
             val fileText = fileResult?.getOrNull()
 
-            // Save question to local DB immediately (before calling the API)
             val savedId = try {
                 savePromptUseCase(
                     Prompt(
@@ -193,9 +184,8 @@ class ChatViewModel @Inject constructor(
                 fileText = fileText,
                 analysisType = analysisType,
             ).onSuccess { responseText ->
-                _uiState.update { ChatUiState.Success(responseText) }
+                _screenState.update { it.copy(chatState = ChatUiState.Success(responseText)) }
 
-                // Update the saved entry with the full Q&A text
                 if (savedId != null) {
                     try {
                         updatePromptTextUseCase(savedId, "Q: $prompt\nA: $responseText")
@@ -213,7 +203,7 @@ class ChatViewModel @Inject constructor(
                     else -> ChatError.Unknown(exception.localizedMessage)
                 }
 
-                _uiState.update { ChatUiState.Error(error) }
+                _screenState.update { it.copy(chatState = ChatUiState.Error(error)) }
             }
         }
     }
@@ -225,10 +215,10 @@ class ChatViewModel @Inject constructor(
     }
 
     fun restoreAnswer(answer: String) {
-        _uiState.update { ChatUiState.Success(answer) }
+        _screenState.update { it.copy(chatState = ChatUiState.Success(answer)) }
     }
 
     fun clearResponse() {
-        _uiState.update { ChatUiState.Initial }
+        _screenState.update { it.copy(chatState = ChatUiState.Initial) }
     }
 }

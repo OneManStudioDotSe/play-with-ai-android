@@ -80,15 +80,17 @@ import se.onemanstudio.playaroundwithai.feature.chat.views.history.HistoryBottom
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun ChatScreen(viewModel: ChatViewModel = hiltViewModel()) {
-    val uiState by viewModel.uiState.collectAsStateWithLifecycle()
-    val suggestions by viewModel.suggestions.collectAsStateWithLifecycle()
-    val isSuggestionsLoading by viewModel.isSuggestionsLoading.collectAsStateWithLifecycle()
+    val screenState by viewModel.screenState.collectAsStateWithLifecycle()
+    val uiState = screenState.chatState
+    val suggestions = screenState.suggestions
+    val isSuggestionsLoading = screenState.isSuggestionsLoading
+    val history = screenState.promptHistory
+    val isSyncing = screenState.isSyncing
+
     var textState by remember { mutableStateOf(TextFieldValue("")) }
     val keyboardController = LocalSoftwareKeyboardController.current
 
     var isSheetOpen by remember { mutableStateOf(false) }
-    val history by viewModel.promptHistory.collectAsStateWithLifecycle()
-    val isSyncing by viewModel.isSyncing.collectAsStateWithLifecycle()
 
     var inputMode by remember { mutableStateOf(InputMode.TEXT) }
     var selectedImageUri by remember { mutableStateOf<Uri?>(null) }

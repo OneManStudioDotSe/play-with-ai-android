@@ -10,6 +10,7 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.flow.launchIn
+import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.test.UnconfinedTestDispatcher
 import kotlinx.coroutines.test.advanceUntilIdle
@@ -50,7 +51,8 @@ class ChatViewModelTest {
         val states = mutableListOf<ChatUiState>()
 
         // When
-        viewModel.uiState
+        viewModel.screenState
+            .map { it.chatState }
             .onEach { states.add(it) }
             .launchIn(CoroutineScope(UnconfinedTestDispatcher(testScheduler)))
         advanceUntilIdle()
@@ -70,7 +72,8 @@ class ChatViewModelTest {
         val states = mutableListOf<ChatUiState>()
 
         // When
-        viewModel.uiState
+        viewModel.screenState
+            .map { it.chatState }
             .onEach { states.add(it) }
             .launchIn(CoroutineScope(UnconfinedTestDispatcher(testScheduler)))
         viewModel.sendPrompt(prompt, null)
@@ -94,7 +97,8 @@ class ChatViewModelTest {
         val states = mutableListOf<ChatUiState>()
 
         // When
-        viewModel.uiState
+        viewModel.screenState
+            .map { it.chatState }
             .onEach { states.add(it) }
             .launchIn(CoroutineScope(UnconfinedTestDispatcher(testScheduler)))
         viewModel.sendPrompt(prompt, null)
@@ -118,7 +122,8 @@ class ChatViewModelTest {
         val states = mutableListOf<ChatUiState>()
 
         // When
-        viewModel.uiState
+        viewModel.screenState
+            .map { it.chatState }
             .onEach { states.add(it) }
             .launchIn(CoroutineScope(UnconfinedTestDispatcher(testScheduler)))
         viewModel.sendPrompt(prompt, null)
@@ -140,11 +145,10 @@ class ChatViewModelTest {
         )
 
         // When
-        // (Init happens automatically on creation)
-        advanceUntilIdle() // Ensure coroutine in init block finishes
+        advanceUntilIdle()
 
         // Then
-        assertEquals(expectedSuggestions, viewModel.suggestions.value)
+        assertEquals(expectedSuggestions, viewModel.screenState.value.suggestions)
     }
 
     @Test
@@ -159,8 +163,8 @@ class ChatViewModelTest {
         // When
         advanceUntilIdle()
 
-        // Then - application.getString() returns "" for relaxed mock, so we get 3 empty strings
-        assertEquals(3, viewModel.suggestions.value.size)
+        // Then - resourceProvider.getFallbackSuggestions() returns emptyList for relaxed mock
+        assertEquals(3, viewModel.screenState.value.suggestions.size)
     }
 
     @Test
@@ -170,7 +174,8 @@ class ChatViewModelTest {
 
         // When
         val states = mutableListOf<Boolean>()
-        viewModel.isSyncing
+        viewModel.screenState
+            .map { it.isSyncing }
             .onEach { states.add(it) }
             .launchIn(CoroutineScope(UnconfinedTestDispatcher(testScheduler)))
         advanceUntilIdle()
@@ -186,7 +191,8 @@ class ChatViewModelTest {
 
         // When
         val states = mutableListOf<Boolean>()
-        viewModel.isSyncing
+        viewModel.screenState
+            .map { it.isSyncing }
             .onEach { states.add(it) }
             .launchIn(CoroutineScope(UnconfinedTestDispatcher(testScheduler)))
         advanceUntilIdle()
@@ -305,7 +311,8 @@ class ChatViewModelTest {
         val states = mutableListOf<ChatUiState>()
 
         // When
-        viewModel.uiState
+        viewModel.screenState
+            .map { it.chatState }
             .onEach { states.add(it) }
             .launchIn(CoroutineScope(UnconfinedTestDispatcher(testScheduler)))
         advanceUntilIdle()
@@ -324,7 +331,8 @@ class ChatViewModelTest {
         val states = mutableListOf<ChatUiState>()
 
         // When
-        viewModel.uiState
+        viewModel.screenState
+            .map { it.chatState }
             .onEach { states.add(it) }
             .launchIn(CoroutineScope(UnconfinedTestDispatcher(testScheduler)))
         viewModel.sendPrompt("test", null)
