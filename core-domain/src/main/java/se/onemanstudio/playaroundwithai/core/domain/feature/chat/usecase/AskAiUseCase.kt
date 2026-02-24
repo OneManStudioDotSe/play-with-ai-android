@@ -8,7 +8,7 @@ import javax.inject.Inject
 internal const val MAX_PROMPT_LENGTH = 50_000
 internal const val MAX_FILE_TEXT_LENGTH = 100_000
 
-class GenerateContentUseCase @Inject constructor(
+class AskAiUseCase @Inject constructor(
     private val repository: GeminiRepository
 ) {
     @Suppress("ReturnCount")
@@ -31,6 +31,6 @@ class GenerateContentUseCase @Inject constructor(
             return Result.failure(IllegalArgumentException("File content exceeds maximum length of $MAX_FILE_TEXT_LENGTH characters"))
         }
 
-        return repository.generateContent(prompt, imageBytes, fileText, analysisType, model)
+        return repository.getAiResponse(prompt, imageBytes, fileText, analysisType, model)
     }
 }

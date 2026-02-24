@@ -1,6 +1,5 @@
 package se.onemanstudio.playaroundwithai.feature.chat
 
-import android.app.Application
 import io.mockk.coEvery
 import io.mockk.coVerify
 import io.mockk.every
@@ -20,7 +19,7 @@ import org.junit.Test
 import se.onemanstudio.playaroundwithai.core.domain.feature.chat.model.Prompt
 import se.onemanstudio.playaroundwithai.core.domain.feature.chat.repository.GeminiRepository
 import se.onemanstudio.playaroundwithai.core.domain.feature.chat.repository.PromptRepository
-import se.onemanstudio.playaroundwithai.core.domain.feature.chat.usecase.GenerateContentUseCase
+import se.onemanstudio.playaroundwithai.core.domain.feature.chat.usecase.AskAiUseCase
 import se.onemanstudio.playaroundwithai.core.domain.feature.chat.usecase.GetFailedSyncCountUseCase
 import se.onemanstudio.playaroundwithai.core.domain.feature.chat.usecase.GetPromptHistoryUseCase
 import se.onemanstudio.playaroundwithai.core.domain.feature.chat.usecase.GetSuggestionsUseCase
@@ -35,6 +34,7 @@ import se.onemanstudio.playaroundwithai.feature.chat.states.ChatError
 import se.onemanstudio.playaroundwithai.feature.chat.states.ChatUiState
 import se.onemanstudio.playaroundwithai.feature.chat.util.FileUtils
 import se.onemanstudio.playaroundwithai.feature.chat.util.MainCoroutineRule
+import se.onemanstudio.playaroundwithai.feature.chat.util.ResourceProvider
 import java.io.IOException
 import kotlin.test.assertEquals
 
@@ -61,7 +61,7 @@ class ChatViewModelTest {
     }
 
     @Test
-    fun `generateContent success updates state to Success`() = runTest {
+    fun `sendPrompt success updates state to Success`() = runTest {
         // Given
         val prompt = "What is the meaning of life?"
         val viewModel = createViewModel(
@@ -73,7 +73,7 @@ class ChatViewModelTest {
         viewModel.uiState
             .onEach { states.add(it) }
             .launchIn(CoroutineScope(UnconfinedTestDispatcher(testScheduler)))
-        viewModel.generateContent(prompt, null)
+        viewModel.sendPrompt(prompt, null)
         advanceUntilIdle()
 
         // Then
@@ -84,7 +84,7 @@ class ChatViewModelTest {
     }
 
     @Test
-    fun `generateContent failure updates state to unknown error`() = runTest {
+    fun `sendPrompt failure updates state to unknown error`() = runTest {
         // Given
         val prompt = "What is the meaning of life?"
         val exception = RuntimeException("Test error")
@@ -97,7 +97,7 @@ class ChatViewModelTest {
         viewModel.uiState
             .onEach { states.add(it) }
             .launchIn(CoroutineScope(UnconfinedTestDispatcher(testScheduler)))
-        viewModel.generateContent(prompt, null)
+        viewModel.sendPrompt(prompt, null)
         advanceUntilIdle()
 
         // Then
@@ -108,7 +108,7 @@ class ChatViewModelTest {
     }
 
     @Test
-    fun `generateContent network failure updates state to Network Error`() = runTest {
+    fun `sendPrompt network failure updates state to Network Error`() = runTest {
         // Given
         val prompt = "Prompt that will be used for testing network errors"
         val exception = IOException("Oh no, no internet!")
@@ -121,7 +121,7 @@ class ChatViewModelTest {
         viewModel.uiState
             .onEach { states.add(it) }
             .launchIn(CoroutineScope(UnconfinedTestDispatcher(testScheduler)))
-        viewModel.generateContent(prompt, null)
+        viewModel.sendPrompt(prompt, null)
         advanceUntilIdle()
 
         // Then
@@ -196,7 +196,7 @@ class ChatViewModelTest {
     }
 
     @Test
-    fun `generateContent saves question first then updates with response`() = runTest {
+    fun `sendPrompt saves question first then updates with response`() = runTest {
         // Given
         val prompt = "Test question"
         val response = "Test response"
@@ -213,7 +213,7 @@ class ChatViewModelTest {
         )
 
         // When
-        viewModel.generateContent(prompt, null)
+        viewModel.sendPrompt(prompt, null)
         advanceUntilIdle()
 
         // Then
@@ -222,7 +222,7 @@ class ChatViewModelTest {
     }
 
     @Test
-    fun `generateContent emits LocalSaveFailed when save throws`() = runTest {
+    fun `sendPrompt emits LocalSaveFailed when save throws`() = runTest {
         // Given
         val prompt = "Test question"
         val promptRepository = mockk<PromptRepository> {
@@ -241,7 +241,7 @@ class ChatViewModelTest {
         viewModel.snackbarEvent
             .onEach { events.add(it) }
             .launchIn(CoroutineScope(UnconfinedTestDispatcher(testScheduler)))
-        viewModel.generateContent(prompt, null)
+        viewModel.sendPrompt(prompt, null)
         advanceUntilIdle()
 
         // Then
@@ -249,7 +249,7 @@ class ChatViewModelTest {
     }
 
     @Test
-    fun `generateContent emits LocalUpdateFailed when update throws`() = runTest {
+    fun `sendPrompt emits LocalUpdateFailed when update throws`() = runTest {
         // Given
         val prompt = "Test question"
         val promptRepository = mockk<PromptRepository> {
@@ -269,7 +269,7 @@ class ChatViewModelTest {
         viewModel.snackbarEvent
             .onEach { events.add(it) }
             .launchIn(CoroutineScope(UnconfinedTestDispatcher(testScheduler)))
-        viewModel.generateContent(prompt, null)
+        viewModel.sendPrompt(prompt, null)
         advanceUntilIdle()
 
         // Then
@@ -315,7 +315,7 @@ class ChatViewModelTest {
     }
 
     @Test
-    fun `generateContent returns ApiKeyMissing when Gemini key is missing`() = runTest {
+    fun `sendPrompt returns ApiKeyMissing when Gemini key is missing`() = runTest {
         // Given
         val viewModel = createViewModel(
             generateContentResult = Result.success("response"),
@@ -327,7 +327,7 @@ class ChatViewModelTest {
         viewModel.uiState
             .onEach { states.add(it) }
             .launchIn(CoroutineScope(UnconfinedTestDispatcher(testScheduler)))
-        viewModel.generateContent("test", null)
+        viewModel.sendPrompt("test", null)
         advanceUntilIdle()
 
         // Then - should stay as ApiKeyMissing, never go to Loading
@@ -345,7 +345,7 @@ class ChatViewModelTest {
         apiKeyAvailability: ApiKeyAvailability = ApiKeyAvailability(isGeminiKeyAvailable = true, isMapsKeyAvailable = true)
     ): ChatViewModel {
         val geminiRepository = mockk<GeminiRepository> {
-            generateContentResult?.let { coEvery { generateContent(any(), any(), any(), any(), any()) } returns it }
+            generateContentResult?.let { coEvery { getAiResponse(any(), any(), any(), any(), any()) } returns it }
             coEvery { generateConversationStarters(any()) } returns suggestionsResult
         }
 
@@ -358,14 +358,14 @@ class ChatViewModelTest {
             every { getFailedSyncCount() } returns flowOf(failedSyncCountResult)
         }
 
-        val application = mockk<Application>(relaxed = true)
+        val resourceProvider = mockk<ResourceProvider>(relaxed = true)
         val fileUtils = mockk<FileUtils>(relaxed = true)
         val authReadyFlow: StateFlow<Boolean> = MutableStateFlow(true)
         val observeAuthReadyUseCase = mockk<ObserveAuthReadyUseCase>()
         every { observeAuthReadyUseCase.invoke() } returns authReadyFlow
 
         return ChatViewModel(
-            GenerateContentUseCase(geminiRepository),
+            AskAiUseCase(geminiRepository),
             GetSuggestionsUseCase(geminiRepository),
             GetPromptHistoryUseCase(effectivePromptRepository),
             GetSyncStateUseCase(effectivePromptRepository),
@@ -376,7 +376,7 @@ class ChatViewModelTest {
             observeAuthReadyUseCase,
             apiKeyAvailability,
             fileUtils,
-            application
+            resourceProvider
         )
     }
 }

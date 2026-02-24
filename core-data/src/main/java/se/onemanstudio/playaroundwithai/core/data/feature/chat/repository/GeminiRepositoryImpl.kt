@@ -44,7 +44,7 @@ class GeminiRepositoryImpl @Inject constructor(
 ) : GeminiRepository {
 
     @Suppress("TooGenericExceptionCaught")
-    override suspend fun generateContent(
+    override suspend fun getAiResponse(
         prompt: String,
         imageBytes: ByteArray?,
         fileText: String?,

@@ -5,7 +5,7 @@ import se.onemanstudio.playaroundwithai.core.domain.feature.chat.model.GeminiMod
 import se.onemanstudio.playaroundwithai.core.domain.feature.map.model.SuggestedPlace
 
 interface GeminiRepository {
-    suspend fun generateContent(
+    suspend fun getAiResponse(
         prompt: String,
         imageBytes: ByteArray?,
         fileText: String?,

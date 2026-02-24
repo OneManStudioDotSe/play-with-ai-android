@@ -21,7 +21,7 @@ import se.onemanstudio.playaroundwithai.core.domain.feature.auth.usecase.Observe
 import se.onemanstudio.playaroundwithai.core.domain.feature.config.model.ApiKeyAvailability
 import se.onemanstudio.playaroundwithai.core.domain.feature.chat.model.Prompt
 import se.onemanstudio.playaroundwithai.core.domain.feature.chat.model.SyncStatus
-import se.onemanstudio.playaroundwithai.core.domain.feature.chat.usecase.GenerateContentUseCase
+import se.onemanstudio.playaroundwithai.core.domain.feature.chat.usecase.AskAiUseCase
 import se.onemanstudio.playaroundwithai.core.domain.feature.chat.usecase.GetFailedSyncCountUseCase
 import se.onemanstudio.playaroundwithai.core.domain.feature.chat.usecase.GetPromptHistoryUseCase
 import se.onemanstudio.playaroundwithai.core.domain.feature.chat.usecase.GetSuggestionsUseCase
@@ -46,7 +46,7 @@ private const val SUBSCRIBE_TIMEOUT = 5000L
 @Suppress("CanBeParameter", "LongParameterList", "TooManyFunctions")
 @HiltViewModel
 class ChatViewModel @Inject constructor(
-    private val generateContentUseCase: GenerateContentUseCase,
+    private val askAiUseCase: AskAiUseCase,
     private val getSuggestionsUseCase: GetSuggestionsUseCase,
     private val getPromptHistoryUseCase: GetPromptHistoryUseCase,
     private val getSyncStateUseCase: GetSyncStateUseCase,
@@ -118,7 +118,7 @@ class ChatViewModel @Inject constructor(
 
     private fun loadSuggestions() {
         viewModelScope.launch {
-            _isSuggestionsLoading.value = true
+            _isSuggestionsLoading.update { true }
             getSuggestionsUseCase()
                 .onSuccess { topics ->
                     _suggestions.update { topics }
@@ -128,7 +128,7 @@ class ChatViewModel @Inject constructor(
                     _suggestions.update { resourceProvider.getFallbackSuggestions() }
                 }
 
-            _isSuggestionsLoading.value = false
+            _isSuggestionsLoading.update { false }
         }
     }
 
@@ -187,7 +187,7 @@ class ChatViewModel @Inject constructor(
                 null
             }
 
-            generateContentUseCase(
+            askAiUseCase(
                 prompt = prompt,
                 imageBytes = imageBytes,
                 fileText = fileText,

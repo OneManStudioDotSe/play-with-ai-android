@@ -250,7 +250,7 @@ fun ChatScreen(viewModel: ChatViewModel = hiltViewModel()) {
                         InputMode.DOCUMENT -> selectedFileUri?.let { Attachment.Document(it) }
                         InputMode.TEXT -> null
                     }
-                    viewModel.generateContent(textState.text, attachment)
+                    viewModel.sendPrompt(textState.text, attachment)
                     keyboardController?.hide()
                     textState = TextFieldValue("")
                     selectedImageUri = null
