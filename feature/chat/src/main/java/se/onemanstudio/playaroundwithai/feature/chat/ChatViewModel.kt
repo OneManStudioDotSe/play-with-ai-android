@@ -1,6 +1,5 @@
 package se.onemanstudio.playaroundwithai.feature.chat
 
-import android.app.Application
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -17,9 +16,7 @@ import kotlinx.coroutines.flow.filter
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.flow.update
-import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
-import kotlinx.coroutines.withContext
 import se.onemanstudio.playaroundwithai.core.domain.feature.auth.usecase.ObserveAuthReadyUseCase
 import se.onemanstudio.playaroundwithai.core.domain.feature.config.model.ApiKeyAvailability
 import se.onemanstudio.playaroundwithai.core.domain.feature.chat.model.Prompt
@@ -37,6 +34,7 @@ import se.onemanstudio.playaroundwithai.feature.chat.models.SnackbarEvent
 import se.onemanstudio.playaroundwithai.feature.chat.states.ChatError
 import se.onemanstudio.playaroundwithai.feature.chat.states.ChatUiState
 import se.onemanstudio.playaroundwithai.feature.chat.util.FileUtils
+import se.onemanstudio.playaroundwithai.feature.chat.util.ResourceProvider
 import timber.log.Timber
 import java.io.FileNotFoundException
 import java.io.IOException
@@ -59,7 +57,7 @@ class ChatViewModel @Inject constructor(
     private val observeAuthReadyUseCase: ObserveAuthReadyUseCase,
     private val apiKeyAvailability: ApiKeyAvailability,
     private val fileUtils: FileUtils,
-    private val application: Application
+    private val resourceProvider: ResourceProvider
 ) : ViewModel() {
     private val _suggestions = MutableStateFlow<List<String>>(emptyList())
     val suggestions = _suggestions.asStateFlow()
@@ -127,13 +125,7 @@ class ChatViewModel @Inject constructor(
                 }
                 .onFailure {
                     // Fallback to static ones if API fails
-                    _suggestions.update {
-                        listOf(
-                            application.getString(R.string.fallback_suggestion_joke),
-                            application.getString(R.string.fallback_suggestion_physics),
-                            application.getString(R.string.fallback_suggestion_roast)
-                        )
-                    }
+                    _suggestions.update { resourceProvider.getFallbackSuggestions() }
                 }
 
             _isSuggestionsLoading.value = false
@@ -141,7 +133,7 @@ class ChatViewModel @Inject constructor(
     }
 
     @Suppress("TooGenericExceptionCaught", "LongMethod")
-    fun generateContent(prompt: String, attachment: Attachment?) {
+    fun sendPrompt(prompt: String, attachment: Attachment?) {
         if (!apiKeyAvailability.isGeminiKeyAvailable) {
             _uiState.update { ChatUiState.Error(ChatError.ApiKeyMissing) }
             return
@@ -152,13 +144,13 @@ class ChatViewModel @Inject constructor(
         viewModelScope.launch {
             // see if we have something attached (decode/compress off main thread)
             val imageBytes = (attachment as? Attachment.Image)?.uri?.let {
-                withContext(Dispatchers.Default) { fileUtils.uriToByteArray(it) }
+                fileUtils.uriToByteArray(it)
             }
             val analysisType = (attachment as? Attachment.Image)?.analysisType
 
             // read attached stuff
             val fileResult = (attachment as? Attachment.Document)?.uri?.let {
-                withContext(Dispatchers.IO) { fileUtils.extractFileContent(it) }
+                fileUtils.extractFileContent(it)
             }
 
             // fail directly if something is off
@@ -190,7 +182,7 @@ class ChatViewModel @Inject constructor(
             } catch (e: Exception) {
                 Timber.e(e, "ChatVM - Failed to save prompt to local DB")
                 _snackbarEvent.tryEmit(
-                    SnackbarEvent.LocalSaveFailed(application.getString(R.string.local_save_failed))
+                    SnackbarEvent.LocalSaveFailed(resourceProvider.getLocalSaveFailedMessage())
                 )
                 null
             }
@@ -210,7 +202,7 @@ class ChatViewModel @Inject constructor(
                     } catch (e: Exception) {
                         Timber.e(e, "ChatVM - Failed to update prompt text in local DB")
                         _snackbarEvent.tryEmit(
-                            SnackbarEvent.LocalUpdateFailed(application.getString(R.string.local_update_failed))
+                            SnackbarEvent.LocalUpdateFailed(resourceProvider.getLocalUpdateFailedMessage())
                         )
                     }
                 }
