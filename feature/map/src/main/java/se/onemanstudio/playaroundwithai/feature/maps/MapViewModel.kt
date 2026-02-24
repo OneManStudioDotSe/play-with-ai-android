@@ -1,9 +1,5 @@
 package se.onemanstudio.playaroundwithai.feature.maps
 
-import android.annotation.SuppressLint
-import android.app.Application
-import android.net.ConnectivityManager
-import android.net.NetworkCapabilities
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.google.android.gms.maps.model.LatLng
@@ -21,12 +17,12 @@ import se.onemanstudio.playaroundwithai.core.domain.feature.map.model.SuggestedP
 import se.onemanstudio.playaroundwithai.core.domain.feature.map.model.VehicleType
 import se.onemanstudio.playaroundwithai.core.domain.feature.map.usecase.GetMapItemsUseCase
 import se.onemanstudio.playaroundwithai.core.domain.feature.map.usecase.GetSuggestedPlacesUseCase
-import se.onemanstudio.playaroundwithai.feature.map.R
 import se.onemanstudio.playaroundwithai.feature.maps.models.MapItemUiModel
 import se.onemanstudio.playaroundwithai.feature.maps.models.toUiModel
 import se.onemanstudio.playaroundwithai.feature.maps.states.MapError
 import se.onemanstudio.playaroundwithai.feature.maps.states.MapUiState
 import se.onemanstudio.playaroundwithai.feature.maps.states.SuggestedPlacesError
+import se.onemanstudio.playaroundwithai.feature.maps.util.ResourceProvider
 import se.onemanstudio.playaroundwithai.feature.maps.utils.calculatePathDistance
 import se.onemanstudio.playaroundwithai.feature.maps.utils.permutations
 import timber.log.Timber
@@ -44,14 +40,11 @@ class MapViewModel @Inject constructor(
     private val getMapItemsUseCase: GetMapItemsUseCase,
     private val getSuggestedPlacesUseCase: GetSuggestedPlacesUseCase,
     private val apiKeyAvailability: ApiKeyAvailability,
-    private val application: Application
+    private val resourceProvider: ResourceProvider
 ) : ViewModel() {
 
     private val _uiState = MutableStateFlow(MapUiState())
     val uiState = _uiState.asStateFlow()
-
-    private val _currentLoadingMessage = MutableStateFlow("")
-    val currentLoadingMessage = _currentLoadingMessage.asStateFlow()
 
     init {
         startLoadingMessageCycle()
@@ -66,7 +59,7 @@ class MapViewModel @Inject constructor(
 
         _uiState.update { it.copy(isLoading = true, error = null) }
 
-        if (!isNetworkAvailable()) {
+        if (!resourceProvider.isNetworkAvailable()) {
             Timber.w("MapViewModel - No network available, cannot load map data")
             _uiState.update { it.copy(isLoading = false, error = MapError.NetworkError) }
             return
@@ -87,16 +80,6 @@ class MapViewModel @Inject constructor(
                 _uiState.update { it.copy(isLoading = false, error = MapError.Unknown(e.localizedMessage)) }
             }
         }
-    }
-
-    @SuppressLint("MissingPermission")
-    @SuppressWarnings("ReturnCount")
-    private fun isNetworkAvailable(): Boolean {
-        val connectivityManager = application.getSystemService(ConnectivityManager::class.java)
-        val network = connectivityManager.activeNetwork ?: return false
-        val capabilities = connectivityManager.getNetworkCapabilities(network) ?: return false
-
-        return capabilities.hasCapability(NetworkCapabilities.NET_CAPABILITY_INTERNET)
     }
 
     fun setPathMode(active: Boolean) {
@@ -280,23 +263,13 @@ class MapViewModel @Inject constructor(
 
     private fun startLoadingMessageCycle() {
         viewModelScope.launch {
-            val messages = getLoadingMessages()
+            val messages = resourceProvider.getLoadingMessages()
             var index = 0
             while (true) {
-                _currentLoadingMessage.value = messages[index]
+                _uiState.update { it.copy(loadingMessage = messages[index]) }
                 delay(LOADING_MESSAGE_DURATION)
                 index = (index + 1) % messages.size
             }
         }
-    }
-
-    private fun getLoadingMessages(): List<String> {
-        return listOf(
-            application.getString(R.string.loading_message_1),
-            application.getString(R.string.loading_message_2),
-            application.getString(R.string.loading_message_3),
-            application.getString(R.string.loading_message_4),
-            application.getString(R.string.loading_message_5)
-        )
     }
 }

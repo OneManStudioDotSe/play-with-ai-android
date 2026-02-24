@@ -37,5 +37,6 @@ data class MapUiState(
     val routeDurationMinutes: Int = 0,
     val suggestedPlaces: PersistentList<SuggestedPlace> = persistentListOf(),
     val focusedSuggestedPlace: SuggestedPlace? = null,
-    val suggestedPlacesError: SuggestedPlacesError? = null
+    val suggestedPlacesError: SuggestedPlacesError? = null,
+    val loadingMessage: String = ""
 )
