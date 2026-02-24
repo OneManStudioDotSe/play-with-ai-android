@@ -34,6 +34,6 @@ data class DreamParticle(
     val size: Float,
 )
 
-enum class ElementShape { CIRCLE, TRIANGLE, MOUNTAIN, WAVE, TREE, CLOUD, STAR }
+enum class ElementShape { CIRCLE, TRIANGLE, MOUNTAIN, WAVE, TREE, CLOUD, STAR, CRESCENT, DIAMOND, SPIRAL, LOTUS, AURORA, CRYSTAL }
 
-enum class ParticleShape { DOT, SPARKLE, RING }
+enum class ParticleShape { DOT, SPARKLE, RING, TEARDROP, DIAMOND_MOTE, DASH, STARBURST }

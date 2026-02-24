@@ -346,14 +346,14 @@ private fun previewScene() = DreamScene(
             depth = 0.2f,
             elements = listOf(
                 DreamElement(shape = ElementShape.MOUNTAIN, x = 0.3f, y = 0.7f, scale = 2.5f, color = 0xFF1B263B, alpha = 0.6f),
-                DreamElement(shape = ElementShape.MOUNTAIN, x = 0.7f, y = 0.7f, scale = 2.0f, color = 0xFF1B263B, alpha = 0.5f),
+                DreamElement(shape = ElementShape.CRYSTAL, x = 0.75f, y = 0.65f, scale = 1.5f, color = 0xFF415A77, alpha = 0.5f),
             ),
         ),
         DreamLayer(
             depth = 0.5f,
             elements = listOf(
                 DreamElement(shape = ElementShape.TREE, x = 0.2f, y = 0.8f, scale = 1.5f, color = 0xFF415A77, alpha = 0.7f),
-                DreamElement(shape = ElementShape.CLOUD, x = 0.6f, y = 0.3f, scale = 1.8f, color = 0x80FFFFFF, alpha = 0.4f),
+                DreamElement(shape = ElementShape.CRESCENT, x = 0.65f, y = 0.25f, scale = 1.6f, color = 0xFFE0E1DD, alpha = 0.6f),
             ),
         ),
         DreamLayer(
@@ -364,7 +364,8 @@ private fun previewScene() = DreamScene(
         ),
     ),
     particles = listOf(
-        DreamParticle(shape = ParticleShape.SPARKLE, count = 15, color = 0xCCE0E1DD, speed = 0.8f, size = 3f),
+        DreamParticle(shape = ParticleShape.STARBURST, count = 12, color = 0xCCE0E1DD, speed = 0.8f, size = 3f),
+        DreamParticle(shape = ParticleShape.DOT, count = 8, color = 0x80415A77, speed = 0.4f, size = 2f),
     ),
 )
 

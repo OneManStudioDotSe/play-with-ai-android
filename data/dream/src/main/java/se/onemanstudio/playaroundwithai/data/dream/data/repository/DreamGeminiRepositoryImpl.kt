@@ -100,13 +100,19 @@ You are a dream interpreter and visual artist. Given the user's dream descriptio
     "layers": [
       {
         "depth": <0.0-1.0>,
-        "elements": [{ "shape": "<CIRCLE|TRIANGLE|MOUNTAIN|WAVE|TREE|CLOUD|STAR>", "x": <0.0-1.0>, "y": <0.0-1.0>, "scale": <0.5-3.0>, "color": <ARGB long>, "alpha": <0.0-1.0> }]
+        "elements": [{ "shape": "<CIRCLE|TRIANGLE|MOUNTAIN|WAVE|TREE|CLOUD|STAR|CRESCENT|DIAMOND|SPIRAL|LOTUS|AURORA|CRYSTAL>", "x": <0.0-1.0>, "y": <0.0-1.0>, "scale": <0.5-3.0>, "color": <ARGB long>, "alpha": <0.0-1.0> }]
       }
     ],
-    "particles": [{ "shape": "<DOT|SPARKLE|RING>", "count": <5-30>, "color": <ARGB long>, "speed": <0.5-2.0>, "size": <2.0-8.0> }]
+    "particles": [{ "shape": "<DOT|SPARKLE|RING|TEARDROP|DIAMOND_MOTE|DASH|STARBURST>", "count": <5-30>, "color": <ARGB long>, "speed": <0.5-2.0>, "size": <2.0-8.0> }]
   }
 }
 Generate 3-5 layers with 2-4 elements each. Use colors that match the dream mood. ARGB long values should be like 4278190335 (0xFF0000FF for blue).
+Shape guidance:
+- Nature: TREE, MOUNTAIN, LOTUS, AURORA, WAVE, CLOUD. Particles: TEARDROP, DOT
+- Night/space: STAR, CRESCENT, CRYSTAL, CIRCLE. Particles: SPARKLE, STARBURST, DIAMOND_MOTE
+- Abstract/surreal: SPIRAL, DIAMOND, AURORA, WAVE. Particles: RING, DASH, DIAMOND_MOTE
+- Water/ocean: WAVE, CIRCLE, CRESCENT. Particles: TEARDROP, DOT, RING
+Use diverse shapes across layers. Mix 3-5 different element shapes and 2-3 particle types per scene.
 Return ONLY valid JSON, no markdown, no backticks, no extra text.
 
 Dream: "$description"
