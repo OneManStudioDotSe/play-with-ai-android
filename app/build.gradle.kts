@@ -85,6 +85,7 @@ dependencies {
     implementation(project(":core:auth"))
     implementation(project(":core:theme"))
     implementation(project(":core:ui"))
+    implementation(project(":data:chat"))
     implementation(project(":feature:chat"))
     implementation(project(":feature:map"))
 

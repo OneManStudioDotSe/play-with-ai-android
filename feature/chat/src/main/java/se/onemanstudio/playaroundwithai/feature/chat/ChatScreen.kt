@@ -57,8 +57,8 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
-import se.onemanstudio.playaroundwithai.feature.chat.domain.model.AnalysisType
-import se.onemanstudio.playaroundwithai.feature.chat.domain.model.InputMode
+import se.onemanstudio.playaroundwithai.data.chat.domain.model.AnalysisType
+import se.onemanstudio.playaroundwithai.data.chat.domain.model.InputMode
 import se.onemanstudio.playaroundwithai.core.ui.sofa.NeoBrutalCard
 import se.onemanstudio.playaroundwithai.core.ui.sofa.NeoBrutalIconButton
 import se.onemanstudio.playaroundwithai.core.ui.sofa.NeoBrutalTopAppBar

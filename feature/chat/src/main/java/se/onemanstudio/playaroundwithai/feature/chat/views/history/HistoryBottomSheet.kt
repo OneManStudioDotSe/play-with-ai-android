@@ -23,7 +23,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
-import se.onemanstudio.playaroundwithai.feature.chat.domain.model.Prompt
+import se.onemanstudio.playaroundwithai.data.chat.domain.model.Prompt
 import se.onemanstudio.playaroundwithai.core.ui.sofa.NeoBrutalCard
 import se.onemanstudio.playaroundwithai.core.ui.theme.Alphas
 import se.onemanstudio.playaroundwithai.core.ui.theme.Dimensions

@@ -42,7 +42,7 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.input.TextFieldValue
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import se.onemanstudio.playaroundwithai.feature.chat.domain.model.InputMode
+import se.onemanstudio.playaroundwithai.data.chat.domain.model.InputMode
 import se.onemanstudio.playaroundwithai.core.ui.sofa.NeoBrutalChip
 import se.onemanstudio.playaroundwithai.core.ui.sofa.NeoBrutalIconButton
 import se.onemanstudio.playaroundwithai.core.ui.sofa.NeoBrutalSegmentedButton

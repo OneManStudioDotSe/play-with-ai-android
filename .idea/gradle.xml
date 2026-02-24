@@ -18,6 +18,7 @@
             <option value="$PROJECT_DIR$/core/theme" />
             <option value="$PROJECT_DIR$/core/ui" />
             <option value="$PROJECT_DIR$/data" />
+            <option value="$PROJECT_DIR$/data/chat" />
             <option value="$PROJECT_DIR$/data/map" />
             <option value="$PROJECT_DIR$/feature" />
             <option value="$PROJECT_DIR$/feature/chat" />

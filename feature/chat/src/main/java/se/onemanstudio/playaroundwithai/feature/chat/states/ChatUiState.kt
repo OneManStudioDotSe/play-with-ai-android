@@ -1,7 +1,7 @@
 package se.onemanstudio.playaroundwithai.feature.chat.states
 
 import androidx.compose.runtime.Immutable
-import se.onemanstudio.playaroundwithai.feature.chat.domain.model.Prompt
+import se.onemanstudio.playaroundwithai.data.chat.domain.model.Prompt
 
 @Immutable
 sealed interface ChatUiState {
