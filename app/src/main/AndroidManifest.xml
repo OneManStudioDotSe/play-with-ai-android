@@ -36,8 +36,7 @@
 
         <service
             android:name="androidx.work.impl.foreground.SystemForegroundService"
-            android:foregroundServiceType="dataSync"
-            tools:node="merge" />
+            android:foregroundServiceType="dataSync" />
 
         <!-- Disable default WorkManager initializer so Hilt's HiltWorkerFactory is used instead -->
         <provider

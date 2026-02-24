@@ -20,3 +20,4 @@ local.properties
 /core/network/build
 /core/config/build
 /core/auth/build
+/data/dream/build

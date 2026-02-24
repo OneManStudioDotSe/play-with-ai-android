@@ -3,6 +3,7 @@ package se.onemanstudio.playaroundwithai.navigation
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Chair
 import androidx.compose.material.icons.filled.Map
+import androidx.compose.material.icons.filled.NightsStay
 import kotlinx.serialization.Serializable
 
 sealed interface Route
@@ -13,7 +14,11 @@ object Chat : Route
 @Serializable
 object Maps : Route
 
+@Serializable
+object Dreams : Route
+
 val navItems = listOf(
     NavItem(Chat, "Chat", Icons.Default.Chair),
     NavItem(Maps, "Explore", Icons.Default.Map),
+    NavItem(Dreams, "Dreams", Icons.Default.NightsStay),
 )

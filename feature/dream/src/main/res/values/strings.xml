@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="dream_title">Dreams</string>
+    <string name="dream_input_placeholder">Describe your dream\u2026</string>
+    <string name="dream_interpret_button">Interpret My Dream</string>
+    <string name="dream_new_button">New Dream</string>
+    <string name="dream_interpretation_label">Interpretation</string>
+    <string name="dream_mood_label">Mood</string>
+    <string name="dream_gallery_title">Past Dreams</string>
+    <string name="dream_empty_gallery">No dreams yet. Describe a dream to begin!</string>
+    <string name="dream_label_clear">Clear</string>
+    <string name="dream_label_delete">Delete dream</string>
+    <string name="dream_label_error_icon">Error Icon</string>
+    <string name="dream_label_dismiss_error">Dismiss error</string>
+
+    <string name="dream_oops">Oops!</string>
+    <string name="dream_error_api_key_missing" translatable="false">Gemini API key not configured.\n\nAdd GEMINI_API_KEY_DEBUG to your local.properties file.\nSee the project README for setup instructions.</string>
+    <string name="dream_error_network">No internet connection. Please check your network.</string>
+    <string name="dream_error_input_too_long">Your dream description is too long. Please keep it under 5,000 characters.</string>
+    <string name="dream_error_unknown">An unknown error occurred.</string>
+
+    <string name="dream_mood_joyful">Joyful</string>
+    <string name="dream_mood_mysterious">Mysterious</string>
+    <string name="dream_mood_anxious">Anxious</string>
+    <string name="dream_mood_peaceful">Peaceful</string>
+    <string name="dream_mood_dark">Dark</string>
+    <string name="dream_mood_surreal">Surreal</string>
+</resources>

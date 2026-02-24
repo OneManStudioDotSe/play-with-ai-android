@@ -1,5 +1,6 @@
 package se.onemanstudio.playaroundwithai.data.chat.data.sync
 
+import android.annotation.SuppressLint
 import android.app.NotificationManager
 import android.content.Context
 import android.content.pm.ServiceInfo
@@ -100,6 +101,8 @@ class SyncWorker @AssistedInject constructor(
         }
     }
 
+    // foregroundServiceType="dataSync" is declared in the app module's AndroidManifest.xml
+    @SuppressLint("SpecifyForegroundServiceType")
     private fun createForegroundInfo(): ForegroundInfo {
         val title = context.getString(R.string.sync_notification_title)
         val content = context.getString(R.string.sync_notification_content)
@@ -112,7 +115,11 @@ class SyncWorker @AssistedInject constructor(
             .setOngoing(true)
             .build()
 
-        return ForegroundInfo(NOTIFICATION_ID, notification, ServiceInfo.FOREGROUND_SERVICE_TYPE_DATA_SYNC)
+        return ForegroundInfo(
+            NOTIFICATION_ID,
+            notification,
+            ServiceInfo.FOREGROUND_SERVICE_TYPE_DATA_SYNC
+        )
     }
 
     private fun showFailureNotification(failedCount: Int) {

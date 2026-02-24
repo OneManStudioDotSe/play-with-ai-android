@@ -87,6 +87,7 @@ dependencies {
     implementation(project(":core:ui"))
     implementation(project(":data:chat"))
     implementation(project(":feature:chat"))
+    implementation(project(":feature:dream"))
     implementation(project(":feature:map"))
 
     implementation(libs.material3)
