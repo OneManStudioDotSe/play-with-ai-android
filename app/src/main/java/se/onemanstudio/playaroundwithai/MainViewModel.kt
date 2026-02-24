@@ -6,10 +6,13 @@ import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import se.onemanstudio.playaroundwithai.core.domain.feature.auth.usecase.SignInAnonymouslyUseCase
 import timber.log.Timber
 import javax.inject.Inject
+
+private const val MAX_AUTH_ATTEMPTS = 3
 
 @HiltViewModel
 class MainViewModel @Inject constructor(
@@ -34,15 +37,15 @@ class MainViewModel @Inject constructor(
             signInAnonymouslyUseCase()
                 .onSuccess { session ->
                     Timber.d("Auth - Session established for user ${session.userId} from @ ${session.authProvider}")
-                    _authError.value = false
-                    _authRetriesExhausted.value = false
+                    _authError.update { false }
+                    _authRetriesExhausted.update { false }
                     authAttemptCount = 0
                 }
                 .onFailure { e ->
                     Timber.e(e, "Auth - Anonymous sign-in failed (attempt $authAttemptCount/$MAX_AUTH_ATTEMPTS)")
-                    _authError.value = true
+                    _authError.update { true }
                     if (authAttemptCount >= MAX_AUTH_ATTEMPTS) {
-                        _authRetriesExhausted.value = true
+                        _authRetriesExhausted.update { true }
                     }
                 }
         }
@@ -51,11 +54,8 @@ class MainViewModel @Inject constructor(
     fun retryAuth() {
         if (_authRetriesExhausted.value) return
 
-        _authError.value = false
+        _authError.update { false }
         signIn()
     }
 
-    companion object {
-        private const val MAX_AUTH_ATTEMPTS = 3
-    }
 }

@@ -116,7 +116,7 @@ fun MapScreen(viewModel: MapViewModel = hiltViewModel()) {
     val scope = rememberCoroutineScope()
 
     val uiState by viewModel.uiState.collectAsState()
-    val currentLoadingMessage by viewModel.currentLoadingMessage.collectAsState()
+    val currentLoadingMessage = uiState.loadingMessage
 
     val stockholm = LatLng(STOCKHOLM_LAT, STOCKHOLM_LNG)
 

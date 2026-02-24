@@ -29,16 +29,16 @@ class GeminiRepositoryImplUnitTest {
         repository = GeminiRepositoryImpl(apiService, gson)
     }
 
-    // region generateContent
+    // region getAiResponse
 
     @Test
-    fun `generateContent with valid prompt returns success`() = runTest {
+    fun `getAiResponsewith valid prompt returns success`() = runTest {
         // GIVEN: API returns a valid response
         val response = createGeminiResponse("AI response text")
         coEvery { apiService.generateContent(any(), any()) } returns response
 
         // WHEN
-        val result = repository.generateContent("Hello", null, null, null, GeminiModel.FLASH_PREVIEW)
+        val result = repository.getAiResponse("Hello", null, null, null, GeminiModel.FLASH_PREVIEW)
 
         // THEN
         assertThat(result.isSuccess).isTrue()
@@ -46,12 +46,12 @@ class GeminiRepositoryImplUnitTest {
     }
 
     @Test
-    fun `generateContent when API throws IOException returns failure`() = runTest {
+    fun `getAiResponsewhen API throws IOException returns failure`() = runTest {
         // GIVEN: API throws a network error
         coEvery { apiService.generateContent(any(), any()) } throws IOException("No network")
 
         // WHEN
-        val result = repository.generateContent("Hello", null, null, null, GeminiModel.FLASH_PREVIEW)
+        val result = repository.getAiResponse("Hello", null, null, null, GeminiModel.FLASH_PREVIEW)
 
         // THEN
         assertThat(result.isFailure).isTrue()
@@ -59,13 +59,13 @@ class GeminiRepositoryImplUnitTest {
     }
 
     @Test
-    fun `generateContent when API returns empty candidates returns fallback text`() = runTest {
+    fun `getAiResponsewhen API returns empty candidates returns fallback text`() = runTest {
         // GIVEN: API returns response with no candidates
         val response = GeminiResponse(candidates = emptyList())
         coEvery { apiService.generateContent(any(), any()) } returns response
 
         // WHEN
-        val result = repository.generateContent("Hello", null, null, null, GeminiModel.FLASH_PREVIEW)
+        val result = repository.getAiResponse("Hello", null, null, null, GeminiModel.FLASH_PREVIEW)
 
         // THEN: extractText() returns null, so fallback text is used
         assertThat(result.isSuccess).isTrue()

@@ -10,15 +10,15 @@ import org.junit.Test
 import se.onemanstudio.playaroundwithai.core.domain.feature.chat.model.GeminiModel
 import se.onemanstudio.playaroundwithai.core.domain.feature.chat.repository.GeminiRepository
 
-class GenerateContentUseCaseTest {
+class AskAiUseCaseTest {
 
     private lateinit var geminiRepository: GeminiRepository
-    private lateinit var useCase: GenerateContentUseCase
+    private lateinit var useCase: AskAiUseCase
 
     @Before
     fun setUp() {
         geminiRepository = mockk()
-        useCase = GenerateContentUseCase(geminiRepository)
+        useCase = AskAiUseCase(geminiRepository)
     }
 
     @Test
@@ -27,7 +27,7 @@ class GenerateContentUseCaseTest {
         val prompt = "Tell me a joke"
         val expectedResponse = "Why did the chicken cross the road?"
         coEvery {
-            geminiRepository.generateContent(prompt, null, null, null, GeminiModel.FLASH_PREVIEW)
+            geminiRepository.getAiResponse(prompt, null, null, null, GeminiModel.FLASH_PREVIEW)
         } returns Result.success(expectedResponse)
 
         // WHEN
@@ -36,7 +36,7 @@ class GenerateContentUseCaseTest {
         // THEN
         assertThat(result.isSuccess).isTrue()
         assertThat(result.getOrThrow()).isEqualTo(expectedResponse)
-        coVerify(exactly = 1) { geminiRepository.generateContent(prompt, null, null, null, GeminiModel.FLASH_PREVIEW) }
+        coVerify(exactly = 1) { geminiRepository.getAiResponse(prompt, null, null, null, GeminiModel.FLASH_PREVIEW) }
     }
 
     @Test
@@ -50,7 +50,7 @@ class GenerateContentUseCaseTest {
         assertThat(result.isFailure).isTrue()
         assertThat(result.exceptionOrNull()).isInstanceOf(IllegalArgumentException::class.java)
         assertThat(result.exceptionOrNull()?.message).isEqualTo("Prompt and attachments cannot all be empty")
-        coVerify(exactly = 0) { geminiRepository.generateContent(any(), any(), any(), any(), any()) }
+        coVerify(exactly = 0) { geminiRepository.getAiResponse(any(), any(), any(), any(), any()) }
     }
 
     @Test
@@ -58,7 +58,7 @@ class GenerateContentUseCaseTest {
         // GIVEN: A blank prompt but with image bytes attached
         val imageBytes = byteArrayOf(1, 2, 3)
         coEvery {
-            geminiRepository.generateContent("", imageBytes, null, null, GeminiModel.FLASH_PREVIEW)
+            geminiRepository.getAiResponse("", imageBytes, null, null, GeminiModel.FLASH_PREVIEW)
         } returns Result.success("Image analysis result")
 
         // WHEN
@@ -67,7 +67,7 @@ class GenerateContentUseCaseTest {
         // THEN
         assertThat(result.isSuccess).isTrue()
         assertThat(result.getOrThrow()).isEqualTo("Image analysis result")
-        coVerify(exactly = 1) { geminiRepository.generateContent("", imageBytes, null, null, GeminiModel.FLASH_PREVIEW) }
+        coVerify(exactly = 1) { geminiRepository.getAiResponse("", imageBytes, null, null, GeminiModel.FLASH_PREVIEW) }
     }
 
     @Test
@@ -75,7 +75,7 @@ class GenerateContentUseCaseTest {
         // GIVEN: A blank prompt but with file text attached
         val fileText = "Some document content"
         coEvery {
-            geminiRepository.generateContent("", null, fileText, null, GeminiModel.FLASH_PREVIEW)
+            geminiRepository.getAiResponse("", null, fileText, null, GeminiModel.FLASH_PREVIEW)
         } returns Result.success("File analysis result")
 
         // WHEN
@@ -84,7 +84,7 @@ class GenerateContentUseCaseTest {
         // THEN
         assertThat(result.isSuccess).isTrue()
         assertThat(result.getOrThrow()).isEqualTo("File analysis result")
-        coVerify(exactly = 1) { geminiRepository.generateContent("", null, fileText, null, GeminiModel.FLASH_PREVIEW) }
+        coVerify(exactly = 1) { geminiRepository.getAiResponse("", null, fileText, null, GeminiModel.FLASH_PREVIEW) }
     }
 
     @Test
@@ -99,8 +99,8 @@ class GenerateContentUseCaseTest {
         assertThat(result.isFailure).isTrue()
         assertThat(result.exceptionOrNull()).isInstanceOf(IllegalArgumentException::class.java)
         assertThat(result.exceptionOrNull()?.message)
-            .isEqualTo("Prompt exceeds maximum length of ${MAX_PROMPT_LENGTH} characters")
-        coVerify(exactly = 0) { geminiRepository.generateContent(any(), any(), any(), any(), any()) }
+            .isEqualTo("Prompt exceeds maximum length of $MAX_PROMPT_LENGTH characters")
+        coVerify(exactly = 0) { geminiRepository.getAiResponse(any(), any(), any(), any(), any()) }
     }
 
     @Test
@@ -115,8 +115,8 @@ class GenerateContentUseCaseTest {
         assertThat(result.isFailure).isTrue()
         assertThat(result.exceptionOrNull()).isInstanceOf(IllegalArgumentException::class.java)
         assertThat(result.exceptionOrNull()?.message)
-            .isEqualTo("File content exceeds maximum length of ${MAX_FILE_TEXT_LENGTH} characters")
-        coVerify(exactly = 0) { geminiRepository.generateContent(any(), any(), any(), any(), any()) }
+            .isEqualTo("File content exceeds maximum length of $MAX_FILE_TEXT_LENGTH characters")
+        coVerify(exactly = 0) { geminiRepository.getAiResponse(any(), any(), any(), any(), any()) }
     }
 
     @Test
@@ -125,7 +125,7 @@ class GenerateContentUseCaseTest {
         val prompt = "Tell me a joke"
         val expectedException = RuntimeException("API error")
         coEvery {
-            geminiRepository.generateContent(prompt, null, null, null, GeminiModel.FLASH_PREVIEW)
+            geminiRepository.getAiResponse(prompt, null, null, null, GeminiModel.FLASH_PREVIEW)
         } returns Result.failure(expectedException)
 
         // WHEN
