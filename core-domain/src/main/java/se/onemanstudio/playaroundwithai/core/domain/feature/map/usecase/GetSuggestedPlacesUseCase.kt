@@ -5,6 +5,9 @@ import se.onemanstudio.playaroundwithai.core.domain.feature.chat.repository.Gemi
 import se.onemanstudio.playaroundwithai.core.domain.feature.map.model.SuggestedPlace
 import javax.inject.Inject
 
+private const val MAX_LATITUDE = 90.0
+private const val MAX_LONGITUDE = 180.0
+
 class GetSuggestedPlacesUseCase @Inject constructor(
     private val geminiRepository: GeminiRepository
 ) {
@@ -22,10 +25,5 @@ class GetSuggestedPlacesUseCase @Inject constructor(
         }
 
         return geminiRepository.getSuggestedPlaces(latitude, longitude, model)
-    }
-
-    companion object {
-        private const val MAX_LATITUDE = 90.0
-        private const val MAX_LONGITUDE = 180.0
     }
 }

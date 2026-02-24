@@ -74,7 +74,7 @@ class GetMapItemsUseCaseTest {
     @Test(expected = IllegalArgumentException::class)
     fun `invoke with count exceeding max throws IllegalArgumentException`() = runTest {
         // GIVEN: Count exceeds the maximum allowed value
-        val countOverMax = GetMapItemsUseCase.MAX_ITEM_COUNT + 1
+        val countOverMax = MAX_ITEM_COUNT + 1
 
         // WHEN
         useCase(count = countOverMax, centerLat = 59.3293, centerLng = 18.0686)

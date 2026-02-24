@@ -90,7 +90,7 @@ class GenerateContentUseCaseTest {
     @Test
     fun `invoke with prompt exceeding max length returns failure`() = runTest {
         // GIVEN: A prompt that exceeds MAX_PROMPT_LENGTH
-        val longPrompt = "a".repeat(GenerateContentUseCase.MAX_PROMPT_LENGTH + 1)
+        val longPrompt = "a".repeat(MAX_PROMPT_LENGTH + 1)
 
         // WHEN
         val result = useCase(prompt = longPrompt)
@@ -99,14 +99,14 @@ class GenerateContentUseCaseTest {
         assertThat(result.isFailure).isTrue()
         assertThat(result.exceptionOrNull()).isInstanceOf(IllegalArgumentException::class.java)
         assertThat(result.exceptionOrNull()?.message)
-            .isEqualTo("Prompt exceeds maximum length of ${GenerateContentUseCase.MAX_PROMPT_LENGTH} characters")
+            .isEqualTo("Prompt exceeds maximum length of ${MAX_PROMPT_LENGTH} characters")
         coVerify(exactly = 0) { geminiRepository.generateContent(any(), any(), any(), any(), any()) }
     }
 
     @Test
     fun `invoke with file text exceeding max length returns failure`() = runTest {
         // GIVEN: File text that exceeds MAX_FILE_TEXT_LENGTH
-        val longFileText = "b".repeat(GenerateContentUseCase.MAX_FILE_TEXT_LENGTH + 1)
+        val longFileText = "b".repeat(MAX_FILE_TEXT_LENGTH + 1)
 
         // WHEN
         val result = useCase(prompt = "Analyze this file", fileText = longFileText)
@@ -115,7 +115,7 @@ class GenerateContentUseCaseTest {
         assertThat(result.isFailure).isTrue()
         assertThat(result.exceptionOrNull()).isInstanceOf(IllegalArgumentException::class.java)
         assertThat(result.exceptionOrNull()?.message)
-            .isEqualTo("File content exceeds maximum length of ${GenerateContentUseCase.MAX_FILE_TEXT_LENGTH} characters")
+            .isEqualTo("File content exceeds maximum length of ${MAX_FILE_TEXT_LENGTH} characters")
         coVerify(exactly = 0) { geminiRepository.generateContent(any(), any(), any(), any(), any()) }
     }
 

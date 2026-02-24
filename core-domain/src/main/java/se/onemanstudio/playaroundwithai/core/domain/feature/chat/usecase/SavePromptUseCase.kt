@@ -4,6 +4,8 @@ import se.onemanstudio.playaroundwithai.core.domain.feature.chat.model.Prompt
 import se.onemanstudio.playaroundwithai.core.domain.feature.chat.repository.PromptRepository
 import javax.inject.Inject
 
+private const val MAX_PROMPT_TEXT_LENGTH = 50_000
+
 class SavePromptUseCase @Inject constructor(
     private val repository: PromptRepository
 ) {
@@ -12,9 +14,5 @@ class SavePromptUseCase @Inject constructor(
         require(prompt.text.length <= MAX_PROMPT_TEXT_LENGTH) { "Prompt text exceeds maximum length of $MAX_PROMPT_TEXT_LENGTH" }
 
         return repository.savePrompt(prompt)
-    }
-
-    companion object {
-        const val MAX_PROMPT_TEXT_LENGTH = 50_000
     }
 }

@@ -24,6 +24,7 @@ import se.onemanstudio.playaroundwithai.core.data.feature.chat.mapper.toEntity a
 
 private const val SYNC_WORK_NAME = "sync_prompts_work"
 private const val LOG_PREVIEW_LENGTH = 50
+private const val BACKOFF_DELAY_SECONDS = 30L
 
 @Singleton
 class PromptRepositoryImpl @Inject constructor(
@@ -110,9 +111,5 @@ class PromptRepositoryImpl @Inject constructor(
             ExistingWorkPolicy.APPEND_OR_REPLACE,
             syncRequest
         )
-    }
-
-    companion object {
-        private const val BACKOFF_DELAY_SECONDS = 30L
     }
 }

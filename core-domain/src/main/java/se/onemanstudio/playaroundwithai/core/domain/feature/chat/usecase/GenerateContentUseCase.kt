@@ -5,6 +5,9 @@ import se.onemanstudio.playaroundwithai.core.domain.feature.chat.model.GeminiMod
 import se.onemanstudio.playaroundwithai.core.domain.feature.chat.repository.GeminiRepository
 import javax.inject.Inject
 
+internal const val MAX_PROMPT_LENGTH = 50_000
+internal const val MAX_FILE_TEXT_LENGTH = 100_000
+
 class GenerateContentUseCase @Inject constructor(
     private val repository: GeminiRepository
 ) {
@@ -29,10 +32,5 @@ class GenerateContentUseCase @Inject constructor(
         }
 
         return repository.generateContent(prompt, imageBytes, fileText, analysisType, model)
-    }
-
-    companion object {
-        const val MAX_PROMPT_LENGTH = 50_000
-        const val MAX_FILE_TEXT_LENGTH = 100_000
     }
 }

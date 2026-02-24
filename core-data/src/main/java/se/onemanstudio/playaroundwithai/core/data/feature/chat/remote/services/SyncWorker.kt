@@ -18,6 +18,9 @@ import se.onemanstudio.playaroundwithai.core.domain.feature.chat.model.SyncStatu
 import timber.log.Timber
 
 private const val SYNC_CHANNEL_FOR_DB = "sync_channel"
+private const val NOTIFICATION_ID = 101
+private const val FAILURE_NOTIFICATION_ID = 102
+private const val MAX_RETRY_COUNT = 3
 
 @HiltWorker
 class SyncWorker @AssistedInject constructor(
@@ -122,11 +125,5 @@ class SyncWorker @AssistedInject constructor(
 
         val notificationManager = context.getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
         notificationManager.notify(FAILURE_NOTIFICATION_ID, notification)
-    }
-
-    companion object {
-        private const val NOTIFICATION_ID = 101
-        private const val FAILURE_NOTIFICATION_ID = 102
-        private const val MAX_RETRY_COUNT = 3
     }
 }

@@ -4,6 +4,10 @@ import se.onemanstudio.playaroundwithai.core.domain.feature.map.model.MapItem
 import se.onemanstudio.playaroundwithai.core.domain.feature.map.repository.MapRepository
 import javax.inject.Inject
 
+internal const val MAX_ITEM_COUNT = 100
+private const val MAX_LATITUDE = 90.0
+private const val MAX_LONGITUDE = 180.0
+
 class GetMapItemsUseCase @Inject constructor(
     private val repository: MapRepository
 ) {
@@ -13,11 +17,5 @@ class GetMapItemsUseCase @Inject constructor(
         require(centerLng in -MAX_LONGITUDE..MAX_LONGITUDE) { "Longitude must be between -$MAX_LONGITUDE and $MAX_LONGITUDE, was $centerLng" }
 
         return repository.getMapItems(count, centerLat, centerLng)
-    }
-
-    companion object {
-        const val MAX_ITEM_COUNT = 100
-        private const val MAX_LATITUDE = 90.0
-        private const val MAX_LONGITUDE = 180.0
     }
 }
