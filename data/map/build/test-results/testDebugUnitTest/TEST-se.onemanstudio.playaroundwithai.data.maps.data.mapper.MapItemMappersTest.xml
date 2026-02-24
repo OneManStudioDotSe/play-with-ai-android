@@ -1,9 +1,0 @@
-<?xml version="1.0" encoding="UTF-8"?>
-<testsuite name="se.onemanstudio.playaroundwithai.data.maps.data.mapper.MapItemMappersTest" tests="3" skipped="0" failures="0" errors="0" timestamp="2026-02-24T21:15:17.599Z" hostname="MBP-CLPQV1FW2M" time="0.021">
-  <properties/>
-  <testcase name="toDomain maps bicycle DTO to domain model correctly" classname="se.onemanstudio.playaroundwithai.data.maps.data.mapper.MapItemMappersTest" time="0.015"/>
-  <testcase name="toDomain preserves coordinate precision" classname="se.onemanstudio.playaroundwithai.data.maps.data.mapper.MapItemMappersTest" time="0.002"/>
-  <testcase name="toDomain maps scooter DTO to domain model correctly" classname="se.onemanstudio.playaroundwithai.data.maps.data.mapper.MapItemMappersTest" time="0.0"/>
-  <system-out><![CDATA[]]></system-out>
-  <system-err><![CDATA[]]></system-err>
-</testsuite>
