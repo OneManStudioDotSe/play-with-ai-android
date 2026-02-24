@@ -81,7 +81,6 @@ dependencies {
     implementation(libs.retrofit)
     implementation(libs.retrofit.converter.gson)
 
-    // Coroutines
     implementation(libs.kotlinx.coroutines.play.services)
 
     debugImplementation(libs.ui.tooling)

@@ -177,26 +177,28 @@ class ChatViewModel @Inject constructor(
                 imageBytes = imageBytes,
                 fileText = fileText,
                 analysisType = analysisType,
-            ).onSuccess { responseText ->
-                _screenState.update { it.copy(chatState = ChatUiState.Success(responseText)) }
+            )
+                .onSuccess { responseText ->
+                    _screenState.update { it.copy(chatState = ChatUiState.Success(responseText)) }
 
-                if (savedId != null) {
-                    try {
-                        updatePromptTextUseCase(savedId, "Q: $prompt\nA: $responseText")
-                    } catch (e: Exception) {
-                        Timber.e(e, "ChatVM - Failed to update prompt text in local DB")
-                        _snackbarEvent.tryEmit(SnackbarEvent.LocalUpdateFailed)
+                    if (savedId != null) {
+                        try {
+                            updatePromptTextUseCase(savedId, "Q: $prompt\nA: $responseText")
+                        } catch (e: Exception) {
+                            Timber.e(e, "ChatVM - Failed to update prompt text in local DB")
+                            _snackbarEvent.tryEmit(SnackbarEvent.LocalUpdateFailed)
+                        }
                     }
                 }
-            }.onFailure { exception ->
-                val error = when (exception) {
-                    is IOException -> ChatError.NetworkMissing
-                    is SecurityException -> ChatError.Permission
-                    else -> ChatError.Unknown(exception.localizedMessage)
-                }
+                .onFailure { exception ->
+                    val error = when (exception) {
+                        is IOException -> ChatError.NetworkMissing
+                        is SecurityException -> ChatError.Permission
+                        else -> ChatError.Unknown(exception.localizedMessage)
+                    }
 
-                _screenState.update { it.copy(chatState = ChatUiState.Error(error)) }
-            }
+                    _screenState.update { it.copy(chatState = ChatUiState.Error(error)) }
+                }
         }
     }
 

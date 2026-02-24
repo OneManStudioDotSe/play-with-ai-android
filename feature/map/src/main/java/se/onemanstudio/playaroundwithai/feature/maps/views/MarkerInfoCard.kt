@@ -35,8 +35,8 @@ import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
-import se.onemanstudio.playaroundwithai.feature.maps.domain.model.MapItem
-import se.onemanstudio.playaroundwithai.feature.maps.domain.model.VehicleType
+import se.onemanstudio.playaroundwithai.data.maps.domain.model.MapItem
+import se.onemanstudio.playaroundwithai.data.maps.domain.model.VehicleType
 import se.onemanstudio.playaroundwithai.core.ui.sofa.NeoBrutalCard
 import se.onemanstudio.playaroundwithai.core.ui.sofa.NeoBrutalIconButton
 import se.onemanstudio.playaroundwithai.core.ui.theme.Dimensions
@@ -75,7 +75,7 @@ fun MarkerInfoCard(
             ) {
                 Row(verticalAlignment = Alignment.CenterVertically) {
                     Icon(
-                        imageVector = if (marker.mapItem.type == VehicleType.BICYCLE) {
+                        imageVector = if (marker.mapItem.type == VehicleType.Bicycle) {
                             Icons.AutoMirrored.Filled.DirectionsBike
                         } else {
                             Icons.Default.ElectricScooter
@@ -91,7 +91,7 @@ fun MarkerInfoCard(
                             fontWeight = FontWeight.Bold
                         )
                         Text(
-                            text = if (marker.mapItem.type == VehicleType.SCOOTER) stringResource(R.string.e_scooter) else stringResource(R.string.e_bike),
+                            text = if (marker.mapItem.type == VehicleType.Scooter) stringResource(R.string.e_scooter) else stringResource(R.string.e_bike),
                             style = MaterialTheme.typography.labelSmall
                         )
                     }
@@ -175,7 +175,7 @@ private fun MarkerInfoCardScooterPreview() {
                     name = "Scooty",
                     lat = 0.0,
                     lng = 0.0,
-                    type = VehicleType.SCOOTER,
+                    type = VehicleType.Scooter,
                     batteryLevel = 87,
                     vehicleCode = "1234",
                     nickname = "Scooty"
@@ -197,7 +197,7 @@ private fun MarkerInfoCardBicyclePreview() {
                     name = "Bikey",
                     lat = 0.0,
                     lng = 0.0,
-                    type = VehicleType.BICYCLE,
+                    type = VehicleType.Bicycle,
                     batteryLevel = 55,
                     vehicleCode = "6789",
                     nickname = "Bikey"

@@ -49,7 +49,7 @@ class AskAiUseCaseTest {
         assertThat(result.isFailure).isTrue()
         assertThat(result.exceptionOrNull()).isInstanceOf(IllegalArgumentException::class.java)
         assertThat(result.exceptionOrNull()?.message).isEqualTo("Prompt and attachments cannot all be empty")
-        coVerify(exactly = 0) { geminiRepository.getAiResponse(any(), any(), any(), any(), any()) }
+        coVerify(exactly = 0) { geminiRepository.getAiResponse(any(), any(), any(), any()) }
     }
 
     @Test
@@ -99,7 +99,7 @@ class AskAiUseCaseTest {
         assertThat(result.exceptionOrNull()).isInstanceOf(IllegalArgumentException::class.java)
         assertThat(result.exceptionOrNull()?.message)
             .isEqualTo("Prompt exceeds maximum length of $MAX_PROMPT_LENGTH characters")
-        coVerify(exactly = 0) { geminiRepository.getAiResponse(any(), any(), any(), any(), any()) }
+        coVerify(exactly = 0) { geminiRepository.getAiResponse(any(), any(), any(), any()) }
     }
 
     @Test
@@ -115,7 +115,7 @@ class AskAiUseCaseTest {
         assertThat(result.exceptionOrNull()).isInstanceOf(IllegalArgumentException::class.java)
         assertThat(result.exceptionOrNull()?.message)
             .isEqualTo("File content exceeds maximum length of $MAX_FILE_TEXT_LENGTH characters")
-        coVerify(exactly = 0) { geminiRepository.getAiResponse(any(), any(), any(), any(), any()) }
+        coVerify(exactly = 0) { geminiRepository.getAiResponse(any(), any(), any(), any()) }
     }
 
     @Test

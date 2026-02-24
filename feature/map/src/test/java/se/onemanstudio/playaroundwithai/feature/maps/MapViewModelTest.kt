@@ -20,17 +20,17 @@ import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
 import se.onemanstudio.playaroundwithai.core.config.model.ApiKeyAvailability
-import se.onemanstudio.playaroundwithai.feature.maps.domain.model.MapItem
-import se.onemanstudio.playaroundwithai.feature.maps.domain.model.VehicleType
-import se.onemanstudio.playaroundwithai.feature.maps.domain.repository.MapGeminiRepository
-import se.onemanstudio.playaroundwithai.feature.maps.domain.repository.MapRepository
-import se.onemanstudio.playaroundwithai.feature.maps.domain.usecase.GetMapItemsUseCase
-import se.onemanstudio.playaroundwithai.feature.maps.domain.usecase.GetSuggestedPlacesUseCase
+import se.onemanstudio.playaroundwithai.data.maps.domain.model.MapItem
+import se.onemanstudio.playaroundwithai.data.maps.domain.model.VehicleType
+import se.onemanstudio.playaroundwithai.data.maps.domain.repository.MapSuggestionsRepository
+import se.onemanstudio.playaroundwithai.data.maps.domain.repository.MapPointsRepository
+import se.onemanstudio.playaroundwithai.data.maps.domain.usecase.GetMapItemsUseCase
+import se.onemanstudio.playaroundwithai.data.maps.domain.usecase.GetSuggestedPlacesUseCase
 import se.onemanstudio.playaroundwithai.feature.maps.states.MapError
 import se.onemanstudio.playaroundwithai.feature.maps.models.toUiModel
 import se.onemanstudio.playaroundwithai.feature.maps.states.MapUiState
 import se.onemanstudio.playaroundwithai.feature.maps.util.MainCoroutineRule
-import se.onemanstudio.playaroundwithai.feature.maps.util.NetworkMonitor
+import se.onemanstudio.playaroundwithai.data.maps.util.NetworkMonitor
 
 @OptIn(ExperimentalCoroutinesApi::class)
 class MapViewModelTest {
@@ -38,9 +38,9 @@ class MapViewModelTest {
     @get:Rule
     val mainDispatcherRule = MainCoroutineRule(UnconfinedTestDispatcher())
 
-    private val repository: MapRepository = mockk()
-    private val mapGeminiRepository: MapGeminiRepository = mockk()
-    private val getSuggestedPlacesUseCase = GetSuggestedPlacesUseCase(mapGeminiRepository)
+    private val repository: MapPointsRepository = mockk()
+    private val mapSuggestionsRepository: MapSuggestionsRepository = mockk()
+    private val getSuggestedPlacesUseCase = GetSuggestedPlacesUseCase(mapSuggestionsRepository)
     private val networkMonitor: NetworkMonitor = mockk()
 
     @Before
@@ -50,11 +50,11 @@ class MapViewModelTest {
 
     // Test Data
     private val scooterItemDomain = MapItem(
-        id = "1", lat = 59.0, lng = 18.0, name = "Scooter 1", type = VehicleType.SCOOTER,
+        id = "1", lat = 59.0, lng = 18.0, name = "Scooter 1", type = VehicleType.Scooter,
         batteryLevel = 88, vehicleCode = "1234", nickname = "Scooty"
     )
     private val bikeItemDomain = MapItem(
-        id = "2", lat = 59.0, lng = 18.0, name = "Bike 1", type = VehicleType.BICYCLE,
+        id = "2", lat = 59.0, lng = 18.0, name = "Bike 1", type = VehicleType.Bicycle,
         batteryLevel = 55, vehicleCode = "5678", nickname = "Bikey"
     )
     private val testDataDomain = listOf(scooterItemDomain, bikeItemDomain)
@@ -146,16 +146,16 @@ class MapViewModelTest {
         assertEquals(2, states.last().visibleLocations.size)
 
         // When: Toggle OFF Scooters
-        viewModel.toggleFilter(VehicleType.SCOOTER)
+        viewModel.toggleFilter(VehicleType.Scooter)
 
         // Then: Only Bikes visible
         val bikeState = states.last()
-        assertFalse(bikeState.activeFilter.contains(VehicleType.SCOOTER))
+        assertFalse(bikeState.activeFilter.contains(VehicleType.Scooter))
         assertEquals(1, bikeState.visibleLocations.size)
-        assertEquals(VehicleType.BICYCLE, bikeState.visibleLocations.first().type)
+        assertEquals(VehicleType.Bicycle, bikeState.visibleLocations.first().type)
 
         // When: Toggle ON Scooters
-        viewModel.toggleFilter(VehicleType.SCOOTER)
+        viewModel.toggleFilter(VehicleType.Scooter)
 
         // Then: Both visible again
         assertEquals(2, states.last().visibleLocations.size)
@@ -203,7 +203,7 @@ class MapViewModelTest {
         val itemCount = MapConstants.MAX_SELECTABLE_POINTS + 1
         val manyItemsDomain = (1..itemCount).map {
             MapItem(
-                id = it.toString(), lat = 0.0, lng = 0.0, name = "Item $it", type = VehicleType.SCOOTER,
+                id = it.toString(), lat = 0.0, lng = 0.0, name = "Item $it", type = VehicleType.Scooter,
                 batteryLevel = 100, vehicleCode = "$it", nickname = "Item $it"
             )
         }

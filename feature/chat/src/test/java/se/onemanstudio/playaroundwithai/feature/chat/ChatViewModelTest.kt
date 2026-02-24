@@ -352,8 +352,8 @@ class ChatViewModelTest {
         apiKeyAvailability: ApiKeyAvailability = ApiKeyAvailability(isGeminiKeyAvailable = true, isMapsKeyAvailable = true),
     ): ChatViewModel {
         val geminiRepository = mockk<ChatGeminiRepository> {
-            generateContentResult?.let { coEvery { getAiResponse(any(), any(), any(), any(), any()) } returns it }
-            coEvery { generateConversationStarters(any()) } returns suggestionsResult
+            generateContentResult?.let { coEvery { getAiResponse(any(), any(), any(), any()) } returns it }
+            coEvery { generateConversationStarters() } returns suggestionsResult
         }
 
         val effectivePromptRepository = promptRepository ?: mockk<PromptRepository> {

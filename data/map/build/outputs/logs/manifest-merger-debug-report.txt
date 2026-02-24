@@ -1,0 +1,16 @@
+-- Merging decision tree log ---
+manifest
+ADDED from /Users/sotirisfalieris/Documents/Repos/Mine/play-with-ai-android/data/map/build/intermediates/tmp/ProcessLibraryManifest/debug/tempAndroidManifest2219473779408855035.xml:2:13-83
+INJECTED from /Users/sotirisfalieris/Documents/Repos/Mine/play-with-ai-android/data/map/build/intermediates/tmp/ProcessLibraryManifest/debug/tempAndroidManifest2219473779408855035.xml:2:13-83
+	package
+		INJECTED from /Users/sotirisfalieris/Documents/Repos/Mine/play-with-ai-android/data/map/build/intermediates/tmp/ProcessLibraryManifest/debug/tempAndroidManifest2219473779408855035.xml
+	xmlns:android
+		ADDED from /Users/sotirisfalieris/Documents/Repos/Mine/play-with-ai-android/data/map/build/intermediates/tmp/ProcessLibraryManifest/debug/tempAndroidManifest2219473779408855035.xml:2:23-81
+uses-sdk
+INJECTED from /Users/sotirisfalieris/Documents/Repos/Mine/play-with-ai-android/data/map/build/intermediates/tmp/ProcessLibraryManifest/debug/tempAndroidManifest2219473779408855035.xml reason: use-sdk injection requested
+INJECTED from /Users/sotirisfalieris/Documents/Repos/Mine/play-with-ai-android/data/map/build/intermediates/tmp/ProcessLibraryManifest/debug/tempAndroidManifest2219473779408855035.xml
+INJECTED from /Users/sotirisfalieris/Documents/Repos/Mine/play-with-ai-android/data/map/build/intermediates/tmp/ProcessLibraryManifest/debug/tempAndroidManifest2219473779408855035.xml
+	android:targetSdkVersion
+		INJECTED from /Users/sotirisfalieris/Documents/Repos/Mine/play-with-ai-android/data/map/build/intermediates/tmp/ProcessLibraryManifest/debug/tempAndroidManifest2219473779408855035.xml
+	android:minSdkVersion
+		INJECTED from /Users/sotirisfalieris/Documents/Repos/Mine/play-with-ai-android/data/map/build/intermediates/tmp/ProcessLibraryManifest/debug/tempAndroidManifest2219473779408855035.xml

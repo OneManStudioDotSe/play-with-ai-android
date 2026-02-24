@@ -33,7 +33,10 @@ class AuthRepositoryImpl @Inject constructor(
                 requireNotNull(firebaseAuth.currentUser).toDomain()
             }
 
-            Timber.d("Auth - Session created for ${session.userId} (isNew: ${session.isNewUser}, ${session.accountAgeDays} days old, from ${session.authProvider})")
+            Timber.d(
+                "Auth - Session created for ${session.userId} " +
+                    "(isNew: ${session.isNewUser}, ${session.accountAgeDays} days old, from ${session.authProvider})"
+            )
             _authReady.value = true
             Result.success(session)
         } catch (e: CancellationException) {

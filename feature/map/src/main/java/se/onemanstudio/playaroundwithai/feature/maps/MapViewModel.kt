@@ -15,17 +15,17 @@ import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.isActive
 import kotlinx.coroutines.launch
 import se.onemanstudio.playaroundwithai.core.config.model.ApiKeyAvailability
-import se.onemanstudio.playaroundwithai.feature.maps.domain.model.MapItem
-import se.onemanstudio.playaroundwithai.feature.maps.domain.model.SuggestedPlace
-import se.onemanstudio.playaroundwithai.feature.maps.domain.model.VehicleType
-import se.onemanstudio.playaroundwithai.feature.maps.domain.usecase.GetMapItemsUseCase
-import se.onemanstudio.playaroundwithai.feature.maps.domain.usecase.GetSuggestedPlacesUseCase
+import se.onemanstudio.playaroundwithai.data.maps.domain.model.MapItem
+import se.onemanstudio.playaroundwithai.data.maps.domain.model.SuggestedPlace
+import se.onemanstudio.playaroundwithai.data.maps.domain.model.VehicleType
+import se.onemanstudio.playaroundwithai.data.maps.domain.usecase.GetMapItemsUseCase
+import se.onemanstudio.playaroundwithai.data.maps.domain.usecase.GetSuggestedPlacesUseCase
 import se.onemanstudio.playaroundwithai.feature.maps.models.MapItemUiModel
 import se.onemanstudio.playaroundwithai.feature.maps.models.toUiModel
 import se.onemanstudio.playaroundwithai.feature.maps.states.MapError
 import se.onemanstudio.playaroundwithai.feature.maps.states.MapUiState
 import se.onemanstudio.playaroundwithai.feature.maps.states.SuggestedPlacesError
-import se.onemanstudio.playaroundwithai.feature.maps.util.NetworkMonitor
+import se.onemanstudio.playaroundwithai.data.maps.util.NetworkMonitor
 import se.onemanstudio.playaroundwithai.feature.maps.utils.calculatePathDistance
 import se.onemanstudio.playaroundwithai.feature.maps.utils.permutations
 import timber.log.Timber
@@ -160,7 +160,7 @@ class MapViewModel @Inject constructor(
                 lat = place.lat,
                 lng = place.lng,
                 name = place.name,
-                type = VehicleType.SCOOTER,
+                type = VehicleType.Scooter,
                 batteryLevel = 0,
                 vehicleCode = "",
                 nickname = place.name

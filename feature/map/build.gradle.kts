@@ -43,18 +43,13 @@ android {
 
 dependencies {
     implementation(project(":core:config"))
-    implementation(project(":core:network"))
     implementation(project(":core:theme"))
     implementation(project(":core:ui"))
+    implementation(project(":data:map"))
 
     implementation(libs.material3)
     implementation(libs.androidx.material.icons.extended)
     implementation(libs.kotlinx.collections.immutable)
-
-    // Data layer
-    implementation(libs.retrofit)
-    implementation(libs.retrofit.converter.gson)
-    implementation(libs.javax.inject)
 
     implementation(libs.timber)
 

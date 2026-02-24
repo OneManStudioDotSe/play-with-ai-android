@@ -81,8 +81,8 @@ import com.google.maps.android.compose.Polyline
 import com.google.maps.android.compose.rememberCameraPositionState
 import com.google.maps.android.compose.rememberUpdatedMarkerState
 import kotlinx.coroutines.launch
-import se.onemanstudio.playaroundwithai.feature.maps.domain.model.SuggestedPlace
-import se.onemanstudio.playaroundwithai.feature.maps.domain.model.VehicleType
+import se.onemanstudio.playaroundwithai.data.maps.domain.model.SuggestedPlace
+import se.onemanstudio.playaroundwithai.data.maps.domain.model.VehicleType
 import se.onemanstudio.playaroundwithai.core.ui.sofa.NeoBrutalButton
 import se.onemanstudio.playaroundwithai.core.ui.sofa.NeoBrutalCard
 import se.onemanstudio.playaroundwithai.core.ui.sofa.NeoBrutalIconButton
@@ -266,7 +266,7 @@ fun MapScreen(viewModel: MapViewModel = hiltViewModel()) {
                     val isSelected = uiState.selectedLocations.any { it.id == item.id } || uiState.focusedMarker?.id == item.id
 
                     val icon =
-                        if (item.type == VehicleType.BICYCLE) Icons.AutoMirrored.Filled.DirectionsBike else Icons.Default.ElectricScooter
+                        if (item.type == VehicleType.Bicycle) Icons.AutoMirrored.Filled.DirectionsBike else Icons.Default.ElectricScooter
 
                     MarkerComposable(
                         keys = arrayOf<Any>(item.id, isSelected),
@@ -472,18 +472,18 @@ private fun BoxScope.TopActions(
         ) {
             FilterChip(
                 text = stringResource(id = MapFeatureR.string.scooters_filter_chip_label),
-                selected = uiState.activeFilter.contains(VehicleType.SCOOTER)
+                selected = uiState.activeFilter.contains(VehicleType.Scooter)
             ) {
                 view.performHapticFeedback(HapticFeedbackConstants.CONTEXT_CLICK)
-                onToggleFilter(VehicleType.SCOOTER)
+                onToggleFilter(VehicleType.Scooter)
             }
 
             FilterChip(
                 text = stringResource(id = MapFeatureR.string.bicycles_filter_chip_label),
-                selected = uiState.activeFilter.contains(VehicleType.BICYCLE)
+                selected = uiState.activeFilter.contains(VehicleType.Bicycle)
             ) {
                 view.performHapticFeedback(HapticFeedbackConstants.CONTEXT_CLICK)
-                onToggleFilter(VehicleType.BICYCLE)
+                onToggleFilter(VehicleType.Bicycle)
             }
 
             NeoBrutalIconButton(
