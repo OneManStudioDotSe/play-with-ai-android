@@ -8,6 +8,7 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.SolidColor
 import androidx.compose.ui.text.input.TextFieldValue
 import androidx.compose.ui.tooling.preview.Preview
 import se.onemanstudio.playaroundwithai.core.ui.theme.Alphas
@@ -22,10 +23,13 @@ fun NeoBrutalTextField(
     modifier: Modifier = Modifier
 ) {
     Box(modifier = modifier) {
+        val onSurfaceColor = MaterialTheme.colorScheme.onSurface
+
         BasicTextField(
             value = value,
             onValueChange = onValueChange,
-            textStyle = MaterialTheme.typography.bodyLarge,
+            textStyle = MaterialTheme.typography.bodyLarge.copy(color = onSurfaceColor),
+            cursorBrush = SolidColor(onSurfaceColor),
             modifier = Modifier
                 .fillMaxWidth()
                 .neoBrutalism(
@@ -55,7 +59,7 @@ fun NeoBrutalTextField(
 private fun NeoBrutalTextFieldLightPreview() {
     SofaAiTheme(darkTheme = false) {
         NeoBrutalTextField(
-            value = TextFieldValue(""),
+            value = TextFieldValue("User input"),
             onValueChange = {},
             placeholder = "Type something..."
         )
@@ -67,7 +71,7 @@ private fun NeoBrutalTextFieldLightPreview() {
 private fun NeoBrutalTextFieldDarkPreview() {
     SofaAiTheme(darkTheme = true) {
         NeoBrutalTextField(
-            value = TextFieldValue("User Input"),
+            value = TextFieldValue("User input"),
             onValueChange = {},
             placeholder = "Type something..."
         )

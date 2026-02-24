@@ -53,7 +53,7 @@ private fun NeoBrutalTopAppBarLightPreview() {
     SofaAiTheme {
         Column {
             NeoBrutalTopAppBar(
-                title = "PREVIEW TITLE",
+                title = "Some title",
                 actions = {
                     NeoBrutalIconButton(
                         onClick = {},
@@ -72,7 +72,7 @@ private fun NeoBrutalTopAppBarDarkPreview() {
     SofaAiTheme(darkTheme = true) {
         Column {
             NeoBrutalTopAppBar(
-                title = "PREVIEW TITLE",
+                title = "Some title",
                 actions = {
                     NeoBrutalIconButton(
                         onClick = {},
