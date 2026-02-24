@@ -9,10 +9,12 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import se.onemanstudio.playaroundwithai.core.ui.sofa.neoBrutalism
 import se.onemanstudio.playaroundwithai.core.ui.theme.Dimensions
 import se.onemanstudio.playaroundwithai.core.ui.theme.SofaAiTheme
+import se.onemanstudio.playaroundwithai.feature.map.R
 
 @Composable
 fun FilterChip(
@@ -49,7 +51,7 @@ fun FilterChip(
 private fun FilterChipUnselectedLightPreview() {
     SofaAiTheme(darkTheme = false) {
         FilterChip(
-            text = "Scooters",
+            text = stringResource(id = R.string.scooters_filter_chip_label),
             selected = false,
             onClick = {}
         )
@@ -61,7 +63,7 @@ private fun FilterChipUnselectedLightPreview() {
 private fun FilterChipSelectedLightPreview() {
     SofaAiTheme(darkTheme = false) {
         FilterChip(
-            text = "Bicycles",
+            text = stringResource(id = R.string.bicycles_filter_chip_label),
             selected = true,
             onClick = {}
         )
@@ -73,7 +75,7 @@ private fun FilterChipSelectedLightPreview() {
 private fun FilterChipUnselectedDarkPreview() {
     SofaAiTheme(darkTheme = true) {
         FilterChip(
-            text = "Scooters",
+            text = stringResource(id = R.string.scooters_filter_chip_label),
             selected = false,
             onClick = {}
         )
@@ -85,7 +87,7 @@ private fun FilterChipUnselectedDarkPreview() {
 private fun FilterChipSelectedDarkPreview() {
     SofaAiTheme(darkTheme = true) {
         FilterChip(
-            text = "Bicycles",
+            text = stringResource(id = R.string.bicycles_filter_chip_label),
             selected = true,
             onClick = {}
         )
