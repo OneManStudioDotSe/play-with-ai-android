@@ -4,8 +4,11 @@
     <string name="settings_about">About</string>
     <string name="settings_app_name">Play With AI</string>
     <string name="settings_version">Version %s</string>
-    <string name="settings_contact">Contact us</string>
+    <string name="settings_contact">Contact me</string>
     <string name="settings_contact_email">hello@onemanstudio.se</string>
+    <string name="settings_linkedin">LinkedIn</string>
+    <string name="settings_app_description">A showcase Android app exploring modern AI engineering with Gemini.</string>
+    <string name="settings_token_suffix">tokens</string>
     <string name="settings_map_controls">Map Controls</string>
     <string name="settings_vehicle_count">Number of vehicles: %d</string>
     <string name="settings_search_radius">Search radius: %.1f km</string>

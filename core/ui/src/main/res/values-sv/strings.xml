@@ -4,8 +4,11 @@
     <string name="settings_about">Om</string>
     <string name="settings_app_name">Play With AI</string>
     <string name="settings_version">Version %s</string>
-    <string name="settings_contact">Kontakta oss</string>
+    <string name="settings_contact">Kontakta mig</string>
     <string name="settings_contact_email">hello@onemanstudio.se</string>
+    <string name="settings_linkedin">LinkedIn</string>
+    <string name="settings_app_description">En Android-app som utforskar modern AI-teknik med Gemini.</string>
+    <string name="settings_token_suffix">tokens</string>
     <string name="settings_map_controls">Kartkontroller</string>
     <string name="settings_vehicle_count">Antal fordon: %d</string>
     <string name="settings_search_radius">Sökradie: %.1f km</string>

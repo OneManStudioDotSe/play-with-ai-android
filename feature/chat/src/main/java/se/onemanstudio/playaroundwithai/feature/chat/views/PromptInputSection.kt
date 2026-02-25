@@ -1,6 +1,8 @@
 package se.onemanstudio.playaroundwithai.feature.chat.views
 
 import androidx.compose.animation.AnimatedVisibility
+import androidx.compose.animation.fadeIn
+import androidx.compose.animation.fadeOut
 import androidx.compose.animation.core.LinearEasing
 import androidx.compose.animation.core.RepeatMode
 import androidx.compose.animation.core.animateFloat
@@ -80,12 +82,16 @@ fun PromptInputSection(
         verticalArrangement = Arrangement.spacedBy(Dimensions.paddingMedium)
     ) {
         // our conversation starters
-        if (inputMode == InputMode.TEXT) {
-            Box(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .height(Dimensions.heightMedium),
-                contentAlignment = Alignment.CenterStart
+        Box(
+            modifier = Modifier
+                .fillMaxWidth()
+                .height(Dimensions.heightMedium),
+            contentAlignment = Alignment.CenterStart
+        ) {
+            androidx.compose.animation.AnimatedVisibility(
+                visible = inputMode == InputMode.TEXT,
+                enter = fadeIn(),
+                exit = fadeOut(),
             ) {
                 if (isSuggestionsLoading) {
                     ThreeDotsLoadingAnimation(

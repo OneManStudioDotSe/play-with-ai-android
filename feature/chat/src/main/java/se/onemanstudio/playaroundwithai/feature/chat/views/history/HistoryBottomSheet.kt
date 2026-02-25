@@ -92,8 +92,8 @@ fun HistoryBottomSheet(
                         item {
                             Text(
                                 text = stringResource(R.string.no_history_yet),
-                                style = MaterialTheme.typography.bodyLarge,
-                                color = MaterialTheme.colorScheme.onSurfaceVariant,
+                                style = MaterialTheme.typography.bodyMedium,
+                                color = MaterialTheme.colorScheme.onSurface.copy(alpha = Alphas.medium),
                                 textAlign = TextAlign.Center,
                                 modifier = Modifier
                                     .fillMaxWidth()
