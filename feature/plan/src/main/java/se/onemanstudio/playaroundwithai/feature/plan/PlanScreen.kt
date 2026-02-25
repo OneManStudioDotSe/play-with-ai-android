@@ -9,6 +9,9 @@ import androidx.compose.animation.core.RepeatMode
 import androidx.compose.animation.core.animateFloat
 import androidx.compose.animation.core.infiniteRepeatable
 import androidx.compose.animation.core.rememberInfiniteTransition
+import androidx.compose.animation.core.Spring
+import androidx.compose.animation.core.animateDpAsState
+import androidx.compose.animation.core.spring
 import androidx.compose.animation.core.tween
 import androidx.compose.animation.fadeIn
 import androidx.compose.animation.slideInVertically
@@ -23,6 +26,7 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.heightIn
+import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.imePadding
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
@@ -53,6 +57,7 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.alpha
+import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.platform.LocalSoftwareKeyboardController
 import androidx.compose.ui.platform.LocalView
@@ -97,6 +102,10 @@ private const val POLYLINE_WIDTH = 5f
 private const val PULSE_ALPHA_MIN = 0.3f
 private const val PULSE_ALPHA_MAX = 1.0f
 private const val PULSE_DURATION_MS = 800
+private const val BOUNCE_DURATION_MS = 400
+private const val BOUNCE_STAGGER_MS = 100
+private const val BOUNCE_DOT_COUNT = 3
+private val BOUNCE_AMPLITUDE = 4.dp
 
 @Composable
 fun PlanScreen(
@@ -303,6 +312,9 @@ private fun StepRow(step: PlanStepUi, isPulsing: Boolean) {
         PULSE_ALPHA_MAX
     }
 
+    val showBouncingDots = isPulsing && step.label.endsWith("...")
+    val displayLabel = if (showBouncingDots) step.label.removeSuffix("...") else step.label
+
     Row(
         modifier = Modifier
             .fillMaxWidth()
@@ -317,10 +329,49 @@ private fun StepRow(step: PlanStepUi, isPulsing: Boolean) {
         )
         Spacer(modifier = Modifier.width(Dimensions.paddingMedium))
         Text(
-            text = step.label,
+            text = displayLabel,
             style = MaterialTheme.typography.bodyMedium,
             color = MaterialTheme.colorScheme.onSurface,
         )
+        if (showBouncingDots) {
+            BouncingDots()
+        }
+    }
+}
+
+@Composable
+private fun BouncingDots() {
+    val transition = rememberInfiniteTransition(label = "bouncingDots")
+
+    Row {
+        repeat(BOUNCE_DOT_COUNT) { index ->
+            val offset by transition.animateFloat(
+                initialValue = 0f,
+                targetValue = -1f,
+                animationSpec = infiniteRepeatable(
+                    animation = tween(
+                        durationMillis = BOUNCE_DURATION_MS,
+                        delayMillis = index * BOUNCE_STAGGER_MS,
+                        easing = LinearEasing,
+                    ),
+                    repeatMode = RepeatMode.Reverse,
+                ),
+                label = "bounce_$index",
+            )
+
+            val animatedOffset: Dp by animateDpAsState(
+                targetValue = BOUNCE_AMPLITUDE * offset,
+                animationSpec = spring(stiffness = Spring.StiffnessLow),
+                label = "dpOffset_$index",
+            )
+
+            Text(
+                text = ".",
+                style = MaterialTheme.typography.bodyMedium,
+                color = MaterialTheme.colorScheme.onSurface,
+                modifier = Modifier.offset(y = animatedOffset),
+            )
+        }
     }
 }
 
