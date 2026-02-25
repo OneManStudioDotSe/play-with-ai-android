@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="dream_title">Drömmar</string>
+    <string name="dream_input_placeholder">Beskriv din dröm\u2026</string>
+    <string name="dream_interpret_button">Vad betyder det?</string>
+    <string name="dream_new_button">Ny dröm</string>
+    <string name="dream_interpretation_label">Tolkning</string>
+    <string name="dream_mood_label">Stämning</string>
+    <string name="dream_gallery_title">Tidigare drömmar</string>
+    <string name="dream_empty_gallery">Inga drömmar ännu. Beskriv en dröm för att börja!</string>
+    <string name="dream_label_clear">Rensa</string>
+    <string name="dream_label_delete">Radera dröm</string>
+    <string name="dream_label_error_icon">Felikon</string>
+    <string name="dream_label_dismiss_error">Avfärda fel</string>
+    <string name="dream_interpreting">Tolkar din dröm\u2026</string>
+
+    <string name="dream_oops">Hoppsan!</string>
+    <string name="dream_error_network">Ingen internetanslutning. Kontrollera ditt nätverk.</string>
+    <string name="dream_error_input_too_long">Din drömbeskrivning är för lång. Håll den under 5 000 tecken.</string>
+    <string name="dream_error_unknown">Ett okänt fel inträffade.</string>
+
+    <string name="dream_mood_joyful">Glad</string>
+    <string name="dream_mood_mysterious">Mystisk</string>
+    <string name="dream_mood_anxious">Ångestfylld</string>
+    <string name="dream_mood_peaceful">Fridfull</string>
+    <string name="dream_mood_dark">Mörk</string>
+    <string name="dream_mood_surreal">Surrealistisk</string>
+</resources>

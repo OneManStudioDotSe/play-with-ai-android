@@ -232,7 +232,7 @@ private fun AboutSection(
         ) {
             Icon(
                 imageVector = Icons.Default.Email,
-                contentDescription = null,
+                contentDescription = stringResource(R.string.settings_contact),
                 tint = MaterialTheme.colorScheme.primary,
             )
             Spacer(modifier = Modifier.width(Dimensions.paddingMedium))

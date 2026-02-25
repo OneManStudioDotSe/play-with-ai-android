@@ -15,6 +15,8 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.semantics.heading
+import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.tooling.preview.Preview
 import se.onemanstudio.playaroundwithai.core.ui.theme.Dimensions
 import se.onemanstudio.playaroundwithai.core.ui.theme.SofaAiTheme
@@ -30,6 +32,7 @@ fun NeoBrutalTopAppBar(
             Text(
                 text = title,
                 style = MaterialTheme.typography.headlineLarge,
+                modifier = Modifier.semantics { heading() },
             )
         },
         actions = {

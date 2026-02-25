@@ -26,6 +26,7 @@ import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.navigationBarsPadding
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
@@ -64,6 +65,7 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalView
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.unit.dp
 import androidx.core.content.ContextCompat
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import com.google.android.gms.location.LocationServices
@@ -617,6 +619,7 @@ private fun BoxScope.MarkerInfoPanel(
             modifier = Modifier
                 .navigationBarsPadding()
                 .padding(Dimensions.paddingLarge)
+                .heightIn(max = 200.dp)
         ) {
             marker?.let {
                 MarkerInfoCard(
@@ -656,6 +659,7 @@ private fun BoxScope.SuggestedPlaceInfoPanel(
             modifier = Modifier
                 .navigationBarsPadding()
                 .padding(Dimensions.paddingLarge)
+                .heightIn(max = 200.dp)
         ) {
             place?.let {
                 SuggestedPlaceInfoCard(

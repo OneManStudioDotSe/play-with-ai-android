@@ -4,4 +4,5 @@
     <string name="auth_error_message">Inloggningen misslyckades. Vissa funktioner kanske inte fungerar.</string>
     <string name="auth_error_retry">Försök igen</string>
     <string name="auth_error_retries_exhausted">Inloggningen misslyckades efter flera försök. Dina frågor kommer inte att synkas till molnet.</string>
+    <string name="token_usage_snackbar">Använde %s tokens</string>
 </resources>

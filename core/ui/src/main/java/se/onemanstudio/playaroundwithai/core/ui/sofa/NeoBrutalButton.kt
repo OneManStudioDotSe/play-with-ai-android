@@ -10,6 +10,7 @@ import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.sizeIn
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Favorite
 import androidx.compose.material.icons.filled.Navigation
@@ -129,6 +130,7 @@ fun NeoBrutalIconButton(
 
     Box(
         modifier = modifier
+            .sizeIn(minWidth = Dimensions.minTouchTarget, minHeight = Dimensions.minTouchTarget)
             .size(size)
             .drawBehind {
                 drawRect(

@@ -18,15 +18,15 @@
             <option value="$PROJECT_DIR$/core/theme" />
             <option value="$PROJECT_DIR$/core/ui" />
             <option value="$PROJECT_DIR$/data" />
-            <option value="$PROJECT_DIR$/data/agents" />
             <option value="$PROJECT_DIR$/data/chat" />
             <option value="$PROJECT_DIR$/data/dream" />
-            <option value="$PROJECT_DIR$/data/map" />
+            <option value="$PROJECT_DIR$/data/explore" />
+            <option value="$PROJECT_DIR$/data/plan" />
             <option value="$PROJECT_DIR$/feature" />
-            <option value="$PROJECT_DIR$/feature/agents" />
             <option value="$PROJECT_DIR$/feature/chat" />
             <option value="$PROJECT_DIR$/feature/dream" />
-            <option value="$PROJECT_DIR$/feature/map" />
+            <option value="$PROJECT_DIR$/feature/explore" />
+            <option value="$PROJECT_DIR$/feature/plan" />
           </set>
         </option>
       </GradleProjectSettings>

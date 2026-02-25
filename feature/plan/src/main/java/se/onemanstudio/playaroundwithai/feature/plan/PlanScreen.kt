@@ -22,6 +22,8 @@ import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.heightIn
+import androidx.compose.foundation.layout.imePadding
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
@@ -54,6 +56,9 @@ import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.platform.LocalSoftwareKeyboardController
 import androidx.compose.ui.platform.LocalView
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.semantics.LiveRegionMode
+import androidx.compose.ui.semantics.liveRegion
+import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.text.input.TextFieldValue
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
@@ -81,7 +86,8 @@ import se.onemanstudio.playaroundwithai.feature.plan.states.StepIcon
 import se.onemanstudio.playaroundwithai.feature.plan.states.TripPlanUi
 import se.onemanstudio.playaroundwithai.feature.plan.states.TripStopUi
 
-private const val MAP_HEIGHT = 280
+private const val MAP_HEIGHT_MIN = 180
+private const val MAP_HEIGHT_MAX = 280
 private const val MAP_ZOOM = 13f
 private const val POLYLINE_WIDTH = 5f
 private const val PULSE_ALPHA_MIN = 0.3f
@@ -132,7 +138,8 @@ fun PlanScreen(
         Box(
             modifier = Modifier
                 .fillMaxSize()
-                .padding(paddingValues),
+                .padding(paddingValues)
+                .imePadding(),
             contentAlignment = Alignment.Center,
         ) {
             when (val state = uiState) {
@@ -252,6 +259,7 @@ private fun RunningState(state: PlanUiState.Running) {
             text = stringResource(R.string.plan_planning_trip),
             style = MaterialTheme.typography.titleMedium,
             color = MaterialTheme.colorScheme.onSurface,
+            modifier = Modifier.semantics { liveRegion = LiveRegionMode.Polite },
         )
 
         Spacer(modifier = Modifier.height(Dimensions.paddingExtraLarge))
@@ -414,7 +422,7 @@ private fun TripMap(stops: PersistentList<TripStopUi>) {
     GoogleMap(
         modifier = Modifier
             .fillMaxWidth()
-            .height(MAP_HEIGHT.dp),
+            .heightIn(min = MAP_HEIGHT_MIN.dp, max = MAP_HEIGHT_MAX.dp),
         cameraPositionState = cameraPositionState,
     ) {
         stops.forEach { stop ->
@@ -506,6 +514,7 @@ private fun ErrorState(
                 style = MaterialTheme.typography.bodyMedium,
                 color = MaterialTheme.colorScheme.onSurface,
                 textAlign = TextAlign.Center,
+                modifier = Modifier.semantics { liveRegion = LiveRegionMode.Polite },
             )
             if (state.error !is PlanError.ApiKeyMissing) {
                 Spacer(modifier = Modifier.height(Dimensions.paddingLarge))

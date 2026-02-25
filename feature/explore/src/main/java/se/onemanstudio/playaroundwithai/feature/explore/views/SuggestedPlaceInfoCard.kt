@@ -48,7 +48,7 @@ fun SuggestedPlaceInfoCard(
                 ) {
                     Icon(
                         imageVector = Icons.Default.Stars,
-                        contentDescription = null,
+                        contentDescription = stringResource(R.string.ai_suggest_button_content_description),
                         modifier = Modifier.size(Dimensions.iconSizeLarge),
                         tint = MaterialTheme.colorScheme.primary
                     )

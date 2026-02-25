@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="plan_title">Reseplanerare</string>
+    <string name="plan_input_placeholder">Beskriv din ideala resa\u2026</string>
+    <string name="plan_plan_button">Planera min resa</string>
+    <string name="plan_new_plan_button">Ny plan</string>
+    <string name="plan_thinking">Tänker\u2026</string>
+    <string name="plan_step_searching">Söker efter %s</string>
+    <string name="plan_step_calculating_route">Beräknar optimal rutt</string>
+    <string name="plan_step_found_places">Hittade %d platser</string>
+    <string name="plan_step_route_ready">Rutt beräknad</string>
+    <string name="plan_your_itinerary">Din resplan</string>
+    <string name="plan_walking_distance">Promenadavstånd: %.1f km</string>
+    <string name="plan_walking_time">Beräknad tid: %d min</string>
+    <string name="plan_oops">Hoppsan!</string>
+    <string name="plan_error_network">Ingen internetanslutning. Kontrollera ditt nätverk.</string>
+    <string name="plan_error_unknown">Något gick fel.</string>
+    <string name="plan_label_error_icon">Felikon</string>
+    <string name="plan_label_dismiss_error">Avfärda fel</string>
+    <string name="plan_example_coffee">Kafferunda i Stockholm</string>
+    <string name="plan_example_museums">Museer i gamla stan</string>
+    <string name="plan_example_parks">Parker och naturvandringar</string>
+    <string name="plan_try_suggestions">Prova ett av dessa:</string>
+    <string name="plan_planning_trip">Planerar din resa\u2026</string>
+</resources>

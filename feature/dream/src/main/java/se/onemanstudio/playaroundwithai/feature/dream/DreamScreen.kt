@@ -10,6 +10,8 @@ import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.heightIn
+import androidx.compose.foundation.layout.imePadding
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.wrapContentSize
@@ -39,6 +41,9 @@ import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.platform.LocalSoftwareKeyboardController
 import androidx.compose.ui.platform.LocalView
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.semantics.LiveRegionMode
+import androidx.compose.ui.semantics.liveRegion
+import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.text.input.TextFieldValue
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
@@ -68,7 +73,8 @@ import se.onemanstudio.playaroundwithai.feature.dream.views.DreamGalleryRow
 import se.onemanstudio.playaroundwithai.feature.dream.views.DreamscapeCanvas
 import java.time.Instant
 
-private const val CANVAS_HEIGHT = 280
+private const val CANVAS_HEIGHT_MIN = 180
+private const val CANVAS_HEIGHT_MAX = 280
 
 @Composable
 fun DreamScreen(
@@ -116,7 +122,8 @@ fun DreamScreen(
         Box(
             modifier = Modifier
                 .fillMaxSize()
-                .padding(paddingValues),
+                .padding(paddingValues)
+                .imePadding(),
             contentAlignment = Alignment.Center,
         ) {
             when (uiState) {
@@ -228,6 +235,7 @@ private fun InterpretingState() {
             text = stringResource(R.string.dream_interpreting),
             style = MaterialTheme.typography.bodyLarge,
             color = MaterialTheme.colorScheme.onSurface,
+            modifier = Modifier.semantics { liveRegion = LiveRegionMode.Polite },
         )
     }
 }
@@ -248,7 +256,7 @@ private fun ResultState(
             scene = state.scene,
             modifier = Modifier
                 .fillMaxWidth()
-                .height(CANVAS_HEIGHT.dp),
+                .heightIn(min = CANVAS_HEIGHT_MIN.dp, max = CANVAS_HEIGHT_MAX.dp),
         )
 
         Column(
@@ -324,6 +332,7 @@ private fun ErrorState(
                 style = MaterialTheme.typography.bodyMedium,
                 color = MaterialTheme.colorScheme.onSurface,
                 textAlign = TextAlign.Center,
+                modifier = Modifier.semantics { liveRegion = LiveRegionMode.Polite },
             )
             if (state.error !is DreamError.ApiKeyMissing) {
                 Spacer(modifier = Modifier.height(Dimensions.paddingLarge))
