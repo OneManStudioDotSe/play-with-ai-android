@@ -33,16 +33,18 @@ import androidx.compose.ui.geometry.Size
 import androidx.compose.ui.graphics.PathEffect
 import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.input.pointer.pointerInput
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import se.onemanstudio.playaroundwithai.core.ui.theme.Alphas
+import se.onemanstudio.playaroundwithai.core.ui.views.R
 import se.onemanstudio.playaroundwithai.core.ui.theme.Dimensions
 import se.onemanstudio.playaroundwithai.core.ui.theme.SofaAiTheme
 import java.text.NumberFormat
 
 private const val CHART_HEIGHT = 120
-private const val DETAIL_TEXT_HEIGHT = 20
+private const val DETAIL_TEXT_HEIGHT = 24
 private const val BAR_CORNER_RADIUS = 4f
 private const val BAR_GAP_FRACTION = 0.3f
 private const val WEEKDAY_COUNT = 7
@@ -139,28 +141,44 @@ fun UsageChart(
         }
     }
 
+    val tokenSuffix = stringResource(R.string.settings_token_suffix)
+
     Column(modifier = modifier) {
         // Always reserve space for detail text to prevent UI jumping
-        Box(
+        Row(
             modifier = Modifier
                 .fillMaxWidth()
                 .height(DETAIL_TEXT_HEIGHT.dp)
                 .padding(bottom = Dimensions.paddingSmall),
-            contentAlignment = Alignment.Center,
         ) {
-            if (selectedIndex != null && selectedIndex in bars.indices && popScale > 0f) {
-                Text(
-                    text = numberFormat.format(countAnimatable.value.toLong()),
-                    style = MaterialTheme.typography.labelSmall,
-                    color = MaterialTheme.colorScheme.onSurface,
-                    textAlign = TextAlign.Center,
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .graphicsLayer {
-                            scaleX = popScale
-                            scaleY = popScale
-                        },
-                )
+            bars.indices.forEach { index ->
+                Box(
+                    modifier = Modifier.weight(1f),
+                    contentAlignment = Alignment.Center,
+                ) {
+                    if (selectedIndex == index && popScale > 0f) {
+                        Row(
+                            modifier = Modifier.graphicsLayer {
+                                scaleX = popScale
+                                scaleY = popScale
+                            },
+                            verticalAlignment = Alignment.CenterVertically,
+                        ) {
+                            Text(
+                                text = numberFormat.format(countAnimatable.value.toLong()),
+                                style = MaterialTheme.typography.labelSmall,
+                                color = MaterialTheme.colorScheme.onSurface,
+                                textAlign = TextAlign.Center,
+                            )
+                            Text(
+                                text = " $tokenSuffix",
+                                style = MaterialTheme.typography.labelSmall,
+                                color = MaterialTheme.colorScheme.onSurface,
+                                textAlign = TextAlign.Center,
+                            )
+                        }
+                    }
+                }
             }
         }
 
