@@ -5,6 +5,7 @@ import se.onemanstudio.playaroundwithai.data.dream.data.local.entity.DreamEntity
 import se.onemanstudio.playaroundwithai.data.dream.domain.model.Dream
 import se.onemanstudio.playaroundwithai.data.dream.domain.model.DreamMood
 import se.onemanstudio.playaroundwithai.data.dream.domain.model.DreamScene
+import timber.log.Timber
 import java.time.Instant
 
 private val gson = Gson()
@@ -14,7 +15,11 @@ fun DreamEntity.toDomain(): Dream {
         id = this.id,
         description = this.description,
         interpretation = this.interpretation,
-        scene = this.sceneJson?.let { runCatching { gson.fromJson(it, DreamScene::class.java) }.getOrNull() },
+        scene = this.sceneJson?.let { json ->
+            runCatching { gson.fromJson(json, DreamScene::class.java) }
+                .onFailure { Timber.w(it, "Failed to parse DreamScene JSON for dream id=$id") }
+                .getOrNull()
+        },
         mood = runCatching { DreamMood.valueOf(this.mood) }.getOrDefault(DreamMood.MYSTERIOUS),
         timestamp = Instant.ofEpochMilli(this.timestamp),
     )

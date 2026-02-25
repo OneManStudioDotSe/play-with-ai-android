@@ -1,5 +1,6 @@
 package se.onemanstudio.playaroundwithai.feature.explore.models
 
+import androidx.compose.runtime.Immutable
 import com.google.android.gms.maps.model.LatLng
 import se.onemanstudio.playaroundwithai.data.explore.domain.model.ExploreItem as DomainExploreItem
 
@@ -9,6 +10,7 @@ import se.onemanstudio.playaroundwithai.data.explore.domain.model.ExploreItem as
  * @property mapItem The core domain model for the explore item.
  * @property isSelected Whether this item is currently selected in the UI.
  */
+@Immutable
 data class ExploreItemUiModel(
     val mapItem: DomainExploreItem,
     val isSelected: Boolean = false,

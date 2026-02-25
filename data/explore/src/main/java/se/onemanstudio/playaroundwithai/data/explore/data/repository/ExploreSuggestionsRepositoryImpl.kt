@@ -79,6 +79,6 @@ class ExploreSuggestionsRepositoryImpl @Inject constructor(
     private fun extractJson(text: String): String {
         val codeFencePattern = Regex("""```\w*\s*([\s\S]*?)```""")
         val match = codeFencePattern.find(text)
-        return (match?.groupValues?.get(1) ?: text).trim()
+        return (match?.groupValues?.getOrNull(1) ?: text).trim()
     }
 }

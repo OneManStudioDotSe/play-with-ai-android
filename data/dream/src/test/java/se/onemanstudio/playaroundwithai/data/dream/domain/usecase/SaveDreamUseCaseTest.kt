@@ -9,6 +9,7 @@ import org.junit.Before
 import org.junit.Test
 import se.onemanstudio.playaroundwithai.data.dream.domain.model.Dream
 import se.onemanstudio.playaroundwithai.data.dream.domain.repository.DreamRepository
+import kotlin.test.assertFailsWith
 
 class SaveDreamUseCaseTest {
 
@@ -32,10 +33,12 @@ class SaveDreamUseCaseTest {
         coVerify(exactly = 1) { repository.saveDream(dream) }
     }
 
-    @Test(expected = IllegalArgumentException::class)
+    @Test
     fun `invoke with blank description throws`() = runTest {
         val dream = Dream(description = "   ")
 
-        useCase(dream)
+        assertFailsWith<IllegalArgumentException> {
+            useCase(dream)
+        }
     }
 }

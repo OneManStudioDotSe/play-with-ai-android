@@ -23,7 +23,8 @@
       "Bash(JAVA_HOME=\"/Applications/Android Studio.app/Contents/jbr/Contents/Home\" ./gradlew lintDebug:*)",
       "Bash(grep:*)",
       "Bash(ls:*)",
-      "Bash(git mv:*)"
+      "Bash(git mv:*)",
+      "Bash(echo $dir - HAS TESTS:*)"
     ]
   }
 }

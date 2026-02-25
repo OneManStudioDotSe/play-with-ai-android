@@ -10,6 +10,7 @@ import org.junit.Test
 import se.onemanstudio.playaroundwithai.data.explore.domain.model.ExploreItem
 import se.onemanstudio.playaroundwithai.data.explore.domain.model.VehicleType
 import se.onemanstudio.playaroundwithai.data.explore.domain.repository.ExplorePointsRepository
+import kotlin.test.assertFailsWith
 
 class GetExploreItemsUseCaseTest {
 
@@ -46,24 +47,32 @@ class GetExploreItemsUseCaseTest {
         coVerify(exactly = 1) { explorePointsRepository.getExploreItems(2, 59.3293, 18.0686) }
     }
 
-    @Test(expected = IllegalArgumentException::class)
+    @Test
     fun `invoke with count of zero throws IllegalArgumentException`() = runTest {
-        useCase(count = 0, centerLat = 59.3293, centerLng = 18.0686)
+        assertFailsWith<IllegalArgumentException> {
+            useCase(count = 0, centerLat = 59.3293, centerLng = 18.0686)
+        }
     }
 
-    @Test(expected = IllegalArgumentException::class)
+    @Test
     fun `invoke with count exceeding max throws IllegalArgumentException`() = runTest {
-        useCase(count = MAX_ITEM_COUNT + 1, centerLat = 59.3293, centerLng = 18.0686)
+        assertFailsWith<IllegalArgumentException> {
+            useCase(count = MAX_ITEM_COUNT + 1, centerLat = 59.3293, centerLng = 18.0686)
+        }
     }
 
-    @Test(expected = IllegalArgumentException::class)
+    @Test
     fun `invoke with invalid latitude throws IllegalArgumentException`() = runTest {
-        useCase(count = 10, centerLat = 91.0, centerLng = 18.0686)
+        assertFailsWith<IllegalArgumentException> {
+            useCase(count = 10, centerLat = 91.0, centerLng = 18.0686)
+        }
     }
 
-    @Test(expected = IllegalArgumentException::class)
+    @Test
     fun `invoke with invalid longitude throws IllegalArgumentException`() = runTest {
-        useCase(count = 10, centerLat = 59.3293, centerLng = 181.0)
+        assertFailsWith<IllegalArgumentException> {
+            useCase(count = 10, centerLat = 59.3293, centerLng = 181.0)
+        }
     }
 
     @Test

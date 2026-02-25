@@ -100,9 +100,12 @@ class TripPlannerRepositoryImpl @Inject constructor(
             val errorBody = e.response()?.errorBody()?.string()
             Timber.e(e, "$LOG_TAG - HTTP ${e.code()} error. Body: $errorBody")
             emit(PlanEvent.Error("API error (${e.code()}): ${errorBody?.take(ERROR_BODY_PREVIEW_LENGTH) ?: e.message()}"))
+        } catch (e: java.io.IOException) {
+            Timber.e(e, "$LOG_TAG - Network error")
+            emit(PlanEvent.Error("Network error: ${e.message ?: "Please check your connection"}"))
         } catch (e: Exception) {
             Timber.e(e, "$LOG_TAG - Agent error")
-            emit(PlanEvent.Error(e.message ?: "An unexpected error occurred"))
+            emit(PlanEvent.Error("An unexpected error occurred: ${e.message}"))
         }
     }.flowOn(Dispatchers.IO)
 
