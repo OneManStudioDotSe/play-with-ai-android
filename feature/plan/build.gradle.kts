@@ -54,9 +54,10 @@ dependencies {
     ksp(libs.hilt.compiler)
     implementation(libs.hilt.navigation.compose)
 
-    // Maps (for result display)
+    // Maps (for result display) and location
     implementation(libs.maps.compose)
     implementation(libs.play.services.maps)
+    implementation(libs.play.services.location)
 
     debugImplementation(libs.ui.tooling)
 
