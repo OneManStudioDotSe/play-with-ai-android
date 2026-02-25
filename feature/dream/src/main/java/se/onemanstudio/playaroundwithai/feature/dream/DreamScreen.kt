@@ -71,6 +71,7 @@ import se.onemanstudio.playaroundwithai.feature.dream.states.DreamError
 import se.onemanstudio.playaroundwithai.feature.dream.states.DreamUiState
 import se.onemanstudio.playaroundwithai.feature.dream.views.DreamGalleryRow
 import se.onemanstudio.playaroundwithai.feature.dream.views.DreamscapeCanvas
+import se.onemanstudio.playaroundwithai.feature.dream.R
 import java.time.Instant
 
 private const val CANVAS_HEIGHT_MIN = 180

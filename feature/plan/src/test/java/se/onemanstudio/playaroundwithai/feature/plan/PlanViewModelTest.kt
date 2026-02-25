@@ -273,7 +273,7 @@ class PlanViewModelTest {
     fun `planTrip catching generic exception transitions to Unknown error`() = runTest {
         // Given
         val viewModel = createViewModel(
-            planEvents = flow { throw RuntimeException("Unexpected failure") }
+            planEvents = flow { throw IllegalStateException("Unexpected failure") }
         )
         val states = captureStates(viewModel)
 

@@ -37,7 +37,7 @@ class TripPlannerRepositoryImpl @Inject constructor(
     private val tokenUsageTracker: TokenUsageTracker,
 ) : TripPlannerRepository {
 
-    @Suppress("TooGenericExceptionCaught")
+    @Suppress("TooGenericExceptionCaught", "LongMethod")
     override fun planTrip(goal: String, latitude: Double, longitude: Double): Flow<PlanEvent> = flow {
         try {
             val tools = listOf(buildToolDeclarations())

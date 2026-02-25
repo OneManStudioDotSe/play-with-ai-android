@@ -30,7 +30,7 @@ import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.navigationBarsPadding
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.layout.statusBarsPadding
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.layout.wrapContentHeight
 import androidx.compose.foundation.layout.wrapContentSize
 import androidx.compose.material.icons.Icons
@@ -43,6 +43,7 @@ import androidx.compose.material.icons.rounded.VpnKey
 import androidx.compose.material.icons.rounded.Warning
 import androidx.compose.material.icons.rounded.WifiOff
 import androidx.compose.material3.CircularProgressIndicator
+import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Snackbar
@@ -89,6 +90,7 @@ import se.onemanstudio.playaroundwithai.data.explore.domain.model.VehicleType
 import se.onemanstudio.playaroundwithai.core.ui.sofa.NeoBrutalButton
 import se.onemanstudio.playaroundwithai.core.ui.sofa.NeoBrutalCard
 import se.onemanstudio.playaroundwithai.core.ui.sofa.NeoBrutalIconButton
+import se.onemanstudio.playaroundwithai.core.ui.sofa.NeoBrutalTopAppBar
 import se.onemanstudio.playaroundwithai.core.ui.theme.Alphas
 import se.onemanstudio.playaroundwithai.core.ui.theme.Dimensions
 import se.onemanstudio.playaroundwithai.core.ui.theme.energeticOrange
@@ -229,8 +231,29 @@ fun ExploreScreen(
         }
     }
 
-    Box(modifier = Modifier.fillMaxSize()) {
-        GoogleMap(
+    Scaffold(
+        containerColor = MaterialTheme.colorScheme.background,
+        topBar = {
+            NeoBrutalTopAppBar(
+                title = stringResource(ExploreFeatureR.string.explore_title),
+                actions = {
+                    NeoBrutalIconButton(
+                        imageVector = Icons.Default.Settings,
+                        contentDescription = stringResource(
+                            se.onemanstudio.playaroundwithai.core.ui.views.R.string.settings_icon_description
+                        ),
+                        onClick = { showSettings = true },
+                    )
+                },
+            )
+        },
+    ) { paddingValues ->
+        Box(
+            modifier = Modifier
+                .fillMaxSize()
+                .padding(top = paddingValues.calculateTopPadding())
+        ) {
+            GoogleMap(
             modifier = Modifier.fillMaxSize(),
             cameraPositionState = cameraPositionState,
             properties = MapProperties(
@@ -348,22 +371,6 @@ fun ExploreScreen(
             onSuggestPlaces = { viewModel.getAiSuggestedPlaces(userLocation) },
         )
 
-        NeoBrutalIconButton(
-            imageVector = Icons.Default.Settings,
-            contentDescription = stringResource(
-                se.onemanstudio.playaroundwithai.core.ui.views.R.string.settings_icon_description
-            ),
-            modifier = Modifier
-                .align(Alignment.TopEnd)
-                .statusBarsPadding()
-                .padding(top = Dimensions.paddingMedium, end = Dimensions.paddingLarge),
-            onClick = { showSettings = true },
-        )
-
-        if (showSettings) {
-            settingsContent { showSettings = false }
-        }
-
         PathModeHint(isVisible = uiState.isPathMode)
 
         ExploreControls(
@@ -436,6 +443,11 @@ fun ExploreScreen(
                 viewModel.loadMapData(lat, lng)
             }
         )
+        }
+    }
+
+    if (showSettings) {
+        settingsContent { showSettings = false }
     }
 }
 
@@ -485,13 +497,15 @@ private fun BoxScope.TopActions(
             )
         ),
         modifier = Modifier
-            .align(Alignment.TopCenter)
-            .statusBarsPadding()
+            .align(Alignment.TopStart)
+            .fillMaxWidth()
             .padding(top = Dimensions.paddingMedium)
     ) {
         Row(
-            horizontalArrangement = Arrangement.spacedBy(Dimensions.paddingLarge),
-            verticalAlignment = Alignment.CenterVertically
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(horizontal = Dimensions.paddingLarge),
+            verticalAlignment = Alignment.CenterVertically,
         ) {
             FilterChip(
                 text = stringResource(id = ExploreFeatureR.string.scooters_filter_chip_label),
@@ -501,6 +515,8 @@ private fun BoxScope.TopActions(
                 onToggleFilter(VehicleType.Scooter)
             }
 
+            Spacer(modifier = Modifier.width(Dimensions.paddingLarge))
+
             FilterChip(
                 text = stringResource(id = ExploreFeatureR.string.bicycles_filter_chip_label),
                 selected = uiState.activeFilter.contains(VehicleType.Bicycle)
@@ -508,6 +524,8 @@ private fun BoxScope.TopActions(
                 view.performHapticFeedback(HapticFeedbackConstants.CONTEXT_CLICK)
                 onToggleFilter(VehicleType.Bicycle)
             }
+
+            Spacer(modifier = Modifier.weight(1f))
 
             NeoBrutalIconButton(
                 backgroundColor = energeticOrange,
@@ -530,7 +548,6 @@ private fun BoxScope.PathModeHint(isVisible: Boolean) {
         exit = fadeOut(animationSpec = tween(durationMillis = AnimationConstants.ANIMATION_DURATION)),
         modifier = Modifier
             .align(Alignment.TopCenter)
-            .statusBarsPadding()
             .padding(top = Dimensions.paddingMedium)
     ) {
         NeoBrutalCard(
