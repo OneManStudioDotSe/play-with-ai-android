@@ -60,15 +60,15 @@ class SyncWorker @AssistedInject constructor(
                 result.isSuccess
             } else {
                 val result = firestoreDataSource.savePrompt(entity.text, entity.timestamp)
-                if (result.isSuccess) {
-                    val docId = result.getOrNull()!!
-                    promptsDao.updateFirestoreDocId(entity.id, docId)
+                val docId = result.getOrNull()
+                if (docId != null) {
+                    promptsDao.updateFirestoreDocId(entity.id.toLong(), docId)
                 }
                 result.isSuccess
             }
 
             if (success) {
-                val rowsUpdated = promptsDao.markSyncedIfTextMatches(entity.id, entity.text, SyncStatus.Synced.name)
+                val rowsUpdated = promptsDao.markSyncedIfTextMatches(entity.id.toLong(), entity.text, SyncStatus.Synced.name)
                 if (rowsUpdated > 0) {
                     Timber.d("SyncWorker - Prompt id=${entity.id} marked as Synced")
                 }
@@ -93,7 +93,7 @@ class SyncWorker @AssistedInject constructor(
                 Timber.e("SyncWorker - All $MAX_RETRY_COUNT attempts exhausted. Marking remaining prompts as Failed")
                 val stillPending = promptsDao.getPromptsBySyncStatus(SyncStatus.Pending.name)
                 stillPending.forEach { entity ->
-                    promptsDao.updateSyncStatus(entity.id, SyncStatus.Failed.name)
+                    promptsDao.updateSyncStatus(entity.id.toLong(), SyncStatus.Failed.name)
                 }
                 showFailureNotification(stillPending.size)
                 Result.failure()

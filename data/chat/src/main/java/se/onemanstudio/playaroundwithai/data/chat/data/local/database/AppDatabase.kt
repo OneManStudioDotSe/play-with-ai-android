@@ -10,12 +10,15 @@ import se.onemanstudio.playaroundwithai.data.chat.data.local.dao.PromptsHistoryD
 import se.onemanstudio.playaroundwithai.data.chat.data.local.dao.TokenUsageDao
 import se.onemanstudio.playaroundwithai.data.chat.data.local.entity.PromptEntity
 import se.onemanstudio.playaroundwithai.data.chat.data.local.entity.TokenUsageEntity
+import se.onemanstudio.playaroundwithai.data.dream.data.local.dao.DreamsDao
+import se.onemanstudio.playaroundwithai.data.dream.data.local.entity.DreamEntity
 
-@Database(entities = [PromptEntity::class, TokenUsageEntity::class], version = 4, exportSchema = false)
+@Database(entities = [PromptEntity::class, TokenUsageEntity::class, DreamEntity::class], version = 5, exportSchema = false)
 @TypeConverters(SyncStatusConverter::class)
 abstract class AppDatabase : RoomDatabase() {
     abstract fun historyDao(): PromptsHistoryDao
     abstract fun tokenUsageDao(): TokenUsageDao
+    abstract fun dreamsDao(): DreamsDao
 
     companion object {
         val MIGRATION_1_2 = object : Migration(1, 2) {
@@ -48,6 +51,23 @@ abstract class AppDatabase : RoomDatabase() {
                 )
                 db.execSQL("CREATE INDEX IF NOT EXISTS index_token_usage_feature ON token_usage (feature)")
                 db.execSQL("CREATE INDEX IF NOT EXISTS index_token_usage_dateMillis ON token_usage (dateMillis)")
+            }
+        }
+
+        val MIGRATION_4_5 = object : Migration(4, 5) {
+            override fun migrate(db: SupportSQLiteDatabase) {
+                db.execSQL(
+                    """
+                    CREATE TABLE IF NOT EXISTS dreams (
+                        id INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL,
+                        description TEXT NOT NULL,
+                        interpretation TEXT NOT NULL,
+                        sceneJson TEXT,
+                        mood TEXT NOT NULL,
+                        timestamp INTEGER NOT NULL
+                    )
+                    """.trimIndent()
+                )
             }
         }
     }

@@ -42,6 +42,7 @@ import androidx.compose.material.icons.rounded.WifiOff
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
+import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
@@ -61,6 +62,7 @@ import androidx.compose.ui.semantics.liveRegion
 import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.text.input.TextFieldValue
 import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
@@ -72,6 +74,8 @@ import com.google.maps.android.compose.Polyline
 import com.google.maps.android.compose.rememberCameraPositionState
 import com.google.maps.android.compose.rememberUpdatedMarkerState
 import kotlinx.collections.immutable.PersistentList
+import kotlinx.collections.immutable.persistentListOf
+import se.onemanstudio.playaroundwithai.core.ui.theme.SofaAiTheme
 import se.onemanstudio.playaroundwithai.core.ui.sofa.NeoBrutalButton
 import se.onemanstudio.playaroundwithai.core.ui.sofa.NeoBrutalCard
 import se.onemanstudio.playaroundwithai.core.ui.sofa.NeoBrutalChip
@@ -436,7 +440,7 @@ private fun TripMap(stops: PersistentList<TripStopUi>) {
         if (routePoints.size >= 2) {
             Polyline(
                 points = routePoints,
-                color = androidx.compose.ui.graphics.Color(0xFF1976D2),
+                color = MaterialTheme.colorScheme.primary,
                 width = POLYLINE_WIDTH,
             )
         }
@@ -537,3 +541,168 @@ private fun getErrorMessageAndIcon(error: PlanError): Pair<String, ImageVector> 
         is PlanError.Unknown -> (error.message ?: stringResource(R.string.plan_error_unknown)) to Icons.Rounded.Warning
     }
 }
+
+// region Previews
+
+@Preview(name = "Initial Light")
+@Composable
+private fun InitialStateLightPreview() {
+    SofaAiTheme(darkTheme = false) {
+        Surface {
+            InitialState(
+                textState = TextFieldValue(""),
+                onTextChanged = {},
+                onPlanClick = {},
+            )
+        }
+    }
+}
+
+@Preview(name = "Initial Dark")
+@Composable
+private fun InitialStateDarkPreview() {
+    SofaAiTheme(darkTheme = true) {
+        Surface {
+            InitialState(
+                textState = TextFieldValue("Coffee tour in Stockholm"),
+                onTextChanged = {},
+                onPlanClick = {},
+            )
+        }
+    }
+}
+
+@Preview(name = "Running Light")
+@Composable
+private fun RunningStateLightPreview() {
+    SofaAiTheme(darkTheme = false) {
+        Surface {
+            RunningState(
+                state = PlanUiState.Running(
+                    steps = persistentListOf(
+                        PlanStepUi(icon = StepIcon.THINKING, label = "Planning your trip..."),
+                        PlanStepUi(icon = StepIcon.TOOL_CALL, label = "Searching for specialty coffee shops"),
+                        PlanStepUi(icon = StepIcon.TOOL_RESULT, label = "Found 4 coffee shops"),
+                        PlanStepUi(icon = StepIcon.THINKING, label = "Looking for more places..."),
+                    ),
+                    currentAction = "Thinking",
+                ),
+            )
+        }
+    }
+}
+
+@Preview(name = "Running Dark")
+@Composable
+private fun RunningStateDarkPreview() {
+    SofaAiTheme(darkTheme = true) {
+        Surface {
+            RunningState(
+                state = PlanUiState.Running(
+                    steps = persistentListOf(
+                        PlanStepUi(icon = StepIcon.THINKING, label = "Planning your trip..."),
+                        PlanStepUi(icon = StepIcon.TOOL_CALL, label = "Calculating optimal route"),
+                    ),
+                    currentAction = "Calculating",
+                ),
+            )
+        }
+    }
+}
+
+@Preview(name = "Result Light")
+@Composable
+private fun ResultStateLightPreview() {
+    SofaAiTheme(darkTheme = false) {
+        Surface {
+            ResultState(
+                state = PlanUiState.Result(
+                    steps = persistentListOf(
+                        PlanStepUi(icon = StepIcon.TOOL_RESULT, label = "Found 3 stops"),
+                    ),
+                    plan = previewTripPlan(),
+                ),
+                onNewPlan = {},
+            )
+        }
+    }
+}
+
+@Preview(name = "Result Dark")
+@Composable
+private fun ResultStateDarkPreview() {
+    SofaAiTheme(darkTheme = true) {
+        Surface {
+            ResultState(
+                state = PlanUiState.Result(
+                    steps = persistentListOf(
+                        PlanStepUi(icon = StepIcon.TOOL_RESULT, label = "Found 3 stops"),
+                    ),
+                    plan = previewTripPlan(),
+                ),
+                onNewPlan = {},
+            )
+        }
+    }
+}
+
+@Preview(name = "Error Light")
+@Composable
+private fun ErrorStateLightPreview() {
+    SofaAiTheme(darkTheme = false) {
+        Surface {
+            ErrorState(
+                state = PlanUiState.Error(error = PlanError.NetworkMissing),
+                onClearError = {},
+            )
+        }
+    }
+}
+
+@Preview(name = "Error Dark")
+@Composable
+private fun ErrorStateDarkPreview() {
+    SofaAiTheme(darkTheme = true) {
+        Surface {
+            ErrorState(
+                state = PlanUiState.Error(error = PlanError.ApiKeyMissing),
+                onClearError = {},
+            )
+        }
+    }
+}
+
+private fun previewTripPlan() = TripPlanUi(
+    summary = "A delightful coffee tour through Stockholm's best specialty cafes, " +
+        "starting from Södermalm and winding through the old town.",
+    stops = persistentListOf(
+        TripStopUi(
+            name = "Drop Coffee",
+            latitude = 59.3173,
+            longitude = 18.0546,
+            description = "Award-winning specialty roaster with minimalist Nordic vibes.",
+            category = "Coffee Shop",
+            orderIndex = 0,
+        ),
+        TripStopUi(
+            name = "Johan & Nyström",
+            latitude = 59.3210,
+            longitude = 18.0710,
+            description = "Popular chain known for single-origin beans and cozy atmosphere.",
+            category = "Coffee Shop",
+            orderIndex = 1,
+        ),
+        TripStopUi(
+            name = "Café Pascal",
+            latitude = 59.3390,
+            longitude = 18.0580,
+            description = "Trendy café serving expertly crafted espresso drinks.",
+            category = "Coffee Shop",
+            orderIndex = 2,
+        ),
+    ),
+    totalDistanceKm = 2.4,
+    totalWalkingMinutes = 29,
+)
+
+// endregion

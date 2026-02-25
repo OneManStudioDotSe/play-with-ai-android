@@ -24,7 +24,7 @@
 - **Min SDK:** 31 (Android 12)
 - **Target/Compile SDK:** 36
 - **JVM Target:** Java 17
-- **Kotlin:** 2.3.10, **AGP:** 9.0
+- **Kotlin:** 2.3.10, **AGP:** 9.0.1
 
 ## Module Structure
 
@@ -37,8 +37,8 @@
 :core:ui                → Reusable Compose UI components
 :data:plan              → Plan domain + data: agent loop, tool dispatch, route calculator, Gemini function calling
 :data:explore           → Explore domain + data: fake API, explore items, suggested places
-:data:chat              → Chat domain + data: Room DB, Firestore sync, prompt history
-:data:dream             → Dream domain + data: Room DB, dream interpretation
+:data:chat              → Chat domain + data: Room DB (v5, 3 tables: prompt_history, token_usage, dreams), Firestore sync, prompt history
+:data:dream             → Dream domain + data: dream entity, DAO, interpretation (DB hosted in :data:chat)
 :feature:plan           → Plan presentation: PlanViewModel, PlanScreen (trip planner UI + map)
 :feature:chat           → Chat presentation: ChatViewModel, ChatScreen
 :feature:explore        → Explore presentation: ExploreViewModel, ExploreScreen
@@ -70,7 +70,7 @@ Dependencies flow: `feature → data → core:network + core:config`, `feature �
 | Category   | Library                                        |
 |------------|------------------------------------------------|
 | UI         | Jetpack Compose, Material3, Compose Navigation |
-| DI         | Hilt 2.59.1                                    |
+| DI         | Hilt 2.59.2                                    |
 | Network    | Retrofit 3.0.0, OkHttp 5.3.2, Gson             |
 | Database   | Room 2.8.4                                     |
 | Firebase   | Firestore, Firebase Auth                       |
@@ -202,7 +202,7 @@ service cloud.firestore {
 │  │   :data:chat     │ │ :data:explore  │ │  :data:dream  │ │  :data:plan       │  │
 │  │ PromptRepository │ │ExploreRepositry│ │ DreamGeminiRep│ │ TripPlannerRepo   │  │
 │  │ ChatGeminiRepo   │ │ExploreGeminiRep│ │ DreamReposito.│ │ PlanTripUseCase   │  │
-│  │ Room, Firestore  │ │ FakeExploreApi │ │ Room DB       │ │ Agent loop, tools │  │
+│  │ Room, Firestore  │ │ FakeExploreApi │ │ Dream entity  │ │ Agent loop, tools │  │
 │  │ SyncWorker       │ │ RouteCalc      │ │               │ │ RouteCalculator   │  │
 │  └───────┬──────────┘ └──────┬─────────┘ └──────┬────────┘ └────────┬──────────┘  │
 │          │                   │                │                    │             │

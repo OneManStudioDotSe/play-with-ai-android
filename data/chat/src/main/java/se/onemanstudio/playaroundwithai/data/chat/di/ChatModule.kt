@@ -17,6 +17,7 @@ import se.onemanstudio.playaroundwithai.core.network.tracking.TokenUsageTracker
 import se.onemanstudio.playaroundwithai.data.chat.data.local.dao.PromptsHistoryDao
 import se.onemanstudio.playaroundwithai.data.chat.data.local.dao.TokenUsageDao
 import se.onemanstudio.playaroundwithai.data.chat.data.local.database.AppDatabase
+import se.onemanstudio.playaroundwithai.data.dream.data.local.dao.DreamsDao
 import se.onemanstudio.playaroundwithai.data.chat.data.repository.ChatGeminiRepositoryImpl
 import se.onemanstudio.playaroundwithai.data.chat.data.repository.PromptRepositoryImpl
 import se.onemanstudio.playaroundwithai.data.chat.data.tracking.TokenUsageTrackerImpl
@@ -34,7 +35,7 @@ object ChatDataModule {
     @Singleton
     fun provideAppDatabase(@ApplicationContext context: Context): AppDatabase {
         return Room.databaseBuilder(context, AppDatabase::class.java, DATABASE)
-            .addMigrations(AppDatabase.MIGRATION_1_2, AppDatabase.MIGRATION_2_3, AppDatabase.MIGRATION_3_4)
+            .addMigrations(AppDatabase.MIGRATION_1_2, AppDatabase.MIGRATION_2_3, AppDatabase.MIGRATION_3_4, AppDatabase.MIGRATION_4_5)
             .build()
     }
 
@@ -46,6 +47,11 @@ object ChatDataModule {
     @Provides
     fun provideTokenUsageDao(appDatabase: AppDatabase): TokenUsageDao {
         return appDatabase.tokenUsageDao()
+    }
+
+    @Provides
+    fun provideDreamsDao(appDatabase: AppDatabase): DreamsDao {
+        return appDatabase.dreamsDao()
     }
 
     @Provides

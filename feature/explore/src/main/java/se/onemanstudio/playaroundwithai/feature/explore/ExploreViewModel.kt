@@ -11,6 +11,7 @@ import kotlinx.coroutines.Job
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.drop
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.isActive
 import kotlinx.coroutines.launch
@@ -60,17 +61,12 @@ class ExploreViewModel @Inject constructor(
 
     private fun observeSettingsChanges() {
         viewModelScope.launch {
-            // Combine both settings flows; skip the initial emission to avoid double-loading
-            var firstEmission = true
             kotlinx.coroutines.flow.combine(
                 exploreSettingsHolder.vehicleCount,
                 exploreSettingsHolder.searchRadiusKm,
             ) { _, _ -> }
+                .drop(1)
                 .collect {
-                    if (firstEmission) {
-                        firstEmission = false
-                        return@collect
-                    }
                     val lat = lastCenterLat ?: return@collect
                     val lng = lastCenterLng ?: return@collect
                     reloadMapData(lat, lng)

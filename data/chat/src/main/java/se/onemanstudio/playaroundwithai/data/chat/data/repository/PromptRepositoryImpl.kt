@@ -51,8 +51,8 @@ class PromptRepositoryImpl @Inject constructor(
 
     override suspend fun updatePromptText(id: Long, text: String) {
         Timber.d("PromptRepo - Updating prompt text for id=$id, text='${text.take(LOG_PREVIEW_LENGTH)}...'")
-        promptsHistoryDao.updatePromptText(id.toInt(), text)
-        promptsHistoryDao.updateSyncStatus(id.toInt(), SyncStatus.Pending.name)
+        promptsHistoryDao.updatePromptText(id, text)
+        promptsHistoryDao.updateSyncStatus(id, SyncStatus.Pending.name)
 
         if (authRepository.isUserSignedIn()) {
             Timber.d("PromptRepo - Text updated. Scheduling sync for the complete Q&A...")

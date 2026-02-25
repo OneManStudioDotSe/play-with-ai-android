@@ -77,19 +77,11 @@ class DreamGeminiRepositoryImpl @Inject constructor(
         )
     }
 
-    private fun cleanJsonResponse(text: String): String {
-        var cleaned = text.trim()
-        if (cleaned.startsWith("```json")) {
-            cleaned = cleaned.removePrefix("```json")
-        }
-        if (cleaned.startsWith("```")) {
-            cleaned = cleaned.removePrefix("```")
-        }
-        if (cleaned.endsWith("```")) {
-            cleaned = cleaned.removeSuffix("```")
-        }
-        return cleaned.trim()
-    }
+    private fun cleanJsonResponse(text: String): String =
+        text.trim()
+            .removeSurrounding("```json", "```")
+            .removeSurrounding("```")
+            .trim()
 
     companion object {
         @Suppress("MaxLineLength")

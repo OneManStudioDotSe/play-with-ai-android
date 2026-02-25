@@ -30,10 +30,8 @@ android {
 dependencies {
     implementation(project(":core:network"))
 
-    // Room
+    // Room (annotations only — DB is in :data:chat)
     implementation(libs.room.runtime)
-    ksp(libs.room.compiler)
-    implementation(libs.room.ktx)
 
     // Network (for Retrofit HttpException in repository)
     implementation(libs.retrofit)

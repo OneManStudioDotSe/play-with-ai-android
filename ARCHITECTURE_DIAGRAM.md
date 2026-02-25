@@ -1,179 +1,101 @@
 ## Architecture Diagram — API Endpoints, Services & Data Flow
 
 ```
-┌─────────────────────────────────────────────────────────────────────────────────┐
-│                              PRESENTATION LAYER                                 │
-│                                                                                 │
-│  ┌──────────────────────────────┐       ┌──────────────────────────────────┐    │
-│  │       :feature:chat          │       │        :feature:explore            │    │
-│  │                              │       │                                    │    │
-│  │  ChatScreen (Compose)        │       │  ExploreScreen (Compose)           │    │
-│  │       │                      │       │       │                            │    │
-│  │       ▼                      │       │       ▼                            │    │
-│  │  ChatViewModel               │       │  ExploreViewModel                  │    │
-│  │   │  StateFlow<ChatUiState>  │       │   │  StateFlow<ExploreUiState>     │    │
-│  │   │   ├─ Initial             │       │   │   (locations, filters,         │    │
-│  │   │   ├─ Loading             │       │   │    route, metrics)             │    │
-│  │   │   ├─ Success             │       │   │                                │    │
-│  │   │   └─ Error               │       │   │                                │    │
-│  └───┼──────────────────────────┘       └───┼────────────────────────────────┘    │
-│      │ Uses 9 use cases                     │ Uses 2 use cases                  │
-└──────┼──────────────────────────────────────┼───────────────────────────────────┘
-       │                                      │
-       ▼                                      ▼
-┌─────────────────────────────────────────────────────────────────────────────────┐
-│                                DOMAIN LAYER                                     │
-│                                :core-domain                                     │
-│                                                                                 │
-│  ┌──────────────────────┐  ┌──────────────────────┐  ┌───────────────────────┐  │
-│  │ GenerateContentUC    │  │ GetPromptHistoryUC   │  │ GetExploreItemsUC     │  │
-│  │ GetSuggestionsUC     │  │ SavePromptUC         │  │ GetSuggestedPlacesUC  │  │
-│  │                      │  │ UpdatePromptTextUC   │  │                       │  │
-│  │                      │  │ GetSyncStateUC       │  │                       │  │
-│  │                      │  │ GetFailedSyncCountUC │  │                       │  │
-│  │                      │  │ RetryPendingSyncsUC  │  │                       │  │
-│  └──────────┬───────────┘  └──────────┬───────────┘  └───────────┬───────────┘  │
-│             │                         │                          │              │
-│             ▼                         ▼                          ▼              │
-│  ┌──────────────────────┐  ┌──────────────────────┐  ┌───────────────────────┐  │
-│  │ GeminiRepository     │  │ PromptRepository     │  │ ExploreRepository     │  │
-│  │ (interface)          │  │ (interface)          │  │ (interface)           │  │
-│  └──────────┬───────────┘  └──────────┬───────────┘  └───────────┬───────────┘  │
-│             │                         │                          │              │
-│             │          ┌──────────────┤                          │              │
-│             │          │  AuthRepository (interface)             │              │
-│             │          │              │                          │              │
-└─────────────┼──────────┼──────────────┼──────────────────────────┼──────────────┘
-              │          │              │                          │
-              ▼          ▼              ▼                          ▼
-┌─────────────────────────────────────────────────────────────────────────────────┐
-│                                 DATA LAYER                                      │
-│                                 :core-data                                      │
-│                                                                                 │
-│  ┌─────────────────────────────────────────────────────────────────────────┐    │
-│  │                        Repository Implementations                       │    │
-│  │                                                                         │    │
-│  │  GeminiRepositoryImpl   PromptRepositoryImpl   ExploreRepositoryImpl    │    │
-│  │         │                  │          │              │                  │    │
-│  │         │                  │          │              │                  │    │
-│  │  AuthRepositoryImpl        │          │              │                  │    │
-│  │         │                  │          │              │                  │    │
-│  └─────────┼──────────────────┼──────────┼──────────────┼──────────────────┘    │
-│            │                  │          │              │                       │
-│            ▼                  ▼          │              ▼                       │
-│  ┌──────────────────────────────────┐    │    ┌─────────────────────────┐       │
-│  │       REMOTE DATA SOURCES        │    │    │  FakeExploreItemsService│       │
-│  │                                  │    │    │   (Mock data generator) │       │
-│  │  ┌────────────────────────────┐  │    │    │   * Simulates  delay    │       │
-│  │  │     GeminiApiService       │  │    │    │   * Generates random    │       │
-│  │  │     (Retrofit)             │  │    │    │     vehicle locations   │       │
-│  │  │                            │  │    │    └─────────────────────────┘       │
-│  │  │  POST v1beta/models/       │  │    │                                      │
-│  │  │  gemini-3-flash-preview    │  │    │                                      │
-│  │  │  :generateContent          │  │    │                                      │
-│  │  └────────────┬───────────────┘  │    │                                      │
-│  │               │                  │    │                                      │
-│  │  ┌────────────────────────────┐  │    │                                      │
-│  │  │  FirestoreDataSource       │  │    │                                      │
-│  │  │                            │  │    │                                      │
-│  │  │  Path: /users/{userId}/    │  │    │                                      │
-│  │  │        prompts/{docId}     │  │    │                                      │
-│  │  │  Doc: {text, timestamp}    │  │    │                                      │
-│  │  │  Ops: add, update          │  │    │                                      │
-│  │  └────────────┬───────────────┘  │    │                                      │
-│  │               │                  │    │                                      │
-│  │  ┌────────────────────────────┐  │    │                                      │
-│  │  │  Firebase Auth             │  │    │                                      │
-│  │  │  signInAnonymously()       │  │    │                                      │
-│  │  └────────────┬───────────────┘  │    │                                      │
-│  └───────────────┼──────────────────┘    │                                      │
-│                  │                       ▼                                      │
-│                  │    ┌──────────────────────────────────┐                      │
-│                  │    │       LOCAL DATA SOURCE          │                      │
-│                  │    │                                  │                      │
-│                  │    │   Room DB: "play_with_ai_db" v3  │                      │
-│                  │    │   Table: "prompt_history"        │                      │
-│                  │    │   ┌─────────────────────────┐    │                      │
-│                  │    │   │ id             (PK,auto)│    │                      │
-│                  │    │   │ text           (String) │    │                      │
-│                  │    │   │ timestamp      (Long)   │    │                      │
-│                  │    │   │ syncStatus     (Enum)   │    │                      │
-│                  │    │   │  ├─ Pending             │    │                      │
-│                  │    │   │  ├─ Synced              │    │                      │
-│                  │    │   │  └─ Failed              │    │                      │
-│                  │    │   │ firestoreDocId (String) │    │                      │
-│                  │    │   │                         │    │                      │
-│                  │    │   │ Indexes:                │    │                      │
-│                  │    │   │  syncStatus,            │    │                      │
-│                  │    │   │  firestoreDocId         │    │                      │
-│                  │    │   └─────────────────────────┘    │                      │
-│                  │    │                                  │                      │
-│                  │    │   PromptsHistoryDao:             │                      │
-│                  │    │    savePrompt()                  │                      │
-│                  │    │    getPromptHistory() → Flow     │                      │
-│                  │    │    getPromptsBySyncStatus()      │                      │
-│                  │    │    updateSyncStatus()            │                      │
-│                  │    │    updateFirestoreDocId()        │                      │
-│                  │    │    markSyncedIfTextMatches()     │                      │
-│                  │    └──────────────────────────────────┘                      │
-│                  │                      ▲                                       │
-│                  │                      │                                       │
-│                  │    ┌─────────────────┴────────────────┐                      │
-│                  │    │       BACKGROUND SYNC            │                      │
-│                  │    │                                  │                      │
-│                  │    │   SyncWorker (WorkManager)       │                      │
-│                  │    │    1. Get Pending prompts (Room) │                      │
-│                  │    │    2. No docId? → CREATE in ─────┼──┐                   │
-│                  │    │       Firestore, store docId     │  │                   │
-│                  │    │       Has docId? → UPDATE ───────┼──┤                   │
-│                  │    │       existing Firestore doc     │  │                   │
-│                  │    │    3. Mark Synced if text        │  │                   │
-│                  │    │       unchanged (race guard)     │  │                   │
-│                  │    │                                  │  │                   │
-│                  │    │   Constraints:                   │  │                   │
-│                  │    │    - Requires network            │  │                   │
-│                  │    │   Policy: APPEND_OR_REPLACE      │  │                   │
-│                  │    │   Backoff: Exponential (30s)     │  │                   │
-│                  │    └──────────────────────────────────┘  │                   │
-│                  │                                          │                   │
-└──────────────────┼──────────────────────────────────────────┼───────────────────┘
-                   │                                          │
-                   ▼                                          ▼
-┌─────────────────────────────────────────────────────────────────────────────────┐
-│                            EXTERNAL SERVICES                                    │
-│                                                                                 │
-│  ┌──────────────────────────────────────────────────────────────────────────┐   │
-│  │  Google Gemini API                                                       │   │
-│  │  Base: https://generativelanguage.googleapis.com/                        │   │
-│  │  Endpoint: POST /v1beta/models/gemini-3-flash-preview:generateContent    │   │
-│  │  Auth: ?key={GEMINI_API_KEY} (query param via AuthenticationInterceptor) │   │
-│  │                                                                          │   │
-│  │  Request:  { contents: [{ parts: [{ text, inlineData? }] }] }            │   │
-│  │  Response: { candidates: [{ content: { parts: [{ text }] } }] }          │   │
-│  └──────────────────────────────────────────────────────────────────────────┘   │
-│                                                                                 │
-│  ┌──────────────────────────────────────────────────────────────────────────┐   │
-│  │  Firebase Firestore                                                      │   │
-│  │  Path: /users/{userId}/prompts/{autoDocId}                               │   │
-│  │  Document: { text: String, timestamp: Long }                             │   │
-│  │  Operations: add (create), update (update text with AI answer)           │   │
-│  │  userId is encoded in the document path, not stored as a field           │   │
-│  └──────────────────────────────────────────────────────────────────────────┘   │
-│                                                                                 │
-│  ┌──────────────────────────────────────────────────────────────────────────┐   │
-│  │  Firebase Auth                                                           │   │
-│  │  Method: Anonymous sign-in                                               │   │
-│  │  Purpose: Identify user for Firestore documents                          │   │
-│  └──────────────────────────────────────────────────────────────────────────┘   │
-│                                                                                 │
-│  ┌──────────────────────────────────────────────────────────────────────────┐   │
-│  │  Google Maps SDK                                                         │   │
-│  │  Auth: MAPS_API_KEY (manifest placeholder)                               │   │
-│  │  Services: Map tiles, markers, polylines, camera                         │   │
-│  │  Location: FusedLocationProviderClient (last known location)             │   │
-│  └──────────────────────────────────────────────────────────────────────────┘   │
-│                                                                                 │
-└─────────────────────────────────────────────────────────────────────────────────┘
+┌──────────────────────────────────────────────────────────────────────────────────────────────────────┐
+│                                       PRESENTATION LAYER                                              │
+│                                                                                                      │
+│  ┌──────────────────────┐ ┌──────────────────────┐ ┌──────────────────────┐ ┌──────────────────────┐ │
+│  │   :feature:chat      │ │  :feature:explore    │ │   :feature:dream     │ │   :feature:plan      │ │
+│  │                      │ │                      │ │                      │ │                      │ │
+│  │  ChatScreen          │ │  ExploreScreen       │ │  DreamScreen         │ │  PlanScreen          │ │
+│  │       │              │ │       │              │ │       │              │ │       │              │ │
+│  │       ▼              │ │       ▼              │ │       ▼              │ │       ▼              │ │
+│  │  ChatViewModel       │ │  ExploreViewModel    │ │  DreamViewModel      │ │  PlanViewModel       │ │
+│  │  StateFlow:          │ │  StateFlow:          │ │  StateFlow:          │ │  StateFlow:          │ │
+│  │   Initial|Loading|   │ │   (locations,filters │ │   Initial|Interpreting│ │   Initial|Running|  │ │
+│  │   Success|Error      │ │    route,metrics)    │ │   |Result|Error      │ │   Result|Error       │ │
+│  └───────┬──────────────┘ └───────┬──────────────┘ └───────┬──────────────┘ └───────┬──────────────┘ │
+│          │ Uses 9 use cases       │ Uses 2 use cases       │ Uses 3 use cases       │ Uses 1 use case│
+└──────────┼────────────────────────┼────────────────────────┼────────────────────────┼────────────────┘
+           │                        │                        │                        │
+           ▼                        ▼                        ▼                        ▼
+┌──────────────────────────────────────────────────────────────────────────────────────────────────────┐
+│                              DOMAIN + DATA LAYER (co-located per feature)                              │
+│                                                                                                      │
+│  ┌──────────────────────┐ ┌──────────────────────┐ ┌──────────────────────┐ ┌──────────────────────┐ │
+│  │    :data:chat        │ │   :data:explore      │ │    :data:dream       │ │    :data:plan        │ │
+│  │                      │ │                      │ │                      │ │                      │ │
+│  │ Use Cases:           │ │ Use Cases:           │ │ Use Cases:           │ │ Use Cases:           │ │
+│  │  AskAiUseCase        │ │  GetExploreItemsUC   │ │  InterpretDreamUC    │ │  PlanTripUseCase     │ │
+│  │  SavePromptUseCase   │ │  GetSuggestedPlacesUC│ │  SaveDreamUseCase    │ │                      │ │
+│  │  UpdatePromptTextUC  │ │                      │ │  GetDreamHistoryUC   │ │ Repositories:        │ │
+│  │  GetPromptHistoryUC  │ │ Repositories:        │ │                      │ │  TripPlannerRepo     │ │
+│  │  GetSyncStateUseCase │ │  ExploreRepository   │ │ Repositories:        │ │                      │ │
+│  │  GetFailedSyncCountUC│ │  ExploreGeminiRepo   │ │  DreamGeminiRepo     │ │ Tools:               │ │
+│  │  RetryPendingSyncsUC │ │                      │ │  DreamRepository     │ │  search_places       │ │
+│  │                      │ │ Data Sources:        │ │                      │ │  calculate_route     │ │
+│  │ Repositories:        │ │  FakeExploreItemsSvc │ │ Data Sources:        │ │  RouteCalculator     │ │
+│  │  ChatGeminiRepo      │ │  RouteCalculator     │ │  Room (dreams table) │ │                      │ │
+│  │  PromptRepository    │ │                      │ │                      │ │                      │ │
+│  │                      │ │                      │ │                      │ │                      │ │
+│  │ Data Sources:        │ │                      │ │                      │ │                      │ │
+│  │  Room (prompt_history│ │                      │ │                      │ │                      │ │
+│  │  FirestoreDataSource │ │                      │ │                      │ │                      │ │
+│  │  SyncWorker          │ │                      │ │                      │ │                      │ │
+│  └───────┬──────────────┘ └───────┬──────────────┘ └───────┬──────────────┘ └───────┬──────────────┘ │
+│          │                        │                        │                        │                │
+└──────────┼────────────────────────┼────────────────────────┼────────────────────────┼────────────────┘
+           │                        │                        │                        │
+           ▼                        ▼                        ▼                        ▼
+┌──────────────────────────────────────────────────────────────────────────────────────────────────────┐
+│                                       SHARED CORE MODULES                                             │
+│                                                                                                      │
+│  ┌──────────────────────┐  ┌──────────────────────┐  ┌──────────────────────────────────────────┐   │
+│  │   :core:network      │  │    :core:auth        │  │          :core:config                    │   │
+│  │  GeminiApiService    │  │  AuthRepository      │  │  ApiKeyAvailability                      │   │
+│  │  DTOs (text +        │  │  AuthSession         │  │  @GeminiApiKey, @BaseUrl, @LoggingLevel  │   │
+│  │  function calling)   │  │  Firebase Auth       │  │  ConfigurationModule                     │   │
+│  │  Interceptor         │  │  Auth Use Cases      │  │  BuildConfig fields                      │   │
+│  └──────────────────────┘  └──────────────────────┘  └──────────────────────────────────────────┘   │
+│                                                                                                      │
+│  ┌──────────────────────┐  ┌──────────────────────┐                                                 │
+│  │   :core:theme        │  │    :core:ui          │                                                 │
+│  │  Colors, Typography  │  │  Compose widgets     │                                                 │
+│  └──────────────────────┘  └──────────────────────┘                                                 │
+└──────────────────────────────────────────────────────────────────────────────────────────────────────┘
+           │
+           ▼
+┌──────────────────────────────────────────────────────────────────────────────────────────────────────┐
+│                                       EXTERNAL SERVICES                                               │
+│                                                                                                      │
+│  ┌──────────────────────────────────────────────────────────────────────────────────────────────┐    │
+│  │  Google Gemini API                                                                           │    │
+│  │  Base: https://generativelanguage.googleapis.com/                                            │    │
+│  │  Endpoint: POST /v1beta/models/gemini-3-flash-preview:generateContent                        │    │
+│  │  Auth: ?key={GEMINI_API_KEY} (query param via AuthenticationInterceptor)                      │    │
+│  │                                                                                              │    │
+│  │  Standard:  { contents: [{ parts: [{ text, inlineData? }] }] }                               │    │
+│  │  With tools: + { tools: [{ functionDeclarations }] }  (plan feature — agent loop)            │    │
+│  │  Response: { candidates: [{ content: { parts: [text | functionCall] } }] }                   │    │
+│  └──────────────────────────────────────────────────────────────────────────────────────────────┘    │
+│                                                                                                      │
+│  ┌──────────────────────────────────────────────────────────────────────────────────────────────┐    │
+│  │  Firebase Firestore                                                                          │    │
+│  │  Path: /users/{userId}/prompts/{autoDocId}                                                   │    │
+│  │  Document: { text: String, timestamp: Long }                                                 │    │
+│  │  Operations: add (create), update (update text with AI answer)                               │    │
+│  └──────────────────────────────────────────────────────────────────────────────────────────────┘    │
+│                                                                                                      │
+│  ┌──────────────────────────────────────────────────────────────────────────────────────────────┐    │
+│  │  Firebase Auth — Method: Anonymous sign-in                                                    │    │
+│  └──────────────────────────────────────────────────────────────────────────────────────────────┘    │
+│                                                                                                      │
+│  ┌──────────────────────────────────────────────────────────────────────────────────────────────┐    │
+│  │  Google Maps SDK — Auth: MAPS_API_KEY (manifest placeholder)                                  │    │
+│  │  Services: Map tiles, markers, polylines, camera, FusedLocationProviderClient                 │    │
+│  └──────────────────────────────────────────────────────────────────────────────────────────────┘    │
+│                                                                                                      │
+└──────────────────────────────────────────────────────────────────────────────────────────────────────┘
 ```
 
 ### Chat Feature — Request/Response Flow
@@ -188,12 +110,12 @@ ChatViewModel.generateContent(prompt, imageUri?, documentUri?)
   ├─ Document? → withContext(IO) → read text content
   │
   ▼
-GenerateContentUseCase.invoke(prompt, imageBytes?, fileText?, analysisType?)
+AskAiUseCase.invoke(prompt, imageBytes?, fileText?, analysisType?)
   ├─ Validate: prompt not blank (unless attachment present)
   ├─ Validate: prompt ≤ 50K chars, fileText ≤ 100K chars
   │
   ▼
-GeminiRepositoryImpl.generateContent()
+ChatGeminiRepositoryImpl.getAiResponse()
   │
   ├─ Prepend system instruction ("AI Overlord" persona, max 42 words)
   ├─ Append file content if present

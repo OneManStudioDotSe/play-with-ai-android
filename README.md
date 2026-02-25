@@ -32,6 +32,8 @@ My principles during the development of this project are the following:
 - **AI Chat**: Prompts to Gemini with image and document attachment support
 - **Smart History**: Local Q&A history synced to Firestore
 - **Map Interaction**: Discover and filter vehicles with optimal route calculation
+- **Dream Interpreter**: AI-powered dream analysis with generative visual scenes
+- **Trip Planner**: Agentic AI trip planning using Gemini function calling with map integration
 
 ## Technical stack
 
@@ -116,6 +118,8 @@ A highly modular structure that scales regardless of team size:
 - **`:core:ui`**: Reusable Compose components
 - **`:feature:chat`**: Complete chat feature — domain, data, and presentation layers (Room, Firestore, WorkManager)
 - **`:feature:explore`**: Complete explore feature — domain, data, and presentation layers (fake API, route calculation)
+- **`:feature:dream`**: Complete dream feature — domain, data, and presentation layers (Room, Gemini-powered interpretation)
+- **`:feature:plan`**: Complete plan feature — domain, data, and presentation layers (agentic AI loop, Gemini function calling)
 
 Each feature module is self-contained with its own domain models, repository interfaces, use case classes, and data layer implementations. Shared infrastructure (networking, auth, config) lives in focused core modules. Multiple teams can work on separate features without conflicts.
 

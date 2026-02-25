@@ -123,26 +123,26 @@ class PromptRepositoryImplTest {
 
     @Test
     fun `updatePromptText updates text resets sync status and schedules sync`() = runTest {
-        coEvery { dao.updatePromptText(5, "Updated text") } returns Unit
-        coEvery { dao.updateSyncStatus(5, SyncStatus.Pending.name) } returns Unit
+        coEvery { dao.updatePromptText(5L, "Updated text") } returns Unit
+        coEvery { dao.updateSyncStatus(5L, SyncStatus.Pending.name) } returns Unit
 
         repository.updatePromptText(5L, "Updated text")
 
-        coVerify { dao.updatePromptText(5, "Updated text") }
-        coVerify { dao.updateSyncStatus(5, SyncStatus.Pending.name) }
+        coVerify { dao.updatePromptText(5L, "Updated text") }
+        coVerify { dao.updateSyncStatus(5L, SyncStatus.Pending.name) }
         verify { workManager.enqueueUniqueWork(any(), any(), any<androidx.work.OneTimeWorkRequest>()) }
     }
 
     @Test
     fun `updatePromptText does not schedule sync when user is not authenticated`() = runTest {
         every { authRepository.isUserSignedIn() } returns false
-        coEvery { dao.updatePromptText(5, "Updated text") } returns Unit
-        coEvery { dao.updateSyncStatus(5, SyncStatus.Pending.name) } returns Unit
+        coEvery { dao.updatePromptText(5L, "Updated text") } returns Unit
+        coEvery { dao.updateSyncStatus(5L, SyncStatus.Pending.name) } returns Unit
 
         repository.updatePromptText(5L, "Updated text")
 
-        coVerify { dao.updatePromptText(5, "Updated text") }
-        coVerify { dao.updateSyncStatus(5, SyncStatus.Pending.name) }
+        coVerify { dao.updatePromptText(5L, "Updated text") }
+        coVerify { dao.updateSyncStatus(5L, SyncStatus.Pending.name) }
         verify(exactly = 0) { workManager.enqueueUniqueWork(any(), any(), any<androidx.work.OneTimeWorkRequest>()) }
     }
 

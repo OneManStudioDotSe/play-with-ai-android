@@ -30,6 +30,7 @@ android {
 dependencies {
     implementation(project(":core:auth"))
     implementation(project(":core:network"))
+    implementation(project(":data:dream"))
 
     // Room
     implementation(libs.room.runtime)
