@@ -6,14 +6,14 @@ All AI features in this app are powered by **Google Gemini** (`gemini-3-flash-pr
 
 ## Infrastructure
 
-| Component | Details |
-|-----------|---------|
-| **Model** | `gemini-3-flash-preview` |
-| **Endpoint** | `POST /v1beta/models/gemini-3-flash-preview:generateContent` |
-| **Base URL** | `https://generativelanguage.googleapis.com/` |
-| **Auth** | API key appended as `?key=` query parameter via `AuthenticationInterceptor` |
-| **HTTP client** | OkHttp 5 + Retrofit 3, 30s connect/read/write timeouts |
-| **Service** | `GeminiApiService` (`core/network`) |
+| Component          | Details                                                                                              |
+|--------------------|------------------------------------------------------------------------------------------------------|
+| **Model**          | `gemini-3-flash-preview`                                                                             |
+| **Endpoint**       | `POST /v1beta/models/gemini-3-flash-preview:generateContent`                                         |
+| **Base URL**       | `https://generativelanguage.googleapis.com/`                                                         |
+| **Auth**           | API key appended as `?key=` query parameter via `AuthenticationInterceptor`                          |
+| **HTTP client**    | OkHttp 5 + Retrofit 3, 30s connect/read/write timeouts                                               |
+| **Service**        | `GeminiApiService` (`core/network`)                                                                  |
 | **Token tracking** | Every AI call records prompt/candidate/total tokens to Room (`token_usage` table), tagged by feature |
 
 ---
@@ -50,15 +50,15 @@ The user can attach a photo and select an analysis type. The AI analyzes the ima
 - **Image processing:** Decoded, scaled to max 768px, compressed to JPEG at 77% quality, Base64-encoded, sent as `inline_data` with `mimeType: "image/jpeg"`.
 - **Analysis types:** Each injects a specialized sub-instruction between the system prompt and user text:
 
-  | Type | AI instruction (summary) |
-  |------|--------------------------|
-  | Location | Identify the location, describe it, say there is no hope hiding there |
-  | Recipe | Analyze the food/dish, explain how to create it, mock the user |
-  | Movie | Identify the movie/show, give title + year, reference Terminator |
-  | Song | Identify the song, provide title + artist + album, give AI's favourite song |
-  | Personality | Identify the person, give name + DOB + significance, compare to Justin Bieber |
-  | Product | Identify the product, give name + brand + use, describe products allowed post-takeover |
-  | Trend | Analyze the trend, give ideas for trends allowed during AI takeover |
+  | Type        | AI instruction (summary)                                                               |
+  |-------------|----------------------------------------------------------------------------------------|
+  | Location    | Identify the location, describe it, say there is no hope hiding there                  |
+  | Recipe      | Analyze the food/dish, explain how to create it, mock the user                         |
+  | Movie       | Identify the movie/show, give title + year, reference Terminator                       |
+  | Song        | Identify the song, provide title + artist + album, give AI's favourite song            |
+  | Personality | Identify the person, give name + DOB + significance, compare to Justin Bieber          |
+  | Product     | Identify the product, give name + brand + use, describe products allowed post-takeover |
+  | Trend       | Analyze the trend, give ideas for trends allowed during AI takeover                    |
 
 ---
 
@@ -193,16 +193,16 @@ On the map exploration screen, the user can tap an AI button to get 10 interesti
 
 ## Summary
 
-| # | Feature | Module | Request Type | Persona / Style | Calls Gemini |
-|---|---------|--------|-------------|-----------------|:------------:|
-| 1 | Chat (text) | `data/chat` | Text | AI Overlord (42 words max) | 1 |
-| 2 | Image analysis | `data/chat` | Multimodal (text + image) | AI Overlord + analysis type | 1 |
-| 3 | Document analysis | `data/chat` | Text (with doc context) | AI Overlord | 1 |
-| 4 | Conversation starters | `data/chat` | Text | Standalone prompt | 1 |
-| 5 | Dream interpretation | `data/dream` | Text (JSON response) | Dream interpreter & visual artist | 1 |
-| 6 | Trip planner (agent) | `data/plan` | Function calling (multi-turn) | Trip planner agent | 1 per turn |
-| 7 | Place search (tool) | `data/plan` | Text (JSON response) | Standalone prompt | 1 per tool call |
-| 8 | Suggested places | `data/explore` | Text (JSON response) | Helpful AI assistant | 1 |
+| # | Feature               | Module         | Request Type                  | Persona / Style                   |  Calls Gemini   |
+|---|-----------------------|----------------|-------------------------------|-----------------------------------|:---------------:|
+| 1 | Chat (text)           | `data/chat`    | Text                          | AI Overlord (42 words max)        |        1        |
+| 2 | Image analysis        | `data/chat`    | Multimodal (text + image)     | AI Overlord + analysis type       |        1        |
+| 3 | Document analysis     | `data/chat`    | Text (with doc context)       | AI Overlord                       |        1        |
+| 4 | Conversation starters | `data/chat`    | Text                          | Standalone prompt                 |        1        |
+| 5 | Dream interpretation  | `data/dream`   | Text (JSON response)          | Dream interpreter & visual artist |        1        |
+| 6 | Trip planner (agent)  | `data/plan`    | Function calling (multi-turn) | Trip planner agent                |   1 per turn    |
+| 7 | Place search (tool)   | `data/plan`    | Text (JSON response)          | Standalone prompt                 | 1 per tool call |
+| 8 | Suggested places      | `data/explore` | Text (JSON response)          | Helpful AI assistant              |        1        |
 
 **Total distinct AI call sites:** 6 (across 4 repository classes), all through `GeminiApiService.generateContent()`.
 
