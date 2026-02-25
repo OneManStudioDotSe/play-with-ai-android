@@ -39,9 +39,11 @@ import dagger.hilt.android.AndroidEntryPoint
 import se.onemanstudio.playaroundwithai.core.ui.theme.Alphas
 import se.onemanstudio.playaroundwithai.core.ui.theme.Dimensions
 import se.onemanstudio.playaroundwithai.core.ui.theme.SofaAiTheme
+import se.onemanstudio.playaroundwithai.feature.agents.AgentScreen
 import se.onemanstudio.playaroundwithai.feature.chat.ChatScreen
 import se.onemanstudio.playaroundwithai.feature.dream.DreamScreen
 import se.onemanstudio.playaroundwithai.feature.maps.MapScreen
+import se.onemanstudio.playaroundwithai.navigation.Agents
 import se.onemanstudio.playaroundwithai.navigation.Chat
 import se.onemanstudio.playaroundwithai.navigation.Dreams
 import se.onemanstudio.playaroundwithai.navigation.Maps
@@ -138,6 +140,7 @@ private fun SoFaApp() {
                 composable<Chat> { ChatScreen() }
                 composable<Maps> { MapScreen() }
                 composable<Dreams> { DreamScreen() }
+                composable<Agents> { AgentScreen() }
             }
         }
     }

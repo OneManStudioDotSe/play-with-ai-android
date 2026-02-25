@@ -1,6 +1,7 @@
 package se.onemanstudio.playaroundwithai.navigation
 
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.AutoAwesome
 import androidx.compose.material.icons.filled.Chair
 import androidx.compose.material.icons.filled.Map
 import androidx.compose.material.icons.filled.NightsStay
@@ -17,8 +18,12 @@ object Maps : Route
 @Serializable
 object Dreams : Route
 
+@Serializable
+object Agents : Route
+
 val navItems = listOf(
     NavItem(Chat, "Chat", Icons.Default.Chair),
     NavItem(Maps, "Explore", Icons.Default.Map),
     NavItem(Dreams, "Dreams", Icons.Default.NightsStay),
+    NavItem(Agents, "Planner", Icons.Default.AutoAwesome),
 )

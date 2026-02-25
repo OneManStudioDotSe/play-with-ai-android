@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="agent_title">Trip Planner</string>
+    <string name="agent_input_placeholder">Describe your ideal trip\u2026</string>
+    <string name="agent_plan_button">Plan my trip</string>
+    <string name="agent_new_plan_button">New plan</string>
+    <string name="agent_thinking">Thinking\u2026</string>
+    <string name="agent_step_searching">Searching for %s</string>
+    <string name="agent_step_calculating_route">Calculating optimal route</string>
+    <string name="agent_step_found_places">Found %d places</string>
+    <string name="agent_step_route_ready">Route calculated</string>
+    <string name="agent_your_itinerary">Your Itinerary</string>
+    <string name="agent_walking_distance">Walking distance: %.1f km</string>
+    <string name="agent_walking_time">Estimated time: %d min</string>
+    <string name="agent_oops">Oops!</string>
+    <string name="agent_error_api_key_missing" translatable="false">Gemini API key not configured.\n\nAdd GEMINI_API_KEY_DEBUG to your local.properties file.\nSee the project README for setup instructions.</string>
+    <string name="agent_error_network">No internet connection. Please check your network.</string>
+    <string name="agent_error_unknown">Something went wrong.</string>
+    <string name="agent_label_error_icon">Error icon</string>
+    <string name="agent_label_dismiss_error">Dismiss error</string>
+    <string name="agent_example_coffee">Coffee tour in Stockholm</string>
+    <string name="agent_example_museums">Museums in old town</string>
+    <string name="agent_example_parks">Parks and nature walks</string>
+</resources>
