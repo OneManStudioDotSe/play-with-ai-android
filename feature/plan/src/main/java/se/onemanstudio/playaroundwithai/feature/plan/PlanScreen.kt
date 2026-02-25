@@ -252,7 +252,7 @@ private fun RunningState(state: PlanUiState.Running) {
     ) {
         Icon(
             imageVector = Icons.Rounded.AutoAwesome,
-            contentDescription = null,
+            contentDescription = stringResource(R.string.plan_icon_planning),
             tint = MaterialTheme.colorScheme.primary,
             modifier = Modifier.size(Dimensions.iconSizeXXLarge),
         )
@@ -311,7 +311,7 @@ private fun StepRow(step: PlanStepUi, isPulsing: Boolean) {
     ) {
         Icon(
             imageVector = stepIcon(step.icon),
-            contentDescription = null,
+            contentDescription = stepIconContentDescription(step.icon),
             tint = stepIconColor(step.icon),
             modifier = Modifier.size(Dimensions.iconSizeLarge),
         )
@@ -336,6 +336,13 @@ private fun stepIconColor(icon: StepIcon) = when (icon) {
     StepIcon.THINKING -> MaterialTheme.colorScheme.primary
     StepIcon.TOOL_CALL -> MaterialTheme.colorScheme.tertiary
     StepIcon.TOOL_RESULT -> MaterialTheme.colorScheme.secondary
+}
+
+@Composable
+private fun stepIconContentDescription(icon: StepIcon) = when (icon) {
+    StepIcon.THINKING -> stringResource(R.string.plan_icon_step_thinking)
+    StepIcon.TOOL_CALL -> stringResource(R.string.plan_icon_step_tool_call)
+    StepIcon.TOOL_RESULT -> stringResource(R.string.plan_icon_step_tool_result)
 }
 
 @Composable

@@ -3,7 +3,6 @@ package se.onemanstudio.playaroundwithai.feature.dream.views
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
@@ -43,7 +42,6 @@ fun DreamGalleryRow(
         modifier = modifier
             .fillMaxWidth()
             .wrapContentHeight(),
-        contentPadding = PaddingValues(horizontal = Dimensions.paddingLarge),
         horizontalArrangement = Arrangement.spacedBy(Dimensions.paddingMedium),
     ) {
         items(dreams, key = { it.id }) { dream ->

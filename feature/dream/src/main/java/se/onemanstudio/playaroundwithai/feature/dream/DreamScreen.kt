@@ -182,7 +182,7 @@ private fun InitialState(
         Spacer(modifier = Modifier.height(Dimensions.paddingLarge))
 
         NeoBrutalButton(
-            modifier = Modifier.wrapContentSize(),
+            modifier = Modifier.align(Alignment.End),
             text = stringResource(R.string.dream_interpret_button),
             enabled = textState.text.isNotBlank(),
             backgroundColor = MaterialTheme.colorScheme.primary,
