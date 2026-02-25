@@ -2,6 +2,7 @@ package se.onemanstudio.playaroundwithai.feature.dream.views
 
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -15,7 +16,9 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
@@ -29,8 +32,9 @@ import java.time.ZoneId
 import java.time.format.DateTimeFormatter
 
 private val dateFormatter = DateTimeFormatter.ofPattern("MMM dd")
-private const val CARD_WIDTH = 160
-private const val DESCRIPTION_MAX_LINES = 2
+private const val CARD_WIDTH = 180
+private const val DESCRIPTION_MAX_LINES = 4
+private const val EMOJI_BACKGROUND_ALPHA = 0.5f
 
 @Composable
 fun DreamGalleryRow(
@@ -63,25 +67,30 @@ private fun DreamGalleryCard(
             .width(CARD_WIDTH.dp)
             .clickable(onClick = onClick),
     ) {
-        Column(modifier = Modifier.padding(Dimensions.paddingMedium)) {
+        Box {
             Text(
                 text = moodToEmoji(dream.mood),
-                style = MaterialTheme.typography.titleLarge,
+                style = MaterialTheme.typography.displayLarge,
+                modifier = Modifier
+                    .align(Alignment.Center)
+                    .alpha(EMOJI_BACKGROUND_ALPHA),
             )
-            Spacer(modifier = Modifier.height(Dimensions.paddingSmall))
-            Text(
-                text = dream.description,
-                style = MaterialTheme.typography.bodySmall,
-                color = MaterialTheme.colorScheme.onSurface,
-                maxLines = DESCRIPTION_MAX_LINES,
-                overflow = TextOverflow.Ellipsis,
-            )
-            Spacer(modifier = Modifier.height(Dimensions.paddingSmall))
-            Text(
-                text = dream.timestamp.atZone(ZoneId.systemDefault()).format(dateFormatter),
-                style = MaterialTheme.typography.labelSmall,
-                color = MaterialTheme.colorScheme.onSurface.copy(alpha = se.onemanstudio.playaroundwithai.core.ui.theme.Alphas.medium),
-            )
+
+            Column(modifier = Modifier.padding(Dimensions.paddingMedium)) {
+                Text(
+                    text = dream.description,
+                    style = MaterialTheme.typography.bodySmall,
+                    color = MaterialTheme.colorScheme.onSurface,
+                    maxLines = DESCRIPTION_MAX_LINES,
+                    overflow = TextOverflow.Ellipsis,
+                )
+                Spacer(modifier = Modifier.height(Dimensions.paddingSmall))
+                Text(
+                    text = dream.timestamp.atZone(ZoneId.systemDefault()).format(dateFormatter),
+                    style = MaterialTheme.typography.labelSmall,
+                    color = MaterialTheme.colorScheme.onSurface.copy(alpha = se.onemanstudio.playaroundwithai.core.ui.theme.Alphas.medium),
+                )
+            }
         }
     }
 }

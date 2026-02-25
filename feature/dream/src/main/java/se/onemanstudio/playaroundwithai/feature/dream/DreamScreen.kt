@@ -14,7 +14,6 @@ import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.imePadding
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.layout.wrapContentSize
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
@@ -50,6 +49,7 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import se.onemanstudio.playaroundwithai.core.ui.sofa.MarkerText
 import se.onemanstudio.playaroundwithai.core.ui.sofa.NeoBrutalButton
 import se.onemanstudio.playaroundwithai.core.ui.sofa.NeoBrutalCard
 import se.onemanstudio.playaroundwithai.core.ui.sofa.NeoBrutalChip
@@ -58,6 +58,7 @@ import se.onemanstudio.playaroundwithai.core.ui.sofa.NeoBrutalTextField
 import se.onemanstudio.playaroundwithai.core.ui.sofa.NeoBrutalTopAppBar
 import se.onemanstudio.playaroundwithai.core.ui.theme.Dimensions
 import se.onemanstudio.playaroundwithai.core.ui.theme.SofaAiTheme
+import se.onemanstudio.playaroundwithai.core.ui.theme.vividPink
 import se.onemanstudio.playaroundwithai.data.dream.domain.model.Dream
 import se.onemanstudio.playaroundwithai.data.dream.domain.model.DreamElement
 import se.onemanstudio.playaroundwithai.data.dream.domain.model.DreamLayer
@@ -193,13 +194,10 @@ private fun InitialState(
         if (history.isNotEmpty()) {
             Spacer(modifier = Modifier.height(Dimensions.paddingExtraLarge))
 
-            Text(
+            MarkerText(
                 text = stringResource(R.string.dream_gallery_title),
-                style = MaterialTheme.typography.titleMedium,
-                color = MaterialTheme.colorScheme.onSurface,
-                modifier = Modifier
-                    .wrapContentSize()
-                    .padding(bottom = Dimensions.paddingMedium),
+                lineColor = vividPink,
+                modifier = Modifier.padding(bottom = Dimensions.paddingMedium),
             )
 
             DreamGalleryRow(
@@ -253,37 +251,49 @@ private fun ResultState(
             .fillMaxSize()
             .verticalScroll(scrollState),
     ) {
-        DreamscapeCanvas(
-            scene = state.scene,
-            modifier = Modifier
-                .fillMaxWidth()
-                .heightIn(min = CANVAS_HEIGHT_MIN.dp, max = CANVAS_HEIGHT_MAX.dp),
-        )
+        NeoBrutalCard(modifier = Modifier.fillMaxWidth()) {
+            DreamscapeCanvas(
+                scene = state.scene,
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .heightIn(min = CANVAS_HEIGHT_MIN.dp, max = CANVAS_HEIGHT_MAX.dp),
+            )
+        }
 
         Column(
             modifier = Modifier.padding(Dimensions.paddingLarge),
             horizontalAlignment = Alignment.CenterHorizontally,
         ) {
-            NeoBrutalChip(
-                text = moodDisplayName(state.mood),
-                onClick = {},
-            )
-
-            Spacer(modifier = Modifier.height(Dimensions.paddingLarge))
-
             NeoBrutalCard(modifier = Modifier.fillMaxWidth()) {
-                Column(modifier = Modifier.padding(Dimensions.paddingLarge)) {
-                    Text(
-                        text = stringResource(R.string.dream_interpretation_label),
-                        style = MaterialTheme.typography.titleMedium,
-                        color = MaterialTheme.colorScheme.onSurface,
-                    )
-                    Spacer(modifier = Modifier.height(Dimensions.paddingMedium))
-                    Text(
-                        text = state.interpretation,
-                        style = MaterialTheme.typography.bodyLarge,
-                        color = MaterialTheme.colorScheme.onSurface,
-                    )
+                Box {
+                    Column(
+                        modifier = Modifier
+                            .padding(Dimensions.paddingLarge)
+                            .padding(top = Dimensions.paddingExtraLarge),
+                    ) {
+                        Text(
+                            text = stringResource(R.string.dream_interpretation_label),
+                            style = MaterialTheme.typography.titleMedium,
+                            color = MaterialTheme.colorScheme.onSurface,
+                        )
+                        Spacer(modifier = Modifier.height(Dimensions.paddingMedium))
+                        Text(
+                            text = state.interpretation,
+                            style = MaterialTheme.typography.bodyLarge,
+                            color = MaterialTheme.colorScheme.onSurface,
+                        )
+                    }
+
+                    Box(
+                        modifier = Modifier
+                            .align(Alignment.TopEnd)
+                            .padding(Dimensions.paddingMedium),
+                    ) {
+                        NeoBrutalChip(
+                            text = moodDisplayName(state.mood),
+                            onClick = {},
+                        )
+                    }
                 }
             }
 
