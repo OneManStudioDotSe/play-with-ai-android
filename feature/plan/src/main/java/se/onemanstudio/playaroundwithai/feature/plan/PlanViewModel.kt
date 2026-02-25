@@ -22,9 +22,6 @@ import timber.log.Timber
 import java.io.IOException
 import javax.inject.Inject
 
-private const val STOCKHOLM_LAT = 59.3293
-private const val STOCKHOLM_LNG = 18.0686
-
 @HiltViewModel
 class PlanViewModel @Inject constructor(
     private val planTripUseCase: PlanTripUseCase,
@@ -41,7 +38,7 @@ class PlanViewModel @Inject constructor(
     }
 
     @Suppress("TooGenericExceptionCaught")
-    fun planTrip(goal: String) {
+    fun planTrip(goal: String, latitude: Double, longitude: Double) {
         if (!apiKeyAvailability.isGeminiKeyAvailable) {
             _uiState.value = PlanUiState.Error(PlanError.ApiKeyMissing)
             return
@@ -56,7 +53,7 @@ class PlanViewModel @Inject constructor(
 
         viewModelScope.launch {
             try {
-                planTripUseCase(goal, STOCKHOLM_LAT, STOCKHOLM_LNG).collect { event ->
+                planTripUseCase(goal, latitude, longitude).collect { event ->
                     when (event) {
                         is PlanEvent.Thinking -> {
                             steps.add(PlanStepUi(icon = StepIcon.THINKING, label = event.message))

@@ -2,7 +2,11 @@
 
 package se.onemanstudio.playaroundwithai.feature.plan
 
+import android.Manifest
+import android.annotation.SuppressLint
 import android.view.HapticFeedbackConstants
+import androidx.activity.compose.rememberLauncherForActivityResult
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.core.LinearEasing
 import androidx.compose.animation.core.RepeatMode
@@ -59,6 +63,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.graphics.vector.ImageVector
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalSoftwareKeyboardController
 import androidx.compose.ui.platform.LocalView
 import androidx.compose.ui.res.stringResource
@@ -71,6 +76,7 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import com.google.android.gms.location.LocationServices
 import com.google.android.gms.maps.model.CameraPosition
 import com.google.android.gms.maps.model.LatLng
 import com.google.maps.android.compose.GoogleMap
@@ -95,6 +101,8 @@ import se.onemanstudio.playaroundwithai.feature.plan.states.StepIcon
 import se.onemanstudio.playaroundwithai.feature.plan.states.TripPlanUi
 import se.onemanstudio.playaroundwithai.feature.plan.states.TripStopUi
 
+private const val DEFAULT_LAT = 59.3293
+private const val DEFAULT_LNG = 18.0686
 private const val MAP_HEIGHT_MIN = 180
 private const val MAP_HEIGHT_MAX = 280
 private const val MAP_ZOOM = 13f
@@ -107,17 +115,40 @@ private const val BOUNCE_STAGGER_MS = 100
 private const val BOUNCE_DOT_COUNT = 3
 private val BOUNCE_AMPLITUDE = 4.dp
 
+@SuppressLint("MissingPermission")
 @Composable
 fun PlanScreen(
     viewModel: PlanViewModel = hiltViewModel(),
     settingsContent: @Composable (() -> Unit) -> Unit = { _ -> },
 ) {
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
+    val context = LocalContext.current
 
     var textState by remember { mutableStateOf(TextFieldValue("")) }
     var showSettings by remember { mutableStateOf(false) }
     val keyboardController = LocalSoftwareKeyboardController.current
     val view = LocalView.current
+
+    var userLatitude by remember { mutableStateOf(DEFAULT_LAT) }
+    var userLongitude by remember { mutableStateOf(DEFAULT_LNG) }
+    val fusedLocationClient = remember { LocationServices.getFusedLocationProviderClient(context) }
+
+    val permissionLauncher = rememberLauncherForActivityResult(
+        contract = ActivityResultContracts.RequestPermission()
+    ) { isGranted ->
+        if (isGranted) {
+            fusedLocationClient.lastLocation.addOnSuccessListener { location ->
+                location?.let {
+                    userLatitude = it.latitude
+                    userLongitude = it.longitude
+                }
+            }
+        }
+    }
+
+    LaunchedEffect(Unit) {
+        permissionLauncher.launch(Manifest.permission.ACCESS_FINE_LOCATION)
+    }
 
     LaunchedEffect(uiState) {
         when (uiState) {
@@ -161,7 +192,7 @@ fun PlanScreen(
                     onTextChanged = { textState = it },
                     onPlanClick = {
                         view.performHapticFeedback(HapticFeedbackConstants.CONTEXT_CLICK)
-                        viewModel.planTrip(textState.text)
+                        viewModel.planTrip(textState.text, userLatitude, userLongitude)
                         keyboardController?.hide()
                     },
                 )

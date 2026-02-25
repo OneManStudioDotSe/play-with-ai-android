@@ -27,6 +27,9 @@ import se.onemanstudio.playaroundwithai.feature.plan.states.StepIcon
 import se.onemanstudio.playaroundwithai.feature.plan.util.MainCoroutineRule
 import java.io.IOException
 
+private const val TEST_LAT = 59.3293
+private const val TEST_LNG = 18.0686
+
 @OptIn(ExperimentalCoroutinesApi::class)
 class PlanViewModelTest {
 
@@ -72,7 +75,7 @@ class PlanViewModelTest {
         val states = captureStates(viewModel)
 
         // When
-        viewModel.planTrip("Coffee tour in Stockholm")
+        viewModel.planTrip("Coffee tour in Stockholm", TEST_LAT, TEST_LNG)
         advanceUntilIdle()
 
         // Then - should never go to Running, stays as ApiKeyMissing
@@ -93,7 +96,7 @@ class PlanViewModelTest {
         val states = captureStates(viewModel)
 
         // When
-        viewModel.planTrip("Coffee tour in Stockholm")
+        viewModel.planTrip("Coffee tour in Stockholm", TEST_LAT, TEST_LNG)
         advanceUntilIdle()
 
         // Then - should have transitioned through Running
@@ -119,7 +122,7 @@ class PlanViewModelTest {
         val states = captureStates(viewModel)
 
         // When
-        viewModel.planTrip("Coffee tour in Stockholm")
+        viewModel.planTrip("Coffee tour in Stockholm", TEST_LAT, TEST_LNG)
         advanceUntilIdle()
 
         // Then
@@ -146,7 +149,7 @@ class PlanViewModelTest {
         val states = captureStates(viewModel)
 
         // When
-        viewModel.planTrip("Coffee tour in Stockholm")
+        viewModel.planTrip("Coffee tour in Stockholm", TEST_LAT, TEST_LNG)
         advanceUntilIdle()
 
         // Then
@@ -167,7 +170,7 @@ class PlanViewModelTest {
         val states = captureStates(viewModel)
 
         // When
-        viewModel.planTrip("Coffee tour in Stockholm")
+        viewModel.planTrip("Coffee tour in Stockholm", TEST_LAT, TEST_LNG)
         advanceUntilIdle()
 
         // Then
@@ -185,7 +188,7 @@ class PlanViewModelTest {
         val viewModel = createViewModel(
             planEvents = flowOf(PlanEvent.Error("Something went wrong"))
         )
-        viewModel.planTrip("Coffee tour in Stockholm")
+        viewModel.planTrip("Coffee tour in Stockholm", TEST_LAT, TEST_LNG)
         advanceUntilIdle()
 
         // Verify we are in Error state first
@@ -204,7 +207,7 @@ class PlanViewModelTest {
         val viewModel = createViewModel(
             planEvents = flowOf(PlanEvent.Complete(createTestTripPlan()))
         )
-        viewModel.planTrip("Coffee tour in Stockholm")
+        viewModel.planTrip("Coffee tour in Stockholm", TEST_LAT, TEST_LNG)
         advanceUntilIdle()
 
         // Verify we are in Result state first
@@ -237,7 +240,7 @@ class PlanViewModelTest {
         )
 
         // When
-        viewModel.planTrip("Coffee tour in Stockholm")
+        viewModel.planTrip("Coffee tour in Stockholm", TEST_LAT, TEST_LNG)
         advanceUntilIdle()
 
         // Then - the final Result state carries all accumulated steps from the flow.
@@ -278,7 +281,7 @@ class PlanViewModelTest {
         val states = captureStates(viewModel)
 
         // When
-        viewModel.planTrip("Coffee tour in Stockholm")
+        viewModel.planTrip("Coffee tour in Stockholm", TEST_LAT, TEST_LNG)
         advanceUntilIdle()
 
         // Then

@@ -7,6 +7,7 @@ import androidx.compose.runtime.getValue
 import androidx.compose.ui.platform.LocalContext
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import se.onemanstudio.playaroundwithai.BuildConfig
 import se.onemanstudio.playaroundwithai.core.ui.sofa.ChartBarData
 import se.onemanstudio.playaroundwithai.core.ui.sofa.SettingsBottomSheet
 import se.onemanstudio.playaroundwithai.core.ui.sofa.SettingsState
@@ -36,7 +37,7 @@ fun SettingsBottomSheetContainer(
 
     SettingsBottomSheet(
         state = SettingsState(
-            appVersion = "1.0",
+            appVersion = BuildConfig.VERSION_NAME,
             vehicleCount = vehicleCount,
             searchRadiusKm = searchRadiusKm,
         ),
