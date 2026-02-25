@@ -22,4 +22,8 @@
     <string name="plan_example_parks">Parker och naturvandringar</string>
     <string name="plan_try_suggestions">Prova ett av dessa:</string>
     <string name="plan_planning_trip">Planerar din resa\u2026</string>
+    <string name="plan_icon_planning">Planering pågår</string>
+    <string name="plan_icon_step_thinking">Tänker</string>
+    <string name="plan_icon_step_tool_call">Anropar verktyg</string>
+    <string name="plan_icon_step_tool_result">Verktygsresultat</string>
 </resources>
