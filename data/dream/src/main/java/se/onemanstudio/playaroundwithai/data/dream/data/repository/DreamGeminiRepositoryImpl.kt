@@ -9,6 +9,7 @@ import se.onemanstudio.playaroundwithai.core.network.api.GeminiApiService
 import se.onemanstudio.playaroundwithai.core.network.dto.Content
 import se.onemanstudio.playaroundwithai.core.network.dto.GeminiRequest
 import se.onemanstudio.playaroundwithai.core.network.dto.Part
+import se.onemanstudio.playaroundwithai.core.network.prompts.AiPrompts
 import se.onemanstudio.playaroundwithai.core.network.tracking.TokenUsageTracker
 import se.onemanstudio.playaroundwithai.data.dream.domain.model.DreamInterpretation
 import se.onemanstudio.playaroundwithai.data.dream.domain.model.DreamMood
@@ -31,7 +32,7 @@ class DreamGeminiRepositoryImpl @Inject constructor(
         try {
             Timber.d("DreamGemini - Interpreting dream...")
 
-            val prompt = buildPrompt(description)
+            val prompt = AiPrompts.dreamInterpretationPrompt(description)
             val parts = listOf(Part(text = prompt))
             val request = GeminiRequest(contents = listOf(Content(parts = parts)))
 
@@ -83,36 +84,6 @@ class DreamGeminiRepositoryImpl @Inject constructor(
             .removeSurrounding("```")
             .trim()
 
-    companion object {
-        @Suppress("MaxLineLength")
-        private fun buildPrompt(description: String): String = """
-You are a dream interpreter and visual artist. Given the user's dream description below, return a JSON object with exactly this structure:
-{
-  "interpretation": "A 2-3 sentence analysis of symbolism, emotional meaning, and themes",
-  "mood": "one of: JOYFUL, MYSTERIOUS, ANXIOUS, PEACEFUL, DARK, SURREAL",
-  "scene": {
-    "palette": { "sky": <ARGB long>, "horizon": <ARGB long>, "accent": <ARGB long> },
-    "layers": [
-      {
-        "depth": <0.0-1.0>,
-        "elements": [{ "shape": "<CIRCLE|TRIANGLE|MOUNTAIN|WAVE|TREE|CLOUD|STAR|CRESCENT|DIAMOND|SPIRAL|LOTUS|AURORA|CRYSTAL>", "x": <0.0-1.0>, "y": <0.0-1.0>, "scale": <0.5-3.0>, "color": <ARGB long>, "alpha": <0.0-1.0> }]
-      }
-    ],
-    "particles": [{ "shape": "<DOT|SPARKLE|RING|TEARDROP|DIAMOND_MOTE|DASH|STARBURST>", "count": <5-30>, "color": <ARGB long>, "speed": <0.5-2.0>, "size": <2.0-8.0> }]
-  }
-}
-Generate 3-5 layers with 2-4 elements each. Use colors that match the dream mood. ARGB long values should be like 4278190335 (0xFF0000FF for blue).
-Shape guidance:
-- Nature: TREE, MOUNTAIN, LOTUS, AURORA, WAVE, CLOUD. Particles: TEARDROP, DOT
-- Night/space: STAR, CRESCENT, CRYSTAL, CIRCLE. Particles: SPARKLE, STARBURST, DIAMOND_MOTE
-- Abstract/surreal: SPIRAL, DIAMOND, AURORA, WAVE. Particles: RING, DASH, DIAMOND_MOTE
-- Water/ocean: WAVE, CIRCLE, CRESCENT. Particles: TEARDROP, DOT, RING
-Use diverse shapes across layers. Mix 3-5 different element shapes and 2-3 particle types per scene.
-Return ONLY valid JSON, no markdown, no backticks, no extra text.
-
-Dream: "$description"
-        """.trimIndent()
-    }
 }
 
 // Internal DTOs for Gson parsing of the Gemini JSON response

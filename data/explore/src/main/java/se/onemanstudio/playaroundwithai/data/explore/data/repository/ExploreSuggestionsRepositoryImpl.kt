@@ -15,11 +15,10 @@ import se.onemanstudio.playaroundwithai.core.network.tracking.TokenUsageTracker
 import se.onemanstudio.playaroundwithai.core.network.dto.Content
 import se.onemanstudio.playaroundwithai.core.network.dto.GeminiRequest
 import se.onemanstudio.playaroundwithai.core.network.dto.Part
+import se.onemanstudio.playaroundwithai.core.network.prompts.AiPrompts
 import timber.log.Timber
 import javax.inject.Inject
 import javax.inject.Singleton
-
-private const val SUGGESTED_PLACES_COUNT = 10
 
 @Singleton
 class ExploreSuggestionsRepositoryImpl @Inject constructor(
@@ -35,7 +34,7 @@ class ExploreSuggestionsRepositoryImpl @Inject constructor(
         try {
             Timber.d("Gemini - Getting suggested places for lat=$latitude, lng=$longitude")
 
-            val prompt = buildSuggestedPlacesPrompt(latitude, longitude)
+            val prompt = AiPrompts.suggestedPlacesPrompt(latitude, longitude)
             val parts = listOf(Part(text = prompt))
             val request = GeminiRequest(contents = listOf(Content(parts = parts)))
             val response = apiService.generateContent(request)
@@ -61,19 +60,6 @@ class ExploreSuggestionsRepositoryImpl @Inject constructor(
             Timber.e(e, "Gemini - HTTP error during getSuggestedPlaces (code=${e.code()})")
             Result.failure(e)
         }
-    }
-
-    private fun buildSuggestedPlacesPrompt(latitude: Double, longitude: Double): String {
-        return """
-            You are a helpful AI assistant. Given the latitude and longitude,
-            provide a list of $SUGGESTED_PLACES_COUNT interesting places around this location.
-            For each place, include its name, latitude, longitude,
-            a short description (max 2 sentences),
-            and a category (e.g., "Park", "Museum", "Restaurant").
-            Return the response strictly as a JSON object with a single "places" array,
-            where each element is a place object.
-            Latitude: $latitude, Longitude: $longitude
-        """.trimIndent()
     }
 
     private fun extractJson(text: String): String {

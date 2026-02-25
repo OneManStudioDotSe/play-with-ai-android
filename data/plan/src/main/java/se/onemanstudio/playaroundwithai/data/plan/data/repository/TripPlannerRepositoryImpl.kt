@@ -14,6 +14,7 @@ import se.onemanstudio.playaroundwithai.core.network.dto.FunctionCallDto
 import se.onemanstudio.playaroundwithai.core.network.dto.FunctionResponseDto
 import se.onemanstudio.playaroundwithai.core.network.dto.GeminiRequest
 import se.onemanstudio.playaroundwithai.core.network.dto.Part
+import se.onemanstudio.playaroundwithai.core.network.prompts.AiPrompts
 import se.onemanstudio.playaroundwithai.data.plan.data.tools.RouteCalculator
 import se.onemanstudio.playaroundwithai.data.plan.data.tools.buildToolDeclarations
 import se.onemanstudio.playaroundwithai.data.plan.domain.model.PlanEvent
@@ -27,7 +28,6 @@ import javax.inject.Singleton
 private const val MAX_ITERATIONS = 10
 private const val DEFAULT_COUNT = 5
 private const val ERROR_BODY_PREVIEW_LENGTH = 200
-private const val SEARCH_PLACES_PROMPT_PREFIX = "Return a JSON array of"
 private const val LOG_TAG = "TripPlanner"
 
 @Singleton
@@ -45,7 +45,7 @@ class TripPlannerRepositoryImpl @Inject constructor(
             val collectedStops = mutableListOf<TripStop>()
             var routeResult: se.onemanstudio.playaroundwithai.data.plan.data.tools.RouteResult? = null
 
-            val systemPrompt = buildSystemPrompt(latitude, longitude)
+            val systemPrompt = AiPrompts.tripPlannerSystemPrompt(latitude, longitude)
             history.add(Content(role = "user", parts = listOf(Part(text = "$systemPrompt\n\nUser request: $goal"))))
 
             emit(PlanEvent.Thinking("Understanding your request..."))
@@ -137,7 +137,7 @@ class TripPlannerRepositoryImpl @Inject constructor(
 
         Timber.d("$LOG_TAG - search_places: query='$query' lat=$lat lng=$lng count=$count")
 
-        val prompt = buildSearchPrompt(query, lat, lng, count)
+        val prompt = AiPrompts.searchPlacesPrompt(query, lat, lng, count)
         val request = GeminiRequest(contents = listOf(Content(role = "user", parts = listOf(Part(text = prompt)))))
         val response = apiService.generateContent(request)
         tokenUsageTracker.record("agents", response.usageMetadata)
@@ -300,44 +300,4 @@ class TripPlannerRepositoryImpl @Inject constructor(
         }
     }
 
-    companion object {
-        @Suppress("MaxLineLength")
-        private fun buildSystemPrompt(latitude: Double, longitude: Double): String = """
-You are an AI trip planner agent. Given a user's request, plan a walking trip itinerary.
-
-You have access to these tools:
-- search_places: Find places matching a query near a location
-- calculate_route: Calculate the optimal walking route between places
-
-Strategy:
-1. Break down the user's request into 1-3 search queries (e.g., "specialty coffee shops", "scenic viewpoints")
-2. Use search_places for each query to find candidate locations
-3. Select the best 4-6 stops that create a coherent itinerary
-4. Use calculate_route to find the optimal walking order
-5. Provide a final summary describing the trip with personality and helpful tips
-
-Keep the itinerary to 4-6 stops for a half-day trip. The user is near latitude $latitude, longitude $longitude.
-
-When you have finished planning, respond with a text summary of the itinerary. The summary should describe each stop in order, mention what makes each place special, and include practical tips.
-Do NOT call more than 5 tools total.
-        """.trimIndent()
-
-        @Suppress("MaxLineLength")
-        private fun buildSearchPrompt(query: String, lat: Double, lng: Double, count: Int): String = """
-$SEARCH_PLACES_PROMPT_PREFIX $count real places matching "$query" near latitude $lat, longitude $lng.
-
-Each place must be a real, existing establishment or location. Return ONLY a JSON array with this format:
-[
-  {
-    "name": "Place Name",
-    "latitude": 59.3293,
-    "longitude": 18.0686,
-    "description": "A brief 1-2 sentence description of what makes this place special",
-    "category": "cafe"
-  }
-]
-
-Use realistic coordinates near the specified location. Return ONLY valid JSON, no markdown, no backticks, no extra text.
-        """.trimIndent()
-    }
 }

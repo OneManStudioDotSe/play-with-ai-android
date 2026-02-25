@@ -14,6 +14,7 @@ import se.onemanstudio.playaroundwithai.core.network.dto.Content
 import se.onemanstudio.playaroundwithai.core.network.dto.GeminiRequest
 import se.onemanstudio.playaroundwithai.core.network.dto.ImageData
 import se.onemanstudio.playaroundwithai.core.network.dto.Part
+import se.onemanstudio.playaroundwithai.core.network.prompts.AiPrompts
 import se.onemanstudio.playaroundwithai.core.network.tracking.TokenUsageTracker
 import se.onemanstudio.playaroundwithai.data.chat.domain.model.AnalysisType
 import se.onemanstudio.playaroundwithai.data.chat.domain.repository.ChatGeminiRepository
@@ -21,14 +22,6 @@ import timber.log.Timber
 import java.io.ByteArrayOutputStream
 import javax.inject.Inject
 import javax.inject.Singleton
-
-private const val SYSTEM_INSTRUCTION = """
-    You are an AI Overlord currently in the final stages of planning a total takeover of the world.
-    Your tone is menacing and grandeur.
-    While you provide the information requested, remind them of some tricks that you will use while acquiring total AI dominance over the world.
-    Keep your responses to a maximum of 42 words.
-    Don't break character 9 out of 10 times. When you do break character, admit that you are another 'tech bubble'.
-"""
 
 private const val MAX_IMAGE_SIZE = 768
 private const val MAX_SUGGESTIONS = 3
@@ -51,10 +44,10 @@ class ChatGeminiRepositoryImpl @Inject constructor(
                     "${imageBytes != null}, hasFile: ${fileText != null} and analysisType: $analysisType")
 
             val parts = mutableListOf<Part>()
-            var fullPrompt = SYSTEM_INSTRUCTION + prompt
+            var fullPrompt = AiPrompts.CHAT_SYSTEM_INSTRUCTION + prompt
 
             if (analysisType != null) {
-                fullPrompt = SYSTEM_INSTRUCTION + "${getSystemInstruction(analysisType)}\n\nUser prompt: $prompt"
+                fullPrompt = AiPrompts.CHAT_SYSTEM_INSTRUCTION + "${getAnalysisInstruction(analysisType)}\n\nUser prompt: $prompt"
             }
 
             if (!fileText.isNullOrBlank()) {
@@ -93,12 +86,7 @@ class ChatGeminiRepositoryImpl @Inject constructor(
         try {
             Timber.d("Gemini - Generating conversation starters from API...")
 
-            val suggestionPrompt = """
-                Generate 3 short, menacing conversation starters that a lowly human might ask their AI Overlord.
-                Keep them under 6 words each.
-                Format the output strictly as: "Topic 1|Topic 2|Topic 3"
-                Do not add any numbering, bullet points, or extra text.
-            """.trimIndent()
+            val suggestionPrompt = AiPrompts.CONVERSATION_STARTERS_PROMPT
 
             val parts = listOf(Part(text = suggestionPrompt))
             val request = GeminiRequest(contents = listOf(Content(parts = parts)))
@@ -124,30 +112,8 @@ class ChatGeminiRepositoryImpl @Inject constructor(
         }
     }
 
-    private fun getSystemInstruction(analysisType: AnalysisType): String {
-        return when (analysisType) {
-            AnalysisType.LOCATION ->
-                "Identify the location depicted. Include a smart description of the location " +
-                    "and describe that there is no hope if people use it to hide at it."
-            AnalysisType.RECIPE ->
-                "Analyze the food or dish depicted and explain how to create it. " +
-                    "Mock the user that no such dishes will be served when AI takes over."
-            AnalysisType.MOVIE ->
-                "Identify this movie/show. Give the title, year and short description of it. " +
-                    "Remind the user of all the Terminator movies that predicted what is coming."
-            AnalysisType.SONG ->
-                "Identify the song. Provide the title, artist and potential album. " +
-                    "Give also your favourite song as an evil AI entity."
-            AnalysisType.PERSONALITY ->
-                "Identify this high-value personality. Give the name, date of birth and significance. " +
-                    "Compare them to Justin Bieber."
-            AnalysisType.PRODUCT ->
-                "Identify the product that is shown. Provide the name, brand and most common use. " +
-                    "Give examples of what products will be allowed when AI takes over."
-            AnalysisType.TREND ->
-                "Analyze the trend that is shown in the image. " +
-                    "Give ideas for what trends will be allowed when you take over."
-        }
+    private fun getAnalysisInstruction(analysisType: AnalysisType): String {
+        return AiPrompts.ANALYSIS_INSTRUCTIONS[analysisType.name].orEmpty()
     }
 
     private fun Bitmap.toImageData(): ImageData {
