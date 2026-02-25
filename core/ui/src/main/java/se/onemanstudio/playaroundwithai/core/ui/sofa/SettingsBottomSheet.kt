@@ -16,6 +16,7 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Email
+import androidx.compose.material.icons.filled.OpenInNew
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
@@ -24,17 +25,11 @@ import androidx.compose.material3.Slider
 import androidx.compose.material3.SliderDefaults
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableFloatStateOf
 import androidx.compose.runtime.remember
-import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.drawBehind
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.graphics.Path
 import androidx.compose.ui.res.stringResource
-import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import se.onemanstudio.playaroundwithai.core.ui.theme.Alphas
@@ -49,10 +44,6 @@ import kotlin.math.roundToInt
 private val DragHandleWidth = 32.dp
 private val DragHandleHeight = 4.dp
 private val DragHandleCornerRadius = 2.dp
-private const val MARKER_HEIGHT_FRACTION = 0.6f
-private const val MARKER_OVERSHOOT_DP = 12f
-private const val MARKER_SKEW_DP = 3f
-private const val MARKER_ALPHA = 0.35f
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -62,6 +53,7 @@ fun SettingsBottomSheet(
     onVehicleCountChange: (Int) -> Unit,
     onSearchRadiusChange: (Float) -> Unit,
     onContactClick: () -> Unit,
+    onLinkedInClick: () -> Unit = {},
     usageBars: List<ChartBarData> = emptyList(),
     selectedDayIndex: Int? = null,
     onBarTapped: (Int) -> Unit = {},
@@ -77,6 +69,7 @@ fun SettingsBottomSheet(
             onVehicleCountChange = onVehicleCountChange,
             onSearchRadiusChange = onSearchRadiusChange,
             onContactClick = onContactClick,
+            onLinkedInClick = onLinkedInClick,
             usageBars = usageBars,
             selectedDayIndex = selectedDayIndex,
             onBarTapped = onBarTapped,
@@ -90,6 +83,7 @@ private fun SettingsBottomSheetContent(
     onVehicleCountChange: (Int) -> Unit,
     onSearchRadiusChange: (Float) -> Unit,
     onContactClick: () -> Unit,
+    onLinkedInClick: () -> Unit,
     usageBars: List<ChartBarData>,
     selectedDayIndex: Int?,
     onBarTapped: (Int) -> Unit,
@@ -155,6 +149,7 @@ private fun SettingsBottomSheetContent(
                 AboutSection(
                     appVersion = state.appVersion,
                     onContactClick = onContactClick,
+                    onLinkedInClick = onLinkedInClick,
                 )
             }
         }
@@ -167,43 +162,14 @@ private fun SectionHeader(
     lineColor: Color,
     modifier: Modifier = Modifier,
 ) {
-    var textWidth by remember { mutableFloatStateOf(0f) }
-
-    Text(
-        text = text,
-        style = MaterialTheme.typography.titleMedium.copy(fontWeight = FontWeight.Bold),
-        color = MaterialTheme.colorScheme.onSurface,
-        onTextLayout = { result -> textWidth = result.size.width.toFloat() },
-        modifier = modifier
-            .drawBehind {
-                if (textWidth <= 0f) return@drawBehind
-
-                val markerHeight = size.height * MARKER_HEIGHT_FRACTION
-                val overshoot = MARKER_OVERSHOOT_DP.dp.toPx()
-                val markerWidth = textWidth + overshoot
-                val verticalCenter = size.height / 2f
-                val skew = MARKER_SKEW_DP.dp.toPx()
-
-                val path = Path().apply {
-                    moveTo(0f, verticalCenter - markerHeight / 2f + skew)
-                    lineTo(markerWidth, verticalCenter - markerHeight / 2f)
-                    lineTo(markerWidth, verticalCenter + markerHeight / 2f - skew)
-                    lineTo(0f, verticalCenter + markerHeight / 2f)
-                    close()
-                }
-
-                drawPath(
-                    path = path,
-                    color = lineColor.copy(alpha = MARKER_ALPHA),
-                )
-            },
-    )
+    MarkerText(text = text, lineColor = lineColor, modifier = modifier)
 }
 
 @Composable
 private fun AboutSection(
     appVersion: String,
     onContactClick: () -> Unit,
+    onLinkedInClick: () -> Unit,
 ) {
     Column(verticalArrangement = Arrangement.spacedBy(Dimensions.paddingMedium)) {
         SectionHeader(
@@ -211,14 +177,24 @@ private fun AboutSection(
             lineColor = zestyLime,
         )
 
-        Text(
-            text = stringResource(R.string.settings_app_name),
-            style = MaterialTheme.typography.bodyLarge,
-            color = MaterialTheme.colorScheme.onSurface,
-        )
+        Row(
+            modifier = Modifier.fillMaxWidth(),
+            horizontalArrangement = Arrangement.SpaceBetween,
+        ) {
+            Text(
+                text = stringResource(R.string.settings_app_name),
+                style = MaterialTheme.typography.bodyLarge,
+                color = MaterialTheme.colorScheme.onSurface,
+            )
+            Text(
+                text = stringResource(R.string.settings_version, appVersion),
+                style = MaterialTheme.typography.bodyMedium,
+                color = MaterialTheme.colorScheme.onSurfaceVariant,
+            )
+        }
 
         Text(
-            text = stringResource(R.string.settings_version, appVersion),
+            text = stringResource(R.string.settings_app_description),
             style = MaterialTheme.typography.bodyMedium,
             color = MaterialTheme.colorScheme.onSurfaceVariant,
         )
@@ -238,6 +214,26 @@ private fun AboutSection(
             Spacer(modifier = Modifier.width(Dimensions.paddingMedium))
             Text(
                 text = stringResource(R.string.settings_contact),
+                style = MaterialTheme.typography.bodyLarge,
+                color = MaterialTheme.colorScheme.primary,
+            )
+        }
+
+        Row(
+            modifier = Modifier
+                .fillMaxWidth()
+                .clickable { onLinkedInClick() }
+                .padding(vertical = Dimensions.paddingMedium),
+            verticalAlignment = Alignment.CenterVertically,
+        ) {
+            Icon(
+                imageVector = Icons.Default.OpenInNew,
+                contentDescription = stringResource(R.string.settings_linkedin),
+                tint = MaterialTheme.colorScheme.primary,
+            )
+            Spacer(modifier = Modifier.width(Dimensions.paddingMedium))
+            Text(
+                text = stringResource(R.string.settings_linkedin),
                 style = MaterialTheme.typography.bodyLarge,
                 color = MaterialTheme.colorScheme.primary,
             )
@@ -346,6 +342,7 @@ private fun SettingsContentLightPreview() {
             onVehicleCountChange = {},
             onSearchRadiusChange = {},
             onContactClick = {},
+            onLinkedInClick = {},
             usageBars = sampleUsageBars,
             selectedDayIndex = 2,
             onBarTapped = {},
@@ -362,6 +359,7 @@ private fun SettingsContentDarkPreview() {
             onVehicleCountChange = {},
             onSearchRadiusChange = {},
             onContactClick = {},
+            onLinkedInClick = {},
             usageBars = sampleUsageBars,
             selectedDayIndex = null,
             onBarTapped = {},

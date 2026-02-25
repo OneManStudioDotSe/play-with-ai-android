@@ -49,6 +49,10 @@ fun SettingsBottomSheetContainer(
             }
             context.startActivity(intent)
         },
+        onLinkedInClick = {
+            val intent = Intent(Intent.ACTION_VIEW, "https://www.linkedin.com/in/sotirisfalieris/".toUri())
+            context.startActivity(intent)
+        },
         usageBars = usageBars,
         selectedDayIndex = selectedDayIndex,
         onBarTapped = { viewModel.onBarTapped(it) },
