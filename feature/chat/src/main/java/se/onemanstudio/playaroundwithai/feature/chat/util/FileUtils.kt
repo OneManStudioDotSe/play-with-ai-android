@@ -38,10 +38,10 @@ class FileUtils @Inject constructor(
         try {
             context.contentResolver.openInputStream(uri)?.use { it.readBytes() }
         } catch (e: IOException) {
-            Timber.d("Error reading image: ${e.message}")
+            Timber.w(e, "Error reading image from URI: $uri")
             null
         } catch (e: SecurityException) {
-            Timber.d("Security exception reading image: ${e.message}")
+            Timber.w(e, "Security exception reading image from URI: $uri")
             null
         }
     }

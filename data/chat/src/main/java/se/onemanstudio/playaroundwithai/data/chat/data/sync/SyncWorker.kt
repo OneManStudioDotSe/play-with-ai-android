@@ -56,7 +56,7 @@ class SyncWorker @AssistedInject constructor(
             Timber.d("SyncWorker - Syncing prompt id=${entity.id} (${if (hasFirestoreDoc) "UPDATE" else "CREATE"})...")
 
             val success = if (hasFirestoreDoc) {
-                val result = firestoreDataSource.updatePrompt(entity.firestoreDocId!!, entity.text)
+                val result = firestoreDataSource.updatePrompt(entity.firestoreDocId ?: return@forEach, entity.text)
                 result.isSuccess
             } else {
                 val result = firestoreDataSource.savePrompt(entity.text, entity.timestamp)
