@@ -225,7 +225,7 @@ private fun InterpretingState() {
         )
         Spacer(modifier = Modifier.height(Dimensions.paddingLarge))
         Text(
-            text = "Interpreting your dream\u2026",
+            text = stringResource(R.string.dream_interpreting),
             style = MaterialTheme.typography.bodyLarge,
             color = MaterialTheme.colorScheme.onSurface,
         )

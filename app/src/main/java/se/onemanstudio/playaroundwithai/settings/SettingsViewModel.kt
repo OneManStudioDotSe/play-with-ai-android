@@ -9,20 +9,20 @@ import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.stateIn
 import se.onemanstudio.playaroundwithai.core.network.tracking.DailyTokenUsage
 import se.onemanstudio.playaroundwithai.data.chat.domain.usecase.GetWeeklyTokenUsageUseCase
-import se.onemanstudio.playaroundwithai.data.maps.data.settings.MapSettingsHolder
+import se.onemanstudio.playaroundwithai.data.explore.data.settings.ExploreSettingsHolder
 import javax.inject.Inject
 
 @HiltViewModel
 class SettingsViewModel @Inject constructor(
     getWeeklyTokenUsageUseCase: GetWeeklyTokenUsageUseCase,
-    private val mapSettingsHolder: MapSettingsHolder,
+    private val exploreSettingsHolder: ExploreSettingsHolder,
 ) : ViewModel() {
 
     val weeklyUsage: StateFlow<List<DailyTokenUsage>> = getWeeklyTokenUsageUseCase()
         .stateIn(viewModelScope, SharingStarted.WhileSubscribed(), emptyList())
 
-    val vehicleCount: StateFlow<Int> = mapSettingsHolder.vehicleCount
-    val searchRadiusKm: StateFlow<Float> = mapSettingsHolder.searchRadiusKm
+    val vehicleCount: StateFlow<Int> = exploreSettingsHolder.vehicleCount
+    val searchRadiusKm: StateFlow<Float> = exploreSettingsHolder.searchRadiusKm
 
     private val _selectedDayIndex = MutableStateFlow<Int?>(null)
     val selectedDayIndex: StateFlow<Int?> = _selectedDayIndex
@@ -32,10 +32,10 @@ class SettingsViewModel @Inject constructor(
     }
 
     fun onVehicleCountChange(count: Int) {
-        mapSettingsHolder.updateVehicleCount(count)
+        exploreSettingsHolder.updateVehicleCount(count)
     }
 
     fun onSearchRadiusChange(radius: Float) {
-        mapSettingsHolder.updateSearchRadiusKm(radius)
+        exploreSettingsHolder.updateSearchRadiusKm(radius)
     }
 }

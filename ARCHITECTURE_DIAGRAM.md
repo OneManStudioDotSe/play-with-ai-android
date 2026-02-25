@@ -4,19 +4,19 @@
 ┌─────────────────────────────────────────────────────────────────────────────────┐
 │                              PRESENTATION LAYER                                 │
 │                                                                                 │
-│  ┌──────────────────────────────┐       ┌──────────────────────────────┐        │
-│  │       :feature:chat          │       │        :feature:map          │        │
-│  │                              │       │                              │        │
-│  │  ChatScreen (Compose)        │       │  MapScreen (Compose)         │        │
-│  │       │                      │       │       │                      │        │
-│  │       ▼                      │       │       ▼                      │        │
-│  │  ChatViewModel               │       │  MapViewModel                │        │
-│  │   │  StateFlow<ChatUiState>  │       │   │  StateFlow<MapUiState>   │        │
-│  │   │   ├─ Initial             │       │   │   (locations, filters,   │        │
-│  │   │   ├─ Loading             │       │   │    route, metrics)       │        │
-│  │   │   ├─ Success             │       │   │                          │        │
-│  │   │   └─ Error               │       │   │                          │        │
-│  └───┼──────────────────────────┘       └───┼──────────────────────────┘        │
+│  ┌──────────────────────────────┐       ┌──────────────────────────────────┐    │
+│  │       :feature:chat          │       │        :feature:explore            │    │
+│  │                              │       │                                    │    │
+│  │  ChatScreen (Compose)        │       │  ExploreScreen (Compose)           │    │
+│  │       │                      │       │       │                            │    │
+│  │       ▼                      │       │       ▼                            │    │
+│  │  ChatViewModel               │       │  ExploreViewModel                  │    │
+│  │   │  StateFlow<ChatUiState>  │       │   │  StateFlow<ExploreUiState>     │    │
+│  │   │   ├─ Initial             │       │   │   (locations, filters,         │    │
+│  │   │   ├─ Loading             │       │   │    route, metrics)             │    │
+│  │   │   ├─ Success             │       │   │                                │    │
+│  │   │   └─ Error               │       │   │                                │    │
+│  └───┼──────────────────────────┘       └───┼────────────────────────────────┘    │
 │      │ Uses 9 use cases                     │ Uses 2 use cases                  │
 └──────┼──────────────────────────────────────┼───────────────────────────────────┘
        │                                      │
@@ -26,7 +26,7 @@
 │                                :core-domain                                     │
 │                                                                                 │
 │  ┌──────────────────────┐  ┌──────────────────────┐  ┌───────────────────────┐  │
-│  │ GenerateContentUC    │  │ GetPromptHistoryUC   │  │ GetMapItemsUC         │  │
+│  │ GenerateContentUC    │  │ GetPromptHistoryUC   │  │ GetExploreItemsUC     │  │
 │  │ GetSuggestionsUC     │  │ SavePromptUC         │  │ GetSuggestedPlacesUC  │  │
 │  │                      │  │ UpdatePromptTextUC   │  │                       │  │
 │  │                      │  │ GetSyncStateUC       │  │                       │  │
@@ -36,7 +36,7 @@
 │             │                         │                          │              │
 │             ▼                         ▼                          ▼              │
 │  ┌──────────────────────┐  ┌──────────────────────┐  ┌───────────────────────┐  │
-│  │ GeminiRepository     │  │ PromptRepository     │  │ MapRepository         │  │
+│  │ GeminiRepository     │  │ PromptRepository     │  │ ExploreRepository     │  │
 │  │ (interface)          │  │ (interface)          │  │ (interface)           │  │
 │  └──────────┬───────────┘  └──────────┬───────────┘  └───────────┬───────────┘  │
 │             │                         │                          │              │
@@ -53,7 +53,7 @@
 │  ┌─────────────────────────────────────────────────────────────────────────┐    │
 │  │                        Repository Implementations                       │    │
 │  │                                                                         │    │
-│  │  GeminiRepositoryImpl   PromptRepositoryImpl   MapRepositoryImpl        │    │
+│  │  GeminiRepositoryImpl   PromptRepositoryImpl   ExploreRepositoryImpl    │    │
 │  │         │                  │          │              │                  │    │
 │  │         │                  │          │              │                  │    │
 │  │  AuthRepositoryImpl        │          │              │                  │    │
@@ -62,7 +62,7 @@
 │            │                  │          │              │                       │
 │            ▼                  ▼          │              ▼                       │
 │  ┌──────────────────────────────────┐    │    ┌─────────────────────────┐       │
-│  │       REMOTE DATA SOURCES        │    │    │   FakeMapApiService     │       │
+│  │       REMOTE DATA SOURCES        │    │    │  FakeExploreItemsService│       │
 │  │                                  │    │    │   (Mock data generator) │       │
 │  │  ┌────────────────────────────┐  │    │    │   * Simulates  delay    │       │
 │  │  │     GeminiApiService       │  │    │    │   * Generates random    │       │
@@ -259,37 +259,37 @@ PromptRepositoryImpl.updatePromptText()
   markSyncedIfTextMatches returns 0 (text changed) → stays Pending → Phase 2 handles it
 ```
 
-### Map Feature — Data Flow
+### Explore Feature — Data Flow
 
 ```
-MapScreen launched
+ExploreScreen launched
   │
   ▼
-MapViewModel.loadMapData()
+ExploreViewModel.loadExploreData()
   │
   ▼
-GetMapItemsUseCase.invoke(count = 30)
+GetExploreItemsUseCase.invoke(count = 30)
   │
   ▼
-MapRepositoryImpl.getMapItems(30)
+ExploreRepositoryImpl.getExploreItems(30)
   │
   ▼
-FakeMapApiService.getMapItems(30)       ← Mock implementation
-  ├─ delay(1500ms)                        (no real API yet)
+FakeExploreItemsService.getExploreItems(30)   ← Mock implementation
+  ├─ delay(1500ms)                               (no real API yet)
   ├─ Generate 30 random vehicles
   │   ├─ Type: SCOOTER or BICYCLE
   │   ├─ Position: random lat/lng near Stockholm
   │   ├─ Battery: random level
   │   └─ Nickname: random name
-  └─ Return List<MapItemDto>
+  └─ Return List<ExploreItemDto>
   │
   ▼
-Map DTO → Domain (MapItem) → UI Model (MapItemUiModel)
+Explore DTO → Domain (ExploreItem) → UI Model (ExploreItemUiModel)
   │
   ▼
-MapUiState updated
-  ├─ allLocations: PersistentList<MapItemUiModel>
-  ├─ visibleLocations: PersistentList<MapItemUiModel>   (filtered subset)
+ExploreUiState updated
+  ├─ allLocations: PersistentList<ExploreItemUiModel>
+  ├─ visibleLocations: PersistentList<ExploreItemUiModel>   (filtered subset)
   ├─ activeFilters: PersistentSet<VehicleType>
   ├─ optimalRoute: PersistentList<LatLng>?
   └─ metrics: RouteMetrics?
@@ -297,10 +297,10 @@ MapUiState updated
   ▼
 GoogleMap renders markers + polylines
   │
-  ├─ User toggles filter → MapViewModel.toggleFilter(type)
+  ├─ User toggles filter → ExploreViewModel.toggleFilter(type)
   │   └─ Recompute visibleLocations from allLocations
   │
-  └─ User taps "Calculate Route" → MapViewModel.calculateOptimalRoute(userLoc)
+  └─ User taps "Calculate Route" → ExploreViewModel.calculateOptimalRoute(userLoc)
       ├─ Get user location via FusedLocationProviderClient
       ├─ Compute all permutations of selected locations
       ├─ Find minimum-distance path (brute force TSP)

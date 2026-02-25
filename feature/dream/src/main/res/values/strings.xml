@@ -12,6 +12,7 @@
     <string name="dream_label_delete">Delete dream</string>
     <string name="dream_label_error_icon">Error icon</string>
     <string name="dream_label_dismiss_error">Dismiss error</string>
+    <string name="dream_interpreting">Interpreting your dream\u2026</string>
 
     <string name="dream_oops">Oops!</string>
     <string name="dream_error_api_key_missing" translatable="false">Gemini API key not configured.\n\nAdd GEMINI_API_KEY_DEBUG to your local.properties file.\nSee the project README for setup instructions.</string>

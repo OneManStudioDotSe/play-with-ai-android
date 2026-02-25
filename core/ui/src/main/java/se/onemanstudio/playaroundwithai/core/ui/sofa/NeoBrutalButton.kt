@@ -21,7 +21,10 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.drawBehind
+import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.drawscope.Stroke
 import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.tooling.preview.Preview
@@ -55,40 +58,54 @@ fun NeoBrutalButton(
 
     Box(
         modifier = modifier
-            .graphicsLayer {
-                translationX = if (isPressed) pressOffset.toPx() else 0f
-                translationY = if (isPressed) pressOffset.toPx() else 0f
-            }
-            .neoBrutalism(
-                backgroundColor = activeBackgroundColor,
-                borderColor = activeBorderColor,
-                shadowOffset = shadowOffset
-            )
-            .clickable(
-                interactionSource = interactionSource,
-                indication = null,
-                enabled = enabled,
-                onClick = onClick
-            )
-            .padding(horizontal = Dimensions.paddingLarge, vertical = Dimensions.paddingLarge),
-        contentAlignment = Alignment.Center
-    ) {
-        Row(
-            verticalAlignment = Alignment.CenterVertically,
-            horizontalArrangement = Arrangement.spacedBy(Dimensions.paddingSmall)
-        ) {
-            if (icon != null) {
-                Icon(
-                    imageVector = icon,
-                    contentDescription = iconContentDescription,
-                    tint = activeContentColor
+            .drawBehind {
+                drawRect(
+                    color = activeBorderColor,
+                    topLeft = Offset(shadowOffset.toPx(), shadowOffset.toPx()),
+                    size = this.size
                 )
             }
-            Text(
-                text = text,
-                style = MaterialTheme.typography.labelLarge,
-                color = activeContentColor
-            )
+    ) {
+        Box(
+            modifier = Modifier
+                .graphicsLayer {
+                    translationX = if (isPressed) pressOffset.toPx() else 0f
+                    translationY = if (isPressed) pressOffset.toPx() else 0f
+                }
+                .drawBehind {
+                    drawRect(color = activeBackgroundColor, size = this.size)
+                    drawRect(
+                        color = activeBorderColor,
+                        size = this.size,
+                        style = Stroke(Dimensions.neoBrutalCardStrokeWidth.toPx())
+                    )
+                }
+                .clickable(
+                    interactionSource = interactionSource,
+                    indication = null,
+                    enabled = enabled,
+                    onClick = onClick
+                )
+                .padding(horizontal = Dimensions.paddingLarge, vertical = Dimensions.paddingLarge),
+            contentAlignment = Alignment.Center
+        ) {
+            Row(
+                verticalAlignment = Alignment.CenterVertically,
+                horizontalArrangement = Arrangement.spacedBy(Dimensions.paddingSmall)
+            ) {
+                if (icon != null) {
+                    Icon(
+                        imageVector = icon,
+                        contentDescription = iconContentDescription,
+                        tint = activeContentColor
+                    )
+                }
+                Text(
+                    text = text,
+                    style = MaterialTheme.typography.labelLarge,
+                    color = activeContentColor
+                )
+            }
         }
     }
 }
@@ -113,29 +130,43 @@ fun NeoBrutalIconButton(
     Box(
         modifier = modifier
             .size(size)
-            .graphicsLayer {
-                translationX = if (isPressed) pressOffset.toPx() else 0f
-                translationY = if (isPressed) pressOffset.toPx() else 0f
+            .drawBehind {
+                drawRect(
+                    color = shadowColor,
+                    topLeft = Offset(shadowOffset.toPx(), shadowOffset.toPx()),
+                    size = this.size
+                )
             }
-            .neoBrutalism(
-                backgroundColor = backgroundColor,
-                borderColor = shadowColor,
-                borderWidth = Dimensions.neoBrutalCardStrokeWidth,
-                shadowOffset = shadowOffset
-            )
-            .clickable(
-                interactionSource = interactionSource,
-                indication = null,
-                onClick = onClick
-            ),
-        contentAlignment = Alignment.Center
     ) {
-        Icon(
-            imageVector = imageVector,
-            contentDescription = contentDescription,
-            tint = contentColor,
-            modifier = Modifier.padding(Dimensions.paddingMedium)
-        )
+        Box(
+            modifier = Modifier
+                .matchParentSize()
+                .graphicsLayer {
+                    translationX = if (isPressed) pressOffset.toPx() else 0f
+                    translationY = if (isPressed) pressOffset.toPx() else 0f
+                }
+                .drawBehind {
+                    drawRect(color = backgroundColor, size = this.size)
+                    drawRect(
+                        color = shadowColor,
+                        size = this.size,
+                        style = Stroke(Dimensions.neoBrutalCardStrokeWidth.toPx())
+                    )
+                }
+                .clickable(
+                    interactionSource = interactionSource,
+                    indication = null,
+                    onClick = onClick
+                ),
+            contentAlignment = Alignment.Center
+        ) {
+            Icon(
+                imageVector = imageVector,
+                contentDescription = contentDescription,
+                tint = contentColor,
+                modifier = Modifier.padding(Dimensions.paddingMedium)
+            )
+        }
     }
 }
 

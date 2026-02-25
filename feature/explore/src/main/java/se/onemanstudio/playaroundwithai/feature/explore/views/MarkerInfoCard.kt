@@ -1,0 +1,209 @@
+package se.onemanstudio.playaroundwithai.feature.explore.views
+
+import androidx.compose.animation.core.Animatable
+import androidx.compose.animation.core.FastOutSlowInEasing
+import androidx.compose.animation.core.tween
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.layout.wrapContentSize
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.automirrored.filled.DirectionsBike
+import androidx.compose.material.icons.filled.BatteryStd
+import androidx.compose.material.icons.filled.Close
+import androidx.compose.material.icons.filled.ElectricScooter
+import androidx.compose.material.icons.filled.QrCode
+import androidx.compose.material3.HorizontalDivider
+import androidx.compose.material3.Icon
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Text
+import android.view.HapticFeedbackConstants
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.mutableIntStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.ui.Alignment
+import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalView
+import androidx.compose.ui.graphics.vector.ImageVector
+import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.tooling.preview.Preview
+import se.onemanstudio.playaroundwithai.data.explore.domain.model.ExploreItem
+import se.onemanstudio.playaroundwithai.data.explore.domain.model.VehicleType
+import se.onemanstudio.playaroundwithai.core.ui.sofa.NeoBrutalCard
+import se.onemanstudio.playaroundwithai.core.ui.sofa.NeoBrutalIconButton
+import se.onemanstudio.playaroundwithai.core.ui.theme.Dimensions
+import se.onemanstudio.playaroundwithai.core.ui.theme.SofaAiTheme
+import se.onemanstudio.playaroundwithai.feature.explore.R
+import se.onemanstudio.playaroundwithai.feature.explore.models.ExploreItemUiModel
+
+@Composable
+fun MarkerInfoCard(
+    marker: ExploreItemUiModel,
+    onClose: () -> Unit
+) {
+    val view = LocalView.current
+    val animatedBattery = remember(marker.mapItem.id) { Animatable(1f) }
+    val lastTickedValue = remember(marker.mapItem.id) { mutableIntStateOf(1) }
+
+    LaunchedEffect(marker.mapItem.id) {
+        animatedBattery.animateTo(
+            targetValue = marker.mapItem.batteryLevel.toFloat(),
+            animationSpec = tween(durationMillis = 1000, easing = FastOutSlowInEasing)
+        )
+    }
+
+    val currentInt = animatedBattery.value.toInt()
+    if (currentInt != lastTickedValue.intValue) {
+        lastTickedValue.intValue = currentInt
+        view.performHapticFeedback(HapticFeedbackConstants.CLOCK_TICK)
+    }
+
+    NeoBrutalCard(modifier = Modifier.fillMaxWidth()) {
+        Column(modifier = Modifier.padding(Dimensions.paddingLarge)) {
+            Row(
+                modifier = Modifier.fillMaxWidth(),
+                horizontalArrangement = Arrangement.SpaceBetween,
+                verticalAlignment = Alignment.CenterVertically
+            ) {
+                Row(verticalAlignment = Alignment.CenterVertically) {
+                    Icon(
+                        imageVector = if (marker.mapItem.type == VehicleType.Bicycle) {
+                            Icons.AutoMirrored.Filled.DirectionsBike
+                        } else {
+                            Icons.Default.ElectricScooter
+                        },
+                        contentDescription = stringResource(id = R.string.vehicle_type_icon_content_description),
+                        modifier = Modifier.size(Dimensions.iconSizeLarge)
+                    )
+                    Spacer(modifier = Modifier.width(Dimensions.paddingMedium))
+                    Column {
+                        Text(
+                            text = marker.mapItem.nickname.uppercase(),
+                            style = MaterialTheme.typography.titleMedium,
+                            fontWeight = FontWeight.Bold
+                        )
+                        Text(
+                            text = if (marker.mapItem.type == VehicleType.Scooter) stringResource(R.string.e_scooter) else stringResource(R.string.e_bike),
+                            style = MaterialTheme.typography.labelSmall
+                        )
+                    }
+                }
+
+                NeoBrutalIconButton(
+                    imageVector = Icons.Default.Close,
+                    contentDescription = stringResource(R.string.close),
+                    size = Dimensions.iconSizeXLarge,
+                    backgroundColor = MaterialTheme.colorScheme.errorContainer,
+                    onClick = onClose,
+                )
+            }
+
+            Spacer(modifier = Modifier.height(Dimensions.paddingLarge))
+            HorizontalDivider(color = MaterialTheme.colorScheme.onSurface)
+            Spacer(modifier = Modifier.height(Dimensions.paddingLarge))
+
+            // Stats
+            Row(
+                modifier = Modifier.fillMaxWidth(),
+                horizontalArrangement = Arrangement.SpaceBetween
+            ) {
+                InfoStat(
+                    icon = Icons.Default.BatteryStd,
+                    iconContentDescription = stringResource(id = R.string.battery_icon_content_description),
+                    label = stringResource(R.string.battery),
+                    value = "${animatedBattery.value.toInt().toString().padStart(2, '0')}%"
+                )
+                InfoStat(
+                    icon = Icons.Default.QrCode,
+                    iconContentDescription = stringResource(id = R.string.code_icon_content_description),
+                    label = stringResource(R.string.code),
+                    value = marker.mapItem.vehicleCode
+                )
+            }
+        }
+    }
+}
+
+@Composable
+private fun InfoStat(
+    icon: ImageVector,
+    iconContentDescription: String,
+    label: String,
+    value: String
+) {
+    Row(verticalAlignment = Alignment.CenterVertically) {
+        Icon(
+            imageVector = icon,
+            contentDescription = iconContentDescription,
+            tint = MaterialTheme.colorScheme.primary
+        )
+        Spacer(modifier = Modifier.width(Dimensions.paddingSmall))
+        Column(
+            modifier = Modifier.wrapContentSize(),
+            horizontalAlignment = Alignment.CenterHorizontally
+        ) {
+            Text(
+                text = label,
+                style = MaterialTheme.typography.labelSmall,
+                color = MaterialTheme.colorScheme.onSurfaceVariant
+            )
+            Text(
+                text = value,
+                style = MaterialTheme.typography.bodyLarge,
+                fontWeight = FontWeight.Bold
+            )
+        }
+    }
+}
+
+@Preview(name = "Scooter")
+@Composable
+private fun MarkerInfoCardScooterPreview() {
+    SofaAiTheme {
+        MarkerInfoCard(
+            marker = ExploreItemUiModel(
+                mapItem = ExploreItem(
+                    id = "1",
+                    name = "Scooty",
+                    lat = 0.0,
+                    lng = 0.0,
+                    type = VehicleType.Scooter,
+                    batteryLevel = 87,
+                    vehicleCode = "1234",
+                    nickname = "Scooty"
+                )
+            ),
+            onClose = {}
+        )
+    }
+}
+
+@Preview(name = "Bicycle")
+@Composable
+private fun MarkerInfoCardBicyclePreview() {
+    SofaAiTheme {
+        MarkerInfoCard(
+            marker = ExploreItemUiModel(
+                mapItem = ExploreItem(
+                    id = "2",
+                    name = "Bikey",
+                    lat = 0.0,
+                    lng = 0.0,
+                    type = VehicleType.Bicycle,
+                    batteryLevel = 55,
+                    vehicleCode = "6789",
+                    nickname = "Bikey"
+                )
+            ),
+            onClose = {}
+        )
+    }
+}

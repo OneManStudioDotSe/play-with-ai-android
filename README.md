@@ -115,7 +115,7 @@ A highly modular structure that scales regardless of team size:
 - **`:core:theme`**: Centralized design system (colors, typography)
 - **`:core:ui`**: Reusable Compose components
 - **`:feature:chat`**: Complete chat feature — domain, data, and presentation layers (Room, Firestore, WorkManager)
-- **`:feature:map`**: Complete map feature — domain, data, and presentation layers (fake API, route calculation)
+- **`:feature:explore`**: Complete explore feature — domain, data, and presentation layers (fake API, route calculation)
 
 Each feature module is self-contained with its own domain models, repository interfaces, use case classes, and data layer implementations. Shared infrastructure (networking, auth, config) lives in focused core modules. Multiple teams can work on separate features without conflicts.
 
@@ -171,7 +171,7 @@ Dedicated `toDomain()` / `toEntity()` extensions keep the domain layer free of s
 
 ### Fake API service for development
 
-`FakeMapApiService` implements the real `MapApiService` interface with simulated latency and randomized vehicle data. Swapping for a real backend requires only changing the DI binding.
+`FakeExploreItemsService` implements the real `ExploreApiService` interface with simulated latency and randomized vehicle data. Swapping for a real backend requires only changing the DI binding.
 
 ### Dynamic theme for the map
 

@@ -1,0 +1,47 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources xmlns:tools="http://schemas.android.com/tools">
+    <string name="path_mode_title">STIGLÄGE</string>
+    <string name="points_selected" tools:ignore="PluralsCandidate">%1$d valda punkter</string>
+    <string name="total_distance">TOTALT AVSTÅND</string>
+    <string name="distance_duration">%1$d m • %2$d min</string>
+    <string name="go">KÖR</string>
+    <string name="recalculate">BERÄKNA OM</string>
+    <string name="e_scooter">E-skoter</string>
+    <string name="e_bike">E-cykel</string>
+    <string name="close">Stäng</string>
+    <string name="battery">Batteri</string>
+    <string name="code">Kod</string>
+    <string name="go_icon_content_description">Kör-ikon</string>
+    <string name="recalculate_icon_content_description">Beräkna om-ikon</string>
+    <string name="vehicle_type_icon_content_description">Fordonstyp-ikon</string>
+    <string name="battery_icon_content_description">Batteri-ikon</string>
+    <string name="code_icon_content_description">Kod-ikon</string>
+    <string name="marker_content_description">Kartmarkör för %s</string>
+    <string name="location_disabled_icon_content_description">Plats inaktiverad-ikon</string>
+    <string name="scooters_filter_chip_label">Skotrar</string>
+    <string name="bicycles_filter_chip_label">Cyklar</string>
+    <string name="zoom_in_button_content_description">Zooma in</string>
+    <string name="zoom_out_button_content_description">Zooma ut</string>
+    <string name="my_location_button_content_description">Min plats</string>
+    <string name="exit_path_mode_button_content_description">Avsluta stiglÄge</string>
+    <string name="enter_path_mode_button_content_description">Gå in i stiglÄge</string>
+    <string name="explore_error_network">Kunde inte ladda kartdata. Kontrollera din anslutning och försök igen.</string>
+    <string name="explore_error_unknown">Något gick fel vid laddning av kartan.</string>
+    <string name="explore_error_retry">Försök igen</string>
+    <string name="explore_error_title">Hoppsan!</string>
+    <string name="explore_error_icon">Felikon</string>
+    <string name="ai_suggest_button_content_description">Hämta AI-föreslagna platser</string>
+    <string name="ai_suggested_place_marker_content_description">AI-föreslagen plats: %s</string>
+    <string name="suggested_place_category">Kategori</string>
+    <string name="ai_places_location_error">Kunde inte bestämma din plats. Aktivera platstjänster.</string>
+    <string name="ai_places_fetch_error">Kunde inte ladda AI-föreslagna platser. Försök igen.</string>
+    <string name="dismiss">Stäng</string>
+
+    <string name="path_mode_hint">Tryck på valfri markör för att lägga till den i din rutt. Planera en elskoter-pubrunda eller en scenisk cykeltur!</string>
+
+    <string name="loading_message_1">Samlar kosmiska insikter…</string>
+    <string name="loading_message_2">Brygger briljanta svar…</string>
+    <string name="loading_message_3">Rådgör med den digitala oraklet…</string>
+    <string name="loading_message_4">Polerar visdomens pixlar…</string>
+    <string name="loading_message_5">Väcker datatomtarna…</string>
+</resources>

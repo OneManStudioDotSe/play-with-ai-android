@@ -1,0 +1,48 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources xmlns:tools="http://schemas.android.com/tools">
+    <string name="path_mode_title">PATH MODE</string>
+    <string name="points_selected" tools:ignore="PluralsCandidate">%1$d points Selected</string>
+    <string name="total_distance">TOTAL DISTANCE</string>
+    <string name="distance_duration">%1$d m • %2$d min</string>
+    <string name="go">GO</string>
+    <string name="recalculate">RECALCULATE</string>
+    <string name="e_scooter">E-Scooter</string>
+    <string name="e_bike">E-Bike</string>
+    <string name="close">Close</string>
+    <string name="battery">Battery</string>
+    <string name="code">Code</string>
+    <string name="go_icon_content_description">Go icon</string>
+    <string name="recalculate_icon_content_description">Recalculate icon</string>
+    <string name="vehicle_type_icon_content_description">Vehicle type icon</string>
+    <string name="battery_icon_content_description">Battery icon</string>
+    <string name="code_icon_content_description">Code icon</string>
+    <string name="marker_content_description">Map marker for %s</string>
+    <string name="location_disabled_icon_content_description">Location disabled icon</string>
+    <string name="scooters_filter_chip_label">Scooters</string>
+    <string name="bicycles_filter_chip_label">Bicycles</string>
+    <string name="zoom_in_button_content_description">Zoom in</string>
+    <string name="zoom_out_button_content_description">Zoom out</string>
+    <string name="my_location_button_content_description">My location</string>
+    <string name="exit_path_mode_button_content_description">Exit path mode</string>
+    <string name="enter_path_mode_button_content_description">Enter path mode</string>
+    <string name="explore_error_network">Could not load map data. Check your connection and try again.</string>
+    <string name="explore_error_unknown">Something went wrong while loading the map.</string>
+    <string name="error_maps_api_key_missing" translatable="false">Maps API key not configured.\n\nAdd MAPS_API_KEY to your local.properties file.\nSee the project README for setup instructions.</string>
+    <string name="explore_error_retry">Retry</string>
+    <string name="explore_error_title">Oops!</string>
+    <string name="explore_error_icon">Error icon</string>
+    <string name="ai_suggest_button_content_description">Get AI suggested places</string>
+    <string name="ai_suggested_place_marker_content_description">AI suggested place: %s</string>
+    <string name="suggested_place_category">Category</string>
+    <string name="ai_places_location_error">Could not determine your location. Please enable location services.</string>
+    <string name="ai_places_fetch_error">Failed to load AI suggested places. Please try again.</string>
+    <string name="dismiss">Dismiss</string>
+
+    <string name="path_mode_hint">Tap any marker to add it to your route. Plan a scooter pub crawl or a scenic bike tour!</string>
+
+    <string name="loading_message_1">Gathering insights…</string>
+    <string name="loading_message_2">Brewing responses…</string>
+    <string name="loading_message_3">Consulting the oracle…</string>
+    <string name="loading_message_4">Polishing pixels…</string>
+    <string name="loading_message_5">Waking up the AI…</string>
+</resources>

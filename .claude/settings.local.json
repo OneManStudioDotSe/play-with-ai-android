@@ -22,7 +22,8 @@
       "Bash(JAVA_HOME=\"/Applications/Android Studio Preview.app/Contents/jbr/Contents/Home\" ./gradlew testDebugUnitTest:*)",
       "Bash(JAVA_HOME=\"/Applications/Android Studio.app/Contents/jbr/Contents/Home\" ./gradlew lintDebug:*)",
       "Bash(grep:*)",
-      "Bash(ls:*)"
+      "Bash(ls:*)",
+      "Bash(git mv:*)"
     ]
   }
 }

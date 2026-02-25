@@ -35,13 +35,13 @@
 :core:config            → ApiKeyAvailability, ConfigurationModule, qualifier annotations, BuildConfig
 :core:theme             → Design system: colors, typography ("SoFa" design language)
 :core:ui                → Reusable Compose UI components
-:data:agents            → Agent domain + data: agent loop, tool dispatch, route calculator, Gemini function calling
-:data:map               → Map domain + data: fake API, map items, suggested places
+:data:plan              → Plan domain + data: agent loop, tool dispatch, route calculator, Gemini function calling
+:data:explore           → Explore domain + data: fake API, explore items, suggested places
 :data:chat              → Chat domain + data: Room DB, Firestore sync, prompt history
 :data:dream             → Dream domain + data: Room DB, dream interpretation
-:feature:agents         → Agent presentation: AgentViewModel, AgentScreen (trip planner UI + map)
+:feature:plan           → Plan presentation: PlanViewModel, PlanScreen (trip planner UI + map)
 :feature:chat           → Chat presentation: ChatViewModel, ChatScreen
-:feature:map            → Map presentation: MapViewModel, MapScreen
+:feature:explore        → Explore presentation: ExploreViewModel, ExploreScreen
 :feature:dream          → Dream presentation: DreamViewModel, DreamScreen
 ```
 
@@ -52,7 +52,7 @@ Dependencies flow: `feature → data → core:network + core:config`, `feature �
 - **Clean Architecture** with domain/data/presentation layers co-located per feature
 - **MVVM** with ViewModels managing UI state via `StateFlow`
 - **Repository pattern** — interfaces and implementations within each feature module
-- **Use cases** — one class per operation (e.g., `AskAiUseCase`, `GetMapItemsUseCase`)
+- **Use cases** — one class per operation (e.g., `AskAiUseCase`, `GetExploreItemsUseCase`)
 - **Hilt** for dependency injection across all modules
 - **Compose** with `@Immutable` UI states and `PersistentList`/`PersistentSet` for stability
 
@@ -186,11 +186,11 @@ service cloud.firestore {
 ┌──────────────────────────────────────────────────────────────────────────────────┐
 │                              FEATURE MODULES (presentation)                       │
 │                                                                                  │
-│  ┌──────────────────┐ ┌──────────────┐ ┌───────────────┐ ┌───────────────────┐  │
-│  │  :feature:chat   │ │ :feature:map │ │ :feature:dream│ │ :feature:agents   │  │
-│  │  ChatViewModel   │ │ MapViewModel │ │ DreamViewModel│ │ AgentViewModel    │  │
-│  │  ChatScreen      │ │ MapScreen    │ │ DreamScreen   │ │ AgentScreen       │  │
-│  └───────┬──────────┘ └──────┬───────┘ └──────┬────────┘ └────────┬──────────┘  │
+│  ┌──────────────────┐ ┌────────────────┐ ┌───────────────┐ ┌───────────────────┐  │
+│  │  :feature:chat   │ │:feature:explore│ │ :feature:dream│ │ :feature:plan     │  │
+│  │  ChatViewModel   │ │ExploreViewModel│ │ DreamViewModel│ │ PlanViewModel     │  │
+│  │  ChatScreen      │ │ ExploreScreen  │ │ DreamScreen   │ │ PlanScreen        │  │
+│  └───────┬──────────┘ └──────┬─────────┘ └──────┬────────┘ └────────┬──────────┘  │
 │          │                   │                │                    │             │
 └──────────┼───────────────────┼────────────────┼────────────────────┼─────────────┘
            │                   │                │                    │
@@ -198,13 +198,13 @@ service cloud.firestore {
 ┌──────────────────────────────────────────────────────────────────────────────────┐
 │                          DATA MODULES (domain + data)                             │
 │                                                                                  │
-│  ┌──────────────────┐ ┌──────────────┐ ┌───────────────┐ ┌───────────────────┐  │
-│  │   :data:chat     │ │  :data:map   │ │  :data:dream  │ │  :data:agents     │  │
-│  │ PromptRepository │ │ MapRepository│ │ DreamGeminiRep│ │ TripPlannerRepo   │  │
-│  │ ChatGeminiRepo   │ │ MapGeminiRepo│ │ DreamReposito.│ │ PlanTripUseCase   │  │
-│  │ Room, Firestore  │ │ FakeMapApi   │ │ Room DB       │ │ Agent loop, tools │  │
-│  │ SyncWorker       │ │ RouteCalc    │ │               │ │ RouteCalculator   │  │
-│  └───────┬──────────┘ └──────┬───────┘ └──────┬────────┘ └────────┬──────────┘  │
+│  ┌──────────────────┐ ┌────────────────┐ ┌───────────────┐ ┌───────────────────┐  │
+│  │   :data:chat     │ │ :data:explore  │ │  :data:dream  │ │  :data:plan       │  │
+│  │ PromptRepository │ │ExploreRepositry│ │ DreamGeminiRep│ │ TripPlannerRepo   │  │
+│  │ ChatGeminiRepo   │ │ExploreGeminiRep│ │ DreamReposito.│ │ PlanTripUseCase   │  │
+│  │ Room, Firestore  │ │ FakeExploreApi │ │ Room DB       │ │ Agent loop, tools │  │
+│  │ SyncWorker       │ │ RouteCalc      │ │               │ │ RouteCalculator   │  │
+│  └───────┬──────────┘ └──────┬─────────┘ └──────┬────────┘ └────────┬──────────┘  │
 │          │                   │                │                    │             │
 └──────────┼───────────────────┼────────────────┼────────────────────┼─────────────┘
            │                   │                │                    │
@@ -348,37 +348,37 @@ PromptRepositoryImpl.updatePromptText()
   markSyncedIfTextMatches returns 0 (text changed) → stays Pending → Phase 2 handles it
 ```
 
-### Map Feature — Data Flow
+### Explore Feature — Data Flow
 
 ```
-MapScreen launched
+ExploreScreen launched
   │
   ▼
-MapViewModel.loadMapData()
+ExploreViewModel.loadExploreData()
   │
   ▼
-GetMapItemsUseCase.invoke(count = 30)
+GetExploreItemsUseCase.invoke(count = 30)
   │
   ▼
-MapRepositoryImpl.getMapItems(30)
+ExploreRepositoryImpl.getExploreItems(30)
   │
   ▼
-FakeMapApiService.getMapItems(30)       ← Mock implementation
-  ├─ delay(1500ms)                        (no real API yet)
+FakeExploreItemsService.getExploreItems(30)   ← Mock implementation
+  ├─ delay(1500ms)                               (no real API yet)
   ├─ Generate 30 random vehicles
   │   ├─ Type: SCOOTER or BICYCLE
   │   ├─ Position: random lat/lng near Stockholm
   │   ├─ Battery: random level
   │   └─ Nickname: random name
-  └─ Return List<MapItemDto>
+  └─ Return List<ExploreItemDto>
   │
   ▼
-Map DTO → Domain (MapItem) → UI Model (MapItemUiModel)
+Explore DTO → Domain (ExploreItem) → UI Model (ExploreItemUiModel)
   │
   ▼
-MapUiState updated
-  ├─ allLocations: PersistentList<MapItemUiModel>
-  ├─ visibleLocations: PersistentList<MapItemUiModel>   (filtered subset)
+ExploreUiState updated
+  ├─ allLocations: PersistentList<ExploreItemUiModel>
+  ├─ visibleLocations: PersistentList<ExploreItemUiModel>   (filtered subset)
   ├─ activeFilters: PersistentSet<VehicleType>
   ├─ optimalRoute: PersistentList<LatLng>?
   └─ metrics: RouteMetrics?
@@ -386,17 +386,17 @@ MapUiState updated
   ▼
 GoogleMap renders markers + polylines
   │
-  ├─ User toggles filter → MapViewModel.toggleFilter(type)
+  ├─ User toggles filter → ExploreViewModel.toggleFilter(type)
   │   └─ Recompute visibleLocations from allLocations
   │
-  └─ User taps "Calculate Route" → MapViewModel.calculateOptimalRoute(userLoc)
+  └─ User taps "Calculate Route" → ExploreViewModel.calculateOptimalRoute(userLoc)
       ├─ Get user location via FusedLocationProviderClient
       ├─ Compute all permutations of selected locations
       ├─ Find minimum-distance path (brute force TSP)
       └─ Update optimalRoute + animate camera to bounds
 ```
 
-### Agent Feature — Agentic Loop with Gemini Function Calling
+### Plan Feature — Agentic Loop with Gemini Function Calling
 
 The Trip Planner is an AI agent PoC. Unlike Chat/Dream (single-shot: one request, one response), the agent runs a **multi-turn loop** where Gemini autonomously decides which tools to call, observes results, and repeats until it produces a final answer.
 
@@ -408,14 +408,14 @@ The Trip Planner is an AI agent PoC. Unlike Chat/Dream (single-shot: one request
 User enters goal (e.g., "Coffee tour in Stockholm")
   │
   ▼
-AgentViewModel.planTrip(goal)
+PlanViewModel.planTrip(goal)
   │
   ▼
 PlanTripUseCase.invoke(goal, lat, lng)
   ├─ Validates: goal not blank, ≤1000 chars, valid coordinates
   │
   ▼
-TripPlannerRepositoryImpl.planTrip() → Flow<AgentEvent>
+TripPlannerRepositoryImpl.planTrip() → Flow<PlanEvent>
   │
   ├─ Build system prompt (agent persona + tool strategy instructions)
   ├─ Initialize conversation history: [user message with system prompt + goal]
@@ -452,7 +452,7 @@ TripPlannerRepositoryImpl.planTrip() → Flow<AgentEvent>
 │    │                              Content { role: "function",         │
 │    │                                parts: [functionResponse] }       │
 │    │                                           │                      │
-│    │                              emit AgentEvent.ToolResult          │
+│    │                              emit PlanEvent.ToolResult           │
 │    │                              ─── continue loop ──────────────────│
 │    │                                                                  │
 │    └─── parts contain text (no functionCall)                          │
@@ -462,18 +462,18 @@ TripPlannerRepositoryImpl.planTrip() → Flow<AgentEvent>
 │           - collected TripStops (ordered by route)                    │
 │           - route metrics (distance, walking time)                    │
 │         │                                                             │
-│         emit AgentEvent.Complete(plan)                                │
+│         emit PlanEvent.Complete(plan)                                 │
 │         └─── exit loop ──────────────────────────────────────────────│
 │                                                                       │
 └───────────────────────────────────────────────────────────────────────┘
   │
   ▼
-AgentViewModel collects Flow<AgentEvent>
-  ├─ Thinking    → AgentUiState.Running (accumulate steps)
-  ├─ ToolCalling → AgentUiState.Running (add step with wrench icon)
-  ├─ ToolResult  → AgentUiState.Running (add step with checkmark)
-  ├─ Complete    → AgentUiState.Result  (map + itinerary)
-  └─ Error       → AgentUiState.Error
+PlanViewModel collects Flow<PlanEvent>
+  ├─ Thinking    → PlanUiState.Running (accumulate steps)
+  ├─ ToolCalling → PlanUiState.Running (add step with wrench icon)
+  ├─ ToolResult  → PlanUiState.Running (add step with checkmark)
+  ├─ Complete    → PlanUiState.Result  (map + itinerary)
+  └─ Error       → PlanUiState.Error
 ```
 
 #### Typical Execution Trace
@@ -507,7 +507,7 @@ Request with tools:
 #### UI States
 
 ```
-AgentScreen
+PlanScreen
   ├─ Initial  → Text field + "Plan my trip" button + example chips
   ├─ Running  → Animated step list (thinking/tool call/result icons with pulsing indicator)
   ├─ Result   → Summary card + GoogleMap with markers & polyline + itinerary cards + metrics

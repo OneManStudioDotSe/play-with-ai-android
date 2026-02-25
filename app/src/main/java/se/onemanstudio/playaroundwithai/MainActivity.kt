@@ -39,10 +39,10 @@ import dagger.hilt.android.AndroidEntryPoint
 import se.onemanstudio.playaroundwithai.core.ui.theme.Alphas
 import se.onemanstudio.playaroundwithai.core.ui.theme.Dimensions
 import se.onemanstudio.playaroundwithai.core.ui.theme.SofaAiTheme
-import se.onemanstudio.playaroundwithai.feature.agents.AgentScreen
+import se.onemanstudio.playaroundwithai.feature.plan.PlanScreen
 import se.onemanstudio.playaroundwithai.feature.chat.ChatScreen
 import se.onemanstudio.playaroundwithai.feature.dream.DreamScreen
-import se.onemanstudio.playaroundwithai.feature.maps.MapScreen
+import se.onemanstudio.playaroundwithai.feature.explore.ExploreScreen
 import se.onemanstudio.playaroundwithai.settings.SettingsBottomSheetContainer
 import se.onemanstudio.playaroundwithai.navigation.Agents
 import se.onemanstudio.playaroundwithai.navigation.Chat
@@ -152,13 +152,13 @@ private fun SoFaApp() {
                     ChatScreen(settingsContent = { onDismiss -> SettingsBottomSheetContainer(onDismiss = onDismiss) })
                 }
                 composable<Maps> {
-                    MapScreen(settingsContent = { onDismiss -> SettingsBottomSheetContainer(onDismiss = onDismiss) })
+                    ExploreScreen(settingsContent = { onDismiss -> SettingsBottomSheetContainer(onDismiss = onDismiss) })
                 }
                 composable<Dreams> {
                     DreamScreen(settingsContent = { onDismiss -> SettingsBottomSheetContainer(onDismiss = onDismiss) })
                 }
                 composable<Agents> {
-                    AgentScreen(settingsContent = { onDismiss -> SettingsBottomSheetContainer(onDismiss = onDismiss) })
+                    PlanScreen(settingsContent = { onDismiss -> SettingsBottomSheetContainer(onDismiss = onDismiss) })
                 }
             }
         }
