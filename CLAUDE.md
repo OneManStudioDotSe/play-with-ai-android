@@ -2,7 +2,7 @@
 
 ## Project Overview
 
-**Play With AI** is a showcase Android app demonstrating modern Android engineering. It features AI chat (Gemini API), smart prompt history with Firebase sync, and a map exploration feature for finding/filtering vehicles and calculating optimal routes. Built with Jetpack Compose, Clean Architecture, and Hilt DI.
+**Play With AI** is a showcase Android app demonstrating modern Android engineering. It features AI chat (Gemini API), smart prompt history with Firebase sync, a map exploration feature for finding/filtering vehicles and calculating optimal routes, and an AI agent trip planner using Gemini function calling. Built with Jetpack Compose, Clean Architecture, and Hilt DI.
 
 ## Build & Run
 
@@ -30,16 +30,22 @@
 
 ```
 :app                    → Application entry point, navigation, main activity
-:core:network           → OkHttp, Retrofit, Gson, GeminiApiService, DTOs, interceptor, GeminiModel
+:core:network           → OkHttp, Retrofit, Gson, GeminiApiService, DTOs (incl. function calling), interceptor
 :core:auth              → Firebase Auth, AuthRepository (interface+impl), auth use cases, AuthSession
 :core:config            → ApiKeyAvailability, ConfigurationModule, qualifier annotations, BuildConfig
 :core:theme             → Design system: colors, typography ("SoFa" design language)
 :core:ui                → Reusable Compose UI components
-:feature:chat           → ALL chat: domain + data + presentation (Room, Firestore, WorkManager, sync)
-:feature:map            → ALL map: domain + data + presentation (fake API, route calculation)
+:data:agents            → Agent domain + data: agent loop, tool dispatch, route calculator, Gemini function calling
+:data:map               → Map domain + data: fake API, map items, suggested places
+:data:chat              → Chat domain + data: Room DB, Firestore sync, prompt history
+:data:dream             → Dream domain + data: Room DB, dream interpretation
+:feature:agents         → Agent presentation: AgentViewModel, AgentScreen (trip planner UI + map)
+:feature:chat           → Chat presentation: ChatViewModel, ChatScreen
+:feature:map            → Map presentation: MapViewModel, MapScreen
+:feature:dream          → Dream presentation: DreamViewModel, DreamScreen
 ```
 
-Dependencies flow: `feature → core:network + core:config + core:auth`, `feature → core:ui → core:theme`
+Dependencies flow: `feature → data → core:network + core:config`, `feature → core:ui → core:theme`
 
 ## Architecture
 
@@ -178,41 +184,40 @@ service cloud.firestore {
 
 ```
 ┌──────────────────────────────────────────────────────────────────────────────────┐
-│                          FEATURE MODULES (domain + data + presentation)           │
+│                              FEATURE MODULES (presentation)                       │
 │                                                                                  │
-│  ┌─────────────────────────────────┐    ┌─────────────────────────────────────┐  │
-│  │        :feature:chat            │    │          :feature:map               │  │
-│  │                                 │    │                                     │  │
-│  │  Presentation:                  │    │  Presentation:                      │  │
-│  │    ChatViewModel, ChatScreen    │    │    MapViewModel, MapScreen          │  │
-│  │                                 │    │                                     │  │
-│  │  Domain:                        │    │  Domain:                            │  │
-│  │    AskAiUseCase                 │    │    GetMapItemsUseCase               │  │
-│  │    GetSuggestionsUseCase        │    │    GetSuggestedPlacesUseCase        │  │
-│  │    SavePromptUseCase            │    │    MapRepository (interface)        │  │
-│  │    ChatGeminiRepository (intf)  │    │    MapGeminiRepository (interface)  │  │
-│  │    PromptRepository (interface) │    │                                     │  │
-│  │                                 │    │  Data:                              │  │
-│  │  Data:                          │    │    MapRepositoryImpl                │  │
-│  │    ChatGeminiRepositoryImpl     │    │    MapGeminiRepositoryImpl          │  │
-│  │    PromptRepositoryImpl         │    │    FakeMapApiService                │  │
-│  │    Room DB, FirestoreDataSource │    │    MapDataGenerator                 │  │
-│  │    SyncWorker (WorkManager)     │    │                                     │  │
-│  └────────────┬────────────────────┘    └──────────────┬──────────────────────┘  │
-│               │                                        │                        │
-└───────────────┼────────────────────────────────────────┼────────────────────────┘
-                │                                        │
-                ▼                                        ▼
+│  ┌──────────────────┐ ┌──────────────┐ ┌───────────────┐ ┌───────────────────┐  │
+│  │  :feature:chat   │ │ :feature:map │ │ :feature:dream│ │ :feature:agents   │  │
+│  │  ChatViewModel   │ │ MapViewModel │ │ DreamViewModel│ │ AgentViewModel    │  │
+│  │  ChatScreen      │ │ MapScreen    │ │ DreamScreen   │ │ AgentScreen       │  │
+│  └───────┬──────────┘ └──────┬───────┘ └──────┬────────┘ └────────┬──────────┘  │
+│          │                   │                │                    │             │
+└──────────┼───────────────────┼────────────────┼────────────────────┼─────────────┘
+           │                   │                │                    │
+           ▼                   ▼                ▼                    ▼
+┌──────────────────────────────────────────────────────────────────────────────────┐
+│                          DATA MODULES (domain + data)                             │
+│                                                                                  │
+│  ┌──────────────────┐ ┌──────────────┐ ┌───────────────┐ ┌───────────────────┐  │
+│  │   :data:chat     │ │  :data:map   │ │  :data:dream  │ │  :data:agents     │  │
+│  │ PromptRepository │ │ MapRepository│ │ DreamGeminiRep│ │ TripPlannerRepo   │  │
+│  │ ChatGeminiRepo   │ │ MapGeminiRepo│ │ DreamReposito.│ │ PlanTripUseCase   │  │
+│  │ Room, Firestore  │ │ FakeMapApi   │ │ Room DB       │ │ Agent loop, tools │  │
+│  │ SyncWorker       │ │ RouteCalc    │ │               │ │ RouteCalculator   │  │
+│  └───────┬──────────┘ └──────┬───────┘ └──────┬────────┘ └────────┬──────────┘  │
+│          │                   │                │                    │             │
+└──────────┼───────────────────┼────────────────┼────────────────────┼─────────────┘
+           │                   │                │                    │
+           ▼                   ▼                ▼                    ▼
 ┌──────────────────────────────────────────────────────────────────────────────────┐
 │                              SHARED CORE MODULES                                 │
 │                                                                                  │
 │  ┌──────────────────┐  ┌──────────────────┐  ┌───────────────────────────────┐  │
 │  │   :core:network   │  │   :core:auth     │  │       :core:config            │  │
-│  │                   │  │                  │  │                               │  │
 │  │  GeminiApiService │  │  AuthRepository  │  │  ApiKeyAvailability           │  │
-│  │  GeminiModel      │  │  AuthSession     │  │  @GeminiApiKey, @BaseUrl      │  │
-│  │  DTOs, Interceptor│  │  Firebase Auth   │  │  ConfigurationModule          │  │
-│  │  NetworkModule     │  │  Auth Use Cases  │  │  BuildConfig fields           │  │
+│  │  DTOs (text +     │  │  AuthSession     │  │  @GeminiApiKey, @BaseUrl      │  │
+│  │  function calling)│  │  Firebase Auth   │  │  ConfigurationModule          │  │
+│  │  Interceptor      │  │  Auth Use Cases  │  │  BuildConfig fields           │  │
 │  └──────────────────┘  └──────────────────┘  └───────────────────────────────┘  │
 │                                                                                  │
 │  ┌──────────────────┐  ┌──────────────────┐                                     │
@@ -231,8 +236,9 @@ service cloud.firestore {
 │  │  Endpoint: POST /v1beta/models/gemini-3-flash-preview:generateContent    │    │
 │  │  Auth: ?key={GEMINI_API_KEY} (query param via AuthenticationInterceptor) │    │
 │  │                                                                          │    │
-│  │  Request:  { contents: [{ parts: [{ text, inlineData? }] }] }            │    │
-│  │  Response: { candidates: [{ content: { parts: [{ text }] } }] }          │    │
+│  │  Standard:  { contents: [{ parts: [{ text, inlineData? }] }] }           │    │
+│  │  With tools: + { tools: [{ functionDeclarations }] }  (agent feature)    │    │
+│  │  Response: { candidates: [{ content: { parts: [text|functionCall] } }] } │    │
 │  └──────────────────────────────────────────────────────────────────────────┘    │
 │                                                                                  │
 │  ┌──────────────────────────────────────────────────────────────────────────┐    │
@@ -388,4 +394,122 @@ GoogleMap renders markers + polylines
       ├─ Compute all permutations of selected locations
       ├─ Find minimum-distance path (brute force TSP)
       └─ Update optimalRoute + animate camera to bounds
+```
+
+### Agent Feature — Agentic Loop with Gemini Function Calling
+
+The Trip Planner is an AI agent PoC. Unlike Chat/Dream (single-shot: one request, one response), the agent runs a **multi-turn loop** where Gemini autonomously decides which tools to call, observes results, and repeats until it produces a final answer.
+
+**Key difference from other features:** Gemini's native function calling API — the model returns `functionCall` parts instead of text, the app executes the tool locally, and sends the result back as a `functionResponse` part for the next turn.
+
+#### Agent Loop (core logic in `TripPlannerRepositoryImpl`)
+
+```
+User enters goal (e.g., "Coffee tour in Stockholm")
+  │
+  ▼
+AgentViewModel.planTrip(goal)
+  │
+  ▼
+PlanTripUseCase.invoke(goal, lat, lng)
+  ├─ Validates: goal not blank, ≤1000 chars, valid coordinates
+  │
+  ▼
+TripPlannerRepositoryImpl.planTrip() → Flow<AgentEvent>
+  │
+  ├─ Build system prompt (agent persona + tool strategy instructions)
+  ├─ Initialize conversation history: [user message with system prompt + goal]
+  ├─ Attach tool declarations: search_places, calculate_route
+  │
+  ▼
+┌─────────────────── AGENT LOOP (max 10 iterations) ───────────────────┐
+│                                                                       │
+│  Send GeminiRequest { contents: history, tools: declarations }        │
+│    │                                                                  │
+│    ▼                                                                  │
+│  Gemini responds with Content { role: "model", parts: [...] }         │
+│    │                                                                  │
+│    ├─── parts contain functionCall? ──── YES ──┐                      │
+│    │                                           │                      │
+│    │                              Dispatch tool locally:              │
+│    │                              ┌─────────────────────────┐         │
+│    │                              │ "search_places":        │         │
+│    │                              │   → Separate Gemini API │         │
+│    │                              │     call asking for     │         │
+│    │                              │     real places as JSON │         │
+│    │                              │   → Parse JSON → collect│         │
+│    │                              │     TripStop list       │         │
+│    │                              │                         │         │
+│    │                              │ "calculate_route":      │         │
+│    │                              │   → Haversine + TSP     │         │
+│    │                              │     (brute-force ≤8,    │         │
+│    │                              │      nearest-neighbor   │         │
+│    │                              │      for more)          │         │
+│    │                              │   → Reorder stops       │         │
+│    │                              └────────────┬────────────┘         │
+│    │                                           │                      │
+│    │                              Append to history:                  │
+│    │                              Content { role: "function",         │
+│    │                                parts: [functionResponse] }       │
+│    │                                           │                      │
+│    │                              emit AgentEvent.ToolResult          │
+│    │                              ─── continue loop ──────────────────│
+│    │                                                                  │
+│    └─── parts contain text (no functionCall)                          │
+│         │                                                             │
+│         Agent is done → build TripPlan from:                          │
+│           - summary text from Gemini                                  │
+│           - collected TripStops (ordered by route)                    │
+│           - route metrics (distance, walking time)                    │
+│         │                                                             │
+│         emit AgentEvent.Complete(plan)                                │
+│         └─── exit loop ──────────────────────────────────────────────│
+│                                                                       │
+└───────────────────────────────────────────────────────────────────────┘
+  │
+  ▼
+AgentViewModel collects Flow<AgentEvent>
+  ├─ Thinking    → AgentUiState.Running (accumulate steps)
+  ├─ ToolCalling → AgentUiState.Running (add step with wrench icon)
+  ├─ ToolResult  → AgentUiState.Running (add step with checkmark)
+  ├─ Complete    → AgentUiState.Result  (map + itinerary)
+  └─ Error       → AgentUiState.Error
+```
+
+#### Typical Execution Trace
+
+```
+Turn 1: User goal → Gemini returns functionCall("search_places", {query: "specialty coffee"})
+Turn 2: search_places result → Gemini returns functionCall("search_places", {query: "scenic spots"})
+Turn 3: search_places result → Gemini returns functionCall("calculate_route", {places: [...]})
+Turn 4: calculate_route result → Gemini returns text summary (done!)
+```
+
+#### Gemini Function Calling Wire Format
+
+```
+Request with tools:
+{
+  "contents": [
+    { "role": "user",     "parts": [{ "text": "system prompt + goal" }] },
+    { "role": "model",    "parts": [{ "functionCall": { "name": "search_places", "args": {...} } }] },
+    { "role": "function", "parts": [{ "functionResponse": { "name": "search_places", "response": {...} } }] }
+  ],
+  "tools": [{
+    "functionDeclarations": [
+      { "name": "search_places",   "parameters": { "type": "OBJECT", "properties": {...} } },
+      { "name": "calculate_route", "parameters": { "type": "OBJECT", "properties": {...} } }
+    ]
+  }]
+}
+```
+
+#### UI States
+
+```
+AgentScreen
+  ├─ Initial  → Text field + "Plan my trip" button + example chips
+  ├─ Running  → Animated step list (thinking/tool call/result icons with pulsing indicator)
+  ├─ Result   → Summary card + GoogleMap with markers & polyline + itinerary cards + metrics
+  └─ Error    → NeoBrutalCard with icon + message + dismiss button
 ```
