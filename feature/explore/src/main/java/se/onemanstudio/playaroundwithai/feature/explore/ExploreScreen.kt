@@ -142,6 +142,7 @@ fun ExploreScreen(
     var permissionChecked by remember { mutableStateOf(false) }
     var userLocation by remember { mutableStateOf<LatLng?>(null) }
     var dataLoaded by remember { mutableStateOf(false) }
+    var cameraSettled by remember { mutableStateOf(false) }
     var showSettings by remember { mutableStateOf(false) }
 
     val permissionLauncher = rememberLauncherForActivityResult(
@@ -161,25 +162,44 @@ fun ExploreScreen(
         if (hasLocationPermission) {
             fusedLocationClient.lastLocation
                 .addOnSuccessListener { location ->
-                    location?.let { userLocation = LatLng(it.latitude, it.longitude) }
-                    if (!dataLoaded) {
-                        val lat = userLocation?.latitude ?: STOCKHOLM_LAT
-                        val lng = userLocation?.longitude ?: STOCKHOLM_LNG
-                        viewModel.loadMapData(lat, lng)
-                        dataLoaded = true
+                    location?.let {
+                        val loc = LatLng(it.latitude, it.longitude)
+                        userLocation = loc
+                        scope.launch {
+                            cameraPositionState.animate(
+                                update = CameraUpdateFactory.newLatLngZoom(loc, ExploreConstants.MAX_ZOOM_LEVEL),
+                                durationMs = ExploreConstants.MOVE_TO_POINT_DURATION
+                            )
+                        }
+                    } ?: run {
+                        // No last location available, stay at Stockholm default
+                        cameraSettled = true
                     }
                 }
                 .addOnFailureListener {
-                    if (!dataLoaded) {
-                        viewModel.loadMapData(STOCKHOLM_LAT, STOCKHOLM_LNG)
-                        dataLoaded = true
-                    }
+                    // Location fetch failed, stay at Stockholm default
+                    cameraSettled = true
                 }
         } else {
-            if (!dataLoaded) {
-                viewModel.loadMapData(STOCKHOLM_LAT, STOCKHOLM_LNG)
-                dataLoaded = true
-            }
+            // No permission, stay at Stockholm default
+            cameraSettled = true
+        }
+    }
+
+    // Watch camera movement — when it stops moving after animating, mark as settled
+    LaunchedEffect(cameraPositionState.isMoving) {
+        if (!cameraPositionState.isMoving && !cameraSettled) {
+            cameraSettled = true
+        }
+    }
+
+    // Once camera has settled, load map data
+    LaunchedEffect(cameraSettled) {
+        if (cameraSettled && !dataLoaded) {
+            val lat = userLocation?.latitude ?: STOCKHOLM_LAT
+            val lng = userLocation?.longitude ?: STOCKHOLM_LNG
+            viewModel.loadMapData(lat, lng)
+            dataLoaded = true
         }
     }
 
@@ -515,7 +535,7 @@ private fun BoxScope.TopActions(
                 onToggleFilter(VehicleType.Scooter)
             }
 
-            Spacer(modifier = Modifier.width(Dimensions.paddingLarge))
+            Spacer(modifier = Modifier.width(Dimensions.paddingSmall))
 
             FilterChip(
                 text = stringResource(id = ExploreFeatureR.string.bicycles_filter_chip_label),
@@ -528,6 +548,7 @@ private fun BoxScope.TopActions(
             Spacer(modifier = Modifier.weight(1f))
 
             NeoBrutalIconButton(
+                modifier = Modifier.padding(end = Dimensions.paddingSmall),
                 backgroundColor = energeticOrange,
                 imageVector = Icons.Default.AutoAwesome,
                 contentDescription = stringResource(id = ExploreFeatureR.string.ai_suggest_button_content_description),
