@@ -15,6 +15,7 @@ import androidx.compose.material.icons.outlined.CloudOff
 import androidx.compose.material.icons.outlined.CloudUpload
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
@@ -23,11 +24,11 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import se.onemanstudio.playaroundwithai.data.chat.domain.model.Prompt
-import se.onemanstudio.playaroundwithai.data.chat.domain.model.SyncStatus
 import se.onemanstudio.playaroundwithai.core.ui.sofa.NeoBrutalCard
 import se.onemanstudio.playaroundwithai.core.ui.theme.Dimensions
 import se.onemanstudio.playaroundwithai.core.ui.theme.SofaAiTheme
+import se.onemanstudio.playaroundwithai.data.chat.domain.model.Prompt
+import se.onemanstudio.playaroundwithai.data.chat.domain.model.SyncStatus
 import se.onemanstudio.playaroundwithai.feature.chat.R
 import java.time.Instant
 import java.time.ZoneId
@@ -90,11 +91,13 @@ private fun SyncStatusIcon(syncStatus: SyncStatus) {
             MaterialTheme.colorScheme.primary,
             stringResource(R.string.sync_status_pending)
         )
+
         SyncStatus.Synced -> Triple(
             Icons.Outlined.CloudDone,
             MaterialTheme.colorScheme.primary,
             stringResource(R.string.sync_status_synced)
         )
+
         SyncStatus.Failed -> Triple(
             Icons.Outlined.CloudOff,
             MaterialTheme.colorScheme.error,
@@ -131,16 +134,18 @@ private fun HistoryItemCardSyncedPreview() {
 @Composable
 private fun HistoryItemCardPendingPreview() {
     SofaAiTheme(darkTheme = true) {
-        HistoryItemCard(
-            prompt = Prompt(
-                id = 2,
-                text = "Can you please give me a very detailed and long explanation of how Jetpack Compose works?",
-                timestamp = Instant.now().minusSeconds(259_200),
-                syncStatus = SyncStatus.Pending
-            ),
-            onClick = {},
-            modifier = Modifier.padding(Dimensions.paddingLarge)
-        )
+        Surface {
+            HistoryItemCard(
+                prompt = Prompt(
+                    id = 2,
+                    text = "Can you please give me a very detailed and long explanation of how Jetpack Compose works?",
+                    timestamp = Instant.now().minusSeconds(259_200),
+                    syncStatus = SyncStatus.Pending
+                ),
+                onClick = {},
+                modifier = Modifier.padding(Dimensions.paddingLarge)
+            )
+        }
     }
 }
 
@@ -148,17 +153,19 @@ private fun HistoryItemCardPendingPreview() {
 @Composable
 private fun HistoryItemCardFailedPreview() {
     SofaAiTheme {
-        HistoryItemCard(
-            prompt = Prompt(
-                id = 3,
-                text = "This is a prompt that should be long enough to wrap or truncate when the width is constrained.",
-                timestamp = Instant.now().minusSeconds(3_600),
-                syncStatus = SyncStatus.Failed
-            ),
-            onClick = {},
-            modifier = Modifier
-                .padding(Dimensions.paddingLarge)
-                .width(250.dp)
-        )
+        Surface {
+            HistoryItemCard(
+                prompt = Prompt(
+                    id = 3,
+                    text = "This is a prompt that should be long enough to wrap or truncate when the width is constrained.",
+                    timestamp = Instant.now().minusSeconds(3_600),
+                    syncStatus = SyncStatus.Failed
+                ),
+                onClick = {},
+                modifier = Modifier
+                    .padding(Dimensions.paddingLarge)
+                    .width(250.dp)
+            )
+        }
     }
 }

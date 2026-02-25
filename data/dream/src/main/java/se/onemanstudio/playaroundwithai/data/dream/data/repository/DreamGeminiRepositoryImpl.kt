@@ -9,6 +9,7 @@ import se.onemanstudio.playaroundwithai.core.network.api.GeminiApiService
 import se.onemanstudio.playaroundwithai.core.network.dto.Content
 import se.onemanstudio.playaroundwithai.core.network.dto.GeminiRequest
 import se.onemanstudio.playaroundwithai.core.network.dto.Part
+import se.onemanstudio.playaroundwithai.core.network.tracking.TokenUsageTracker
 import se.onemanstudio.playaroundwithai.data.dream.domain.model.DreamInterpretation
 import se.onemanstudio.playaroundwithai.data.dream.domain.model.DreamMood
 import se.onemanstudio.playaroundwithai.data.dream.domain.model.DreamScene
@@ -22,6 +23,7 @@ import javax.inject.Singleton
 class DreamGeminiRepositoryImpl @Inject constructor(
     private val apiService: GeminiApiService,
     private val gson: Gson,
+    private val tokenUsageTracker: TokenUsageTracker,
 ) : DreamGeminiRepository {
 
     @Suppress("TooGenericExceptionCaught")
@@ -35,6 +37,7 @@ class DreamGeminiRepositoryImpl @Inject constructor(
 
             Timber.d("DreamGemini - Sending request to Gemini API...")
             val response = apiService.generateContent(request)
+            tokenUsageTracker.record("dream", response.usageMetadata)
             val text = response.extractText() ?: return@withContext Result.failure(Exception("No response text from Gemini"))
             Timber.d("DreamGemini - API response received (${text.length} chars)")
 

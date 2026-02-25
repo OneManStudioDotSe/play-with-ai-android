@@ -5,12 +5,15 @@ import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.layout.wrapContentHeight
 import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.items
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
@@ -32,12 +35,14 @@ private const val DESCRIPTION_MAX_LINES = 2
 
 @Composable
 fun DreamGalleryRow(
+    modifier: Modifier = Modifier,
     dreams: List<Dream>,
     onDreamClick: (Dream) -> Unit,
-    modifier: Modifier = Modifier,
 ) {
     LazyRow(
-        modifier = modifier,
+        modifier = modifier
+            .fillMaxWidth()
+            .wrapContentHeight(),
         contentPadding = PaddingValues(horizontal = Dimensions.paddingLarge),
         horizontalArrangement = Arrangement.spacedBy(Dimensions.paddingMedium),
     ) {
@@ -104,7 +109,9 @@ private fun previewDreams() = listOf(
 @Composable
 private fun DreamGalleryRowLightPreview() {
     SofaAiTheme(darkTheme = false) {
-        DreamGalleryRow(dreams = previewDreams(), onDreamClick = {})
+        Surface {
+            DreamGalleryRow(dreams = previewDreams(), onDreamClick = {})
+        }
     }
 }
 
@@ -112,6 +119,8 @@ private fun DreamGalleryRowLightPreview() {
 @Composable
 private fun DreamGalleryRowDarkPreview() {
     SofaAiTheme(darkTheme = true) {
-        DreamGalleryRow(dreams = previewDreams(), onDreamClick = {})
+        Surface {
+            DreamGalleryRow(dreams = previewDreams(), onDreamClick = {})
+        }
     }
 }

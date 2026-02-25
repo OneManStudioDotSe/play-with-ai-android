@@ -4,19 +4,26 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.SharedFlow
+import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.map
+import kotlinx.coroutines.flow.shareIn
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import se.onemanstudio.playaroundwithai.core.auth.usecase.SignInAnonymouslyUseCase
+import se.onemanstudio.playaroundwithai.core.network.tracking.TokenUsageTracker
 import timber.log.Timber
+import java.text.NumberFormat
 import javax.inject.Inject
 
 private const val MAX_AUTH_ATTEMPTS = 3
 
 @HiltViewModel
 class MainViewModel @Inject constructor(
-    private val signInAnonymouslyUseCase: SignInAnonymouslyUseCase
+    private val signInAnonymouslyUseCase: SignInAnonymouslyUseCase,
+    private val tokenUsageTracker: TokenUsageTracker,
 ) : ViewModel() {
 
     private val _authError = MutableStateFlow(false)
@@ -24,6 +31,10 @@ class MainViewModel @Inject constructor(
 
     private val _authRetriesExhausted = MutableStateFlow(false)
     val authRetriesExhausted: StateFlow<Boolean> = _authRetriesExhausted.asStateFlow()
+
+    val tokenUsageMessage: SharedFlow<String> = tokenUsageTracker.lastUsageEvent.map { event ->
+        NumberFormat.getIntegerInstance().format(event.totalTokens)
+    }.shareIn(viewModelScope, SharingStarted.Eagerly)
 
     private var authAttemptCount = 0
 

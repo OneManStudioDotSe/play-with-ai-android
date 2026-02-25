@@ -36,6 +36,7 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.DirectionsBike
 import androidx.compose.material.icons.filled.AutoAwesome
 import androidx.compose.material.icons.filled.ElectricScooter
+import androidx.compose.material.icons.filled.Settings
 import androidx.compose.material.icons.filled.Stars
 import androidx.compose.material.icons.rounded.VpnKey
 import androidx.compose.material.icons.rounded.Warning
@@ -108,7 +109,10 @@ private const val CAMERA_PADDING = 150
 @SuppressLint("MissingPermission", "GoogleMapComposable")
 @OptIn(MapsComposeExperimentalApi::class)
 @Composable
-fun MapScreen(viewModel: MapViewModel = hiltViewModel()) {
+fun MapScreen(
+    viewModel: MapViewModel = hiltViewModel(),
+    settingsContent: @Composable (() -> Unit) -> Unit = { _ -> },
+) {
     val context = LocalContext.current
     val view = LocalView.current
 
@@ -134,6 +138,7 @@ fun MapScreen(viewModel: MapViewModel = hiltViewModel()) {
     var permissionChecked by remember { mutableStateOf(false) }
     var userLocation by remember { mutableStateOf<LatLng?>(null) }
     var dataLoaded by remember { mutableStateOf(false) }
+    var showSettings by remember { mutableStateOf(false) }
 
     val permissionLauncher = rememberLauncherForActivityResult(
         contract = ActivityResultContracts.RequestPermission()
@@ -340,6 +345,22 @@ fun MapScreen(viewModel: MapViewModel = hiltViewModel()) {
             onToggleFilter = { type -> viewModel.toggleFilter(type) },
             onSuggestPlaces = { viewModel.getAiSuggestedPlaces(userLocation) },
         )
+
+        NeoBrutalIconButton(
+            imageVector = Icons.Default.Settings,
+            contentDescription = stringResource(
+                se.onemanstudio.playaroundwithai.core.ui.views.R.string.settings_icon_description
+            ),
+            modifier = Modifier
+                .align(Alignment.TopEnd)
+                .statusBarsPadding()
+                .padding(top = Dimensions.paddingMedium, end = Dimensions.paddingLarge),
+            onClick = { showSettings = true },
+        )
+
+        if (showSettings) {
+            settingsContent { showSettings = false }
+        }
 
         PathModeHint(isVisible = uiState.isPathMode)
 

@@ -21,6 +21,7 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedTextField
+import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
@@ -35,9 +36,9 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import coil.compose.AsyncImage
-import se.onemanstudio.playaroundwithai.data.chat.domain.model.AnalysisType
 import se.onemanstudio.playaroundwithai.core.ui.theme.Dimensions
 import se.onemanstudio.playaroundwithai.core.ui.theme.SofaAiTheme
+import se.onemanstudio.playaroundwithai.data.chat.domain.model.AnalysisType
 import se.onemanstudio.playaroundwithai.feature.chat.R
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -144,12 +145,14 @@ fun AnalysisType.asStringRes(): Int {
 @Composable
 private fun AnalysisHeaderLightPreview() {
     SofaAiTheme {
-        AnalysisHeader(
-            selectedImageUri = Uri.EMPTY,
-            analysisType = AnalysisType.PRODUCT,
-            onAnalysisTypeChange = {},
-            onClearImage = {}
-        )
+        Surface {
+            AnalysisHeader(
+                selectedImageUri = Uri.EMPTY,
+                analysisType = AnalysisType.PRODUCT,
+                onAnalysisTypeChange = {},
+                onClearImage = {}
+            )
+        }
     }
 }
 
@@ -157,11 +160,13 @@ private fun AnalysisHeaderLightPreview() {
 @Composable
 private fun AnalysisHeaderDarkPreview() {
     SofaAiTheme(darkTheme = true) {
-        AnalysisHeader(
-            selectedImageUri = Uri.EMPTY,
-            analysisType = AnalysisType.LOCATION,
-            onAnalysisTypeChange = {},
-            onClearImage = {}
-        )
+        Surface {
+            AnalysisHeader(
+                selectedImageUri = Uri.EMPTY,
+                analysisType = AnalysisType.LOCATION,
+                onAnalysisTypeChange = {},
+                onClearImage = {}
+            )
+        }
     }
 }

@@ -23,7 +23,7 @@ object Agents : Route
 
 val navItems = listOf(
     NavItem(Chat, "Chat", Icons.Default.Chair),
+    NavItem(Dreams, "Explain", Icons.Default.NightsStay),
+    NavItem(Agents, "Plan", Icons.Default.AutoAwesome),
     NavItem(Maps, "Explore", Icons.Default.Map),
-    NavItem(Dreams, "Dreams", Icons.Default.NightsStay),
-    NavItem(Agents, "Planner", Icons.Default.AutoAwesome),
 )

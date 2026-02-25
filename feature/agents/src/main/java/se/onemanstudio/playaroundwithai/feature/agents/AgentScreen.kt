@@ -29,6 +29,7 @@ import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Clear
+import androidx.compose.material.icons.filled.Settings
 import androidx.compose.material.icons.rounded.AutoAwesome
 import androidx.compose.material.icons.rounded.CheckCircle
 import androidx.compose.material.icons.rounded.Construction
@@ -88,10 +89,14 @@ private const val PULSE_ALPHA_MAX = 1.0f
 private const val PULSE_DURATION_MS = 800
 
 @Composable
-fun AgentScreen(viewModel: AgentViewModel = hiltViewModel()) {
+fun AgentScreen(
+    viewModel: AgentViewModel = hiltViewModel(),
+    settingsContent: @Composable (() -> Unit) -> Unit = { _ -> },
+) {
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
 
     var textState by remember { mutableStateOf(TextFieldValue("")) }
+    var showSettings by remember { mutableStateOf(false) }
     val keyboardController = LocalSoftwareKeyboardController.current
     val view = LocalView.current
 
@@ -103,10 +108,25 @@ fun AgentScreen(viewModel: AgentViewModel = hiltViewModel()) {
         }
     }
 
+    if (showSettings) {
+        settingsContent { showSettings = false }
+    }
+
     Scaffold(
         containerColor = MaterialTheme.colorScheme.background,
         topBar = {
-            NeoBrutalTopAppBar(title = stringResource(R.string.agent_title))
+            NeoBrutalTopAppBar(
+                title = stringResource(R.string.agent_title),
+                actions = {
+                    NeoBrutalIconButton(
+                        imageVector = Icons.Default.Settings,
+                        contentDescription = stringResource(
+                            se.onemanstudio.playaroundwithai.core.ui.views.R.string.settings_icon_description
+                        ),
+                        onClick = { showSettings = true },
+                    )
+                },
+            )
         },
     ) { paddingValues ->
         Box(

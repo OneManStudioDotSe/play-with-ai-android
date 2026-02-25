@@ -11,6 +11,7 @@ import androidx.compose.material.icons.filled.Description
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
@@ -70,10 +71,12 @@ private fun FilePreviewHeaderLightPreview() {
 @Composable
 private fun FilePreviewHeaderLongNamePreview() {
     SofaAiTheme {
-        FilePreviewHeader(
-            fileName = "this_is_a_very_long_document_name_that_should_be_truncated.docx",
-            onClearFile = {}
-        )
+        Surface {
+            FilePreviewHeader(
+                fileName = "this_is_a_very_long_document_name_that_should_be_truncated.docx",
+                onClearFile = {}
+            )
+        }
     }
 }
 
@@ -81,9 +84,11 @@ private fun FilePreviewHeaderLongNamePreview() {
 @Composable
 private fun FilePreviewHeaderDarkPreview() {
     SofaAiTheme(darkTheme = true) {
-        FilePreviewHeader(
-            fileName = "report_q3_final.txt",
-            onClearFile = {}
-        )
+        Surface {
+            FilePreviewHeader(
+                fileName = "report_q3_final.txt",
+                onClearFile = {}
+            )
+        }
     }
 }

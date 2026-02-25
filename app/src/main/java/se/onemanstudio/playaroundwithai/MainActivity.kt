@@ -43,6 +43,7 @@ import se.onemanstudio.playaroundwithai.feature.agents.AgentScreen
 import se.onemanstudio.playaroundwithai.feature.chat.ChatScreen
 import se.onemanstudio.playaroundwithai.feature.dream.DreamScreen
 import se.onemanstudio.playaroundwithai.feature.maps.MapScreen
+import se.onemanstudio.playaroundwithai.settings.SettingsBottomSheetContainer
 import se.onemanstudio.playaroundwithai.navigation.Agents
 import se.onemanstudio.playaroundwithai.navigation.Chat
 import se.onemanstudio.playaroundwithai.navigation.Dreams
@@ -70,6 +71,16 @@ private fun SoFaApp() {
     val authErrorMessage = stringResource(R.string.auth_error_message)
     val retryLabel = stringResource(R.string.auth_error_retry)
     val retriesExhaustedMessage = stringResource(R.string.auth_error_retries_exhausted)
+    val tokenUsageTemplate = stringResource(R.string.token_usage_snackbar)
+
+    LaunchedEffect(Unit) {
+        viewModel.tokenUsageMessage.collect { formattedTokens ->
+            snackbarHostState.showSnackbar(
+                message = String.format(tokenUsageTemplate, formattedTokens),
+                duration = SnackbarDuration.Short,
+            )
+        }
+    }
 
     LaunchedEffect(authError, authRetriesExhausted) {
         if (authRetriesExhausted) {
@@ -137,10 +148,18 @@ private fun SoFaApp() {
                 navController = navController,
                 startDestination = Chat,
             ) {
-                composable<Chat> { ChatScreen() }
-                composable<Maps> { MapScreen() }
-                composable<Dreams> { DreamScreen() }
-                composable<Agents> { AgentScreen() }
+                composable<Chat> {
+                    ChatScreen(settingsContent = { onDismiss -> SettingsBottomSheetContainer(onDismiss = onDismiss) })
+                }
+                composable<Maps> {
+                    MapScreen(settingsContent = { onDismiss -> SettingsBottomSheetContainer(onDismiss = onDismiss) })
+                }
+                composable<Dreams> {
+                    DreamScreen(settingsContent = { onDismiss -> SettingsBottomSheetContainer(onDismiss = onDismiss) })
+                }
+                composable<Agents> {
+                    AgentScreen(settingsContent = { onDismiss -> SettingsBottomSheetContainer(onDismiss = onDismiss) })
+                }
             }
         }
     }

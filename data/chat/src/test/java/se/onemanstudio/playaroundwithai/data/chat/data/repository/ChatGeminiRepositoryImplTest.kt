@@ -20,12 +20,14 @@ import se.onemanstudio.playaroundwithai.core.network.dto.Content
 import se.onemanstudio.playaroundwithai.core.network.dto.GeminiRequest
 import se.onemanstudio.playaroundwithai.core.network.dto.GeminiResponse
 import se.onemanstudio.playaroundwithai.core.network.dto.Part
+import se.onemanstudio.playaroundwithai.core.network.tracking.TokenUsageTracker
 import java.io.IOException
 
 @OptIn(ExperimentalCoroutinesApi::class)
 class ChatGeminiRepositoryImplTest {
 
     private lateinit var apiService: GeminiApiService
+    private lateinit var tokenUsageTracker: TokenUsageTracker
     private lateinit var repository: ChatGeminiRepositoryImpl
 
     private val testDispatcher = UnconfinedTestDispatcher()
@@ -34,7 +36,8 @@ class ChatGeminiRepositoryImplTest {
     fun setUp() {
         Dispatchers.setMain(testDispatcher)
         apiService = mockk()
-        repository = ChatGeminiRepositoryImpl(apiService)
+        tokenUsageTracker = mockk(relaxed = true)
+        repository = ChatGeminiRepositoryImpl(apiService, tokenUsageTracker)
     }
 
     @After

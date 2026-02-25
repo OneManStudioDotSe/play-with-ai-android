@@ -32,6 +32,7 @@ import androidx.compose.material.icons.automirrored.filled.Send
 import androidx.compose.material.icons.filled.AddAPhoto
 import androidx.compose.material.icons.filled.UploadFile
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Surface
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
@@ -42,13 +43,13 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.input.TextFieldValue
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import se.onemanstudio.playaroundwithai.data.chat.domain.model.InputMode
 import se.onemanstudio.playaroundwithai.core.ui.sofa.NeoBrutalChip
 import se.onemanstudio.playaroundwithai.core.ui.sofa.NeoBrutalIconButton
 import se.onemanstudio.playaroundwithai.core.ui.sofa.NeoBrutalSegmentedButton
 import se.onemanstudio.playaroundwithai.core.ui.sofa.NeoBrutalTextField
 import se.onemanstudio.playaroundwithai.core.ui.theme.Dimensions
 import se.onemanstudio.playaroundwithai.core.ui.theme.SofaAiTheme
+import se.onemanstudio.playaroundwithai.data.chat.domain.model.InputMode
 import se.onemanstudio.playaroundwithai.feature.chat.R
 
 private val DotSize = 12.dp
@@ -182,7 +183,7 @@ fun PromptInputSection(
 @Composable
 fun ThreeDotsLoadingAnimation(modifier: Modifier = Modifier) {
     val infiniteTransition = rememberInfiniteTransition(label = "dots")
-    
+
     val dotSize = DotSize
     val delayUnit = DOT_DELAY_UNIT
 
@@ -229,17 +230,19 @@ fun ThreeDotsLoadingAnimation(modifier: Modifier = Modifier) {
 @Composable
 private fun PromptInputSectionLightPreview() {
     SofaAiTheme(darkTheme = false) {
-        PromptInputSection(
-            textState = TextFieldValue(""),
-            inputMode = InputMode.TEXT,
-            suggestions = listOf("Tell me a joke", "Explain Quantum Physics", "Roast my code"),
-            isSuggestionsLoading = false,
-            onTextChanged = {},
-            onSendClicked = {},
-            onChipClicked = {},
-            onAttachClicked = {},
-            onModeChange = {}
-        )
+        Surface {
+            PromptInputSection(
+                textState = TextFieldValue(""),
+                inputMode = InputMode.TEXT,
+                suggestions = listOf("Tell me a joke", "Explain Quantum Physics", "Roast my code"),
+                isSuggestionsLoading = false,
+                onTextChanged = {},
+                onSendClicked = {},
+                onChipClicked = {},
+                onAttachClicked = {},
+                onModeChange = {}
+            )
+        }
     }
 }
 
@@ -247,16 +250,18 @@ private fun PromptInputSectionLightPreview() {
 @Composable
 private fun PromptInputSectionLoadingPreview() {
     SofaAiTheme(darkTheme = false) {
-        PromptInputSection(
-            textState = TextFieldValue(""),
-            inputMode = InputMode.TEXT,
-            suggestions = emptyList(),
-            isSuggestionsLoading = true,
-            onTextChanged = {},
-            onSendClicked = {},
-            onChipClicked = {},
-            onAttachClicked = {},
-            onModeChange = {}
-        )
+        Surface {
+            PromptInputSection(
+                textState = TextFieldValue(""),
+                inputMode = InputMode.TEXT,
+                suggestions = emptyList(),
+                isSuggestionsLoading = true,
+                onTextChanged = {},
+                onSendClicked = {},
+                onChipClicked = {},
+                onAttachClicked = {},
+                onModeChange = {}
+            )
+        }
     }
 }

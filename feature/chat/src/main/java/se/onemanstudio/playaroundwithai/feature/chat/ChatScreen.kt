@@ -23,6 +23,7 @@ import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Clear
 import androidx.compose.material.icons.filled.History
+import androidx.compose.material.icons.filled.Settings
 import androidx.compose.material.icons.filled.Sync
 import androidx.compose.material.icons.rounded.BrokenImage
 import androidx.compose.material.icons.rounded.VpnKey
@@ -38,6 +39,7 @@ import androidx.compose.material3.SnackbarDuration
 import androidx.compose.material3.SnackbarHost
 import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.SnackbarResult
+import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
@@ -77,7 +79,10 @@ import se.onemanstudio.playaroundwithai.feature.chat.views.history.HistoryBottom
 @SuppressLint("LocalContextGetResourceValueCall")
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun ChatScreen(viewModel: ChatViewModel = hiltViewModel()) {
+fun ChatScreen(
+    viewModel: ChatViewModel = hiltViewModel(),
+    settingsContent: @Composable (() -> Unit) -> Unit = { _ -> },
+) {
     val screenState by viewModel.screenState.collectAsStateWithLifecycle()
     val uiState = screenState.chatState
     val suggestions = if (screenState.useFallbackSuggestions) {
@@ -97,6 +102,7 @@ fun ChatScreen(viewModel: ChatViewModel = hiltViewModel()) {
     val keyboardController = LocalSoftwareKeyboardController.current
 
     var isSheetOpen by remember { mutableStateOf(false) }
+    var showSettings by remember { mutableStateOf(false) }
 
     var inputMode by remember { mutableStateOf(InputMode.TEXT) }
     var selectedImageUri by remember { mutableStateOf<Uri?>(null) }
@@ -195,6 +201,10 @@ fun ChatScreen(viewModel: ChatViewModel = hiltViewModel()) {
         )
     }
 
+    if (showSettings) {
+        settingsContent { showSettings = false }
+    }
+
     Scaffold(
         containerColor = MaterialTheme.colorScheme.background,
         snackbarHost = { SnackbarHost(hostState = snackbarHostState) },
@@ -213,11 +223,20 @@ fun ChatScreen(viewModel: ChatViewModel = hiltViewModel()) {
                     }
 
                     NeoBrutalIconButton(
-                        modifier = Modifier.padding(start = Dimensions.paddingSmall),
+                        modifier = Modifier.padding(horizontal = Dimensions.paddingSmall),
                         imageVector = Icons.Default.History,
                         contentDescription = stringResource(R.string.label_prompt_history),
                         backgroundColor = MaterialTheme.colorScheme.tertiary,
                         onClick = { isSheetOpen = true },
+                    )
+
+                    NeoBrutalIconButton(
+                        modifier = Modifier.padding(start = Dimensions.paddingSmall),
+                        imageVector = Icons.Default.Settings,
+                        contentDescription = stringResource(
+                            se.onemanstudio.playaroundwithai.core.ui.views.R.string.settings_icon_description
+                        ),
+                        onClick = { showSettings = true },
                     )
                 }
             )
@@ -392,12 +411,14 @@ fun getFileName(context: Context, uri: Uri): String? =
 private fun ContentStateLightPreview() {
     val outputText = stringResource(R.string.preview_chat_response_light)
     SofaAiTheme(darkTheme = false) {
-        ContentState(
-            state = ChatUiState.Success(
-                outputText = outputText
-            ),
-            onClearResponse = {}
-        )
+        Surface {
+            ContentState(
+                state = ChatUiState.Success(
+                    outputText = outputText
+                ),
+                onClearResponse = {}
+            )
+        }
     }
 }
 
@@ -406,12 +427,14 @@ private fun ContentStateLightPreview() {
 private fun ContentStateDarkPreview() {
     val outputText = stringResource(R.string.preview_chat_response_dark)
     SofaAiTheme(darkTheme = true) {
-        ContentState(
-            state = ChatUiState.Success(
-                outputText = outputText
-            ),
-            onClearResponse = {}
-        )
+        Surface {
+            ContentState(
+                state = ChatUiState.Success(
+                    outputText = outputText
+                ),
+                onClearResponse = {}
+            )
+        }
     }
 }
 
@@ -419,12 +442,14 @@ private fun ContentStateDarkPreview() {
 @Composable
 private fun ErrorStateLightPreview() {
     SofaAiTheme(darkTheme = false) {
-        // Mocking an Error state (assuming your Error state takes a string or similar)
-        // If your 'error' property is a specific Enum or Object, pass that instance here.
-        ErrorState(
-            state = ChatUiState.Error(error = ChatError.NetworkMissing),
-            onClearResponse = {}
-        )
+        Surface {
+            // Mocking an Error state (assuming your Error state takes a string or similar)
+            // If your 'error' property is a specific Enum or Object, pass that instance here.
+            ErrorState(
+                state = ChatUiState.Error(error = ChatError.NetworkMissing),
+                onClearResponse = {}
+            )
+        }
     }
 }
 
@@ -432,9 +457,11 @@ private fun ErrorStateLightPreview() {
 @Composable
 private fun ErrorStateDarkPreview() {
     SofaAiTheme(darkTheme = true) {
-        ErrorState(
-            state = ChatUiState.Error(error = ChatError.Permission),
-            onClearResponse = {}
-        )
+        Surface {
+            ErrorState(
+                state = ChatUiState.Error(error = ChatError.Permission),
+                onClearResponse = {}
+            )
+        }
     }
 }

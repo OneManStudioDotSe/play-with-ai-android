@@ -14,6 +14,7 @@ import se.onemanstudio.playaroundwithai.core.network.dto.Content
 import se.onemanstudio.playaroundwithai.core.network.dto.GeminiRequest
 import se.onemanstudio.playaroundwithai.core.network.dto.ImageData
 import se.onemanstudio.playaroundwithai.core.network.dto.Part
+import se.onemanstudio.playaroundwithai.core.network.tracking.TokenUsageTracker
 import se.onemanstudio.playaroundwithai.data.chat.domain.model.AnalysisType
 import se.onemanstudio.playaroundwithai.data.chat.domain.repository.ChatGeminiRepository
 import timber.log.Timber
@@ -36,6 +37,7 @@ private const val COMPRESSION_QUALITY = 77
 @Singleton
 class ChatGeminiRepositoryImpl @Inject constructor(
     private val apiService: GeminiApiService,
+    private val tokenUsageTracker: TokenUsageTracker,
 ) : ChatGeminiRepository {
 
     override suspend fun getAiResponse(
@@ -71,6 +73,7 @@ class ChatGeminiRepositoryImpl @Inject constructor(
             val request = GeminiRequest(contents = listOf(Content(parts = parts)))
             Timber.d("Gemini - Sending request to Gemini API with ${parts.size} parts...")
             val response = apiService.generateContent(request)
+            tokenUsageTracker.record("chat", response.usageMetadata)
             val text = response.extractText() ?: "No response text found."
             Timber.d("Gemini - API response received (and it is ${text.length} chars)")
             Result.success(text)
@@ -100,6 +103,7 @@ class ChatGeminiRepositoryImpl @Inject constructor(
             val parts = listOf(Part(text = suggestionPrompt))
             val request = GeminiRequest(contents = listOf(Content(parts = parts)))
             val response = apiService.generateContent(request)
+            tokenUsageTracker.record("chat", response.usageMetadata)
 
             val text = response.extractText() ?: ""
             val suggestions = text.split("|").map { it.trim() }.filter { it.isNotEmpty() }

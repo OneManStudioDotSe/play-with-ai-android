@@ -15,6 +15,7 @@ import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.isActive
 import kotlinx.coroutines.launch
 import se.onemanstudio.playaroundwithai.core.config.model.ApiKeyAvailability
+import se.onemanstudio.playaroundwithai.data.maps.data.settings.MapSettingsHolder
 import se.onemanstudio.playaroundwithai.data.maps.domain.model.MapItem
 import se.onemanstudio.playaroundwithai.data.maps.domain.model.SuggestedPlace
 import se.onemanstudio.playaroundwithai.data.maps.domain.model.VehicleType
@@ -33,7 +34,6 @@ import java.io.IOException
 import javax.inject.Inject
 import kotlin.math.roundToInt
 
-private const val AMOUNT_OF_POINTS_TO_GENERATE = 30
 private const val WALKING_SPEED_METERS_PER_MIN = 83.0 // approx 5km/h
 private const val LOADING_MESSAGE_DURATION = 3000L
 
@@ -44,15 +44,48 @@ class MapViewModel @Inject constructor(
     private val getSuggestedPlacesUseCase: GetSuggestedPlacesUseCase,
     private val apiKeyAvailability: ApiKeyAvailability,
     private val networkMonitor: NetworkMonitor,
+    private val mapSettingsHolder: MapSettingsHolder,
 ) : ViewModel() {
 
     private val _uiState = MutableStateFlow(MapUiState())
     val uiState = _uiState.asStateFlow()
 
     private var loadingMessageJob: Job? = null
+    private var lastCenterLat: Double? = null
+    private var lastCenterLng: Double? = null
+
+    init {
+        observeSettingsChanges()
+    }
+
+    private fun observeSettingsChanges() {
+        viewModelScope.launch {
+            // Combine both settings flows; skip the initial emission to avoid double-loading
+            var firstEmission = true
+            kotlinx.coroutines.flow.combine(
+                mapSettingsHolder.vehicleCount,
+                mapSettingsHolder.searchRadiusKm,
+            ) { _, _ -> }
+                .collect {
+                    if (firstEmission) {
+                        firstEmission = false
+                        return@collect
+                    }
+                    val lat = lastCenterLat ?: return@collect
+                    val lng = lastCenterLng ?: return@collect
+                    reloadMapData(lat, lng)
+                }
+        }
+    }
+
+    private fun reloadMapData(centerLat: Double, centerLng: Double) {
+        loadMapData(centerLat, centerLng)
+    }
 
     @Suppress("TooGenericExceptionCaught")
     fun loadMapData(centerLat: Double, centerLng: Double) {
+        lastCenterLat = centerLat
+        lastCenterLng = centerLng
         if (!apiKeyAvailability.isMapsKeyAvailable) {
             _uiState.update { it.copy(isLoading = false, error = MapError.ApiKeyMissing) }
             return
@@ -70,7 +103,7 @@ class MapViewModel @Inject constructor(
 
         viewModelScope.launch {
             try {
-                val data = getMapItemsUseCase(AMOUNT_OF_POINTS_TO_GENERATE, centerLat, centerLng)
+                val data = getMapItemsUseCase(mapSettingsHolder.vehicleCount.value, centerLat, centerLng)
                     .map { it.toUiModel() }.toPersistentList()
                 stopLoadingMessageCycle()
                 _uiState.update {

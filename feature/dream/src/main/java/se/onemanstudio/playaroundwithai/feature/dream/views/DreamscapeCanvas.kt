@@ -11,11 +11,10 @@ import androidx.compose.animation.core.tween
 import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
+import androidx.compose.material3.Surface
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.tooling.preview.Preview
-import androidx.compose.ui.unit.dp
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.geometry.Size
 import androidx.compose.ui.graphics.Brush
@@ -25,6 +24,9 @@ import androidx.compose.ui.graphics.StrokeCap
 import androidx.compose.ui.graphics.drawscope.DrawScope
 import androidx.compose.ui.graphics.drawscope.Stroke
 import androidx.compose.ui.graphics.drawscope.withTransform
+import androidx.compose.ui.tooling.preview.Preview
+import androidx.compose.ui.unit.dp
+import se.onemanstudio.playaroundwithai.core.ui.theme.SofaAiTheme
 import se.onemanstudio.playaroundwithai.data.dream.domain.model.DreamElement
 import se.onemanstudio.playaroundwithai.data.dream.domain.model.DreamLayer
 import se.onemanstudio.playaroundwithai.data.dream.domain.model.DreamPalette
@@ -224,6 +226,7 @@ private fun DrawScope.drawDreamElement(
             val scale = 1f + sin(slowPhase) * BREATHE_AMPLITUDE
             drawCircle(color = baseColor, radius = elementSize * scale / 2f, center = Offset(offsetX, baseY))
         }
+
         ElementShape.TRIANGLE -> drawTriangle(baseColor, offsetX, baseY, elementSize)
         ElementShape.MOUNTAIN -> drawMountain(baseColor, offsetX, baseY, elementSize)
         ElementShape.WAVE -> drawWave(baseColor, offsetX, baseY, elementSize, sin(timePhase) * elementSize * WAVE_PHASE_RATIO)
@@ -231,30 +234,37 @@ private fun DrawScope.drawDreamElement(
             val sway = sin(slowPhase * 2f) * elementSize * TREE_SWAY_RATIO
             drawTree(baseColor, offsetX + sway, baseY, elementSize)
         }
+
         ElementShape.CLOUD -> {
             val bob = sin(slowPhase) * elementSize * CLOUD_BOB_RATIO
             drawCloud(baseColor, offsetX, baseY + bob, elementSize)
         }
+
         ElementShape.STAR -> {
             val rotation = time * FULL_CIRCLE_DEGREES.toFloat()
             drawRotated(rotation, offsetX, baseY) { drawStar(baseColor, offsetX, baseY, elementSize) }
         }
+
         ElementShape.CRESCENT -> {
             val rock = sin(slowPhase) * CRESCENT_ROCK_DEGREES
             drawRotated(rock, offsetX, baseY) { drawCrescent(baseColor, offsetX, baseY, elementSize) }
         }
+
         ElementShape.DIAMOND -> {
             val rotation = slowTime * FULL_CIRCLE_DEGREES.toFloat()
             drawRotated(rotation, offsetX, baseY) { drawDiamond(baseColor, offsetX, baseY, elementSize) }
         }
+
         ElementShape.SPIRAL -> {
             val rotation = slowTime * FULL_CIRCLE_DEGREES.toFloat()
             drawRotated(rotation, offsetX, baseY) { drawSpiral(baseColor, offsetX, baseY, elementSize) }
         }
+
         ElementShape.LOTUS -> {
             elementSize *= 1f + sin(slowPhase) * BREATHE_AMPLITUDE
             drawLotus(baseColor, offsetX, baseY, elementSize)
         }
+
         ElementShape.AURORA -> drawAurora(baseColor, offsetX, baseY, elementSize, time)
         ElementShape.CRYSTAL -> {
             val shimmer = CRYSTAL_SHIMMER_BASE + sin(slowPhase * CRYSTAL_SHIMMER_FREQ) * CRYSTAL_SHIMMER_RANGE
@@ -397,7 +407,7 @@ private fun DrawScope.drawSpiral(color: Color, x: Float, y: Float, elementSize: 
         val t = i.toFloat() / SPIRAL_POINTS
         val theta = t * SPIRAL_ROTATIONS * TWO_PI
         val r = maxRadius * (E.toFloat().pow(SPIRAL_GROWTH_RATE * theta) - 1f) /
-            (E.toFloat().pow(SPIRAL_GROWTH_RATE * SPIRAL_ROTATIONS * TWO_PI) - 1f)
+                (E.toFloat().pow(SPIRAL_GROWTH_RATE * SPIRAL_ROTATIONS * TWO_PI) - 1f)
         val px = x + r * cos(theta)
         val py = y + r * sin(theta)
         if (i == 0) path.moveTo(px, py) else path.lineTo(px, py)
@@ -491,10 +501,12 @@ private fun DrawScope.drawParticles(particles: List<DreamParticle>, time: Float,
                     val yLissajous = cos(timePhase * DOT_Y_LISSAJOUS_FREQ) * size.height * DOT_Y_LISSAJOUS_AMP
                     drawCircle(color = color, radius = particleSize, center = Offset(baseXPos + xDrift, baseYPos + yLissajous))
                 }
+
                 ParticleShape.SPARKLE -> {
                     val alpha = SPARKLE_ALPHA_BASE + sin(timePhase * SPARKLE_FREQ) * SPARKLE_ALPHA_BASE
                     drawSparkle(color.copy(alpha = alpha), baseXPos, baseYPos, particleSize)
                 }
+
                 ParticleShape.RING -> {
                     val scale = 1f + sin(timePhase * RING_FREQ) * RING_BREATHE_AMPLITUDE
                     drawCircle(
@@ -504,18 +516,21 @@ private fun DrawScope.drawParticles(particles: List<DreamParticle>, time: Float,
                         style = Stroke(width = particleSize * RING_STROKE_RATIO),
                     )
                 }
+
                 ParticleShape.TEARDROP -> {
                     val yDown = baseYPos + time * size.height * TEARDROP_DOWN_BIAS * particle.speed
                     val xSway = baseXPos + sin(slowPhase) * size.width * TEARDROP_SWAY_RATIO
                     val wrappedY = yDown % size.height
                     drawTeardrop(color, xSway, wrappedY, particleSize)
                 }
+
                 ParticleShape.DIAMOND_MOTE -> {
                     val rotation = slowTime * FULL_CIRCLE_DEGREES.toFloat() + seed * FULL_CIRCLE_DEGREES.toFloat()
                     drawRotated(rotation, baseXPos, baseYPos) {
                         drawDiamondMote(color, baseXPos, baseYPos, particleSize)
                     }
                 }
+
                 ParticleShape.DASH -> {
                     val dashX = ((seed + time * particle.speed * HALF_ROTATION * DASH_SPEED_MULTIPLIER) % 1f) * size.width
                     val rotation = sin(timePhase) * DASH_ROTATION_AMP
@@ -523,6 +538,7 @@ private fun DrawScope.drawParticles(particles: List<DreamParticle>, time: Float,
                         drawDash(color, dashX, baseYPos, particleSize)
                     }
                 }
+
                 ParticleShape.STARBURST -> {
                     val alpha = SPARKLE_ALPHA_BASE + sin(timePhase * STARBURST_TWINKLE_SPEED) * SPARKLE_ALPHA_BASE
                     drawStarburst(color.copy(alpha = alpha), baseXPos, baseYPos, particleSize)
@@ -663,23 +679,31 @@ private fun previewJoyfulScene() = DreamScene(
 @Preview(name = "Mysterious")
 @Composable
 private fun DreamscapeCanvasMysteriousPreview() {
-    DreamscapeCanvas(
-        scene = previewMysteriousScene(),
-        modifier = Modifier
-            .fillMaxWidth()
-            .height(PREVIEW_HEIGHT.dp),
-    )
+    SofaAiTheme(darkTheme = false) {
+        Surface {
+            DreamscapeCanvas(
+                scene = previewMysteriousScene(),
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .height(PREVIEW_HEIGHT.dp),
+            )
+        }
+    }
 }
 
 @Preview(name = "Joyful")
 @Composable
 private fun DreamscapeCanvasJoyfulPreview() {
-    DreamscapeCanvas(
-        scene = previewJoyfulScene(),
-        modifier = Modifier
-            .fillMaxWidth()
-            .height(PREVIEW_HEIGHT.dp),
-    )
+    SofaAiTheme(darkTheme = false) {
+        Surface {
+            DreamscapeCanvas(
+                scene = previewJoyfulScene(),
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .height(PREVIEW_HEIGHT.dp),
+            )
+        }
+    }
 }
 
 // endregion

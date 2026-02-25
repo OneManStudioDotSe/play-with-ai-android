@@ -30,6 +30,7 @@ import se.onemanstudio.playaroundwithai.feature.maps.states.MapError
 import se.onemanstudio.playaroundwithai.feature.maps.models.toUiModel
 import se.onemanstudio.playaroundwithai.feature.maps.states.MapUiState
 import se.onemanstudio.playaroundwithai.feature.maps.util.MainCoroutineRule
+import se.onemanstudio.playaroundwithai.data.maps.data.settings.MapSettingsHolder
 import se.onemanstudio.playaroundwithai.data.maps.util.NetworkMonitor
 
 @OptIn(ExperimentalCoroutinesApi::class)
@@ -42,6 +43,7 @@ class MapViewModelTest {
     private val mapSuggestionsRepository: MapSuggestionsRepository = mockk()
     private val getSuggestedPlacesUseCase = GetSuggestedPlacesUseCase(mapSuggestionsRepository)
     private val networkMonitor: NetworkMonitor = mockk()
+    private val mapSettingsHolder = MapSettingsHolder()
 
     @Before
     fun setup() {
@@ -284,7 +286,7 @@ class MapViewModelTest {
     private fun createViewModel(
         apiKeyAvailability: ApiKeyAvailability = ApiKeyAvailability(isGeminiKeyAvailable = true, isMapsKeyAvailable = true)
     ): MapViewModel {
-        return MapViewModel(GetMapItemsUseCase(repository), getSuggestedPlacesUseCase, apiKeyAvailability, networkMonitor)
+        return MapViewModel(GetMapItemsUseCase(repository), getSuggestedPlacesUseCase, apiKeyAvailability, networkMonitor, mapSettingsHolder)
     }
 
     private fun captureStates(viewModel: MapViewModel): List<MapUiState> {

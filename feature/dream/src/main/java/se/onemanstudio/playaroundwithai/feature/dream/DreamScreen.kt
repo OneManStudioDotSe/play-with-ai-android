@@ -12,10 +12,12 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.wrapContentSize
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Clear
+import androidx.compose.material.icons.filled.Settings
 import androidx.compose.material.icons.rounded.VpnKey
 import androidx.compose.material.icons.rounded.Warning
 import androidx.compose.material.icons.rounded.WifiOff
@@ -69,12 +71,16 @@ import java.time.Instant
 private const val CANVAS_HEIGHT = 280
 
 @Composable
-fun DreamScreen(viewModel: DreamViewModel = hiltViewModel()) {
+fun DreamScreen(
+    viewModel: DreamViewModel = hiltViewModel(),
+    settingsContent: @Composable (() -> Unit) -> Unit = { _ -> },
+) {
     val screenState by viewModel.screenState.collectAsStateWithLifecycle()
     val uiState = screenState.dreamState
     val history = screenState.dreamHistory
 
     var textState by remember { mutableStateOf(TextFieldValue("")) }
+    var showSettings by remember { mutableStateOf(false) }
     val keyboardController = LocalSoftwareKeyboardController.current
     val view = LocalView.current
 
@@ -86,10 +92,25 @@ fun DreamScreen(viewModel: DreamViewModel = hiltViewModel()) {
         }
     }
 
+    if (showSettings) {
+        settingsContent { showSettings = false }
+    }
+
     Scaffold(
         containerColor = MaterialTheme.colorScheme.background,
         topBar = {
-            NeoBrutalTopAppBar(title = stringResource(R.string.dream_title))
+            NeoBrutalTopAppBar(
+                title = stringResource(R.string.dream_title),
+                actions = {
+                    NeoBrutalIconButton(
+                        imageVector = Icons.Default.Settings,
+                        contentDescription = stringResource(
+                            se.onemanstudio.playaroundwithai.core.ui.views.R.string.settings_icon_description
+                        ),
+                        onClick = { showSettings = true },
+                    )
+                },
+            )
         },
     ) { paddingValues ->
         Box(
@@ -98,7 +119,7 @@ fun DreamScreen(viewModel: DreamViewModel = hiltViewModel()) {
                 .padding(paddingValues),
             contentAlignment = Alignment.Center,
         ) {
-            when (val state = uiState) {
+            when (uiState) {
                 is DreamUiState.Initial -> InitialState(
                     textState = textState,
                     onTextChanged = { textState = it },
@@ -113,7 +134,7 @@ fun DreamScreen(viewModel: DreamViewModel = hiltViewModel()) {
 
                 is DreamUiState.Interpreting -> InterpretingState()
                 is DreamUiState.Result -> ResultState(
-                    state = state,
+                    state = uiState,
                     onNewDream = {
                         textState = TextFieldValue("")
                         viewModel.clearResult()
@@ -121,7 +142,7 @@ fun DreamScreen(viewModel: DreamViewModel = hiltViewModel()) {
                 )
 
                 is DreamUiState.Error -> ErrorState(
-                    state = state,
+                    state = uiState,
                     onClearError = { viewModel.clearResult() },
                 )
             }
@@ -134,15 +155,15 @@ private fun InitialState(
     textState: TextFieldValue,
     onTextChanged: (TextFieldValue) -> Unit,
     onInterpretClick: () -> Unit,
-    history: List<se.onemanstudio.playaroundwithai.data.dream.domain.model.Dream>,
-    onDreamClick: (se.onemanstudio.playaroundwithai.data.dream.domain.model.Dream) -> Unit,
+    history: List<Dream>,
+    onDreamClick: (Dream) -> Unit,
 ) {
     Column(
         modifier = Modifier
             .fillMaxSize()
             .verticalScroll(rememberScrollState())
             .padding(Dimensions.paddingLarge),
-        horizontalAlignment = Alignment.CenterHorizontally,
+        horizontalAlignment = Alignment.Start,
     ) {
         NeoBrutalTextField(
             value = textState,
@@ -154,6 +175,7 @@ private fun InitialState(
         Spacer(modifier = Modifier.height(Dimensions.paddingLarge))
 
         NeoBrutalButton(
+            modifier = Modifier.wrapContentSize(),
             text = stringResource(R.string.dream_interpret_button),
             enabled = textState.text.isNotBlank(),
             backgroundColor = MaterialTheme.colorScheme.primary,
@@ -168,7 +190,7 @@ private fun InitialState(
                 style = MaterialTheme.typography.titleMedium,
                 color = MaterialTheme.colorScheme.onSurface,
                 modifier = Modifier
-                    .fillMaxWidth()
+                    .wrapContentSize()
                     .padding(bottom = Dimensions.paddingMedium),
             )
 

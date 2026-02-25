@@ -62,10 +62,24 @@ fun TypewriterText(
     )
 }
 
-@Preview(name = "Static")
+@Preview(name = "Static, light")
 @Composable
 private fun TypewriterTextStaticPreview() {
     SofaAiTheme {
+        Surface {
+            Text(
+                text = "This is what the final text will look like after the animation is complete.",
+                style = MaterialTheme.typography.bodyLarge,
+                color = MaterialTheme.colorScheme.onBackground
+            )
+        }
+    }
+}
+
+@Preview(name = "Static, dark")
+@Composable
+private fun TypewriterTextStaticPreviewDark() {
+    SofaAiTheme(darkTheme = true) {
         Surface {
             Text(
                 text = "This is what the final text will look like after the animation is complete.",

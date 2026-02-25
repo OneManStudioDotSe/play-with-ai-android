@@ -11,6 +11,7 @@ import se.onemanstudio.playaroundwithai.data.maps.data.dto.toSuggestedPlaceDomai
 import se.onemanstudio.playaroundwithai.data.maps.domain.model.SuggestedPlace
 import se.onemanstudio.playaroundwithai.data.maps.domain.repository.MapSuggestionsRepository
 import se.onemanstudio.playaroundwithai.core.network.api.GeminiApiService
+import se.onemanstudio.playaroundwithai.core.network.tracking.TokenUsageTracker
 import se.onemanstudio.playaroundwithai.core.network.dto.Content
 import se.onemanstudio.playaroundwithai.core.network.dto.GeminiRequest
 import se.onemanstudio.playaroundwithai.core.network.dto.Part
@@ -23,7 +24,8 @@ private const val SUGGESTED_PLACES_COUNT = 10
 @Singleton
 class MapSuggestionsRepositoryImpl @Inject constructor(
     private val apiService: GeminiApiService,
-    private val gson: Gson
+    private val gson: Gson,
+    private val tokenUsageTracker: TokenUsageTracker,
 ) : MapSuggestionsRepository {
 
     override suspend fun getSuggestedPlaces(
@@ -37,6 +39,7 @@ class MapSuggestionsRepositoryImpl @Inject constructor(
             val parts = listOf(Part(text = prompt))
             val request = GeminiRequest(contents = listOf(Content(parts = parts)))
             val response = apiService.generateContent(request)
+            tokenUsageTracker.record("map", response.usageMetadata)
 
             val rawText = response.extractText() ?: ""
             if (rawText.isBlank()) {

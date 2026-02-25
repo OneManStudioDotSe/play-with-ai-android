@@ -9,6 +9,7 @@ import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.flow.flowOn
 import se.onemanstudio.playaroundwithai.core.network.api.GeminiApiService
 import se.onemanstudio.playaroundwithai.core.network.dto.Content
+import se.onemanstudio.playaroundwithai.core.network.tracking.TokenUsageTracker
 import se.onemanstudio.playaroundwithai.core.network.dto.FunctionCallDto
 import se.onemanstudio.playaroundwithai.core.network.dto.FunctionResponseDto
 import se.onemanstudio.playaroundwithai.core.network.dto.GeminiRequest
@@ -33,6 +34,7 @@ private const val LOG_TAG = "TripPlanner"
 class TripPlannerRepositoryImpl @Inject constructor(
     private val apiService: GeminiApiService,
     private val gson: Gson,
+    private val tokenUsageTracker: TokenUsageTracker,
 ) : TripPlannerRepository {
 
     @Suppress("TooGenericExceptionCaught")
@@ -55,6 +57,7 @@ class TripPlannerRepositoryImpl @Inject constructor(
 
                 val request = GeminiRequest(contents = history, tools = tools)
                 val response = apiService.generateContent(request)
+                tokenUsageTracker.record("agents", response.usageMetadata)
                 val modelContent = response.candidates.firstOrNull()?.content ?: break
 
                 history.add(modelContent)
@@ -134,6 +137,7 @@ class TripPlannerRepositoryImpl @Inject constructor(
         val prompt = buildSearchPrompt(query, lat, lng, count)
         val request = GeminiRequest(contents = listOf(Content(role = "user", parts = listOf(Part(text = prompt)))))
         val response = apiService.generateContent(request)
+        tokenUsageTracker.record("agents", response.usageMetadata)
         val text = response.extractText().orEmpty()
 
         val places = parsePlacesFromResponse(text)

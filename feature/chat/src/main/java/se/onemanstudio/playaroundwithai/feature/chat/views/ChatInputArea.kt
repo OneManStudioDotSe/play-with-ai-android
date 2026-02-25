@@ -5,16 +5,17 @@ import androidx.compose.animation.animateContentSize
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
+import androidx.compose.material3.Surface
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.input.TextFieldValue
 import androidx.compose.ui.tooling.preview.Preview
-import se.onemanstudio.playaroundwithai.data.chat.domain.model.AnalysisType
-import se.onemanstudio.playaroundwithai.data.chat.domain.model.InputMode
 import se.onemanstudio.playaroundwithai.core.ui.sofa.NeoBrutalCard
 import se.onemanstudio.playaroundwithai.core.ui.theme.Dimensions
 import se.onemanstudio.playaroundwithai.core.ui.theme.SofaAiTheme
+import se.onemanstudio.playaroundwithai.data.chat.domain.model.AnalysisType
+import se.onemanstudio.playaroundwithai.data.chat.domain.model.InputMode
 
 @Composable
 fun ChatInputArea(
@@ -36,6 +37,7 @@ fun ChatInputArea(
 ) {
     NeoBrutalCard(
         modifier = Modifier
+            .padding(horizontal = Dimensions.paddingSmall)
             .fillMaxWidth()
             .animateContentSize(alignment = Alignment.BottomCenter)
     ) {
@@ -123,22 +125,24 @@ private fun ChatInputAreaImageModePreview() {
 @Composable
 private fun ChatInputAreaDocumentModePreview() {
     SofaAiTheme {
-        ChatInputArea(
-            inputMode = InputMode.DOCUMENT,
-            textState = TextFieldValue("Summarize this document in a funny way"),
-            suggestions = listOf("Tell me a joke", "Explain Quantum Physics", "Roast my code"),
-            isSuggestionsLoading = false,
-            selectedImageUri = null,
-            selectedFileName = null,
-            analysisType = AnalysisType.LOCATION,
-            onModeChange = {},
-            onTextChanged = {},
-            onChipClicked = {},
-            onAnalysisTypeChange = {},
-            onClearImage = {},
-            onClearFile = {},
-            onAttachClicked = {},
-            onSendClicked = {}
-        )
+        Surface {
+            ChatInputArea(
+                inputMode = InputMode.DOCUMENT,
+                textState = TextFieldValue("Summarize this document in a funny way"),
+                suggestions = listOf("Tell me a joke", "Explain Quantum Physics", "Roast my code"),
+                isSuggestionsLoading = false,
+                selectedImageUri = null,
+                selectedFileName = null,
+                analysisType = AnalysisType.LOCATION,
+                onModeChange = {},
+                onTextChanged = {},
+                onChipClicked = {},
+                onAnalysisTypeChange = {},
+                onClearImage = {},
+                onClearFile = {},
+                onAttachClicked = {},
+                onSendClicked = {}
+            )
+        }
     }
 }
