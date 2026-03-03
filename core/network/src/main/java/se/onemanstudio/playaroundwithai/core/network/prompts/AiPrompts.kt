@@ -116,11 +116,12 @@ Each place must be a real, existing establishment or location. Return ONLY a JSO
 Use realistic coordinates near the specified location. Return ONLY valid JSON, no markdown, no backticks, no extra text.
     """.trimIndent()
 
-    private const val SUGGESTED_PLACES_COUNT = 10
+    private const val SUGGESTED_PLACES_COUNT = 5
 
     fun suggestedPlacesPrompt(latitude: Double, longitude: Double): String = """
 You are a helpful AI assistant. Given the latitude and longitude,
-provide a list of $SUGGESTED_PLACES_COUNT interesting places around this location.
+provide a list of $SUGGESTED_PLACES_COUNT interesting places within a 5 to 10 km radius of this location.
+Spread them out geographically — do not cluster them in one area.
 For each place, include its name, latitude, longitude,
 a short description (max 2 sentences),
 and a category (e.g., "Park", "Museum", "Restaurant").
