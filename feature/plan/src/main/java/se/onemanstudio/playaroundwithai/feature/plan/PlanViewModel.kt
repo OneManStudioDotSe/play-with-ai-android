@@ -100,6 +100,13 @@ class PlanViewModel @Inject constructor(
         _uiState.value = PlanUiState.Initial
     }
 
+    fun loadSampleData() {
+        _uiState.value = PlanUiState.Result(
+            steps = samplePlanSteps(),
+            plan = sampleTripPlan(),
+        )
+    }
+
     private fun se.onemanstudio.playaroundwithai.data.plan.domain.model.TripPlan.toUi(): TripPlanUi {
         return TripPlanUi(
             summary = summary,
