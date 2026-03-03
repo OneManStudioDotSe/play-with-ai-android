@@ -14,7 +14,8 @@ import androidx.compose.foundation.layout.width
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.LocationDisabled
 import androidx.compose.material3.Icon
-import androidx.compose.material3.LinearProgressIndicator
+import androidx.compose.material3.ExperimentalMaterial3ExpressiveApi
+import androidx.compose.material3.LinearWavyProgressIndicator
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -85,7 +86,8 @@ fun SelfDismissingNotification(
                 )
             }
             Spacer(modifier = Modifier.height(Dimensions.paddingLarge))
-            LinearProgressIndicator(
+            @OptIn(ExperimentalMaterial3ExpressiveApi::class)
+            LinearWavyProgressIndicator(
                 progress = { progress },
                 modifier = Modifier
                     .fillMaxWidth()

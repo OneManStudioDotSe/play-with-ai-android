@@ -42,7 +42,8 @@ import androidx.compose.material.icons.filled.Stars
 import androidx.compose.material.icons.rounded.VpnKey
 import androidx.compose.material.icons.rounded.Warning
 import androidx.compose.material.icons.rounded.WifiOff
-import androidx.compose.material3.CircularProgressIndicator
+import androidx.compose.material3.ExperimentalMaterial3ExpressiveApi
+import androidx.compose.material3.LoadingIndicator
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
@@ -816,9 +817,10 @@ private fun LoadingState(
                         .fillMaxWidth()
                         .padding(Dimensions.paddingLarge)
                 ) {
-                    CircularProgressIndicator(
+                    @OptIn(ExperimentalMaterial3ExpressiveApi::class)
+                    LoadingIndicator(
                         modifier = Modifier.wrapContentSize(),
-                        color = MaterialTheme.colorScheme.primary
+                        color = MaterialTheme.colorScheme.primary,
                     )
 
                     if (currentLoadingMessage.isNotEmpty()) {

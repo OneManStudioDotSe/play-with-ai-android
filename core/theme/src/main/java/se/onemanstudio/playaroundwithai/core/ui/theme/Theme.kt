@@ -1,7 +1,8 @@
 package se.onemanstudio.playaroundwithai.core.ui.theme
 
 import androidx.compose.foundation.isSystemInDarkTheme
-import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.ExperimentalMaterial3ExpressiveApi
+import androidx.compose.material3.MaterialExpressiveTheme
 import androidx.compose.material3.Shapes
 import androidx.compose.material3.darkColorScheme
 import androidx.compose.material3.lightColorScheme
@@ -55,6 +56,7 @@ private val NeoBrutalistLightColorScheme =
         onErrorContainer = offWhite
     )
 
+@OptIn(ExperimentalMaterial3ExpressiveApi::class)
 @Suppress("FunctionNaming")
 @Composable
 fun SofaAiTheme(
@@ -68,7 +70,7 @@ fun SofaAiTheme(
     }
 
     // Neo-brutalism uses sharp corners. We will override the shapes here.
-    MaterialTheme(
+    MaterialExpressiveTheme(
         colorScheme = colorScheme,
         typography = Typography,
         shapes = Shapes(
@@ -76,8 +78,11 @@ fun SofaAiTheme(
             small = ZeroCornerSize,
             medium = ZeroCornerSize,
             large = ZeroCornerSize,
-            extraLarge = ZeroCornerSize
+            extraLarge = ZeroCornerSize,
+            largeIncreased = ZeroCornerSize,
+            extraLargeIncreased = ZeroCornerSize,
+            extraExtraLarge = ZeroCornerSize,
         ),
-        content = content
+        content = content,
     )
 }

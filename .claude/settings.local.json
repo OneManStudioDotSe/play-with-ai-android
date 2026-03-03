@@ -26,7 +26,13 @@
       "Bash(git mv:*)",
       "Bash(echo $dir - HAS TESTS:*)",
       "WebSearch",
-      "WebFetch(domain:discuss.google.dev)"
+      "WebFetch(domain:discuss.google.dev)",
+      "WebFetch(domain:composables.com)",
+      "WebFetch(domain:m3.material.io)",
+      "WebFetch(domain:navczydev.medium.com)",
+      "WebFetch(domain:zoewave.medium.com)",
+      "WebFetch(domain:android-developers.googleblog.com)",
+      "WebFetch(domain:medium.com)"
     ]
   }
 }

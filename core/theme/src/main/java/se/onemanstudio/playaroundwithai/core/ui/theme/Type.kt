@@ -1,5 +1,6 @@
 package se.onemanstudio.playaroundwithai.core.ui.theme
 
+import androidx.compose.material3.ExperimentalMaterial3ExpressiveApi
 import androidx.compose.material3.Typography
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontFamily
@@ -13,6 +14,7 @@ val IbmPlexMono = FontFamily(
     androidx.compose.ui.text.font.Font(R.font.ibm_plex_mono_bold, FontWeight.Bold)
 )
 
+@OptIn(ExperimentalMaterial3ExpressiveApi::class)
 val Typography = Typography(
     displayLarge = TextStyle(
         fontFamily = IbmPlexMono,
@@ -118,5 +120,110 @@ val Typography = Typography(
         fontSize = 10.sp,
         lineHeight = 12.sp,
         letterSpacing = 0.sp
-    )
+    ),
+    displayLargeEmphasized = TextStyle(
+        fontFamily = IbmPlexMono,
+        fontWeight = FontWeight.Bold,
+        fontSize = 52.sp,
+        lineHeight = 60.sp,
+        letterSpacing = (-0.25).sp
+    ),
+    displayMediumEmphasized = TextStyle(
+        fontFamily = IbmPlexMono,
+        fontWeight = FontWeight.Bold,
+        fontSize = 44.sp,
+        lineHeight = 52.sp,
+        letterSpacing = 0.sp
+    ),
+    displaySmallEmphasized = TextStyle(
+        fontFamily = IbmPlexMono,
+        fontWeight = FontWeight.Bold,
+        fontSize = 40.sp,
+        lineHeight = 52.sp,
+        letterSpacing = 0.sp
+    ),
+    headlineLargeEmphasized = TextStyle(
+        fontFamily = IbmPlexMono,
+        fontWeight = FontWeight.Bold,
+        fontSize = 32.sp,
+        lineHeight = 40.sp,
+        letterSpacing = 0.sp
+    ),
+    headlineMediumEmphasized = TextStyle(
+        fontFamily = IbmPlexMono,
+        fontWeight = FontWeight.Bold,
+        fontSize = 28.sp,
+        lineHeight = 40.sp,
+        letterSpacing = 0.sp
+    ),
+    headlineSmallEmphasized = TextStyle(
+        fontFamily = IbmPlexMono,
+        fontWeight = FontWeight.Bold,
+        fontSize = 24.sp,
+        lineHeight = 40.sp,
+        letterSpacing = 0.sp
+    ),
+    titleLargeEmphasized = TextStyle(
+        fontFamily = IbmPlexMono,
+        fontWeight = FontWeight.Bold,
+        fontSize = 22.sp,
+        lineHeight = 28.sp,
+        letterSpacing = 0.sp
+    ),
+    titleMediumEmphasized = TextStyle(
+        fontFamily = IbmPlexMono,
+        fontWeight = FontWeight.SemiBold,
+        fontSize = 20.sp,
+        lineHeight = 24.sp,
+        letterSpacing = 0.sp
+    ),
+    titleSmallEmphasized = TextStyle(
+        fontFamily = IbmPlexMono,
+        fontWeight = FontWeight.SemiBold,
+        fontSize = 18.sp,
+        lineHeight = 24.sp,
+        letterSpacing = 0.sp
+    ),
+    bodyLargeEmphasized = TextStyle(
+        fontFamily = IbmPlexMono,
+        fontWeight = FontWeight.Medium,
+        fontSize = 16.sp,
+        lineHeight = 24.sp,
+        letterSpacing = 0.5.sp
+    ),
+    bodyMediumEmphasized = TextStyle(
+        fontFamily = IbmPlexMono,
+        fontWeight = FontWeight.Medium,
+        fontSize = 14.sp,
+        lineHeight = 20.sp,
+        letterSpacing = 0.5.sp
+    ),
+    bodySmallEmphasized = TextStyle(
+        fontFamily = IbmPlexMono,
+        fontWeight = FontWeight.Medium,
+        fontSize = 12.sp,
+        lineHeight = 16.sp,
+        letterSpacing = 0.5.sp
+    ),
+    labelLargeEmphasized = TextStyle(
+        fontFamily = IbmPlexMono,
+        fontWeight = FontWeight.Bold,
+        fontSize = 14.sp,
+        lineHeight = 20.sp,
+        letterSpacing = 0.1.sp
+    ),
+    labelMediumEmphasized = TextStyle(
+        fontFamily = IbmPlexMono,
+        fontWeight = FontWeight.SemiBold,
+        fontSize = 12.sp,
+        lineHeight = 16.sp,
+        letterSpacing = 0.5.sp
+    ),
+    labelSmallEmphasized = TextStyle(
+        fontFamily = IbmPlexMono,
+        fontWeight = FontWeight.SemiBold,
+        fontSize = 10.sp,
+        lineHeight = 12.sp,
+        letterSpacing = 0.sp
+    ),
 )
