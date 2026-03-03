@@ -24,6 +24,8 @@ sealed interface PlanUiState {
 data class PlanStepUi(
     val icon: StepIcon,
     val label: String,
+    val toolName: String? = null,
+    val detail: String? = null,
 )
 
 enum class StepIcon { THINKING, TOOL_CALL, TOOL_RESULT }

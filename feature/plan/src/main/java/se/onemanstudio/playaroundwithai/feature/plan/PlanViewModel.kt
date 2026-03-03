@@ -45,46 +45,12 @@ class PlanViewModel @Inject constructor(
         }
 
         val steps = mutableListOf<PlanStepUi>()
-
-        _uiState.value = PlanUiState.Running(
-            steps = persistentListOf(),
-            currentAction = "Starting...",
-        )
+        _uiState.value = PlanUiState.Running(steps = persistentListOf(), currentAction = "Starting...")
 
         viewModelScope.launch {
             try {
                 planTripUseCase(goal, latitude, longitude).collect { event ->
-                    when (event) {
-                        is PlanEvent.Thinking -> {
-                            steps.add(PlanStepUi(icon = StepIcon.THINKING, label = event.message))
-                            _uiState.update {
-                                PlanUiState.Running(steps = steps.toPersistentList(), currentAction = event.message)
-                            }
-                        }
-
-                        is PlanEvent.ToolCalling -> {
-                            steps.add(PlanStepUi(icon = StepIcon.TOOL_CALL, label = event.summary))
-                            _uiState.update {
-                                PlanUiState.Running(steps = steps.toPersistentList(), currentAction = event.summary)
-                            }
-                        }
-
-                        is PlanEvent.ToolResult -> {
-                            steps.add(PlanStepUi(icon = StepIcon.TOOL_RESULT, label = event.summary))
-                            _uiState.update {
-                                PlanUiState.Running(steps = steps.toPersistentList(), currentAction = event.summary)
-                            }
-                        }
-
-                        is PlanEvent.Complete -> {
-                            val planUi = event.plan.toUi()
-                            _uiState.value = PlanUiState.Result(steps = steps.toPersistentList(), plan = planUi)
-                        }
-
-                        is PlanEvent.Error -> {
-                            _uiState.value = PlanUiState.Error(PlanError.Unknown(event.message))
-                        }
-                    }
+                    handlePlanEvent(event, steps)
                 }
             } catch (e: IOException) {
                 Timber.e(e, "PlanVM - Network error")
@@ -92,6 +58,35 @@ class PlanViewModel @Inject constructor(
             } catch (e: Exception) {
                 Timber.e(e, "PlanVM - Unexpected error")
                 _uiState.value = PlanUiState.Error(PlanError.Unknown(e.message))
+            }
+        }
+    }
+
+    private fun handlePlanEvent(event: PlanEvent, steps: MutableList<PlanStepUi>) {
+        when (event) {
+            is PlanEvent.Thinking -> {
+                steps.add(PlanStepUi(icon = StepIcon.THINKING, label = event.message))
+                _uiState.update { PlanUiState.Running(steps = steps.toPersistentList(), currentAction = event.message) }
+            }
+
+            is PlanEvent.ToolCalling -> {
+                steps.add(PlanStepUi(icon = StepIcon.TOOL_CALL, label = event.summary, toolName = event.toolName))
+                _uiState.update { PlanUiState.Running(steps = steps.toPersistentList(), currentAction = event.summary) }
+            }
+
+            is PlanEvent.ToolResult -> {
+                steps.add(
+                    PlanStepUi(icon = StepIcon.TOOL_RESULT, label = event.summary, toolName = event.toolName, detail = event.summary)
+                )
+                _uiState.update { PlanUiState.Running(steps = steps.toPersistentList(), currentAction = event.summary) }
+            }
+
+            is PlanEvent.Complete -> {
+                _uiState.value = PlanUiState.Result(steps = steps.toPersistentList(), plan = event.plan.toUi())
+            }
+
+            is PlanEvent.Error -> {
+                _uiState.value = PlanUiState.Error(PlanError.Unknown(event.message))
             }
         }
     }

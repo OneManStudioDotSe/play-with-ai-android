@@ -89,6 +89,10 @@ internal fun InitialState(
                 onClick = { onTextChanged(TextFieldValue(parksText)) },
             )
         }
+
+        Spacer(modifier = Modifier.height(Dimensions.paddingExtraLarge))
+
+        HowItWorksCard()
     }
 }
 

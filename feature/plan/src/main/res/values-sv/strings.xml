@@ -27,4 +27,23 @@
     <string name="plan_icon_step_tool_call">Anropar verktyg</string>
     <string name="plan_icon_step_tool_result">Verktygsresultat</string>
     <string name="plan_load_sample_data">Ladda exempeldata</string>
+
+    <!-- Result section headers -->
+    <string name="plan_trip_summary">Reseöversikt</string>
+    <string name="plan_your_route">Din rutt</string>
+    <string name="plan_distance_value">%.1f km</string>
+    <string name="plan_time_value">%d min</string>
+
+    <!-- How It Works card -->
+    <string name="plan_how_it_works_title">Hur AI-agenten fungerar</string>
+    <string name="plan_how_it_works_expand">Visa detaljer</string>
+    <string name="plan_how_it_works_collapse">Dölj detaljer</string>
+    <string name="plan_how_it_works_description">Den här funktionen använder Geminis API för funktionsanrop i en flerstegs agentloop. Modellen bestämmer vilka verktyg som ska anropas, observerar resultat och upprepar tills den har ett komplett svar.</string>
+    <string name="plan_how_it_works_tools_label">Tillgängliga verktyg:</string>
+    <string name="plan_how_it_works_flow">1. Du beskriver ditt mål\n2. Modellen anropar verktyg självständigt\n3. Den upprepar tills en komplett plan är klar</string>
+
+    <!-- Agent Log section -->
+    <string name="plan_agent_log_title">Agentlogg</string>
+    <string name="plan_agent_log_expand">Visa agentlogg</string>
+    <string name="plan_agent_log_collapse">Dölj agentlogg</string>
 </resources>

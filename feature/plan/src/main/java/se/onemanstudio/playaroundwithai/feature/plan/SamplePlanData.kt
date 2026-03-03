@@ -12,13 +12,26 @@ private const val TOTAL_WALKING_MINUTES = 46
 
 fun samplePlanSteps(): PersistentList<PlanStepUi> = persistentListOf(
     PlanStepUi(icon = StepIcon.THINKING, label = "Understanding your request..."),
-    PlanStepUi(icon = StepIcon.TOOL_CALL, label = "Searching for \"historical landmarks in Stockholm\""),
-    PlanStepUi(icon = StepIcon.TOOL_RESULT, label = "Found 5 places"),
-    PlanStepUi(icon = StepIcon.TOOL_CALL, label = "Searching for \"scenic waterfront spots in Stockholm\""),
-    PlanStepUi(icon = StepIcon.TOOL_RESULT, label = "Found 3 places"),
+    PlanStepUi(
+        icon = StepIcon.TOOL_CALL,
+        label = "Searching for \"historical landmarks in Stockholm\"",
+        toolName = "search_places",
+    ),
+    PlanStepUi(icon = StepIcon.TOOL_RESULT, label = "Found 5 places", toolName = "search_places", detail = "Found 5 places"),
+    PlanStepUi(
+        icon = StepIcon.TOOL_CALL,
+        label = "Searching for \"scenic waterfront spots in Stockholm\"",
+        toolName = "search_places",
+    ),
+    PlanStepUi(icon = StepIcon.TOOL_RESULT, label = "Found 3 places", toolName = "search_places", detail = "Found 3 places"),
     PlanStepUi(icon = StepIcon.THINKING, label = "Selecting the best stops for your itinerary..."),
-    PlanStepUi(icon = StepIcon.TOOL_CALL, label = "Calculating optimal walking route"),
-    PlanStepUi(icon = StepIcon.TOOL_RESULT, label = "Route: 3.8 km, ~46 min walk"),
+    PlanStepUi(icon = StepIcon.TOOL_CALL, label = "Calculating optimal walking route", toolName = "calculate_route"),
+    PlanStepUi(
+        icon = StepIcon.TOOL_RESULT,
+        label = "Route: 3.8 km, ~46 min walk",
+        toolName = "calculate_route",
+        detail = "Route: 3.8 km, ~46 min walk",
+    ),
 )
 
 @Suppress("LongMethod")

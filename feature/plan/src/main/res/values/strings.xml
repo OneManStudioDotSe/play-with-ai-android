@@ -28,4 +28,23 @@
     <string name="plan_icon_step_tool_call">Calling tool</string>
     <string name="plan_icon_step_tool_result">Tool result</string>
     <string name="plan_load_sample_data">Load sample data</string>
+
+    <!-- Result section headers -->
+    <string name="plan_trip_summary">Trip Summary</string>
+    <string name="plan_your_route">Your Route</string>
+    <string name="plan_distance_value">%.1f km</string>
+    <string name="plan_time_value">%d min</string>
+
+    <!-- How It Works card -->
+    <string name="plan_how_it_works_title">How the AI Agent Works</string>
+    <string name="plan_how_it_works_expand">Show details</string>
+    <string name="plan_how_it_works_collapse">Hide details</string>
+    <string name="plan_how_it_works_description">This feature uses Gemini\'s function calling API in a multi-turn agent loop. The model decides which tools to call, observes results, and repeats until it has a complete answer.</string>
+    <string name="plan_how_it_works_tools_label">Available tools:</string>
+    <string name="plan_how_it_works_flow">1. You describe your goal\n2. The model calls tools autonomously\n3. It repeats until a full plan is ready</string>
+
+    <!-- Agent Log section -->
+    <string name="plan_agent_log_title">Agent Log</string>
+    <string name="plan_agent_log_expand">Show agent log</string>
+    <string name="plan_agent_log_collapse">Hide agent log</string>
 </resources>
