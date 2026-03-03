@@ -2,6 +2,7 @@ package se.onemanstudio.playaroundwithai.feature.dream.views
 
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
@@ -45,9 +46,11 @@ fun DreamGalleryRow(
 ) {
     LazyRow(
         modifier = modifier
+            .padding(horizontal = Dimensions.paddingMedium)
             .fillMaxWidth()
             .wrapContentHeight(),
         horizontalArrangement = Arrangement.spacedBy(Dimensions.paddingLarge),
+        contentPadding = PaddingValues(horizontal = Dimensions.paddingLarge),
     ) {
         items(dreams, key = { it.id }) { dream ->
             DreamGalleryCard(

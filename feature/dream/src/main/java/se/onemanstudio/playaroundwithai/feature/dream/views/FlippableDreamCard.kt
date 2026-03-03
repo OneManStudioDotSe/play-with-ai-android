@@ -3,6 +3,7 @@
 package se.onemanstudio.playaroundwithai.feature.dream.views
 
 import android.graphics.BitmapFactory
+import androidx.compose.animation.AnimatedContent
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.core.MutableTransitionState
 import androidx.compose.animation.core.animateFloatAsState
@@ -10,10 +11,14 @@ import androidx.compose.animation.core.tween
 import androidx.compose.animation.fadeIn
 import androidx.compose.animation.fadeOut
 import androidx.compose.animation.scaleIn
+import androidx.compose.animation.scaleOut
+import androidx.compose.animation.slideInHorizontally
+import androidx.compose.animation.slideOutHorizontally
+import androidx.compose.animation.togetherWith
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
-import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
@@ -22,6 +27,7 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.rounded.Autorenew
+import androidx.compose.material.icons.rounded.Close
 import androidx.compose.material.icons.rounded.Palette
 import androidx.compose.material.icons.rounded.QuestionMark
 import androidx.compose.material3.Icon
@@ -100,22 +106,15 @@ fun FlippableDreamCard(
     NeoBrutalCard(
         modifier = modifier
             .fillMaxWidth()
-            .then(
-                if (isImageReady) {
-                    Modifier.clickable { isFlipped = !isFlipped }
-                } else {
-                    Modifier
-                }
-            )
             .graphicsLayer {
                 rotationY = rotation
                 cameraDistance = CAMERA_DISTANCE_FACTOR * density
             },
     ) {
         if (rotation < FLIP_HALF_ANGLE) {
-            FrontSide(scene = scene, flipIconVisible = flipIconVisible)
+            FrontSide(scene = scene, flipIconVisible = flipIconVisible, onFlipClick = { isFlipped = !isFlipped })
         } else {
-            BackSide(imageState = imageState, scene = scene)
+            BackSide(imageState = imageState, scene = scene, onFlipBack = { isFlipped = !isFlipped })
         }
     }
 }
@@ -124,6 +123,7 @@ fun FlippableDreamCard(
 private fun FrontSide(
     scene: DreamScene,
     flipIconVisible: MutableTransitionState<Boolean>,
+    onFlipClick: () -> Unit,
 ) {
     Timber.d("FrontSide - flipIconVisible: ${flipIconVisible.targetState} and scene is $scene")
     Box {
@@ -143,18 +143,17 @@ private fun FrontSide(
                 .align(Alignment.BottomEnd)
                 .padding(Dimensions.paddingMedium),
         ) {
-            Icon(
+            NeoBrutalIconButton(
                 imageVector = Icons.Rounded.Autorenew,
                 contentDescription = stringResource(R.string.dream_flip_hint),
-                tint = MaterialTheme.colorScheme.onSurface,
-                modifier = Modifier.size(Dimensions.iconSizeLarge),
+                onClick = onFlipClick,
             )
         }
     }
 }
 
 @Composable
-private fun BackSide(imageState: DreamImageState, scene: DreamScene) {
+private fun BackSide(imageState: DreamImageState, scene: DreamScene, onFlipBack: () -> Unit) {
     Box(
         modifier = Modifier.graphicsLayer { rotationY = FLIP_FULL_ANGLE },
     ) {
@@ -185,9 +184,18 @@ private fun BackSide(imageState: DreamImageState, scene: DreamScene) {
         if (generated != null) {
             ArtistOverlay(
                 artistName = generated.artistName,
-                modifier = Modifier.align(Alignment.BottomEnd),
+                modifier = Modifier.align(Alignment.BottomStart),
             )
         }
+
+        NeoBrutalIconButton(
+            imageVector = Icons.Rounded.Autorenew,
+            contentDescription = stringResource(R.string.dream_flip_hint),
+            onClick = onFlipBack,
+            modifier = Modifier
+                .align(Alignment.BottomEnd)
+                .padding(Dimensions.paddingMedium),
+        )
     }
 }
 
@@ -228,27 +236,33 @@ private fun ArtistOverlay(
 ) {
     var showArtist by remember { mutableStateOf(false) }
 
-    Box(modifier = modifier.padding(Dimensions.paddingMedium)) {
-        NeoBrutalIconButton(
-            imageVector = Icons.Rounded.QuestionMark,
-            contentDescription = stringResource(R.string.dream_artist_hint),
-            size = Dimensions.iconSizeSmall,
-            backgroundColor = MaterialTheme.colorScheme.surface,
-            onClick = { showArtist = !showArtist },
-            modifier = Modifier.align(Alignment.BottomEnd),
-        )
+    Row(
+        modifier = modifier.padding(Dimensions.paddingMedium),
+        verticalAlignment = Alignment.CenterVertically,
+    ) {
+        AnimatedContent(
+            targetState = showArtist,
+            transitionSpec = { (fadeIn() + scaleIn()) togetherWith (fadeOut() + scaleOut()) },
+            label = "artistIconMorph",
+        ) { isExpanded ->
+            NeoBrutalIconButton(
+                imageVector = if (isExpanded) Icons.Rounded.Close else Icons.Rounded.QuestionMark,
+                contentDescription = stringResource(R.string.dream_artist_hint),
+                size = Dimensions.iconSizeSmall,
+                backgroundColor = MaterialTheme.colorScheme.surface,
+                onClick = { showArtist = !showArtist },
+            )
+        }
 
         AnimatedVisibility(
             visible = showArtist,
-            enter = fadeIn(),
-            exit = fadeOut(),
-            modifier = Modifier
-                .align(Alignment.BottomCenter)
-                .padding(bottom = Dimensions.paddingExtraLarge),
+            enter = slideInHorizontally { -it } + fadeIn(),
+            exit = slideOutHorizontally { -it } + fadeOut(),
         ) {
             Surface(
                 color = MaterialTheme.colorScheme.surface.copy(alpha = ARTIST_LABEL_ALPHA),
                 shape = CircleShape,
+                modifier = Modifier.padding(start = Dimensions.paddingMedium),
             ) {
                 Text(
                     text = artistName,
@@ -409,6 +423,7 @@ private fun BackPlaceholderDarkPalettePreview() {
                         artistName = "Lorem ipsum"
                     ),
                     scene = previewDarkScene(),
+                    onFlipBack = {},
                 )
             }
         }
@@ -427,6 +442,7 @@ private fun BackPlaceholderWarmPalettePreview() {
                         artistName = "Salvador Dalí"
                     ),
                     scene = previewWarmScene(),
+                    onFlipBack = {},
                 )
             }
         }
@@ -445,6 +461,7 @@ private fun BackPlaceholderDarkThemePreview() {
                         artistName = "Claude Monet"
                     ),
                     scene = previewDarkScene(),
+                    onFlipBack = {},
                 )
             }
         }

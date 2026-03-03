@@ -8,9 +8,11 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.sizeIn
+import androidx.compose.foundation.layout.wrapContentHeight
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Favorite
 import androidx.compose.material.icons.filled.Navigation
@@ -172,13 +174,79 @@ fun NeoBrutalIconButton(
     }
 }
 
+@Composable
+fun NeoBrutalIconButtonSmall(
+    modifier: Modifier = Modifier,
+    imageVector: ImageVector,
+    contentDescription: String,
+    contentColor: Color = MaterialTheme.colorScheme.onSurface,
+    backgroundColor: Color = MaterialTheme.colorScheme.surface,
+    shadowColor: Color = MaterialTheme.colorScheme.onSurface,
+    onClick: () -> Unit,
+) {
+    val interactionSource = remember { MutableInteractionSource() }
+    val isPressed by interactionSource.collectIsPressedAsState()
+
+    val shadowOffset = Dimensions.paddingExtraSmall
+    val pressOffset = Dimensions.paddingExtraSmall
+
+    Box(
+        modifier = modifier
+            .sizeIn(minWidth = Dimensions.minTouchTarget, minHeight = Dimensions.minTouchTarget),
+        contentAlignment = Alignment.Center,
+    ) {
+        Box(
+            modifier = Modifier
+                .size(Dimensions.iconSizeMedium)
+                .drawBehind {
+                    drawRect(
+                        color = shadowColor,
+                        topLeft = Offset(shadowOffset.toPx(), shadowOffset.toPx()),
+                        size = this.size
+                    )
+                }
+        ) {
+            Box(
+                modifier = Modifier
+                    .matchParentSize()
+                    .graphicsLayer {
+                        translationX = if (isPressed) pressOffset.toPx() else 0f
+                        translationY = if (isPressed) pressOffset.toPx() else 0f
+                    }
+                    .drawBehind {
+                        drawRect(color = backgroundColor, size = this.size)
+                        drawRect(
+                            color = shadowColor,
+                            size = this.size,
+                            style = Stroke(Dimensions.borderStrokeSmall.toPx())
+                        )
+                    }
+                    .clickable(
+                        interactionSource = interactionSource,
+                        indication = null,
+                        onClick = onClick
+                    ),
+                contentAlignment = Alignment.Center
+            ) {
+                Icon(
+                    imageVector = imageVector,
+                    contentDescription = contentDescription,
+                    tint = contentColor,
+                    modifier = Modifier.padding(Dimensions.paddingSmall)
+                )
+            }
+        }
+    }
+}
+
 @Preview(name = "Light")
 @Composable
 private fun NeoBrutalButtonLightPreview() {
     SofaAiTheme {
         Column(
             modifier = Modifier
-                .fillMaxSize()
+                .fillMaxWidth()
+                .wrapContentHeight()
                 .padding(Dimensions.paddingLarge),
             horizontalAlignment = Alignment.CenterHorizontally,
             verticalArrangement = Arrangement.spacedBy(Dimensions.paddingLarge)
@@ -206,6 +274,12 @@ private fun NeoBrutalButtonLightPreview() {
                 contentDescription = "Favorite Icon",
                 backgroundColor = MaterialTheme.colorScheme.tertiary
             )
+            NeoBrutalIconButtonSmall(
+                onClick = {},
+                imageVector = Icons.Default.Favorite,
+                contentDescription = "Favorite Small",
+                backgroundColor = MaterialTheme.colorScheme.tertiary
+            )
         }
     }
 }
@@ -216,7 +290,8 @@ private fun NeoBrutalButtonDarkPreview() {
     SofaAiTheme(darkTheme = true) {
         Column(
             modifier = Modifier
-                .fillMaxSize()
+                .fillMaxWidth()
+                .wrapContentHeight()
                 .padding(Dimensions.paddingLarge),
             horizontalAlignment = Alignment.CenterHorizontally,
             verticalArrangement = Arrangement.spacedBy(Dimensions.paddingLarge)

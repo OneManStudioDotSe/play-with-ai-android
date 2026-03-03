@@ -3,6 +3,10 @@
 package se.onemanstudio.playaroundwithai.feature.dream
 
 import android.view.HapticFeedbackConstants
+import androidx.compose.animation.AnimatedVisibility
+import androidx.compose.animation.fadeIn
+import androidx.compose.animation.fadeOut
+import androidx.compose.animation.slideInHorizontally
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -38,6 +42,7 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.vector.ImageVector
+import androidx.compose.ui.layout.layout
 import androidx.compose.ui.platform.LocalSoftwareKeyboardController
 import androidx.compose.ui.platform.LocalView
 import androidx.compose.ui.res.stringResource
@@ -47,6 +52,8 @@ import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.text.input.TextFieldValue
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
+import androidx.compose.ui.unit.Dp
+import androidx.compose.ui.unit.dp
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import se.onemanstudio.playaroundwithai.core.ui.sofa.MarkerText
@@ -54,6 +61,7 @@ import se.onemanstudio.playaroundwithai.core.ui.sofa.NeoBrutalButton
 import se.onemanstudio.playaroundwithai.core.ui.sofa.NeoBrutalCard
 import se.onemanstudio.playaroundwithai.core.ui.sofa.NeoBrutalChip
 import se.onemanstudio.playaroundwithai.core.ui.sofa.NeoBrutalIconButton
+import se.onemanstudio.playaroundwithai.core.ui.sofa.NeoBrutalIconButtonSmall
 import se.onemanstudio.playaroundwithai.core.ui.sofa.NeoBrutalTextField
 import se.onemanstudio.playaroundwithai.core.ui.sofa.NeoBrutalTopAppBar
 import se.onemanstudio.playaroundwithai.core.ui.theme.Dimensions
@@ -109,7 +117,7 @@ fun DreamScreen(
             NeoBrutalTopAppBar(
                 title = stringResource(R.string.dream_title),
                 actions = {
-                    NeoBrutalIconButton(
+                    NeoBrutalIconButtonSmall(
                         imageVector = Icons.Default.Settings,
                         contentDescription = stringResource(
                             se.onemanstudio.playaroundwithai.core.ui.views.R.string.settings_icon_description
@@ -140,9 +148,8 @@ fun DreamScreen(
                     onDreamClick = { dream -> viewModel.restoreDream(dream) },
                 )
 
-                is DreamUiState.Interpreting -> InterpretingState()
-                is DreamUiState.Result -> ResultState(
-                    state = uiState,
+                is DreamUiState.Interpreting, is DreamUiState.Result -> ResultState(
+                    state = uiState as? DreamUiState.Result,
                     imageState = imageState,
                     onNewDream = {
                         textState = TextFieldValue("")
@@ -201,6 +208,7 @@ private fun InitialState(
             )
 
             DreamGalleryRow(
+                modifier = Modifier.ignoreHorizontalParentPadding(Dimensions.paddingLarge),
                 dreams = history,
                 onDreamClick = onDreamClick,
             )
@@ -221,32 +229,13 @@ private fun InitialState(
 
 @OptIn(ExperimentalMaterial3ExpressiveApi::class)
 @Composable
-private fun InterpretingState() {
-    Column(
-        horizontalAlignment = Alignment.CenterHorizontally,
-        verticalArrangement = Arrangement.Center,
-    ) {
-        LoadingIndicator(
-            color = MaterialTheme.colorScheme.primary,
-            modifier = Modifier.size(Dimensions.iconSizeXXLarge),
-        )
-        Spacer(modifier = Modifier.height(Dimensions.paddingLarge))
-        Text(
-            text = stringResource(R.string.dream_interpreting),
-            style = MaterialTheme.typography.bodyLarge,
-            color = MaterialTheme.colorScheme.onSurface,
-            modifier = Modifier.semantics { liveRegion = LiveRegionMode.Polite },
-        )
-    }
-}
-
-@Composable
 private fun ResultState(
-    state: DreamUiState.Result,
+    state: DreamUiState.Result?,
     imageState: DreamImageState,
     onNewDream: () -> Unit,
 ) {
     val scrollState = rememberScrollState()
+    val hasResult = state != null
 
     Column(
         modifier = Modifier
@@ -255,45 +244,82 @@ private fun ResultState(
             .padding(Dimensions.paddingLarge),
         horizontalAlignment = Alignment.CenterHorizontally,
     ) {
-        FlippableDreamCard(
-            scene = state.scene,
-            imageState = imageState,
-        )
+        Box(
+            modifier = Modifier
+                .fillMaxWidth()
+                .height(280.dp),
+            contentAlignment = Alignment.Center,
+        ) {
+            androidx.compose.animation.AnimatedVisibility(
+                visible = !hasResult,
+                exit = fadeOut(),
+            ) {
+                NeoBrutalCard(modifier = Modifier.fillMaxSize()) {
+                    Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
+                        LoadingIndicator(
+                            color = MaterialTheme.colorScheme.primary,
+                            modifier = Modifier.size(Dimensions.iconSizeXXLarge),
+                        )
+                    }
+                }
+            }
 
-        Spacer(modifier = Modifier.height(Dimensions.paddingLarge))
-
-        NeoBrutalCard(modifier = Modifier.fillMaxWidth()) {
-            Column(modifier = Modifier.padding(Dimensions.paddingLarge)) {
-                Row(
-                    modifier = Modifier.fillMaxWidth(),
-                    horizontalArrangement = Arrangement.SpaceBetween,
-                    verticalAlignment = Alignment.CenterVertically,
-                ) {
-                    MarkerText(
-                        text = stringResource(R.string.dream_interpretation_label),
-                        lineColor = electricBlue,
-                    )
-                    NeoBrutalChip(
-                        text = moodDisplayName(state.mood),
-                        onClick = {},
+            androidx.compose.animation.AnimatedVisibility(
+                visible = hasResult,
+                enter = fadeIn(),
+            ) {
+                if (state != null) {
+                    FlippableDreamCard(
+                        scene = state.scene,
+                        imageState = imageState,
                     )
                 }
-                Spacer(modifier = Modifier.height(Dimensions.paddingMedium))
-                Text(
-                    text = state.interpretation,
-                    style = MaterialTheme.typography.bodyLarge,
-                    color = MaterialTheme.colorScheme.onSurface,
-                )
             }
         }
 
-        Spacer(modifier = Modifier.height(Dimensions.paddingLarge))
+        AnimatedVisibility(
+            visible = hasResult,
+            enter = slideInHorizontally { it } + fadeIn(),
+        ) {
+            if (state != null) {
+                Column(horizontalAlignment = Alignment.CenterHorizontally) {
+                    Spacer(modifier = Modifier.height(Dimensions.paddingLarge))
 
-        NeoBrutalButton(
-            text = stringResource(R.string.dream_new_button),
-            backgroundColor = MaterialTheme.colorScheme.secondary,
-            onClick = onNewDream,
-        )
+                    NeoBrutalCard(modifier = Modifier.fillMaxWidth()) {
+                        Column(modifier = Modifier.padding(Dimensions.paddingLarge)) {
+                            Row(
+                                modifier = Modifier.fillMaxWidth(),
+                                horizontalArrangement = Arrangement.SpaceBetween,
+                                verticalAlignment = Alignment.CenterVertically,
+                            ) {
+                                MarkerText(
+                                    text = stringResource(R.string.dream_interpretation_label),
+                                    lineColor = electricBlue,
+                                )
+                                NeoBrutalChip(
+                                    text = moodDisplayName(state.mood),
+                                    onClick = {},
+                                )
+                            }
+                            Spacer(modifier = Modifier.height(Dimensions.paddingMedium))
+                            Text(
+                                text = state.interpretation,
+                                style = MaterialTheme.typography.bodyMedium,
+                                color = MaterialTheme.colorScheme.onSurface,
+                            )
+                        }
+                    }
+
+                    Spacer(modifier = Modifier.height(Dimensions.paddingLarge))
+
+                    NeoBrutalButton(
+                        text = stringResource(R.string.dream_new_button),
+                        backgroundColor = MaterialTheme.colorScheme.secondary,
+                        onClick = onNewDream,
+                    )
+                }
+            }
+        }
     }
 }
 
@@ -379,6 +405,14 @@ private fun moodDisplayName(mood: DreamMood): String = when (mood) {
     DreamMood.ROMANTIC -> stringResource(R.string.dream_mood_romantic)
 }
 
+private fun Modifier.ignoreHorizontalParentPadding(horizontal: Dp) = layout { measurable, constraints ->
+    val overriddenWidth = constraints.maxWidth + 2 * horizontal.roundToPx()
+    val placeable = measurable.measure(constraints.copy(maxWidth = overriddenWidth))
+    layout(placeable.width, placeable.height) {
+        placeable.place(-horizontal.roundToPx(), 0)
+    }
+}
+
 // region Previews
 
 @Suppress("MagicNumber")
@@ -456,7 +490,11 @@ private fun InitialStateDarkPreview() {
 private fun InterpretingStateLightPreview() {
     SofaAiTheme(darkTheme = false) {
         Surface {
-            InterpretingState()
+            ResultState(
+                state = null,
+                imageState = DreamImageState.Idle,
+                onNewDream = {},
+            )
         }
     }
 }
@@ -466,7 +504,11 @@ private fun InterpretingStateLightPreview() {
 private fun InterpretingStateDarkPreview() {
     SofaAiTheme(darkTheme = true) {
         Surface {
-            InterpretingState()
+            ResultState(
+                state = null,
+                imageState = DreamImageState.Idle,
+                onNewDream = {},
+            )
         }
     }
 }

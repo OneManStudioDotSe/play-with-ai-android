@@ -32,6 +32,7 @@ import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
+import se.onemanstudio.playaroundwithai.core.ui.theme.Dimensions
 import androidx.compose.ui.platform.LocalView
 import androidx.compose.ui.res.stringResource
 import androidx.core.content.ContextCompat
@@ -51,7 +52,7 @@ import com.google.maps.android.compose.Polyline
 import com.google.maps.android.compose.rememberCameraPositionState
 import com.google.maps.android.compose.rememberUpdatedMarkerState
 import kotlinx.coroutines.launch
-import se.onemanstudio.playaroundwithai.core.ui.sofa.NeoBrutalIconButton
+import se.onemanstudio.playaroundwithai.core.ui.sofa.NeoBrutalIconButtonSmall
 import se.onemanstudio.playaroundwithai.core.ui.sofa.NeoBrutalTopAppBar
 import se.onemanstudio.playaroundwithai.data.explore.domain.model.VehicleType
 import se.onemanstudio.playaroundwithai.feature.explore.ExploreConstants.STOCKHOLM_LAT
@@ -218,7 +219,7 @@ fun ExploreScreen(
             NeoBrutalTopAppBar(
                 title = stringResource(ExploreFeatureR.string.explore_title),
                 actions = {
-                    NeoBrutalIconButton(
+                    NeoBrutalIconButtonSmall(
                         imageVector = Icons.Default.Settings,
                         contentDescription = stringResource(
                             se.onemanstudio.playaroundwithai.core.ui.views.R.string.settings_icon_description

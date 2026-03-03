@@ -92,6 +92,7 @@ import se.onemanstudio.playaroundwithai.core.ui.sofa.NeoBrutalButton
 import se.onemanstudio.playaroundwithai.core.ui.sofa.NeoBrutalCard
 import se.onemanstudio.playaroundwithai.core.ui.sofa.NeoBrutalChip
 import se.onemanstudio.playaroundwithai.core.ui.sofa.NeoBrutalIconButton
+import se.onemanstudio.playaroundwithai.core.ui.sofa.NeoBrutalIconButtonSmall
 import se.onemanstudio.playaroundwithai.core.ui.sofa.NeoBrutalTextField
 import se.onemanstudio.playaroundwithai.core.ui.sofa.NeoBrutalTopAppBar
 import se.onemanstudio.playaroundwithai.core.ui.theme.Dimensions
@@ -170,7 +171,7 @@ fun PlanScreen(
             NeoBrutalTopAppBar(
                 title = stringResource(R.string.plan_title),
                 actions = {
-                    NeoBrutalIconButton(
+                    NeoBrutalIconButtonSmall(
                         imageVector = Icons.Default.Settings,
                         contentDescription = stringResource(
                             se.onemanstudio.playaroundwithai.core.ui.views.R.string.settings_icon_description

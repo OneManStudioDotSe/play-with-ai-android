@@ -13,9 +13,10 @@ object Dimensions {
 
     // Icon Sizes
     val iconSizeSmall = 16.dp
+    val iconSizeMedium = 28.dp
     val iconSizeLarge = 32.dp
     val iconSizeXLarge = 40.dp
-    val minTouchTarget = 48.dp
+    val minTouchTarget = 44.dp
     val iconSizeXXLarge = 52.dp
 
     // Component-specific dimensions

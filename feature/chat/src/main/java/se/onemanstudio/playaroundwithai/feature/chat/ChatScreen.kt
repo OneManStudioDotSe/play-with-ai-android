@@ -67,6 +67,7 @@ import se.onemanstudio.playaroundwithai.data.chat.domain.model.AnalysisType
 import se.onemanstudio.playaroundwithai.data.chat.domain.model.InputMode
 import se.onemanstudio.playaroundwithai.core.ui.sofa.NeoBrutalCard
 import se.onemanstudio.playaroundwithai.core.ui.sofa.NeoBrutalIconButton
+import se.onemanstudio.playaroundwithai.core.ui.sofa.NeoBrutalIconButtonSmall
 import se.onemanstudio.playaroundwithai.core.ui.sofa.NeoBrutalTopAppBar
 import se.onemanstudio.playaroundwithai.core.ui.theme.Dimensions
 import se.onemanstudio.playaroundwithai.core.ui.theme.SofaAiTheme
@@ -217,8 +218,7 @@ fun ChatScreen(
                 title = stringResource(R.string.let_s_talk),
                 actions = {
                     if (isSyncing) {
-                        NeoBrutalIconButton(
-                            modifier = Modifier.padding(horizontal = Dimensions.paddingSmall),
+                        NeoBrutalIconButtonSmall(
                             imageVector = Icons.Default.Sync,
                             contentDescription = stringResource(R.string.label_syncing),
                             backgroundColor = MaterialTheme.colorScheme.secondary,
@@ -226,16 +226,14 @@ fun ChatScreen(
                         )
                     }
 
-                    NeoBrutalIconButton(
-                        modifier = Modifier.padding(horizontal = Dimensions.paddingSmall),
+                    NeoBrutalIconButtonSmall(
                         imageVector = Icons.Default.History,
                         contentDescription = stringResource(R.string.label_prompt_history),
                         backgroundColor = MaterialTheme.colorScheme.tertiary,
                         onClick = { isSheetOpen = true },
                     )
 
-                    NeoBrutalIconButton(
-                        modifier = Modifier.padding(start = Dimensions.paddingSmall),
+                    NeoBrutalIconButtonSmall(
                         imageVector = Icons.Default.Settings,
                         contentDescription = stringResource(
                             se.onemanstudio.playaroundwithai.core.ui.views.R.string.settings_icon_description
@@ -315,14 +313,16 @@ private fun ContentState(
     val scrollState = rememberScrollState()
 
     Box(modifier = Modifier.padding(Dimensions.paddingLarge)) {
-        Box(
+        Column(
             modifier = Modifier
-                .padding(top = Dimensions.paddingExtraLarge)
+                .padding(top = Dimensions.paddingLarge)
                 .fillMaxSize()
-                .verticalScroll(scrollState)
+                .verticalScroll(scrollState),
+            verticalArrangement = Arrangement.Top
         ) {
+            Spacer(Modifier.height(Dimensions.paddingExtraLarge))
+
             TypewriterText(
-                modifier = Modifier.align(Alignment.TopStart),
                 text = state.outputText,
                 scrollState = scrollState
             )

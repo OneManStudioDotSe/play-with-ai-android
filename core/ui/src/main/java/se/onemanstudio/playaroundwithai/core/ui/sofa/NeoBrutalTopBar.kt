@@ -58,10 +58,10 @@ private fun NeoBrutalTopAppBarLightPreview() {
             NeoBrutalTopAppBar(
                 title = "Some title",
                 actions = {
-                    NeoBrutalIconButton(
+                    NeoBrutalIconButtonSmall(
                         onClick = {},
                         imageVector = Icons.Default.History,
-                        contentDescription = "History"
+                        contentDescription = "History",
                     )
                 }
             )
@@ -77,10 +77,16 @@ private fun NeoBrutalTopAppBarDarkPreview() {
             NeoBrutalTopAppBar(
                 title = "Some title",
                 actions = {
-                    NeoBrutalIconButton(
+                    NeoBrutalIconButtonSmall(
                         onClick = {},
                         imageVector = Icons.Default.History,
-                        contentDescription = "History"
+                        contentDescription = "History",
+                    )
+
+                    NeoBrutalIconButtonSmall(
+                        onClick = {},
+                        imageVector = Icons.Default.History,
+                        contentDescription = "History",
                     )
                 }
             )
