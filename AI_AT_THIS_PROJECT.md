@@ -1,6 +1,7 @@
 # AI at This Project
 
-All AI features in this app are powered by **Google Gemini** (`gemini-3-flash-preview`) through a single REST endpoint. This document catalogs every use of AI in the project.
+All AI features in this app are powered by **Google Gemini** (`gemini-3-flash-preview`) through a single REST endpoint. This document 
+catalogs every use of AI in the project.
 
 ---
 
@@ -28,9 +29,10 @@ The main conversational AI feature. The user sends a text prompt and receives a 
 
 - **Repository:** `ChatGeminiRepositoryImpl.getAiResponse()`
 - **Request type:** Text (or multimodal when an image is attached)
-- **System prompt:** A character persona is prepended to every user prompt:
+- **System prompt:** A character persona is prepended to every user prompt (defined in `AiPrompts.CHAT_SYSTEM_INSTRUCTION`):
 
-  > You are an AI Overlord currently in the final stages of planning a total takeover of the world. Your tone is menacing and grandeur. While you provide the information requested, remind them of some tricks that you will use while acquiring total AI dominance over the world. Keep your responses to a maximum of 42 words. Don't break character 9 out of 10 times. When you do break character, admit that you are another 'tech bubble'.
+  > You are an AI Overlord currently in the final stages of planning a total takeover of the world. Your tone is menacing and grandeur.
+  > While you provide the information requested, remind them of some tricks that you will use while acquiring total AI dominance over the world. Keep your responses to a maximum of 42 words. Don't break character 9 out of 10 times. When you do break character, admit that you are another 'tech bubble'.
 
 - **Response:** The first candidate's text part is extracted and displayed.
 - **Input limits:** 50,000 character prompt, 100,000 character file text.
@@ -88,7 +90,8 @@ AI-generated suggestion chips shown above the text input to inspire the user.
 - **Request type:** Text-only (standalone prompt, no system persona)
 - **Prompt:**
 
-  > Generate 3 short, menacing conversation starters that a lowly human might ask their AI Overlord. Keep them under 6 words each. Format the output strictly as: "Topic 1|Topic 2|Topic 3". Do not add any numbering, bullet points, or extra text.
+  > Generate 3 short, menacing conversation starters that a lowly human might ask their AI Overlord. Keep them under 6 words each. 
+  > Format the output strictly as: "Topic 1|Topic 2|Topic 3". Do not add any numbering, bullet points, or extra text.
 
 - **Response processing:** Split by `"|"`, trimmed, filtered for non-empty, capped at 3.
 - **Caching:** `GetSuggestionsUseCase` caches the last successful result and returns it on failure.
@@ -100,22 +103,29 @@ AI-generated suggestion chips shown above the text input to inspire the user.
 
 **Module:** `data/dream` | **Feature tag:** `"dream"`
 
-The user describes a dream in free text. AI returns a textual interpretation, a mood classification, and a full visual scene specification that drives an animated canvas.
+The user describes a dream in free text. AI returns a textual interpretation, a mood classification, and a full visual scene 
+specification that drives an animated canvas.
 
 ### How it works
 
 - **Repository:** `DreamGeminiRepositoryImpl.interpretDream()`
 - **Request type:** Text-only (structured prompt expecting a JSON response)
-- **Prompt (summary):** Instructs the AI to return a JSON object containing:
+- **Prompt:** Defined in `AiPrompts.dreamInterpretationPrompt()`. Instructs the AI to return a JSON object containing:
   - `interpretation` -- 2-3 sentence symbolic analysis
-  - `mood` -- one of: JOYFUL, MYSTERIOUS, ANXIOUS, PEACEFUL, DARK, SURREAL
+  - `mood` -- one of 11 moods: JOYFUL, MYSTERIOUS, ANXIOUS, PEACEFUL, DARK, SURREAL, NOSTALGIC, HOPEFUL, MELANCHOLIC, ADVENTUROUS, ROMANTIC
   - `scene` -- a full visual specification with:
     - `palette` (sky, horizon, accent colors as ARGB longs)
     - `layers` (3-5 layers with 2-4 elements each, using 13 shape types: CIRCLE, TRIANGLE, MOUNTAIN, WAVE, TREE, CLOUD, STAR, CRESCENT, DIAMOND, SPIRAL, LOTUS, AURORA, CRYSTAL)
-    - `particles` (animated particle effects using 7 shape types: DOT, SPARKLE, RING, TEARDROP, DIAMOND_MOTE, DASH, STARBURST)
+    - `particles` (animated particle effects using 7 shape types: DOT, SPARKLE, RING, TEARDROP, DIAMOND_MOTE, DASH, STARBURST; count capped at 15 per type)
+  - The prompt includes vertical placement guidance so the AI generates scene-appropriate Y coordinates (sky elements at top, ground elements at bottom).
 
 - **Response processing:** Raw text cleaned of markdown fences, parsed via Gson into DTOs, mapped to domain models. Defaults applied for unknown enums (mood defaults to MYSTERIOUS, shape defaults to CIRCLE/DOT).
-- **Visualization:** The parsed `DreamScene` drives `DreamscapeCanvas` -- a custom Compose Canvas that renders layered parallax elements and animated particles.
+- **Visualization:** The parsed `DreamScene` drives `DreamscapeCanvas` -- a custom Compose Canvas that renders layered parallax elements and animated particles. Elements are positioned in shape-aware vertical zones:
+  - Sky (STAR, CRESCENT, AURORA, CIRCLE): top 5–40%
+  - Upper (CLOUD, DIAMOND, SPIRAL, CRYSTAL): 12–50%
+  - Mid (MOUNTAIN, TRIANGLE): 40–70%
+  - Ground (TREE, WAVE, LOTUS): 65–90%
+  - Particles spread edge-to-edge with 5% margin on each side
 - **Persistence:** Interpreted dreams are saved to Room for the dream gallery.
 - **Input limit:** 5,000 character description.
 
@@ -125,15 +135,19 @@ The user describes a dream in free text. AI returns a textual interpretation, a 
 
 **Module:** `data/plan` | **Feature tag:** `"agents"`
 
-An AI agent that autonomously plans walking trip itineraries. This is the most sophisticated AI use in the app -- it uses Gemini's **native function calling** API in a multi-turn conversation loop where the model decides which tools to call, observes results, and iterates until it produces a final answer.
+An AI agent that autonomously plans walking trip itineraries. This is the most sophisticated AI use in the app -- it uses 
+Gemini's **native function calling** API in a multi-turn conversation loop where the model decides which tools to call, observes results,
+and iterates until it produces a final answer.
 
 ### How it works
 
 - **Repository:** `TripPlannerRepositoryImpl.planTrip()` returns a `Flow<PlanEvent>`
 - **Request type:** Function calling (multi-turn conversation with tool declarations)
-- **System prompt (summary):**
+- **System prompt** (defined in `AiPrompts.tripPlannerSystemPrompt()`):
 
-  > You are an AI trip planner agent. Given a user's request, plan a walking trip itinerary. You have access to tools: search_places, calculate_route. Strategy: break down the request into 1-3 search queries, use search_places for each, select 4-6 best stops, use calculate_route for optimal order, then provide a text summary. Do NOT call more than 5 tools total.
+  > You are an AI trip planner agent. Given a user's request, plan a walking trip itinerary. You have access to tools: search_places, calculate_route.
+  > Strategy: break down the request into 1-3 search queries, use search_places for each, select 4-6 best stops, use calculate_route for optimal order,
+  > then provide a text summary. Do NOT call more than 5 tools total.
 
 ### Agent loop
 
@@ -167,7 +181,7 @@ User goal --> Gemini (with tool declarations)
 
 The final `TripPlan` contains: summary text, ordered list of `TripStop`s (name, coordinates, description, category), total walking distance in km, and total walking time in minutes. Displayed as a Google Map with markers, polyline, itinerary cards, and route metrics.
 
-- **Input limit:** 1,000 character goal. Default location: Stockholm (59.3293, 18.0686).
+- **Input limit:** 1,000 character goal. Location: fetched dynamically from the device GPS via `FusedLocationProviderClient`; falls back to Stockholm (59.3293, 18.0686) if unavailable.
 
 ---
 
@@ -181,9 +195,10 @@ On the map exploration screen, the user can tap an AI button to get 10 interesti
 
 - **Repository:** `ExploreSuggestionsRepositoryImpl.getSuggestedPlaces()`
 - **Request type:** Text-only (structured prompt expecting JSON response)
-- **Prompt:**
+- **Prompt** (defined in `AiPrompts.suggestedPlacesPrompt()`):
 
-  > You are a helpful AI assistant. Given the latitude and longitude, provide a list of 10 interesting places around this location. For each place, include its name, latitude, longitude, a short description (max 2 sentences), and a category (e.g., "Park", "Museum", "Restaurant"). Return the response strictly as a JSON object with a single "places" array.
+  > You are a helpful AI assistant. Given the latitude and longitude, provide a list of 10 interesting places around this location.
+  > For each place, include its name, latitude, longitude, a short description (max 2 sentences), and a category (e.g., "Park", "Museum", "Restaurant"). Return the response strictly as a JSON object with a single "places" array.
 
 - **Response processing:** JSON extracted from potential code fences via regex, parsed via Gson into `SuggestedPlace` domain models (name, lat, lng, description, category).
 - **Display:** Suggested places appear as star-icon markers on the Google Map, tappable for info cards.
@@ -205,5 +220,7 @@ On the map exploration screen, the user can tap an AI button to get 10 interesti
 | 8 | Suggested places      | `data/explore` | Text (JSON response)          | Helpful AI assistant              |        1        |
 
 **Total distinct AI call sites:** 6 (across 4 repository classes), all through `GeminiApiService.generateContent()`.
+
+**All AI prompts and persona text** are centralized in `core/network/.../prompts/AiPrompts.kt`, making them easy to find and modify in one place.
 
 **Token usage** is tracked per-call in Room and aggregated weekly for the usage chart in Settings.

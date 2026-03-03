@@ -26,10 +26,10 @@ There is no way to turn this off.
 
 ### 3. AI Persona Selector
 
-The chat uses a hardcoded "AI Overlord" persona with a 42-word max response length. Offer preset personas (e.g., concise 
+The chat uses a hardcoded "AI Overlord" persona with a 42-word max response length. Offer preset personas (e.g., concise
 assistant, creative storyteller, technical expert) or a free-text system instruction field.
 
-- **Code:** `data/chat/src/main/java/.../repository/ChatGeminiRepositoryImpl.kt` — `SYSTEM_INSTRUCTION` constant and `"maximum of 42 words"` embedded in the prompt
+- **Code:** `core/network/src/main/java/.../prompts/AiPrompts.kt` — `CHAT_SYSTEM_INSTRUCTION` constant (all prompts are now centralized here)
 
 ### 4. Walking Speed
 
@@ -64,7 +64,7 @@ The agentic trip planner loop hard-stops at 10 iterations and the system prompt 
 pick a budget (quick 5 / standard 10 / thorough 15) to trade speed for depth.
 
 - **Code:** `data/plan/src/main/java/.../repository/TripPlannerRepositoryImpl.kt` — `MAX_ITERATIONS = 10`, `DEFAULT_COUNT = 5`
-- **Code:** Same file, `buildSystemPrompt()` — `"Do NOT call more than 5 tools total"`
+- **Code:** `core/network/src/main/java/.../prompts/AiPrompts.kt` — `tripPlannerSystemPrompt()` contains `"Do NOT call more than 5 tools total"`
 
 ### 8. Image Quality / Compression
 
@@ -78,7 +78,7 @@ would let users balance upload size vs. detail.
 The map feature asks Gemini for exactly 10 suggested places. A slider (5–20) would let users control how many AI suggestions
 appear.
 
-- **Code:** `data/explore/src/main/java/.../repository/ExploreSuggestionsRepositoryImpl.kt` — `SUGGESTED_PLACES_COUNT = 10`
+- **Code:** `core/network/src/main/java/.../prompts/AiPrompts.kt` — `SUGGESTED_PLACES_COUNT = 10` (inside `AiPrompts` object)
 
 ### 10. Max Route Points
 
@@ -98,19 +98,19 @@ API calls time out after 30 seconds. A slider (15–120 s) would help users on s
 
 ### 12. Default Map Location
 
-The map always centers on Stockholm (59.3293, 18.0686) — hardcoded in three independent places. Add a "home location" 
-setting or auto-detect from last-known GPS.
+Both Explore and Plan screens now fetch the user's real GPS location via `FusedLocationProviderClient` and fall back to
+Stockholm (59.3293, 18.0686) if unavailable. A "home location" setting could let users override the fallback.
 
-- **Code:** `data/explore/src/main/java/.../util/ExploreDataGenerator.kt` — `CENTER_LAT / CENTER_LNG`
-- **Code:** `feature/explore/src/main/java/.../ExploreConstants.kt` — `STOCKHOLM_LAT / STOCKHOLM_LNG`
-- **Code:** `feature/plan/src/main/java/.../PlanViewModel.kt` — duplicated `STOCKHOLM_LAT / STOCKHOLM_LNG`
+- **Code:** `feature/explore/src/main/java/.../ExploreConstants.kt` — `STOCKHOLM_LAT / STOCKHOLM_LNG` (fallback)
+- **Code:** `feature/plan/src/main/java/.../PlanScreen.kt` — `DEFAULT_LAT / DEFAULT_LNG` (fallback)
+- ~~**Code:** `feature/plan/src/main/java/.../PlanViewModel.kt` — duplicated `STOCKHOLM_LAT / STOCKHOLM_LNG`~~ (removed — now passed from PlanScreen)
 
 ### 13. Trip Length Preset
 
-The agent system prompt targets "4–6 stops for a half-day trip." Offer presets (quick 2–3 stops / standard 4–6 / extended 
+The agent system prompt targets "4–6 stops for a half-day trip." Offer presets (quick 2–3 stops / standard 4–6 / extended
 7–10) so the user can control itinerary size.
 
-- **Code:** `data/plan/src/main/java/.../repository/TripPlannerRepositoryImpl.kt` — `buildSystemPrompt()` contains `"Keep the itinerary to 4-6 stops for a half-day trip."`
+- **Code:** `core/network/src/main/java/.../prompts/AiPrompts.kt` — `tripPlannerSystemPrompt()` contains `"Keep the itinerary to 4-6 stops for a half-day trip."`
 
 ### 14. Token Usage Tracking Toggle
 
@@ -131,7 +131,7 @@ for the map tiles specifically.
 
 ## Bonus: Bug to Fix
 
-**Hardcoded app version** — `SettingsBottomSheetContainer.kt` passes `appVersion = "1.0"` as a string literal instead of 
-reading from `BuildConfig.VERSION_NAME`.
+~~**Hardcoded app version** — `SettingsBottomSheetContainer.kt` passes `appVersion = "1.0"` as a string literal instead of
+reading from `BuildConfig.VERSION_NAME`.~~ **FIXED** — Now reads `BuildConfig.VERSION_NAME` dynamically.
 
-- **Code:** `app/src/main/java/.../settings/SettingsBottomSheetContainer.kt` — line ~39
+- **Code:** `app/src/main/java/.../settings/SettingsBottomSheetContainer.kt`

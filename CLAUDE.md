@@ -30,7 +30,7 @@
 
 ```
 :app                    → Application entry point, navigation, main activity
-:core:network           → OkHttp, Retrofit, Gson, GeminiApiService, DTOs (incl. function calling), interceptor
+:core:network           → OkHttp, Retrofit, Gson, GeminiApiService, DTOs (incl. function calling), interceptor, AiPrompts
 :core:auth              → Firebase Auth, AuthRepository (interface+impl), auth use cases, AuthSession
 :core:config            → ApiKeyAvailability, ConfigurationModule, qualifier annotations, BuildConfig
 :core:theme             → Design system: colors, typography ("SoFa" design language)
@@ -217,7 +217,8 @@ service cloud.firestore {
 │  │  GeminiApiService │  │  AuthRepository  │  │  ApiKeyAvailability           │  │
 │  │  DTOs (text +     │  │  AuthSession     │  │  @GeminiApiKey, @BaseUrl      │  │
 │  │  function calling)│  │  Firebase Auth   │  │  ConfigurationModule          │  │
-│  │  Interceptor      │  │  Auth Use Cases  │  │  BuildConfig fields           │  │
+│  │  AiPrompts        │  │  Auth Use Cases  │  │  BuildConfig fields           │  │
+│  │  Interceptor      │  │                  │  │                               │  │
 │  └──────────────────┘  └──────────────────┘  └───────────────────────────────┘  │
 │                                                                                  │
 │  ┌──────────────────┐  ┌──────────────────┐                                     │
@@ -284,7 +285,7 @@ AskAiUseCase.invoke(prompt, imageBytes?, fileText?, analysisType?)
   ▼
 ChatGeminiRepositoryImpl.getAiResponse()
   │
-  ├─ Prepend system instruction ("AI Overlord" persona, max 42 words)
+  ├─ Prepend system instruction from AiPrompts ("AI Overlord" persona, max 42 words)
   ├─ Append file content if present
   ├─ Build GeminiRequest { contents: [{ parts: [{ text }, { inlineData? }] }] }
   │
@@ -408,7 +409,9 @@ The Trip Planner is an AI agent PoC. Unlike Chat/Dream (single-shot: one request
 User enters goal (e.g., "Coffee tour in Stockholm")
   │
   ▼
-PlanViewModel.planTrip(goal)
+PlanViewModel.planTrip(goal, lat, lng)
+  │  (lat/lng passed from PlanScreen via FusedLocationProviderClient;
+  │   falls back to Stockholm 59.3293, 18.0686 if unavailable)
   │
   ▼
 PlanTripUseCase.invoke(goal, lat, lng)
@@ -417,7 +420,7 @@ PlanTripUseCase.invoke(goal, lat, lng)
   ▼
 TripPlannerRepositoryImpl.planTrip() → Flow<PlanEvent>
   │
-  ├─ Build system prompt (agent persona + tool strategy instructions)
+  ├─ Build system prompt from AiPrompts (agent persona + tool strategy instructions)
   ├─ Initialize conversation history: [user message with system prompt + goal]
   ├─ Attach tool declarations: search_places, calculate_route
   │
