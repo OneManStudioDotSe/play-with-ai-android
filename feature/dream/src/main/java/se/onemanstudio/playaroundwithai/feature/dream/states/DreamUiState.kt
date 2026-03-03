@@ -26,7 +26,22 @@ sealed interface DreamError {
 }
 
 @Immutable
+sealed interface DreamImageState {
+    data object Idle : DreamImageState
+    data object Generating : DreamImageState
+    data class Generated(
+        val imagePath: String? = null,
+        val imageBase64: String? = null,
+        val mimeType: String,
+        val artistName: String,
+    ) : DreamImageState
+    data class Error(val message: String) : DreamImageState
+}
+
+@Immutable
 data class DreamScreenState(
     val dreamState: DreamUiState = DreamUiState.Initial,
     val dreamHistory: List<Dream> = emptyList(),
+    val imageState: DreamImageState = DreamImageState.Idle,
+    val currentDescription: String = "",
 )

@@ -8,4 +8,5 @@ interface DreamRepository {
     fun getDreamHistory(): Flow<List<Dream>>
     suspend fun getDreamById(id: Long): Dream?
     suspend fun deleteDream(id: Long)
+    suspend fun saveDreamImage(dreamId: Long, imageBytes: ByteArray, mimeType: String, artistName: String): String
 }

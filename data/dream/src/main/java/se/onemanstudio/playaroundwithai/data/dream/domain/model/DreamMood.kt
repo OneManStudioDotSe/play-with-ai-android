@@ -7,4 +7,9 @@ enum class DreamMood {
     PEACEFUL,
     DARK,
     SURREAL,
+    NOSTALGIC,
+    HOPEFUL,
+    MELANCHOLIC,
+    ADVENTUROUS,
+    ROMANTIC,
 }

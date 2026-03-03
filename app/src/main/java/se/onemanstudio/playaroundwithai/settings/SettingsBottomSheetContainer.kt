@@ -31,7 +31,7 @@ fun SettingsBottomSheetContainer(
         ChartBarData(
             label = day.dayLabel,
             value = day.totalTokens.toFloat(),
-            detailText = "${day.dayLabel}: ${numberFormat.format(day.totalTokens)} tokens (${day.callCount} calls)",
+            detailText = "${day.dayLabel}: ${numberFormat.format(day.totalTokens)}/${day.callCount}",
         )
     }
 

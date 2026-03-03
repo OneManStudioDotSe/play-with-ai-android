@@ -34,7 +34,7 @@ import java.time.format.DateTimeFormatter
 private val dateFormatter = DateTimeFormatter.ofPattern("MMM dd")
 private const val CARD_WIDTH = 180
 private const val DESCRIPTION_MAX_LINES = 4
-private const val EMOJI_BACKGROUND_ALPHA = 0.5f
+private const val EMOJI_BACKGROUND_ALPHA = 0.2f
 
 @Composable
 fun DreamGalleryRow(
@@ -73,7 +73,8 @@ private fun DreamGalleryCard(
                 style = MaterialTheme.typography.displayLarge,
                 modifier = Modifier
                     .align(Alignment.Center)
-                    .alpha(EMOJI_BACKGROUND_ALPHA),
+                    .alpha(EMOJI_BACKGROUND_ALPHA)
+                    .padding(all = Dimensions.paddingSmall),
             )
 
             Column(modifier = Modifier.padding(Dimensions.paddingMedium)) {
@@ -102,6 +103,11 @@ private fun moodToEmoji(mood: DreamMood): String = when (mood) {
     DreamMood.PEACEFUL -> "\uD83C\uDF3F"
     DreamMood.DARK -> "\uD83C\uDF11"
     DreamMood.SURREAL -> "\uD83C\uDF00"
+    DreamMood.NOSTALGIC -> "\uD83D\uDCF7"
+    DreamMood.HOPEFUL -> "\uD83C\uDF05"
+    DreamMood.MELANCHOLIC -> "\uD83C\uDF27\uFE0F"
+    DreamMood.ADVENTUROUS -> "\uD83E\uDDED"
+    DreamMood.ROMANTIC -> "\uD83C\uDF39"
 }
 
 @Suppress("MagicNumber")

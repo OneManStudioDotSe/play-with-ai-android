@@ -9,4 +9,6 @@ data class Dream(
     val scene: DreamScene? = null,
     val mood: DreamMood = DreamMood.MYSTERIOUS,
     val timestamp: Instant = Instant.now(),
+    val imagePath: String? = null,
+    val artistName: String? = null,
 )

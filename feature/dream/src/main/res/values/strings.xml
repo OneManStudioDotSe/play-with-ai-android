@@ -20,10 +20,22 @@
     <string name="dream_error_input_too_long">Your dream description is too long. Please keep it under 5,000 characters.</string>
     <string name="dream_error_unknown">An unknown error occurred.</string>
 
+    <string name="dream_paint_button">Paint my dream</string>
+    <string name="dream_painting">Painting your dream\u2026</string>
+    <string name="dream_artist_hint">Show artist</string>
+    <string name="dream_image_description">AI-generated painting of your dream</string>
+    <string name="dream_error_image_generation">Could not generate the image. Please try again.</string>
+    <string name="dream_flip_hint">Tap to see AI painting</string>
+
     <string name="dream_mood_joyful">Joyful</string>
     <string name="dream_mood_mysterious">Mysterious</string>
     <string name="dream_mood_anxious">Anxious</string>
     <string name="dream_mood_peaceful">Peaceful</string>
     <string name="dream_mood_dark">Dark</string>
     <string name="dream_mood_surreal">Surreal</string>
+    <string name="dream_mood_nostalgic">Nostalgic</string>
+    <string name="dream_mood_hopeful">Hopeful</string>
+    <string name="dream_mood_melancholic">Melancholic</string>
+    <string name="dream_mood_adventurous">Adventurous</string>
+    <string name="dream_mood_romantic">Romantic</string>
 </resources>

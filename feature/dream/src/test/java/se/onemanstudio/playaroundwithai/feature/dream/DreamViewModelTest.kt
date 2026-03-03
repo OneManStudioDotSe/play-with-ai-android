@@ -30,6 +30,7 @@ import se.onemanstudio.playaroundwithai.data.dream.domain.usecase.GetDreamHistor
 import se.onemanstudio.playaroundwithai.data.dream.domain.usecase.InterpretDreamUseCase
 import se.onemanstudio.playaroundwithai.data.dream.domain.usecase.SaveDreamUseCase
 import se.onemanstudio.playaroundwithai.feature.dream.states.DreamError
+import se.onemanstudio.playaroundwithai.feature.dream.states.DreamImageState
 import se.onemanstudio.playaroundwithai.feature.dream.states.DreamUiState
 import se.onemanstudio.playaroundwithai.feature.dream.util.MainCoroutineRule
 import java.io.IOException
@@ -72,6 +73,19 @@ class DreamViewModelTest {
         assertEquals(DreamUiState.Interpreting, states[1])
         assert(states[2] is DreamUiState.Result)
         assertEquals(interpretation.textAnalysis, (states[2] as DreamUiState.Result).interpretation)
+    }
+
+    @Test
+    fun `interpretDream success sets image state to Generated`() = runTest {
+        val interpretation = createTestInterpretation()
+        val viewModel = createViewModel(interpretResult = Result.success(interpretation))
+
+        viewModel.interpretDream("I was flying")
+        advanceUntilIdle()
+
+        val imageState = viewModel.screenState.value.imageState
+        assert(imageState is DreamImageState.Generated)
+        assertEquals("Lorem ipsum", (imageState as DreamImageState.Generated).artistName)
     }
 
     @Test
@@ -137,6 +151,7 @@ class DreamViewModelTest {
         advanceUntilIdle()
 
         assertEquals(DreamUiState.Initial, viewModel.screenState.value.dreamState)
+        assertEquals(DreamImageState.Idle, viewModel.screenState.value.imageState)
     }
 
     @Test
@@ -155,6 +170,51 @@ class DreamViewModelTest {
         advanceUntilIdle()
 
         coVerify { dreamRepository.saveDream(match { it.description == "Dream text" }) }
+    }
+
+    @Test
+    fun `restoreDream with imagePath sets Generated state with path`() = runTest {
+        val viewModel = createViewModel()
+        val scene = createTestInterpretation().scene
+
+        viewModel.restoreDream(
+            Dream(
+                id = 42,
+                description = "A dream",
+                interpretation = "Meaning",
+                scene = scene,
+                mood = DreamMood.MYSTERIOUS,
+                imagePath = "/some/path.png",
+                artistName = "Van Gogh",
+            )
+        )
+        advanceUntilIdle()
+
+        val imageState = viewModel.screenState.value.imageState
+        assert(imageState is DreamImageState.Generated)
+        assertEquals("/some/path.png", (imageState as DreamImageState.Generated).imagePath)
+        assertEquals("Van Gogh", imageState.artistName)
+    }
+
+    @Test
+    fun `restoreDream without imagePath sets Generated state with placeholder artist`() = runTest {
+        val viewModel = createViewModel()
+        val scene = createTestInterpretation().scene
+
+        viewModel.restoreDream(
+            Dream(
+                id = 42,
+                description = "A dream",
+                interpretation = "Meaning",
+                scene = scene,
+                mood = DreamMood.MYSTERIOUS,
+            )
+        )
+        advanceUntilIdle()
+
+        val imageState = viewModel.screenState.value.imageState
+        assert(imageState is DreamImageState.Generated)
+        assertEquals("Lorem ipsum", (imageState as DreamImageState.Generated).artistName)
     }
 
     private fun createViewModel(

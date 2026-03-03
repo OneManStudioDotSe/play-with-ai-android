@@ -12,4 +12,6 @@ data class DreamEntity(
     val sceneJson: String?,
     val mood: String,
     val timestamp: Long,
+    val imagePath: String? = null,
+    val artistName: String? = null,
 )

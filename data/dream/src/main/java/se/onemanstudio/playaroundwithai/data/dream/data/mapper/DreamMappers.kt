@@ -22,6 +22,8 @@ fun DreamEntity.toDomain(): Dream {
         },
         mood = runCatching { DreamMood.valueOf(this.mood) }.getOrDefault(DreamMood.MYSTERIOUS),
         timestamp = Instant.ofEpochMilli(this.timestamp),
+        imagePath = this.imagePath,
+        artistName = this.artistName,
     )
 }
 
@@ -33,5 +35,7 @@ fun Dream.toEntity(): DreamEntity {
         sceneJson = this.scene?.let { gson.toJson(it) },
         mood = this.mood.name,
         timestamp = this.timestamp.toEpochMilli(),
+        imagePath = this.imagePath,
+        artistName = this.artistName,
     )
 }

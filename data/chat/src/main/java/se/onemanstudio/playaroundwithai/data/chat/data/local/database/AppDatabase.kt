@@ -13,7 +13,7 @@ import se.onemanstudio.playaroundwithai.data.chat.data.local.entity.TokenUsageEn
 import se.onemanstudio.playaroundwithai.data.dream.data.local.dao.DreamsDao
 import se.onemanstudio.playaroundwithai.data.dream.data.local.entity.DreamEntity
 
-@Database(entities = [PromptEntity::class, TokenUsageEntity::class, DreamEntity::class], version = 5, exportSchema = false)
+@Database(entities = [PromptEntity::class, TokenUsageEntity::class, DreamEntity::class], version = 6, exportSchema = false)
 @TypeConverters(SyncStatusConverter::class)
 abstract class AppDatabase : RoomDatabase() {
     abstract fun historyDao(): PromptsHistoryDao
@@ -68,6 +68,13 @@ abstract class AppDatabase : RoomDatabase() {
                     )
                     """.trimIndent()
                 )
+            }
+        }
+
+        val MIGRATION_5_6 = object : Migration(5, 6) {
+            override fun migrate(db: SupportSQLiteDatabase) {
+                db.execSQL("ALTER TABLE dreams ADD COLUMN imagePath TEXT DEFAULT NULL")
+                db.execSQL("ALTER TABLE dreams ADD COLUMN artistName TEXT DEFAULT NULL")
             }
         }
     }

@@ -8,9 +8,11 @@ import retrofit2.HttpException
 import se.onemanstudio.playaroundwithai.core.network.api.GeminiApiService
 import se.onemanstudio.playaroundwithai.core.network.dto.Content
 import se.onemanstudio.playaroundwithai.core.network.dto.GeminiRequest
+import se.onemanstudio.playaroundwithai.core.network.dto.GenerationConfig
 import se.onemanstudio.playaroundwithai.core.network.dto.Part
 import se.onemanstudio.playaroundwithai.core.network.prompts.AiPrompts
 import se.onemanstudio.playaroundwithai.core.network.tracking.TokenUsageTracker
+import se.onemanstudio.playaroundwithai.data.dream.domain.model.DreamImage
 import se.onemanstudio.playaroundwithai.data.dream.domain.model.DreamInterpretation
 import se.onemanstudio.playaroundwithai.data.dream.domain.model.DreamMood
 import se.onemanstudio.playaroundwithai.data.dream.domain.model.DreamScene
@@ -60,6 +62,42 @@ class DreamGeminiRepositoryImpl @Inject constructor(
         }
     }
 
+    @Suppress("TooGenericExceptionCaught")
+    override suspend fun generateDreamImage(description: String): Result<DreamImage> = withContext(Dispatchers.IO) {
+        try {
+            Timber.d("DreamGemini - Generating dream image...")
+
+            val prompt = AiPrompts.dreamImagePrompt(description)
+            val parts = listOf(Part(text = prompt))
+            val request = GeminiRequest(
+                contents = listOf(Content(parts = parts)),
+                generationConfig = GenerationConfig(responseModalities = listOf("TEXT", "IMAGE")),
+            )
+
+            Timber.d("DreamGemini - Sending image generation request to Gemini API...")
+            val response = apiService.generateImageContent(request)
+            tokenUsageTracker.record("dream_image", response.usageMetadata)
+
+            val imageData = response.extractImageData()
+                ?: return@withContext Result.failure(Exception("No image data in Gemini response"))
+
+            val text = response.extractText().orEmpty()
+            val artistName = ARTIST_REGEX.find(text)?.groupValues?.get(1)?.trim() ?: "Unknown Artist"
+            Timber.d("DreamGemini - Image generated, artist: $artistName")
+
+            Result.success(DreamImage(imageBase64 = imageData.data, mimeType = imageData.mimeType, artistName = artistName))
+        } catch (e: IOException) {
+            Timber.e(e, "DreamGemini - Network error during image generation")
+            Result.failure(e)
+        } catch (e: HttpException) {
+            Timber.e(e, "DreamGemini - HTTP error during image generation (code=${e.code()})")
+            Result.failure(e)
+        } catch (e: Exception) {
+            Timber.e(e, "DreamGemini - Unexpected error during image generation")
+            Result.failure(e)
+        }
+    }
+
     private fun parseInterpretation(json: String): DreamInterpretation {
         val parsed = gson.fromJson(json, GeminiDreamResponse::class.java)
 
@@ -84,6 +122,9 @@ class DreamGeminiRepositoryImpl @Inject constructor(
             .removeSurrounding("```")
             .trim()
 
+    companion object {
+        private val ARTIST_REGEX = Regex("""Artist:\s*(.+)""", RegexOption.IGNORE_CASE)
+    }
 }
 
 // Internal DTOs for Gson parsing of the Gemini JSON response

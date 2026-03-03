@@ -6,11 +6,11 @@ import android.view.HapticFeedbackConstants
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
-import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.imePadding
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
@@ -58,6 +58,7 @@ import se.onemanstudio.playaroundwithai.core.ui.sofa.NeoBrutalTextField
 import se.onemanstudio.playaroundwithai.core.ui.sofa.NeoBrutalTopAppBar
 import se.onemanstudio.playaroundwithai.core.ui.theme.Dimensions
 import se.onemanstudio.playaroundwithai.core.ui.theme.SofaAiTheme
+import se.onemanstudio.playaroundwithai.core.ui.theme.electricBlue
 import se.onemanstudio.playaroundwithai.core.ui.theme.vividPink
 import se.onemanstudio.playaroundwithai.data.dream.domain.model.Dream
 import se.onemanstudio.playaroundwithai.data.dream.domain.model.DreamElement
@@ -69,14 +70,11 @@ import se.onemanstudio.playaroundwithai.data.dream.domain.model.DreamScene
 import se.onemanstudio.playaroundwithai.data.dream.domain.model.ElementShape
 import se.onemanstudio.playaroundwithai.data.dream.domain.model.ParticleShape
 import se.onemanstudio.playaroundwithai.feature.dream.states.DreamError
+import se.onemanstudio.playaroundwithai.feature.dream.states.DreamImageState
 import se.onemanstudio.playaroundwithai.feature.dream.states.DreamUiState
 import se.onemanstudio.playaroundwithai.feature.dream.views.DreamGalleryRow
-import se.onemanstudio.playaroundwithai.feature.dream.views.DreamscapeCanvas
-import se.onemanstudio.playaroundwithai.feature.dream.R
+import se.onemanstudio.playaroundwithai.feature.dream.views.FlippableDreamCard
 import java.time.Instant
-
-private const val CANVAS_HEIGHT_MIN = 180
-private const val CANVAS_HEIGHT_MAX = 280
 
 @Composable
 fun DreamScreen(
@@ -86,6 +84,7 @@ fun DreamScreen(
     val screenState by viewModel.screenState.collectAsStateWithLifecycle()
     val uiState = screenState.dreamState
     val history = screenState.dreamHistory
+    val imageState = screenState.imageState
 
     var textState by remember { mutableStateOf(TextFieldValue("")) }
     var showSettings by remember { mutableStateOf(false) }
@@ -144,6 +143,7 @@ fun DreamScreen(
                 is DreamUiState.Interpreting -> InterpretingState()
                 is DreamUiState.Result -> ResultState(
                     state = uiState,
+                    imageState = imageState,
                     onNewDream = {
                         textState = TextFieldValue("")
                         viewModel.clearResult()
@@ -184,7 +184,7 @@ private fun InitialState(
         Spacer(modifier = Modifier.height(Dimensions.paddingLarge))
 
         NeoBrutalButton(
-            modifier = Modifier.align(Alignment.End),
+            modifier = Modifier.align(Alignment.CenterHorizontally),
             text = stringResource(R.string.dream_interpret_button),
             enabled = textState.text.isNotBlank(),
             backgroundColor = MaterialTheme.colorScheme.primary,
@@ -242,6 +242,7 @@ private fun InterpretingState() {
 @Composable
 private fun ResultState(
     state: DreamUiState.Result,
+    imageState: DreamImageState,
     onNewDream: () -> Unit,
 ) {
     val scrollState = rememberScrollState()
@@ -249,62 +250,49 @@ private fun ResultState(
     Column(
         modifier = Modifier
             .fillMaxSize()
-            .verticalScroll(scrollState),
+            .verticalScroll(scrollState)
+            .padding(Dimensions.paddingLarge),
+        horizontalAlignment = Alignment.CenterHorizontally,
     ) {
+        FlippableDreamCard(
+            scene = state.scene,
+            imageState = imageState,
+        )
+
+        Spacer(modifier = Modifier.height(Dimensions.paddingLarge))
+
         NeoBrutalCard(modifier = Modifier.fillMaxWidth()) {
-            DreamscapeCanvas(
-                scene = state.scene,
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .heightIn(min = CANVAS_HEIGHT_MIN.dp, max = CANVAS_HEIGHT_MAX.dp),
-            )
-        }
-
-        Column(
-            modifier = Modifier.padding(Dimensions.paddingLarge),
-            horizontalAlignment = Alignment.CenterHorizontally,
-        ) {
-            NeoBrutalCard(modifier = Modifier.fillMaxWidth()) {
-                Box {
-                    Column(
-                        modifier = Modifier
-                            .padding(Dimensions.paddingLarge)
-                            .padding(top = Dimensions.paddingExtraLarge),
-                    ) {
-                        Text(
-                            text = stringResource(R.string.dream_interpretation_label),
-                            style = MaterialTheme.typography.titleMedium,
-                            color = MaterialTheme.colorScheme.onSurface,
-                        )
-                        Spacer(modifier = Modifier.height(Dimensions.paddingMedium))
-                        Text(
-                            text = state.interpretation,
-                            style = MaterialTheme.typography.bodyLarge,
-                            color = MaterialTheme.colorScheme.onSurface,
-                        )
-                    }
-
-                    Box(
-                        modifier = Modifier
-                            .align(Alignment.TopEnd)
-                            .padding(Dimensions.paddingMedium),
-                    ) {
-                        NeoBrutalChip(
-                            text = moodDisplayName(state.mood),
-                            onClick = {},
-                        )
-                    }
+            Column(modifier = Modifier.padding(Dimensions.paddingLarge)) {
+                Row(
+                    modifier = Modifier.fillMaxWidth(),
+                    horizontalArrangement = Arrangement.SpaceBetween,
+                    verticalAlignment = Alignment.CenterVertically,
+                ) {
+                    MarkerText(
+                        text = stringResource(R.string.dream_interpretation_label),
+                        lineColor = electricBlue,
+                    )
+                    NeoBrutalChip(
+                        text = moodDisplayName(state.mood),
+                        onClick = {},
+                    )
                 }
+                Spacer(modifier = Modifier.height(Dimensions.paddingMedium))
+                Text(
+                    text = state.interpretation,
+                    style = MaterialTheme.typography.bodyLarge,
+                    color = MaterialTheme.colorScheme.onSurface,
+                )
             }
-
-            Spacer(modifier = Modifier.height(Dimensions.paddingLarge))
-
-            NeoBrutalButton(
-                text = stringResource(R.string.dream_new_button),
-                backgroundColor = MaterialTheme.colorScheme.secondary,
-                onClick = onNewDream,
-            )
         }
+
+        Spacer(modifier = Modifier.height(Dimensions.paddingLarge))
+
+        NeoBrutalButton(
+            text = stringResource(R.string.dream_new_button),
+            backgroundColor = MaterialTheme.colorScheme.secondary,
+            onClick = onNewDream,
+        )
     }
 }
 
@@ -320,38 +308,45 @@ private fun ErrorState(
             .fillMaxWidth()
             .padding(Dimensions.paddingLarge),
     ) {
-        Column(
-            horizontalAlignment = Alignment.CenterHorizontally,
-            verticalArrangement = Arrangement.Center,
-            modifier = Modifier.padding(Dimensions.paddingLarge),
-        ) {
-            Icon(
-                imageVector = errorIcon,
-                contentDescription = stringResource(R.string.dream_label_error_icon),
-                tint = MaterialTheme.colorScheme.error,
-                modifier = Modifier.size(Dimensions.iconSizeXLarge),
-            )
-            Spacer(modifier = Modifier.height(Dimensions.paddingMedium))
-            Text(
-                text = stringResource(R.string.dream_oops),
-                style = MaterialTheme.typography.titleMedium,
-                color = MaterialTheme.colorScheme.onSurface,
-            )
-            Spacer(modifier = Modifier.height(Dimensions.paddingSmall))
-            Text(
-                text = errorMsg,
-                style = MaterialTheme.typography.bodyMedium,
-                color = MaterialTheme.colorScheme.onSurface,
-                textAlign = TextAlign.Center,
-                modifier = Modifier.semantics { liveRegion = LiveRegionMode.Polite },
-            )
+        Box {
+            Column(
+                horizontalAlignment = Alignment.CenterHorizontally,
+                verticalArrangement = Arrangement.Center,
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(Dimensions.paddingLarge),
+            ) {
+                Icon(
+                    imageVector = errorIcon,
+                    contentDescription = stringResource(R.string.dream_label_error_icon),
+                    tint = MaterialTheme.colorScheme.error,
+                    modifier = Modifier.size(Dimensions.iconSizeXLarge),
+                )
+                Spacer(modifier = Modifier.height(Dimensions.paddingMedium))
+                Text(
+                    text = stringResource(R.string.dream_oops),
+                    style = MaterialTheme.typography.titleMedium,
+                    color = MaterialTheme.colorScheme.onSurface,
+                )
+                Spacer(modifier = Modifier.height(Dimensions.paddingSmall))
+                Text(
+                    text = errorMsg,
+                    style = MaterialTheme.typography.bodyMedium,
+                    color = MaterialTheme.colorScheme.onSurface,
+                    textAlign = TextAlign.Center,
+                    modifier = Modifier.semantics { liveRegion = LiveRegionMode.Polite },
+                )
+            }
+
             if (state.error !is DreamError.ApiKeyMissing) {
-                Spacer(modifier = Modifier.height(Dimensions.paddingLarge))
                 NeoBrutalIconButton(
                     onClick = onClearError,
                     imageVector = Icons.Default.Clear,
                     contentDescription = stringResource(R.string.dream_label_dismiss_error),
                     backgroundColor = MaterialTheme.colorScheme.error,
+                    modifier = Modifier
+                        .align(Alignment.TopEnd)
+                        .padding(Dimensions.paddingMedium),
                 )
             }
         }
@@ -376,6 +371,11 @@ private fun moodDisplayName(mood: DreamMood): String = when (mood) {
     DreamMood.PEACEFUL -> stringResource(R.string.dream_mood_peaceful)
     DreamMood.DARK -> stringResource(R.string.dream_mood_dark)
     DreamMood.SURREAL -> stringResource(R.string.dream_mood_surreal)
+    DreamMood.NOSTALGIC -> stringResource(R.string.dream_mood_nostalgic)
+    DreamMood.HOPEFUL -> stringResource(R.string.dream_mood_hopeful)
+    DreamMood.MELANCHOLIC -> stringResource(R.string.dream_mood_melancholic)
+    DreamMood.ADVENTUROUS -> stringResource(R.string.dream_mood_adventurous)
+    DreamMood.ROMANTIC -> stringResource(R.string.dream_mood_romantic)
 }
 
 // region Previews
@@ -385,28 +385,28 @@ private fun previewScene() = DreamScene(
     palette = DreamPalette(sky = 0xFF0D1B2A, horizon = 0xFF1B263B, accent = 0xFF415A77),
     layers = listOf(
         DreamLayer(
-            depth = 0.2f,
+            depth = 0.8f,
             elements = listOf(
-                DreamElement(shape = ElementShape.MOUNTAIN, x = 0.3f, y = 0.7f, scale = 2.5f, color = 0xFF1B263B, alpha = 0.6f),
-                DreamElement(shape = ElementShape.CRYSTAL, x = 0.75f, y = 0.65f, scale = 1.5f, color = 0xFF415A77, alpha = 0.5f),
+                DreamElement(shape = ElementShape.STAR, x = 0.5f, y = 0.3f, scale = 0.8f, color = 0xFFE0E1DD, alpha = 0.9f),
+                DreamElement(shape = ElementShape.CRESCENT, x = 0.65f, y = 0.4f, scale = 1.6f, color = 0xFFE0E1DD, alpha = 0.6f),
             ),
         ),
         DreamLayer(
             depth = 0.5f,
             elements = listOf(
-                DreamElement(shape = ElementShape.TREE, x = 0.2f, y = 0.8f, scale = 1.5f, color = 0xFF415A77, alpha = 0.7f),
-                DreamElement(shape = ElementShape.CRESCENT, x = 0.65f, y = 0.25f, scale = 1.6f, color = 0xFFE0E1DD, alpha = 0.6f),
+                DreamElement(shape = ElementShape.CRYSTAL, x = 0.75f, y = 0.5f, scale = 1.5f, color = 0xFF415A77, alpha = 0.5f),
             ),
         ),
         DreamLayer(
-            depth = 0.8f,
+            depth = 0.2f,
             elements = listOf(
-                DreamElement(shape = ElementShape.STAR, x = 0.5f, y = 0.15f, scale = 0.8f, color = 0xFFE0E1DD, alpha = 0.9f),
+                DreamElement(shape = ElementShape.MOUNTAIN, x = 0.3f, y = 0.5f, scale = 2.5f, color = 0xFF1B263B, alpha = 0.6f),
+                DreamElement(shape = ElementShape.TREE, x = 0.2f, y = 0.5f, scale = 1.5f, color = 0xFF415A77, alpha = 0.7f),
             ),
         ),
     ),
     particles = listOf(
-        DreamParticle(shape = ParticleShape.STARBURST, count = 12, color = 0xCCE0E1DD, speed = 0.8f, size = 3f),
+        DreamParticle(shape = ParticleShape.STARBURST, count = 10, color = 0xCCE0E1DD, speed = 0.8f, size = 3f),
         DreamParticle(shape = ParticleShape.DOT, count = 8, color = 0x80415A77, speed = 0.4f, size = 2f),
     ),
 )
@@ -482,6 +482,7 @@ private fun ResultStateLightPreview() {
                     scene = previewScene(),
                     mood = DreamMood.SURREAL,
                 ),
+                imageState = DreamImageState.Generated(mimeType = "image/png", artistName = "Lorem ipsum"),
                 onNewDream = {},
             )
         }
@@ -499,6 +500,7 @@ private fun ResultStateDarkPreview() {
                     scene = previewScene(),
                     mood = DreamMood.MYSTERIOUS,
                 ),
+                imageState = DreamImageState.Generated(mimeType = "image/png", artistName = "Lorem ipsum"),
                 onNewDream = {},
             )
         }

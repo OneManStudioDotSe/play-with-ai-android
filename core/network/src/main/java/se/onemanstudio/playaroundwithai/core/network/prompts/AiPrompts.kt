@@ -38,7 +38,7 @@ Do not add any numbering, bullet points, or extra text."""
 You are a dream interpreter and visual artist. Given the user's dream description below, return a JSON object with exactly this structure:
 {
   "interpretation": "A 2-3 sentence analysis of symbolism, emotional meaning, and themes",
-  "mood": "one of: JOYFUL, MYSTERIOUS, ANXIOUS, PEACEFUL, DARK, SURREAL",
+  "mood": "one of: JOYFUL, MYSTERIOUS, ANXIOUS, PEACEFUL, DARK, SURREAL, NOSTALGIC, HOPEFUL, MELANCHOLIC, ADVENTUROUS, ROMANTIC",
   "scene": {
     "palette": { "sky": <ARGB long>, "horizon": <ARGB long>, "accent": <ARGB long> },
     "layers": [
@@ -56,8 +56,25 @@ Shape guidance:
 - Night/space: STAR, CRESCENT, CRYSTAL, CIRCLE. Particles: SPARKLE, STARBURST, DIAMOND_MOTE
 - Abstract/surreal: SPIRAL, DIAMOND, AURORA, WAVE. Particles: RING, DASH, DIAMOND_MOTE
 - Water/ocean: WAVE, CIRCLE, CRESCENT. Particles: TEARDROP, DOT, RING
+Vertical placement guide (y values):
+- Sky elements (STAR, CRESCENT, AURORA, CIRCLE as sun/moon): y between 0.05-0.3
+- Upper elements (CLOUD, DIAMOND, SPIRAL, CRYSTAL): y between 0.15-0.4
+- Mid elements (MOUNTAIN, TRIANGLE): y between 0.4-0.7, they grow downward from their peak
+- Ground elements (TREE, WAVE, LOTUS): y between 0.7-0.9
 Use diverse shapes across layers. Mix 3-5 different element shapes and 2-3 particle types per scene.
+Keep particle count between 5-15 per type to avoid cluttering the scene.
 Return ONLY valid JSON, no markdown, no backticks, no extra text.
+
+Dream: "$description"
+    """.trimIndent()
+
+    fun dreamImagePrompt(description: String): String = """
+Generate a painting inspired by the following dream. Paint it in the distinctive style of a famous artist whose work resonates with the dream's mood and imagery. Choose from artists like Dalí, Monet, Van Gogh, Klimt, Kahlo, Hokusai, Magritte, Munch, Rothko, or any other renowned painter.
+
+The painting should be vivid, atmospheric, and capture the emotional essence of the dream.
+
+In your text response, include ONLY the artist's name in this exact format:
+Artist: <Full Name>
 
 Dream: "$description"
     """.trimIndent()

@@ -8,4 +8,7 @@ import se.onemanstudio.playaroundwithai.core.network.dto.GeminiResponse
 interface GeminiApiService {
     @POST("v1beta/models/gemini-3-flash-preview:generateContent")
     suspend fun generateContent(@Body request: GeminiRequest): GeminiResponse
+
+    @POST("v1beta/models/gemini-2.5-flash-image:generateContent")
+    suspend fun generateImageContent(@Body request: GeminiRequest): GeminiResponse
 }

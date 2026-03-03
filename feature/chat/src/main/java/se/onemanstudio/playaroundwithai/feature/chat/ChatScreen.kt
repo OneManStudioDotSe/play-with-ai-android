@@ -352,38 +352,45 @@ private fun ErrorState(
             .fillMaxWidth()
             .padding(Dimensions.paddingLarge),
     ) {
-        Column(
-            horizontalAlignment = Alignment.CenterHorizontally,
-            verticalArrangement = Arrangement.Center,
-            modifier = Modifier.padding(Dimensions.paddingLarge)
-        ) {
-            Icon(
-                imageVector = errorIcon,
-                contentDescription = stringResource(R.string.label_error_icon),
-                tint = MaterialTheme.colorScheme.error,
-                modifier = Modifier.size(Dimensions.iconSizeXLarge)
-            )
-            Spacer(modifier = Modifier.height(Dimensions.paddingMedium))
-            Text(
-                text = stringResource(R.string.oops),
-                style = MaterialTheme.typography.titleMedium,
-                color = MaterialTheme.colorScheme.onSurface
-            )
-            Spacer(modifier = Modifier.height(Dimensions.paddingSmall))
-            Text(
-                text = errorMsg,
-                style = MaterialTheme.typography.bodyMedium,
-                color = MaterialTheme.colorScheme.onSurface,
-                textAlign = TextAlign.Center,
-                modifier = Modifier.semantics { liveRegion = LiveRegionMode.Polite },
-            )
+        Box {
+            Column(
+                horizontalAlignment = Alignment.CenterHorizontally,
+                verticalArrangement = Arrangement.Center,
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(Dimensions.paddingLarge),
+            ) {
+                Icon(
+                    imageVector = errorIcon,
+                    contentDescription = stringResource(R.string.label_error_icon),
+                    tint = MaterialTheme.colorScheme.error,
+                    modifier = Modifier.size(Dimensions.iconSizeXLarge),
+                )
+                Spacer(modifier = Modifier.height(Dimensions.paddingMedium))
+                Text(
+                    text = stringResource(R.string.oops),
+                    style = MaterialTheme.typography.titleMedium,
+                    color = MaterialTheme.colorScheme.onSurface,
+                )
+                Spacer(modifier = Modifier.height(Dimensions.paddingSmall))
+                Text(
+                    text = errorMsg,
+                    style = MaterialTheme.typography.bodyMedium,
+                    color = MaterialTheme.colorScheme.onSurface,
+                    textAlign = TextAlign.Center,
+                    modifier = Modifier.semantics { liveRegion = LiveRegionMode.Polite },
+                )
+            }
+
             if (state.error !is ChatError.ApiKeyMissing) {
-                Spacer(modifier = Modifier.height(Dimensions.paddingLarge))
                 NeoBrutalIconButton(
                     onClick = { onClearResponse() },
                     imageVector = Icons.Default.Clear,
                     contentDescription = stringResource(R.string.label_dismiss_error),
-                    backgroundColor = MaterialTheme.colorScheme.error
+                    backgroundColor = MaterialTheme.colorScheme.error,
+                    modifier = Modifier
+                        .align(Alignment.TopEnd)
+                        .padding(Dimensions.paddingMedium),
                 )
             }
         }

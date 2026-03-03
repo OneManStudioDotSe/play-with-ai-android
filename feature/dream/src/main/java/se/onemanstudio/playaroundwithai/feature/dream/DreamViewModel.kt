@@ -9,12 +9,11 @@ import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import se.onemanstudio.playaroundwithai.core.config.model.ApiKeyAvailability
 import se.onemanstudio.playaroundwithai.data.dream.domain.model.Dream
-import se.onemanstudio.playaroundwithai.data.dream.domain.model.DreamMood
-import se.onemanstudio.playaroundwithai.data.dream.domain.usecase.DeleteDreamUseCase
 import se.onemanstudio.playaroundwithai.data.dream.domain.usecase.GetDreamHistoryUseCase
 import se.onemanstudio.playaroundwithai.data.dream.domain.usecase.InterpretDreamUseCase
 import se.onemanstudio.playaroundwithai.data.dream.domain.usecase.SaveDreamUseCase
 import se.onemanstudio.playaroundwithai.feature.dream.states.DreamError
+import se.onemanstudio.playaroundwithai.feature.dream.states.DreamImageState
 import se.onemanstudio.playaroundwithai.feature.dream.states.DreamScreenState
 import se.onemanstudio.playaroundwithai.feature.dream.states.DreamUiState
 import timber.log.Timber
@@ -22,12 +21,13 @@ import java.io.IOException
 import java.time.Instant
 import javax.inject.Inject
 
+private const val PLACEHOLDER_ARTIST = "Lorem ipsum"
+
 @HiltViewModel
 class DreamViewModel @Inject constructor(
     private val interpretDreamUseCase: InterpretDreamUseCase,
     private val saveDreamUseCase: SaveDreamUseCase,
-    private val deleteDreamUseCase: DeleteDreamUseCase,
-    getDreamHistoryUseCase: GetDreamHistoryUseCase,
+    private val getDreamHistoryUseCase: GetDreamHistoryUseCase,
     private val apiKeyAvailability: ApiKeyAvailability,
 ) : ViewModel() {
 
@@ -57,7 +57,7 @@ class DreamViewModel @Inject constructor(
             return
         }
 
-        _screenState.update { it.copy(dreamState = DreamUiState.Interpreting) }
+        _screenState.update { it.copy(dreamState = DreamUiState.Interpreting, currentDescription = description) }
 
         viewModelScope.launch {
             interpretDreamUseCase(description)
@@ -68,7 +68,11 @@ class DreamViewModel @Inject constructor(
                                 interpretation = interpretation.textAnalysis,
                                 scene = interpretation.scene,
                                 mood = interpretation.mood,
-                            )
+                            ),
+                            imageState = DreamImageState.Generated(
+                                mimeType = "image/png",
+                                artistName = PLACEHOLDER_ARTIST,
+                            ),
                         )
                     }
 
@@ -96,16 +100,11 @@ class DreamViewModel @Inject constructor(
                                 DreamError.Unknown(exception.localizedMessage)
                             }
                         }
+
                         else -> DreamError.Unknown(exception.localizedMessage)
                     }
                     _screenState.update { it.copy(dreamState = DreamUiState.Error(error)) }
                 }
-        }
-    }
-
-    fun deleteDream(id: Long) {
-        viewModelScope.launch {
-            deleteDreamUseCase(id)
         }
     }
 
@@ -117,12 +116,18 @@ class DreamViewModel @Inject constructor(
                     interpretation = dream.interpretation,
                     scene = scene,
                     mood = dream.mood,
-                )
+                ),
+                currentDescription = dream.description,
+                imageState = DreamImageState.Generated(
+                    imagePath = dream.imagePath,
+                    mimeType = "image/png",
+                    artistName = dream.artistName ?: PLACEHOLDER_ARTIST,
+                ),
             )
         }
     }
 
     fun clearResult() {
-        _screenState.update { it.copy(dreamState = DreamUiState.Initial) }
+        _screenState.update { it.copy(dreamState = DreamUiState.Initial, imageState = DreamImageState.Idle, currentDescription = "") }
     }
 }

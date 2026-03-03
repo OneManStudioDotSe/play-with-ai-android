@@ -20,4 +20,7 @@ interface DreamsDao {
 
     @Query("DELETE FROM dreams WHERE id = :id")
     suspend fun deleteDream(id: Long)
+
+    @Query("UPDATE dreams SET imagePath = :imagePath, artistName = :artistName WHERE id = :dreamId")
+    suspend fun updateDreamImage(dreamId: Long, imagePath: String, artistName: String)
 }

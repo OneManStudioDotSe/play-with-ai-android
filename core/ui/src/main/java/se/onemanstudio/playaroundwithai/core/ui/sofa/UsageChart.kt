@@ -170,12 +170,6 @@ fun UsageChart(
                                 color = MaterialTheme.colorScheme.onSurface,
                                 textAlign = TextAlign.Center,
                             )
-                            Text(
-                                text = " $tokenSuffix",
-                                style = MaterialTheme.typography.labelSmall,
-                                color = MaterialTheme.colorScheme.onSurface,
-                                textAlign = TextAlign.Center,
-                            )
                         }
                     }
                 }

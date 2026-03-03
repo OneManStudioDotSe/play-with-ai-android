@@ -24,7 +24,9 @@
       "Bash(grep:*)",
       "Bash(ls:*)",
       "Bash(git mv:*)",
-      "Bash(echo $dir - HAS TESTS:*)"
+      "Bash(echo $dir - HAS TESTS:*)",
+      "WebSearch",
+      "WebFetch(domain:discuss.google.dev)"
     ]
   }
 }

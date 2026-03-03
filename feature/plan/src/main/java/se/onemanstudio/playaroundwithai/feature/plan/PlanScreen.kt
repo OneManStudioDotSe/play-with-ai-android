@@ -87,6 +87,7 @@ import com.google.maps.android.compose.rememberUpdatedMarkerState
 import kotlinx.collections.immutable.PersistentList
 import kotlinx.collections.immutable.persistentListOf
 import se.onemanstudio.playaroundwithai.core.ui.theme.SofaAiTheme
+import se.onemanstudio.playaroundwithai.core.ui.sofa.MarkerText
 import se.onemanstudio.playaroundwithai.core.ui.sofa.NeoBrutalButton
 import se.onemanstudio.playaroundwithai.core.ui.sofa.NeoBrutalCard
 import se.onemanstudio.playaroundwithai.core.ui.sofa.NeoBrutalChip
@@ -94,6 +95,7 @@ import se.onemanstudio.playaroundwithai.core.ui.sofa.NeoBrutalIconButton
 import se.onemanstudio.playaroundwithai.core.ui.sofa.NeoBrutalTextField
 import se.onemanstudio.playaroundwithai.core.ui.sofa.NeoBrutalTopAppBar
 import se.onemanstudio.playaroundwithai.core.ui.theme.Dimensions
+import se.onemanstudio.playaroundwithai.core.ui.theme.zestyLime
 import se.onemanstudio.playaroundwithai.feature.plan.states.PlanError
 import se.onemanstudio.playaroundwithai.feature.plan.states.PlanStepUi
 import se.onemanstudio.playaroundwithai.feature.plan.states.PlanUiState
@@ -457,10 +459,9 @@ private fun ResultState(
 
             Spacer(modifier = Modifier.height(Dimensions.paddingLarge))
 
-            Text(
+            MarkerText(
                 text = stringResource(R.string.plan_your_itinerary),
-                style = MaterialTheme.typography.titleMedium,
-                color = MaterialTheme.colorScheme.onSurface,
+                lineColor = zestyLime,
                 modifier = Modifier.fillMaxWidth(),
             )
 
@@ -584,38 +585,45 @@ private fun ErrorState(
             .fillMaxWidth()
             .padding(Dimensions.paddingLarge),
     ) {
-        Column(
-            horizontalAlignment = Alignment.CenterHorizontally,
-            verticalArrangement = Arrangement.Center,
-            modifier = Modifier.padding(Dimensions.paddingLarge),
-        ) {
-            Icon(
-                imageVector = errorIcon,
-                contentDescription = stringResource(R.string.plan_label_error_icon),
-                tint = MaterialTheme.colorScheme.error,
-                modifier = Modifier.size(Dimensions.iconSizeXLarge),
-            )
-            Spacer(modifier = Modifier.height(Dimensions.paddingMedium))
-            Text(
-                text = stringResource(R.string.plan_oops),
-                style = MaterialTheme.typography.titleMedium,
-                color = MaterialTheme.colorScheme.onSurface,
-            )
-            Spacer(modifier = Modifier.height(Dimensions.paddingSmall))
-            Text(
-                text = errorMsg,
-                style = MaterialTheme.typography.bodyMedium,
-                color = MaterialTheme.colorScheme.onSurface,
-                textAlign = TextAlign.Center,
-                modifier = Modifier.semantics { liveRegion = LiveRegionMode.Polite },
-            )
+        Box {
+            Column(
+                horizontalAlignment = Alignment.CenterHorizontally,
+                verticalArrangement = Arrangement.Center,
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(Dimensions.paddingLarge),
+            ) {
+                Icon(
+                    imageVector = errorIcon,
+                    contentDescription = stringResource(R.string.plan_label_error_icon),
+                    tint = MaterialTheme.colorScheme.error,
+                    modifier = Modifier.size(Dimensions.iconSizeXLarge),
+                )
+                Spacer(modifier = Modifier.height(Dimensions.paddingMedium))
+                Text(
+                    text = stringResource(R.string.plan_oops),
+                    style = MaterialTheme.typography.titleMedium,
+                    color = MaterialTheme.colorScheme.onSurface,
+                )
+                Spacer(modifier = Modifier.height(Dimensions.paddingSmall))
+                Text(
+                    text = errorMsg,
+                    style = MaterialTheme.typography.bodyMedium,
+                    color = MaterialTheme.colorScheme.onSurface,
+                    textAlign = TextAlign.Center,
+                    modifier = Modifier.semantics { liveRegion = LiveRegionMode.Polite },
+                )
+            }
+
             if (state.error !is PlanError.ApiKeyMissing) {
-                Spacer(modifier = Modifier.height(Dimensions.paddingLarge))
                 NeoBrutalIconButton(
                     onClick = onClearError,
                     imageVector = Icons.Default.Clear,
                     contentDescription = stringResource(R.string.plan_label_dismiss_error),
                     backgroundColor = MaterialTheme.colorScheme.error,
+                    modifier = Modifier
+                        .align(Alignment.TopEnd)
+                        .padding(Dimensions.paddingMedium),
                 )
             }
         }
