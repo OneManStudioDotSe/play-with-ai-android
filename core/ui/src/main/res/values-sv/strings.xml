@@ -15,4 +15,6 @@
     <string name="settings_weekly_usage">Veckoanvändning</string>
     <string name="settings_no_usage_data">Ingen AI-användningsdata ännu</string>
     <string name="settings_icon_description">Inställningar</string>
+    <string name="settings_general">Allmänt</string>
+    <string name="settings_show_token_usage">Visa tokenanvändning</string>
 </resources>

@@ -33,7 +33,7 @@ import se.onemanstudio.playaroundwithai.feature.chat.R
 import java.time.Instant
 import java.time.ZoneId
 import java.time.format.DateTimeFormatter
-import java.util.Locale
+import androidx.compose.ui.platform.LocalConfiguration
 
 @Composable
 fun HistoryItemCard(
@@ -64,9 +64,10 @@ fun HistoryItemCard(
             Spacer(Modifier.height(Dimensions.paddingLarge))
 
             Row(verticalAlignment = Alignment.CenterVertically) {
+                val locale = LocalConfiguration.current.locales[0]
                 val zoneId = ZoneId.systemDefault()
-                val formattedDate = DateTimeFormatter.ofPattern(dateFormat, Locale.getDefault()).withZone(zoneId).format(prompt.timestamp)
-                val formattedTime = DateTimeFormatter.ofPattern(timeFormat, Locale.getDefault()).withZone(zoneId).format(prompt.timestamp)
+                val formattedDate = DateTimeFormatter.ofPattern(dateFormat, locale).withZone(zoneId).format(prompt.timestamp)
+                val formattedTime = DateTimeFormatter.ofPattern(timeFormat, locale).withZone(zoneId).format(prompt.timestamp)
 
                 Text(
                     text = String.format(dateAtTimePattern, formattedDate, formattedTime),

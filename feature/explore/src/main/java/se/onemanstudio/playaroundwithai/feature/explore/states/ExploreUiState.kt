@@ -40,5 +40,5 @@ data class ExploreUiState(
     val suggestedPlaces: PersistentList<SuggestedPlace> = persistentListOf(),
     val focusedSuggestedPlace: SuggestedPlace? = null,
     val suggestedPlacesError: SuggestedPlacesError? = null,
-    @StringRes val loadingMessageResId: Int = 0
+    @get:StringRes val loadingMessageResId: Int = 0
 )

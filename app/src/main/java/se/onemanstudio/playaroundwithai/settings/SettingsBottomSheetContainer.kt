@@ -11,8 +11,8 @@ import se.onemanstudio.playaroundwithai.BuildConfig
 import se.onemanstudio.playaroundwithai.core.ui.sofa.ChartBarData
 import se.onemanstudio.playaroundwithai.core.ui.sofa.SettingsBottomSheet
 import se.onemanstudio.playaroundwithai.core.ui.sofa.SettingsState
+import androidx.compose.ui.platform.LocalConfiguration
 import java.text.NumberFormat
-import java.util.Locale
 import androidx.core.net.toUri
 
 @Composable
@@ -26,7 +26,7 @@ fun SettingsBottomSheetContainer(
     val vehicleCount by viewModel.vehicleCount.collectAsStateWithLifecycle()
     val searchRadiusKm by viewModel.searchRadiusKm.collectAsStateWithLifecycle()
     val context = LocalContext.current
-    val numberFormat = NumberFormat.getNumberInstance(Locale.getDefault())
+    val numberFormat = NumberFormat.getNumberInstance(LocalConfiguration.current.locales[0])
 
     val usageBars = weeklyUsage.map { day ->
         ChartBarData(

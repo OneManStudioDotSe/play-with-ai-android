@@ -45,7 +45,7 @@ class OneManStudioApp : Application(), Configuration.Provider {
         Timber.d("OneManStudioApp started")
     }
 
-    @SuppressWarnings("TooGenericExceptionCaught")
+    @Suppress("TooGenericExceptionCaught")
     private fun retryFailedSyncs() {
         applicationScope.launch {
             try {

@@ -20,7 +20,7 @@ private const val DREAM_IMAGES_DIR = "dream_images"
 @Singleton
 class DreamRepositoryImpl @Inject constructor(
     private val dreamsDao: DreamsDao,
-    @ApplicationContext private val context: Context,
+    @param:ApplicationContext private val context: Context,
 ) : DreamRepository {
 
     override suspend fun saveDream(dream: Dream): Long {

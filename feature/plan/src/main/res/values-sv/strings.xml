@@ -26,4 +26,5 @@
     <string name="plan_icon_step_thinking">Tänker</string>
     <string name="plan_icon_step_tool_call">Anropar verktyg</string>
     <string name="plan_icon_step_tool_result">Verktygsresultat</string>
+    <string name="plan_load_sample_data">Ladda exempeldata</string>
 </resources>

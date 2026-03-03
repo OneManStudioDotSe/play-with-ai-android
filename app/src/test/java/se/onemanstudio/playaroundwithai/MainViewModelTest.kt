@@ -14,6 +14,7 @@ import se.onemanstudio.playaroundwithai.core.auth.model.AuthSession
 import se.onemanstudio.playaroundwithai.core.auth.usecase.SignInAnonymouslyUseCase
 import se.onemanstudio.playaroundwithai.core.network.tracking.TokenUsageEvent
 import se.onemanstudio.playaroundwithai.core.network.tracking.TokenUsageTracker
+import se.onemanstudio.playaroundwithai.data.explore.data.settings.AppSettingsHolder
 import se.onemanstudio.playaroundwithai.util.MainCoroutineRule
 import java.time.Instant
 
@@ -28,6 +29,8 @@ class MainViewModelTest {
     private val tokenUsageTracker = mockk<TokenUsageTracker>(relaxed = true) {
         coEvery { lastUsageEvent } returns fakeUsageFlow
     }
+
+    private val appSettingsHolder = AppSettingsHolder()
 
     private fun createAuthSession(): AuthSession = AuthSession(
         userId = "test-uid",
@@ -47,7 +50,7 @@ class MainViewModelTest {
             coEvery { this@mockk.invoke() } returns signInResult
         }
 
-        return MainViewModel(signInAnonymouslyUseCase, tokenUsageTracker)
+        return MainViewModel(signInAnonymouslyUseCase, tokenUsageTracker, appSettingsHolder)
     }
 
     // --- Test 1: init calls signIn and on success sets authError = false ---
@@ -85,7 +88,7 @@ class MainViewModelTest {
             Result.failure(RuntimeException("Auth failed")),
             Result.success(createAuthSession())
         )
-        val viewModel = MainViewModel(signInAnonymouslyUseCase, tokenUsageTracker)
+        val viewModel = MainViewModel(signInAnonymouslyUseCase, tokenUsageTracker, appSettingsHolder)
         advanceUntilIdle()
 
         // Verify initial failure
@@ -107,7 +110,7 @@ class MainViewModelTest {
         // Given - exhaust all 3 attempts (1 init + 2 retries)
         val signInAnonymouslyUseCase = mockk<SignInAnonymouslyUseCase>()
         coEvery { signInAnonymouslyUseCase.invoke() } returns Result.failure(RuntimeException("Auth failed"))
-        val viewModel = MainViewModel(signInAnonymouslyUseCase, tokenUsageTracker)
+        val viewModel = MainViewModel(signInAnonymouslyUseCase, tokenUsageTracker, appSettingsHolder)
         advanceUntilIdle()
 
         // Retry twice to exhaust attempts (init=1, retry=2, retry=3)
@@ -134,7 +137,7 @@ class MainViewModelTest {
         // Given
         val signInAnonymouslyUseCase = mockk<SignInAnonymouslyUseCase>()
         coEvery { signInAnonymouslyUseCase.invoke() } returns Result.failure(RuntimeException("Auth failed"))
-        val viewModel = MainViewModel(signInAnonymouslyUseCase, tokenUsageTracker)
+        val viewModel = MainViewModel(signInAnonymouslyUseCase, tokenUsageTracker, appSettingsHolder)
         advanceUntilIdle()
 
         // Attempt 1 (init): authRetriesExhausted should be false (1 < 3)
@@ -163,7 +166,7 @@ class MainViewModelTest {
             Result.failure(RuntimeException("Auth failed")),
             Result.success(createAuthSession())
         )
-        val viewModel = MainViewModel(signInAnonymouslyUseCase, tokenUsageTracker)
+        val viewModel = MainViewModel(signInAnonymouslyUseCase, tokenUsageTracker, appSettingsHolder)
         advanceUntilIdle()
 
         // Attempt 1 (init) fails

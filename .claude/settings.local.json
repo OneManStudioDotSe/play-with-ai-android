@@ -33,7 +33,8 @@
       "WebFetch(domain:zoewave.medium.com)",
       "WebFetch(domain:android-developers.googleblog.com)",
       "WebFetch(domain:medium.com)",
-      "WebFetch(domain:developers.googleblog.com)"
+      "WebFetch(domain:developers.googleblog.com)",
+      "Bash(./gradlew assembleDebug:*)"
     ]
   }
 }

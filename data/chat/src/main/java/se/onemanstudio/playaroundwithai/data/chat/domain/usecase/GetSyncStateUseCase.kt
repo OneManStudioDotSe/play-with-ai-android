@@ -1,5 +1,6 @@
 package se.onemanstudio.playaroundwithai.data.chat.domain.usecase
 
+import kotlinx.coroutines.FlowPreview
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.debounce
 import kotlinx.coroutines.flow.distinctUntilChanged
@@ -11,6 +12,7 @@ private const val SYNC_STATE_DEBOUNCE_MS = 300L
 class GetSyncStateUseCase @Inject constructor(
     private val repository: PromptRepository
 ) {
+    @OptIn(FlowPreview::class)
     operator fun invoke(): Flow<Boolean> = repository.isSyncing()
         .debounce(SYNC_STATE_DEBOUNCE_MS)
         .distinctUntilChanged()

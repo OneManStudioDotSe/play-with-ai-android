@@ -141,8 +141,6 @@ fun UsageChart(
         }
     }
 
-    val tokenSuffix = stringResource(R.string.settings_token_suffix)
-
     Column(modifier = modifier) {
         // Always reserve space for detail text to prevent UI jumping
         Row(

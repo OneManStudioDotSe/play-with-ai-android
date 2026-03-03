@@ -245,7 +245,7 @@ fun ChatScreen(
         },
         bottomBar = {
             val isApiKeyMissing = uiState is ChatUiState.Error &&
-                (uiState as ChatUiState.Error).error is ChatError.ApiKeyMissing
+                uiState.error is ChatError.ApiKeyMissing
 
             if (!isApiKeyMissing) ChatInputArea(
                 inputMode = inputMode,

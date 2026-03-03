@@ -11,7 +11,7 @@ import java.io.IOException
 import javax.inject.Inject
 
 class FileUtils @Inject constructor(
-    @ApplicationContext private val context: Context
+    @param:ApplicationContext private val context: Context,
 ) {
     suspend fun extractFileContent(uri: Uri): Result<String> = withContext(Dispatchers.IO) {
         try {
