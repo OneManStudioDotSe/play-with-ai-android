@@ -42,7 +42,7 @@ object ConfigurationModule {
     @LoggingLevel
     fun provideLoggingLevel(): HttpLoggingInterceptor.Level {
         return if (BuildConfig.DEBUG) {
-            HttpLoggingInterceptor.Level.BASIC
+            HttpLoggingInterceptor.Level.BODY
         } else {
             HttpLoggingInterceptor.Level.NONE
         }
