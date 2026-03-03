@@ -27,6 +27,7 @@
             <option value="$PROJECT_DIR$/feature/dream" />
             <option value="$PROJECT_DIR$/feature/explore" />
             <option value="$PROJECT_DIR$/feature/plan" />
+            <option value="$PROJECT_DIR$/feature/showcase" />
           </set>
         </option>
       </GradleProjectSettings>

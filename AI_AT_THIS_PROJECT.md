@@ -1,4 +1,4 @@
-# AI at This Project
+# AI uses at this project
 
 All AI features in this app are powered by **Google Gemini** (`gemini-3-flash-preview`) through a single REST endpoint. This document 
 catalogs every use of AI in the project.
