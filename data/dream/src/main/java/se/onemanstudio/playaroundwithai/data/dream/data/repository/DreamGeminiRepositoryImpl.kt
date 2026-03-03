@@ -71,18 +71,32 @@ class DreamGeminiRepositoryImpl @Inject constructor(
             val parts = listOf(Part(text = prompt))
             val request = GeminiRequest(
                 contents = listOf(Content(parts = parts)),
-                generationConfig = GenerationConfig(responseModalities = listOf("TEXT", "IMAGE")),
+                generationConfig = GenerationConfig(responseModalities = listOf("IMAGE", "TEXT")),
             )
 
-            Timber.d("DreamGemini - Sending image generation request to Gemini API...")
-            val response = apiService.generateImageContent(request)
-            tokenUsageTracker.record("dream_image", response.usageMetadata)
+            var imageData: se.onemanstudio.playaroundwithai.core.network.dto.ImageData? = null
+            var lastText = ""
 
-            val imageData = response.extractImageData()
-                ?: return@withContext Result.failure(Exception("No image data in Gemini response"))
+            for (attempt in 1..IMAGE_GENERATION_MAX_RETRIES) {
+                Timber.d("DreamGemini - Image generation attempt %d/%d...", attempt, IMAGE_GENERATION_MAX_RETRIES)
+                val response = apiService.generateImageContent(request)
+                tokenUsageTracker.record("dream_image", response.usageMetadata)
 
-            val text = response.extractText().orEmpty()
-            val artistName = ARTIST_REGEX.find(text)?.groupValues?.get(1)?.trim() ?: "Unknown Artist"
+                imageData = response.extractImageData()
+                lastText = response.extractText().orEmpty()
+
+                if (imageData != null) {
+                    Timber.d("DreamGemini - Image data received on attempt %d", attempt)
+                    break
+                }
+                Timber.w("DreamGemini - Attempt %d returned text only: %s", attempt, lastText.take(RETRY_LOG_PREVIEW_LENGTH))
+            }
+
+            if (imageData == null) {
+                return@withContext Result.failure(Exception("No image data after $IMAGE_GENERATION_MAX_RETRIES attempts"))
+            }
+
+            val artistName = ARTIST_REGEX.find(lastText)?.groupValues?.get(1)?.trim() ?: "Unknown Artist"
             Timber.d("DreamGemini - Image generated, artist: $artistName")
 
             Result.success(DreamImage(imageBase64 = imageData.data, mimeType = imageData.mimeType, artistName = artistName))
@@ -141,6 +155,8 @@ class DreamGeminiRepositoryImpl @Inject constructor(
             .trim()
 
     companion object {
+        private const val IMAGE_GENERATION_MAX_RETRIES = 3
+        private const val RETRY_LOG_PREVIEW_LENGTH = 80
         private val ARTIST_REGEX = Regex("""Artist:\s*(.+)""", RegexOption.IGNORE_CASE)
     }
 }
