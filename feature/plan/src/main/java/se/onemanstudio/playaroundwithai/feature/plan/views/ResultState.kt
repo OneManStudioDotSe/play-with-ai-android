@@ -1,6 +1,6 @@
 @file:Suppress("TooManyFunctions")
 
-package se.onemanstudio.playaroundwithai.feature.plan
+package se.onemanstudio.playaroundwithai.feature.plan.views
 
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.core.MutableTransitionState
@@ -64,6 +64,7 @@ import se.onemanstudio.playaroundwithai.core.ui.theme.energeticOrange
 import se.onemanstudio.playaroundwithai.core.ui.theme.solarYellow
 import se.onemanstudio.playaroundwithai.core.ui.theme.vividPink
 import se.onemanstudio.playaroundwithai.core.ui.theme.zestyLime
+import se.onemanstudio.playaroundwithai.feature.plan.R
 import se.onemanstudio.playaroundwithai.feature.plan.PlanConstants.ACCENT_COLOR_COUNT
 import se.onemanstudio.playaroundwithai.feature.plan.PlanConstants.MAP_HEIGHT_MAX
 import se.onemanstudio.playaroundwithai.feature.plan.PlanConstants.MAP_HEIGHT_MIN
@@ -96,8 +97,8 @@ internal fun ResultState(
         // Map section
         if (state.plan.stops.isNotEmpty()) {
             PhasedVisibility(delayMs = 0) {
-                Column(modifier = Modifier.padding(horizontal = Dimensions.paddingLarge)) {
-                    Spacer(modifier = Modifier.height(Dimensions.paddingLarge))
+                Column(modifier = Modifier.padding(horizontal = Dimensions.paddingExtraLarge)) {
+                    Spacer(modifier = Modifier.height(Dimensions.paddingExtraLarge))
 
                     MarkerText(
                         text = stringResource(R.string.plan_your_route),
@@ -118,7 +119,7 @@ internal fun ResultState(
         }
 
         Column(
-            modifier = Modifier.padding(Dimensions.paddingLarge),
+            modifier = Modifier.padding(Dimensions.paddingExtraLarge),
             horizontalAlignment = Alignment.CenterHorizontally,
         ) {
             // Trip Summary section
@@ -144,7 +145,7 @@ internal fun ResultState(
                 }
             }
 
-            Spacer(modifier = Modifier.height(Dimensions.paddingLarge))
+            Spacer(modifier = Modifier.height(Dimensions.paddingExtraLarge))
 
             // Itinerary section
             PhasedVisibility(delayMs = RESULT_ITINERARY_DELAY_MS) {
@@ -183,7 +184,7 @@ internal fun ResultState(
                 Spacer(modifier = Modifier.height(Dimensions.paddingMedium))
             }
 
-            Spacer(modifier = Modifier.height(Dimensions.paddingMedium))
+            Spacer(modifier = Modifier.height(Dimensions.paddingLarge))
 
             // Metrics card
             PhasedVisibility(delayMs = RESULT_METRICS_DELAY_MS) {
@@ -193,7 +194,7 @@ internal fun ResultState(
                 )
             }
 
-            Spacer(modifier = Modifier.height(Dimensions.paddingLarge))
+            Spacer(modifier = Modifier.height(Dimensions.paddingExtraLarge))
 
             // New plan button
             val buttonTransitionState = remember {
@@ -217,7 +218,7 @@ internal fun ResultState(
             }
 
             if (state.steps.isNotEmpty()) {
-                Spacer(modifier = Modifier.height(Dimensions.paddingLarge))
+                Spacer(modifier = Modifier.height(Dimensions.paddingExtraLarge))
 
                 AgentLogSection(steps = state.steps)
             }

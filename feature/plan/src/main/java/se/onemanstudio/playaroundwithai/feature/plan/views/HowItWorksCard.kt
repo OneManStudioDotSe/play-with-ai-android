@@ -1,4 +1,4 @@
-package se.onemanstudio.playaroundwithai.feature.plan
+package se.onemanstudio.playaroundwithai.feature.plan.views
 
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.expandVertically
@@ -38,6 +38,7 @@ import se.onemanstudio.playaroundwithai.core.ui.sofa.NeoBrutalChip
 import se.onemanstudio.playaroundwithai.core.ui.theme.Dimensions
 import se.onemanstudio.playaroundwithai.core.ui.theme.SofaAiTheme
 import se.onemanstudio.playaroundwithai.core.ui.theme.electricBlue
+import se.onemanstudio.playaroundwithai.feature.plan.R
 
 @OptIn(ExperimentalLayoutApi::class)
 @Composable
@@ -85,7 +86,7 @@ internal fun HowItWorksCard(modifier: Modifier = Modifier) {
 
                     Text(
                         text = stringResource(R.string.plan_how_it_works_description),
-                        style = MaterialTheme.typography.bodySmall,
+                        style = MaterialTheme.typography.bodyMedium,
                         color = MaterialTheme.colorScheme.onSurface,
                     )
 
@@ -93,7 +94,7 @@ internal fun HowItWorksCard(modifier: Modifier = Modifier) {
 
                     Text(
                         text = stringResource(R.string.plan_how_it_works_tools_label),
-                        style = MaterialTheme.typography.labelMedium.copy(fontWeight = FontWeight.Bold),
+                        style = MaterialTheme.typography.labelLarge.copy(fontWeight = FontWeight.Bold),
                         color = MaterialTheme.colorScheme.onSurface,
                     )
 
@@ -111,7 +112,7 @@ internal fun HowItWorksCard(modifier: Modifier = Modifier) {
 
                     Text(
                         text = stringResource(R.string.plan_how_it_works_flow),
-                        style = MaterialTheme.typography.bodySmall,
+                        style = MaterialTheme.typography.bodyMedium,
                         color = MaterialTheme.colorScheme.onSurface,
                     )
                 }

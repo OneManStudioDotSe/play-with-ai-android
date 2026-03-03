@@ -14,6 +14,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.drawBehind
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.Path
+import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
@@ -33,12 +34,13 @@ fun MarkerText(
     text: String,
     lineColor: Color,
     modifier: Modifier = Modifier,
+    style: TextStyle = MaterialTheme.typography.titleLarge.copy(fontWeight = FontWeight.Bold),
 ) {
     var textWidth by remember { mutableFloatStateOf(0f) }
 
     Text(
         text = text,
-        style = MaterialTheme.typography.titleMedium.copy(fontWeight = FontWeight.Bold),
+        style = style,
         color = MaterialTheme.colorScheme.onSurface,
         onTextLayout = { result -> textWidth = result.size.width.toFloat() },
         modifier = modifier

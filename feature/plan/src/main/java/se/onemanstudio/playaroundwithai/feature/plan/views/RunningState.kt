@@ -1,4 +1,4 @@
-package se.onemanstudio.playaroundwithai.feature.plan
+package se.onemanstudio.playaroundwithai.feature.plan.views
 
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.core.LinearEasing
@@ -60,6 +60,7 @@ import se.onemanstudio.playaroundwithai.core.ui.theme.SofaAiTheme
 import se.onemanstudio.playaroundwithai.core.ui.theme.electricBlue
 import se.onemanstudio.playaroundwithai.core.ui.theme.energeticOrange
 import se.onemanstudio.playaroundwithai.core.ui.theme.zestyLime
+import se.onemanstudio.playaroundwithai.feature.plan.PlanConstants
 import se.onemanstudio.playaroundwithai.feature.plan.PlanConstants.BOUNCE_AMPLITUDE
 import se.onemanstudio.playaroundwithai.feature.plan.PlanConstants.BOUNCE_DOT_COUNT
 import se.onemanstudio.playaroundwithai.feature.plan.PlanConstants.BOUNCE_DURATION_MS
@@ -69,6 +70,7 @@ import se.onemanstudio.playaroundwithai.feature.plan.PlanConstants.PULSE_ALPHA_M
 import se.onemanstudio.playaroundwithai.feature.plan.PlanConstants.PULSE_DURATION_MS
 import se.onemanstudio.playaroundwithai.feature.plan.PlanConstants.STEP_BORDER_WIDTH
 import se.onemanstudio.playaroundwithai.feature.plan.PlanConstants.STEP_STAGGER_DELAY_MS
+import se.onemanstudio.playaroundwithai.feature.plan.R
 import se.onemanstudio.playaroundwithai.feature.plan.states.PlanStepUi
 import se.onemanstudio.playaroundwithai.feature.plan.states.PlanUiState
 import se.onemanstudio.playaroundwithai.feature.plan.states.StepIcon
@@ -79,12 +81,12 @@ internal fun RunningState(state: PlanUiState.Running) {
         modifier = Modifier
             .fillMaxSize()
             .verticalScroll(rememberScrollState())
-            .padding(Dimensions.paddingLarge),
+            .padding(Dimensions.paddingExtraLarge),
         horizontalAlignment = Alignment.CenterHorizontally,
     ) {
         AgentPulse(modifier = Modifier.size(PlanConstants.AGENT_PULSE_SIZE.dp))
 
-        Spacer(modifier = Modifier.height(Dimensions.paddingLarge))
+        Spacer(modifier = Modifier.height(Dimensions.paddingExtraLarge))
 
         MarkerText(
             text = stringResource(R.string.plan_planning_trip),

@@ -1,4 +1,4 @@
-package se.onemanstudio.playaroundwithai.feature.plan
+package se.onemanstudio.playaroundwithai.feature.plan.views
 
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
@@ -38,7 +38,7 @@ internal fun InitialState(
         modifier = Modifier
             .fillMaxSize()
             .verticalScroll(rememberScrollState())
-            .padding(Dimensions.paddingLarge),
+            .padding(Dimensions.paddingExtraLarge),
         horizontalAlignment = Alignment.CenterHorizontally,
     ) {
         NeoBrutalTextField(
@@ -48,7 +48,7 @@ internal fun InitialState(
             modifier = Modifier.fillMaxWidth(),
         )
 
-        Spacer(modifier = Modifier.height(Dimensions.paddingLarge))
+        Spacer(modifier = Modifier.height(Dimensions.paddingExtraLarge))
 
         NeoBrutalButton(
             text = stringResource(R.string.plan_plan_button),
