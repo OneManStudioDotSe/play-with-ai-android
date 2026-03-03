@@ -8,53 +8,19 @@ import android.content.pm.PackageManager
 import android.view.HapticFeedbackConstants
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
-import androidx.compose.animation.AnimatedContent
-import androidx.compose.animation.AnimatedVisibility
-import androidx.compose.animation.core.EaseInOutQuart
-import androidx.compose.animation.core.tween
-import androidx.compose.animation.fadeIn
-import androidx.compose.animation.fadeOut
-import androidx.compose.animation.slideInHorizontally
-import androidx.compose.animation.slideOutHorizontally
-import androidx.compose.animation.togetherWith
-import androidx.compose.foundation.background
 import androidx.compose.foundation.isSystemInDarkTheme
-import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.BoxScope
-import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.height
-import androidx.compose.foundation.layout.heightIn
-import androidx.compose.foundation.layout.navigationBarsPadding
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.layout.width
-import androidx.compose.foundation.layout.wrapContentHeight
-import androidx.compose.foundation.layout.wrapContentSize
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.DirectionsBike
-import androidx.compose.material.icons.filled.AutoAwesome
 import androidx.compose.material.icons.filled.ElectricScooter
 import androidx.compose.material.icons.filled.Settings
 import androidx.compose.material.icons.filled.Stars
-import androidx.compose.material.icons.rounded.VpnKey
-import androidx.compose.material.icons.rounded.Warning
-import androidx.compose.material.icons.rounded.WifiOff
-import androidx.compose.material3.ExperimentalMaterial3ExpressiveApi
-import androidx.compose.material3.Icon
-import androidx.compose.material3.LoadingIndicator
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
-import androidx.compose.material3.Snackbar
-import androidx.compose.material3.SnackbarHost
 import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.SnackbarResult
-import androidx.compose.material3.Surface
-import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
@@ -64,14 +30,10 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
-import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalView
 import androidx.compose.ui.res.stringResource
-import androidx.compose.ui.text.style.TextAlign
-import androidx.compose.ui.tooling.preview.Preview
-import androidx.compose.ui.unit.dp
 import androidx.core.content.ContextCompat
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import com.google.android.gms.location.LocationServices
@@ -80,7 +42,6 @@ import com.google.android.gms.maps.model.CameraPosition
 import com.google.android.gms.maps.model.LatLng
 import com.google.android.gms.maps.model.LatLngBounds
 import com.google.android.gms.maps.model.MapStyleOptions
-import com.google.maps.android.compose.CameraPositionState
 import com.google.maps.android.compose.GoogleMap
 import com.google.maps.android.compose.MapProperties
 import com.google.maps.android.compose.MapUiSettings
@@ -90,28 +51,22 @@ import com.google.maps.android.compose.Polyline
 import com.google.maps.android.compose.rememberCameraPositionState
 import com.google.maps.android.compose.rememberUpdatedMarkerState
 import kotlinx.coroutines.launch
-import se.onemanstudio.playaroundwithai.core.ui.sofa.NeoBrutalButton
-import se.onemanstudio.playaroundwithai.core.ui.sofa.NeoBrutalCard
 import se.onemanstudio.playaroundwithai.core.ui.sofa.NeoBrutalIconButton
 import se.onemanstudio.playaroundwithai.core.ui.sofa.NeoBrutalTopAppBar
-import se.onemanstudio.playaroundwithai.core.ui.theme.Alphas
-import se.onemanstudio.playaroundwithai.core.ui.theme.Dimensions
-import se.onemanstudio.playaroundwithai.core.ui.theme.SofaAiTheme
-import se.onemanstudio.playaroundwithai.core.ui.theme.energeticOrange
-import se.onemanstudio.playaroundwithai.data.explore.domain.model.SuggestedPlace
 import se.onemanstudio.playaroundwithai.data.explore.domain.model.VehicleType
 import se.onemanstudio.playaroundwithai.feature.explore.ExploreConstants.STOCKHOLM_LAT
 import se.onemanstudio.playaroundwithai.feature.explore.ExploreConstants.STOCKHOLM_LNG
-import se.onemanstudio.playaroundwithai.feature.explore.models.ExploreItemUiModel
-import se.onemanstudio.playaroundwithai.feature.explore.states.ExploreError
-import se.onemanstudio.playaroundwithai.feature.explore.states.ExploreUiState
 import se.onemanstudio.playaroundwithai.feature.explore.states.SuggestedPlacesError
 import se.onemanstudio.playaroundwithai.feature.explore.views.CustomMarkerIcon
-import se.onemanstudio.playaroundwithai.feature.explore.views.FilterChip
-import se.onemanstudio.playaroundwithai.feature.explore.views.MarkerInfoCard
-import se.onemanstudio.playaroundwithai.feature.explore.views.PathModeBar
-import se.onemanstudio.playaroundwithai.feature.explore.views.SideControls
-import se.onemanstudio.playaroundwithai.feature.explore.views.SuggestedPlaceInfoCard
+import se.onemanstudio.playaroundwithai.feature.explore.views.ErrorState
+import se.onemanstudio.playaroundwithai.feature.explore.views.ExploreControls
+import se.onemanstudio.playaroundwithai.feature.explore.views.LoadingState
+import se.onemanstudio.playaroundwithai.feature.explore.views.MarkerInfoPanel
+import se.onemanstudio.playaroundwithai.feature.explore.views.PathModeHint
+import se.onemanstudio.playaroundwithai.feature.explore.views.PathModePanel
+import se.onemanstudio.playaroundwithai.feature.explore.views.SnackbarContainer
+import se.onemanstudio.playaroundwithai.feature.explore.views.SuggestedPlaceInfoPanel
+import se.onemanstudio.playaroundwithai.feature.explore.views.TopActions
 import se.onemanstudio.playaroundwithai.feature.explore.R as ExploreFeatureR
 
 private const val CAMERA_PADDING = 150
@@ -474,456 +429,5 @@ fun ExploreScreen(
 
     if (showSettings) {
         settingsContent { showSettings = false }
-    }
-}
-
-@Composable
-private fun BoxScope.ExploreControls(
-    uiState: ExploreUiState,
-    cameraPositionState: CameraPositionState,
-    onMyLocationClick: () -> Unit,
-    onSetPathMode: (Boolean) -> Unit,
-) {
-    Box(
-        modifier = Modifier
-            .align(Alignment.CenterEnd)
-            .padding(Dimensions.paddingLarge)
-    ) {
-        SideControls(
-            uiState = uiState,
-            cameraPositionState = cameraPositionState,
-            onMyLocationClick = onMyLocationClick,
-            onSetPathMode = onSetPathMode,
-        )
-    }
-}
-
-@Composable
-private fun BoxScope.TopActions(
-    uiState: ExploreUiState,
-    onToggleFilter: (VehicleType) -> Unit,
-    onSuggestPlaces: () -> Unit,
-) {
-    val view = LocalView.current
-
-    AnimatedVisibility(
-        visible = !uiState.isPathMode,
-        enter = slideInHorizontally(
-            initialOffsetX = { -it * 2 },
-            animationSpec = tween(
-                durationMillis = AnimationConstants.ANIMATION_DURATION,
-                easing = EaseInOutQuart
-            )
-        ),
-        exit = slideOutHorizontally(
-            targetOffsetX = { -it * 2 },
-            animationSpec = tween(
-                durationMillis = AnimationConstants.ANIMATION_DURATION,
-                easing = EaseInOutQuart
-            )
-        ),
-        modifier = Modifier
-            .align(Alignment.TopStart)
-            .fillMaxWidth()
-            .padding(top = Dimensions.paddingMedium)
-    ) {
-        Row(
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(horizontal = Dimensions.paddingLarge),
-            verticalAlignment = Alignment.CenterVertically,
-        ) {
-            FilterChip(
-                text = stringResource(id = ExploreFeatureR.string.scooters_filter_chip_label),
-                selected = uiState.activeFilter.contains(VehicleType.Scooter)
-            ) {
-                view.performHapticFeedback(HapticFeedbackConstants.CONTEXT_CLICK)
-                onToggleFilter(VehicleType.Scooter)
-            }
-
-            Spacer(modifier = Modifier.width(Dimensions.paddingSmall))
-
-            FilterChip(
-                text = stringResource(id = ExploreFeatureR.string.bicycles_filter_chip_label),
-                selected = uiState.activeFilter.contains(VehicleType.Bicycle)
-            ) {
-                view.performHapticFeedback(HapticFeedbackConstants.CONTEXT_CLICK)
-                onToggleFilter(VehicleType.Bicycle)
-            }
-
-            Spacer(modifier = Modifier.weight(1f))
-
-            @OptIn(ExperimentalMaterial3ExpressiveApi::class)
-            AnimatedVisibility(visible = uiState.isLoadingMarkers) {
-                LoadingIndicator(
-                    modifier = Modifier
-                        .padding(end = Dimensions.paddingSmall)
-                        .size(Dimensions.iconSizeLarge),
-                    color = MaterialTheme.colorScheme.primary,
-                )
-            }
-
-            NeoBrutalIconButton(
-                modifier = Modifier.padding(end = Dimensions.paddingSmall),
-                backgroundColor = energeticOrange,
-                imageVector = Icons.Default.AutoAwesome,
-                contentDescription = stringResource(id = ExploreFeatureR.string.ai_suggest_button_content_description),
-                onClick = {
-                    view.performHapticFeedback(HapticFeedbackConstants.CONTEXT_CLICK)
-                    onSuggestPlaces()
-                },
-            )
-        }
-    }
-}
-
-@Composable
-private fun BoxScope.PathModeHint(isVisible: Boolean) {
-    AnimatedVisibility(
-        visible = isVisible,
-        enter = fadeIn(animationSpec = tween(durationMillis = AnimationConstants.ANIMATION_DURATION)),
-        exit = fadeOut(animationSpec = tween(durationMillis = AnimationConstants.ANIMATION_DURATION)),
-        modifier = Modifier
-            .align(Alignment.TopCenter)
-            .padding(top = Dimensions.paddingMedium)
-    ) {
-        NeoBrutalCard(
-            modifier = Modifier.padding(horizontal = Dimensions.paddingLarge)
-        ) {
-            Text(
-                text = stringResource(id = ExploreFeatureR.string.path_mode_hint),
-                style = MaterialTheme.typography.labelSmall,
-                color = MaterialTheme.colorScheme.onSurface,
-                textAlign = TextAlign.Center,
-                modifier = Modifier.padding(Dimensions.paddingLarge)
-            )
-        }
-    }
-}
-
-@Composable
-private fun BoxScope.PathModePanel(
-    isVisible: Boolean,
-    selectedCount: Int,
-    distanceMeters: Int,
-    durationMinutes: Int,
-    onGoClick: () -> Unit,
-) {
-    AnimatedVisibility(
-        modifier = Modifier
-            .align(Alignment.BottomCenter)
-            .navigationBarsPadding()
-            .padding(Dimensions.paddingMedium),
-        visible = isVisible,
-        enter = slideInHorizontally(
-            initialOffsetX = { it },
-            animationSpec = tween(
-                durationMillis = AnimationConstants.ANIMATION_DURATION,
-                easing = EaseInOutQuart
-            )
-        ),
-        exit = slideOutHorizontally(
-            targetOffsetX = { it },
-            animationSpec = tween(
-                durationMillis = AnimationConstants.ANIMATION_DURATION,
-                easing = EaseInOutQuart
-            )
-        )
-    ) {
-        Box(
-            modifier = Modifier
-                .navigationBarsPadding()
-                .padding(Dimensions.paddingLarge)
-        ) {
-            PathModeBar(
-                count = selectedCount,
-                distance = distanceMeters,
-                duration = durationMinutes,
-                onGoClick = onGoClick,
-            )
-        }
-    }
-}
-
-@Composable
-private fun BoxScope.MarkerInfoPanel(
-    marker: ExploreItemUiModel?,
-    isPathMode: Boolean,
-    onClose: () -> Unit,
-) {
-    AnimatedVisibility(
-        modifier = Modifier.align(Alignment.BottomCenter),
-        visible = marker != null && !isPathMode,
-        enter = slideInHorizontally(
-            initialOffsetX = { it },
-            animationSpec = tween(
-                durationMillis = AnimationConstants.ANIMATION_DURATION,
-                easing = EaseInOutQuart
-            )
-        ),
-        exit = slideOutHorizontally(
-            targetOffsetX = { it },
-            animationSpec = tween(
-                durationMillis = AnimationConstants.ANIMATION_DURATION,
-                easing = EaseInOutQuart
-            )
-        )
-    ) {
-        Box(
-            modifier = Modifier
-                .navigationBarsPadding()
-                .padding(Dimensions.paddingLarge)
-                .heightIn(max = 200.dp)
-        ) {
-            marker?.let {
-                MarkerInfoCard(
-                    marker = it,
-                    onClose = onClose,
-                )
-            }
-        }
-    }
-}
-
-@Composable
-private fun BoxScope.SuggestedPlaceInfoPanel(
-    place: SuggestedPlace?,
-    isPathMode: Boolean,
-    onClose: () -> Unit,
-) {
-    AnimatedVisibility(
-        modifier = Modifier.align(Alignment.BottomCenter),
-        visible = place != null && !isPathMode,
-        enter = slideInHorizontally(
-            initialOffsetX = { it },
-            animationSpec = tween(
-                durationMillis = AnimationConstants.ANIMATION_DURATION,
-                easing = EaseInOutQuart
-            )
-        ) + fadeIn(animationSpec = tween(durationMillis = AnimationConstants.ANIMATION_DURATION)),
-        exit = slideOutHorizontally(
-            targetOffsetX = { it },
-            animationSpec = tween(
-                durationMillis = AnimationConstants.ANIMATION_DURATION,
-                easing = EaseInOutQuart
-            )
-        ) + fadeOut(animationSpec = tween(durationMillis = AnimationConstants.ANIMATION_DURATION)),
-    ) {
-        Box(
-            modifier = Modifier
-                .navigationBarsPadding()
-                .padding(Dimensions.paddingLarge)
-                .heightIn(max = 400.dp)
-        ) {
-            place?.let {
-                SuggestedPlaceInfoCard(
-                    place = it,
-                    onClose = onClose,
-                )
-            }
-        }
-    }
-}
-
-@Composable
-private fun BoxScope.SnackbarContainer(snackbarHostState: SnackbarHostState) {
-    SnackbarHost(
-        hostState = snackbarHostState,
-        modifier = Modifier
-            .align(Alignment.BottomCenter)
-            .navigationBarsPadding()
-            .padding(Dimensions.paddingMedium),
-        snackbar = { data ->
-            Snackbar(
-                snackbarData = data,
-                containerColor = MaterialTheme.colorScheme.errorContainer,
-                contentColor = MaterialTheme.colorScheme.onErrorContainer,
-                actionColor = MaterialTheme.colorScheme.onErrorContainer
-            )
-        }
-    )
-}
-
-@Composable
-private fun ErrorState(
-    error: ExploreError?,
-    onRetry: () -> Unit
-) {
-    error?.let { error ->
-        Box(
-            modifier = Modifier
-                .fillMaxSize()
-                .background(color = MaterialTheme.colorScheme.surface.copy(alpha = Alphas.high)),
-            contentAlignment = Alignment.Center
-        ) {
-            NeoBrutalCard(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .wrapContentHeight()
-                    .padding(Dimensions.paddingLarge),
-            ) {
-                Column(
-                    horizontalAlignment = Alignment.CenterHorizontally,
-                    verticalArrangement = Arrangement.Center,
-                    modifier = Modifier.padding(Dimensions.paddingLarge)
-                ) {
-                    Icon(
-                        imageVector = when (error) {
-                            is ExploreError.ApiKeyMissing -> Icons.Rounded.VpnKey
-                            is ExploreError.NetworkError -> Icons.Rounded.WifiOff
-                            is ExploreError.Unknown -> Icons.Rounded.Warning
-                        },
-                        contentDescription = stringResource(ExploreFeatureR.string.explore_error_icon),
-                        tint = MaterialTheme.colorScheme.error,
-                        modifier = Modifier.size(Dimensions.iconSizeXLarge)
-                    )
-                    Spacer(modifier = Modifier.height(Dimensions.paddingMedium))
-                    Text(
-                        text = stringResource(ExploreFeatureR.string.explore_error_title),
-                        style = MaterialTheme.typography.titleMedium,
-                        color = MaterialTheme.colorScheme.onSurface
-                    )
-                    Spacer(modifier = Modifier.height(Dimensions.paddingSmall))
-                    Text(
-                        text = when (error) {
-                            is ExploreError.ApiKeyMissing -> stringResource(ExploreFeatureR.string.error_maps_api_key_missing)
-                            is ExploreError.NetworkError -> stringResource(ExploreFeatureR.string.explore_error_network)
-                            is ExploreError.Unknown -> error.message ?: stringResource(ExploreFeatureR.string.explore_error_unknown)
-                        },
-                        style = MaterialTheme.typography.bodyMedium,
-                        color = MaterialTheme.colorScheme.onSurface,
-                        textAlign = TextAlign.Center
-                    )
-                    if (error !is ExploreError.ApiKeyMissing) {
-                        Spacer(modifier = Modifier.height(Dimensions.paddingLarge))
-                        NeoBrutalButton(
-                            text = stringResource(ExploreFeatureR.string.explore_error_retry),
-                            onClick = onRetry,
-                            backgroundColor = MaterialTheme.colorScheme.error
-                        )
-                    }
-                }
-            }
-        }
-    }
-}
-
-@Composable
-private fun LoadingState(
-    isLoading: Boolean,
-    currentLoadingMessage: String
-) {
-    if (isLoading) {
-        Box(
-            modifier = Modifier
-                .fillMaxSize()
-                .background(color = MaterialTheme.colorScheme.surface.copy(alpha = Alphas.high)),
-            contentAlignment = Alignment.Center,
-        ) {
-            NeoBrutalCard(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .wrapContentHeight()
-                    .padding(Dimensions.paddingLarge),
-            ) {
-                Column(
-                    horizontalAlignment = Alignment.CenterHorizontally,
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .padding(Dimensions.paddingLarge)
-                ) {
-                    @OptIn(ExperimentalMaterial3ExpressiveApi::class)
-                    LoadingIndicator(
-                        modifier = Modifier.wrapContentSize(),
-                        color = MaterialTheme.colorScheme.primary,
-                    )
-
-                    if (currentLoadingMessage.isNotEmpty()) {
-                        Spacer(modifier = Modifier.height(Dimensions.paddingExtraLarge))
-                        AnimatedContent(
-                            targetState = currentLoadingMessage,
-                            transitionSpec = {
-                                fadeIn(animationSpec = tween(durationMillis = AnimationConstants.ANIMATION_DURATION))
-                                    .togetherWith(
-                                        fadeOut(animationSpec = tween(durationMillis = AnimationConstants.ANIMATION_DURATION))
-                                    )
-                            },
-                            label = "loadingMessageTransition"
-                        ) { message ->
-                            Text(
-                                text = message,
-                                style = MaterialTheme.typography.bodyLarge,
-                                color = MaterialTheme.colorScheme.onSurface,
-                                textAlign = TextAlign.Center,
-                                modifier = Modifier.padding(horizontal = Dimensions.paddingLarge)
-                            )
-                        }
-                    }
-                }
-            }
-        }
-    }
-}
-
-@Preview
-@Composable
-private fun LoadingStatePreview() {
-    SofaAiTheme {
-        Surface {
-            LoadingState(
-                isLoading = true,
-                currentLoadingMessage = "Consulting the oracle..."
-            )
-        }
-    }
-}
-
-@Preview
-@Composable
-private fun TopActionsPreview() {
-    SofaAiTheme {
-        Surface {
-            Box(modifier = Modifier.fillMaxSize()) {
-                TopActions(
-                    uiState = ExploreUiState(isLoadingMarkers = true),
-                    onToggleFilter = {},
-                    onSuggestPlaces = {},
-                )
-            }
-        }
-    }
-}
-
-@Preview
-@Composable
-private fun PathModeHintPreview() {
-    SofaAiTheme {
-        Surface {
-            Box(modifier = Modifier.fillMaxSize()) {
-                PathModeHint(isVisible = true)
-            }
-        }
-    }
-}
-
-@Preview
-@Composable
-private fun SuggestedPlaceInfoPanelPreview() {
-    SofaAiTheme {
-        Surface {
-            Box(modifier = Modifier.fillMaxSize()) {
-                SuggestedPlaceInfoPanel(
-                    place = SuggestedPlace(
-                        name = "Royal Palace",
-                        lat = 59.3268,
-                        lng = 18.0717,
-                        description = "The official residence of the Swedish monarch. A baroque-style palace with over 600 rooms.",
-                        category = "Landmark"
-                    ),
-                    isPathMode = false,
-                    onClose = {},
-                )
-            }
-        }
     }
 }

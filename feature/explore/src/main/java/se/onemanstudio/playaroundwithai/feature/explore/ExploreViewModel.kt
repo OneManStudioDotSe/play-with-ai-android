@@ -1,6 +1,5 @@
 package se.onemanstudio.playaroundwithai.feature.explore
 
-import se.onemanstudio.playaroundwithai.feature.explore.R
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.google.android.gms.maps.model.LatLng
@@ -22,12 +21,12 @@ import se.onemanstudio.playaroundwithai.data.explore.domain.model.SuggestedPlace
 import se.onemanstudio.playaroundwithai.data.explore.domain.model.VehicleType
 import se.onemanstudio.playaroundwithai.data.explore.domain.usecase.GetExploreItemsUseCase
 import se.onemanstudio.playaroundwithai.data.explore.domain.usecase.GetSuggestedPlacesUseCase
+import se.onemanstudio.playaroundwithai.data.explore.util.NetworkMonitor
 import se.onemanstudio.playaroundwithai.feature.explore.models.ExploreItemUiModel
 import se.onemanstudio.playaroundwithai.feature.explore.models.toUiModel
 import se.onemanstudio.playaroundwithai.feature.explore.states.ExploreError
 import se.onemanstudio.playaroundwithai.feature.explore.states.ExploreUiState
 import se.onemanstudio.playaroundwithai.feature.explore.states.SuggestedPlacesError
-import se.onemanstudio.playaroundwithai.data.explore.util.NetworkMonitor
 import se.onemanstudio.playaroundwithai.feature.explore.utils.calculatePathDistance
 import se.onemanstudio.playaroundwithai.feature.explore.utils.permutations
 import timber.log.Timber
@@ -37,6 +36,14 @@ import kotlin.math.roundToInt
 
 private const val WALKING_SPEED_METERS_PER_MIN = 83.0 // approx 5km/h
 private const val LOADING_MESSAGE_DURATION = 3000L
+
+private val LOADING_MESSAGE_RES_IDS = listOf(
+    R.string.loading_message_1,
+    R.string.loading_message_2,
+    R.string.loading_message_3,
+    R.string.loading_message_4,
+    R.string.loading_message_5,
+)
 
 @Suppress("TooManyFunctions")
 @HiltViewModel
@@ -309,15 +316,5 @@ class ExploreViewModel @Inject constructor(
     private fun stopLoadingMessageCycle() {
         loadingMessageJob?.cancel()
         loadingMessageJob = null
-    }
-
-    companion object {
-        private val LOADING_MESSAGE_RES_IDS = listOf(
-            R.string.loading_message_1,
-            R.string.loading_message_2,
-            R.string.loading_message_3,
-            R.string.loading_message_4,
-            R.string.loading_message_5,
-        )
     }
 }
