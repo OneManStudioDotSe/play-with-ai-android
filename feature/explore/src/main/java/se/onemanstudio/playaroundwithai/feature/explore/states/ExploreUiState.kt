@@ -25,7 +25,8 @@ sealed interface SuggestedPlacesError {
 
 @Immutable
 data class ExploreUiState(
-    val isLoading: Boolean = true,
+    val isLoading: Boolean = false,
+    val isLoadingMarkers: Boolean = true,
     val isPathMode: Boolean = false,
     val error: ExploreError? = null,
     val allLocations: PersistentList<ExploreItemUiModel> = persistentListOf(),

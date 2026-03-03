@@ -1,3 +1,5 @@
+@file:Suppress("TooManyFunctions")
+
 package se.onemanstudio.playaroundwithai.feature.explore
 
 import android.Manifest
@@ -67,6 +69,7 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalView
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.core.content.ContextCompat
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
@@ -94,6 +97,7 @@ import se.onemanstudio.playaroundwithai.core.ui.sofa.NeoBrutalIconButton
 import se.onemanstudio.playaroundwithai.core.ui.sofa.NeoBrutalTopAppBar
 import se.onemanstudio.playaroundwithai.core.ui.theme.Alphas
 import se.onemanstudio.playaroundwithai.core.ui.theme.Dimensions
+import se.onemanstudio.playaroundwithai.core.ui.theme.SofaAiTheme
 import se.onemanstudio.playaroundwithai.core.ui.theme.energeticOrange
 import se.onemanstudio.playaroundwithai.feature.explore.ExploreConstants.STOCKHOLM_LAT
 import se.onemanstudio.playaroundwithai.feature.explore.ExploreConstants.STOCKHOLM_LNG
@@ -548,6 +552,16 @@ private fun BoxScope.TopActions(
 
             Spacer(modifier = Modifier.weight(1f))
 
+            @OptIn(ExperimentalMaterial3ExpressiveApi::class)
+            AnimatedVisibility(visible = uiState.isLoadingMarkers) {
+                LoadingIndicator(
+                    modifier = Modifier
+                        .padding(end = Dimensions.paddingSmall)
+                        .size(Dimensions.iconSizeLarge),
+                    color = MaterialTheme.colorScheme.primary,
+                )
+            }
+
             NeoBrutalIconButton(
                 modifier = Modifier.padding(end = Dimensions.paddingSmall),
                 backgroundColor = energeticOrange,
@@ -698,7 +712,7 @@ private fun BoxScope.SuggestedPlaceInfoPanel(
             modifier = Modifier
                 .navigationBarsPadding()
                 .padding(Dimensions.paddingLarge)
-                .heightIn(max = 200.dp)
+                .heightIn(max = 400.dp)
         ) {
             place?.let {
                 SuggestedPlaceInfoCard(
@@ -846,6 +860,61 @@ private fun LoadingState(
                     }
                 }
             }
+        }
+    }
+}
+
+@Preview
+@Composable
+private fun LoadingStatePreview() {
+    SofaAiTheme {
+        LoadingState(
+            isLoading = true,
+            currentLoadingMessage = "Consulting the oracle..."
+        )
+    }
+}
+
+@Preview
+@Composable
+private fun TopActionsPreview() {
+    SofaAiTheme {
+        Box(modifier = Modifier.fillMaxSize()) {
+            TopActions(
+                uiState = ExploreUiState(isLoadingMarkers = true),
+                onToggleFilter = {},
+                onSuggestPlaces = {},
+            )
+        }
+    }
+}
+
+@Preview
+@Composable
+private fun PathModeHintPreview() {
+    SofaAiTheme {
+        Box(modifier = Modifier.fillMaxSize()) {
+            PathModeHint(isVisible = true)
+        }
+    }
+}
+
+@Preview
+@Composable
+private fun SuggestedPlaceInfoPanelPreview() {
+    SofaAiTheme {
+        Box(modifier = Modifier.fillMaxSize()) {
+            SuggestedPlaceInfoPanel(
+                place = SuggestedPlace(
+                    name = "Royal Palace",
+                    lat = 59.3268,
+                    lng = 18.0717,
+                    description = "The official residence of the Swedish monarch. A baroque-style palace with over 600 rooms.",
+                    category = "Landmark"
+                ),
+                isPathMode = false,
+                onClose = {},
+            )
         }
     }
 }

@@ -83,17 +83,15 @@ class ExploreViewModel @Inject constructor(
         lastCenterLat = centerLat
         lastCenterLng = centerLng
         if (!apiKeyAvailability.isMapsKeyAvailable) {
-            _uiState.update { it.copy(isLoading = false, error = ExploreError.ApiKeyMissing) }
+            _uiState.update { it.copy(isLoadingMarkers = false, error = ExploreError.ApiKeyMissing) }
             return
         }
 
-        _uiState.update { it.copy(isLoading = true, error = null) }
-        startLoadingMessageCycle()
+        _uiState.update { it.copy(isLoadingMarkers = true, error = null) }
 
         if (!networkMonitor.isNetworkAvailable()) {
             Timber.w("ExploreViewModel - No network available, cannot load map data")
-            stopLoadingMessageCycle()
-            _uiState.update { it.copy(isLoading = false, error = ExploreError.NetworkError) }
+            _uiState.update { it.copy(isLoadingMarkers = false, error = ExploreError.NetworkError) }
             return
         }
 
@@ -101,18 +99,15 @@ class ExploreViewModel @Inject constructor(
             try {
                 val data = getExploreItemsUseCase(exploreSettingsHolder.vehicleCount.value, centerLat, centerLng)
                     .map { it.toUiModel() }.toPersistentList()
-                stopLoadingMessageCycle()
                 _uiState.update {
-                    it.copy(isLoading = false, allLocations = data, visibleLocations = data)
+                    it.copy(isLoadingMarkers = false, allLocations = data, visibleLocations = data)
                 }
             } catch (e: IOException) {
                 Timber.e(e, "ExploreViewModel - Failed to load map data (network)")
-                stopLoadingMessageCycle()
-                _uiState.update { it.copy(isLoading = false, error = ExploreError.NetworkError) }
+                _uiState.update { it.copy(isLoadingMarkers = false, error = ExploreError.NetworkError) }
             } catch (e: Exception) {
                 Timber.e(e, "ExploreViewModel - Failed to load map data")
-                stopLoadingMessageCycle()
-                _uiState.update { it.copy(isLoading = false, error = ExploreError.Unknown(e.localizedMessage)) }
+                _uiState.update { it.copy(isLoadingMarkers = false, error = ExploreError.Unknown(e.localizedMessage)) }
             }
         }
     }
