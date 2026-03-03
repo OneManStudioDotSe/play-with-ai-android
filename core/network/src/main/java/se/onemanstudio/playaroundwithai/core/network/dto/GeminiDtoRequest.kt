@@ -5,6 +5,11 @@ import com.google.gson.annotations.SerializedName
 data class GeminiRequest(
     @SerializedName("contents") val contents: List<Content>,
     @SerializedName("tools") val tools: List<Tool>? = null,
+    @SerializedName("generationConfig") val generationConfig: GenerationConfig? = null,
+)
+
+data class GenerationConfig(
+    @SerializedName("response_modalities") val responseModalities: List<String>? = null,
 )
 
 data class Content(
@@ -14,14 +19,14 @@ data class Content(
 
 data class Part(
     @SerializedName("text") val text: String? = null,
-    @SerializedName("inline_data") val inlineData: ImageData? = null,
+    @SerializedName(value = "inlineData", alternate = ["inline_data"]) val inlineData: ImageData? = null,
     @SerializedName("functionCall") val functionCall: FunctionCallDto? = null,
     @SerializedName("functionResponse") val functionResponse: FunctionResponseDto? = null,
     @SerializedName("thought_signature") val thoughtSignature: String? = null,
 )
 
 data class ImageData(
-    @SerializedName("mime_type") val mimeType: String,
+    @SerializedName(value = "mimeType", alternate = ["mime_type"]) val mimeType: String,
     @SerializedName("data") val data: String,
 )
 
