@@ -32,7 +32,8 @@
       "WebFetch(domain:navczydev.medium.com)",
       "WebFetch(domain:zoewave.medium.com)",
       "WebFetch(domain:android-developers.googleblog.com)",
-      "WebFetch(domain:medium.com)"
+      "WebFetch(domain:medium.com)",
+      "WebFetch(domain:developers.googleblog.com)"
     ]
   }
 }

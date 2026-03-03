@@ -17,6 +17,7 @@ import org.junit.Rule
 import org.junit.Test
 import se.onemanstudio.playaroundwithai.core.config.model.ApiKeyAvailability
 import se.onemanstudio.playaroundwithai.data.dream.domain.model.Dream
+import se.onemanstudio.playaroundwithai.data.dream.domain.model.DreamImage
 import se.onemanstudio.playaroundwithai.data.dream.domain.model.DreamInterpretation
 import se.onemanstudio.playaroundwithai.data.dream.domain.model.DreamMood
 import se.onemanstudio.playaroundwithai.data.dream.domain.model.DreamPalette
@@ -25,9 +26,10 @@ import se.onemanstudio.playaroundwithai.data.dream.domain.model.DreamScene
 import se.onemanstudio.playaroundwithai.data.dream.domain.model.ParticleShape
 import se.onemanstudio.playaroundwithai.data.dream.domain.repository.DreamGeminiRepository
 import se.onemanstudio.playaroundwithai.data.dream.domain.repository.DreamRepository
-import se.onemanstudio.playaroundwithai.data.dream.domain.usecase.DeleteDreamUseCase
+import se.onemanstudio.playaroundwithai.data.dream.domain.usecase.GenerateDreamImageUseCase
 import se.onemanstudio.playaroundwithai.data.dream.domain.usecase.GetDreamHistoryUseCase
 import se.onemanstudio.playaroundwithai.data.dream.domain.usecase.InterpretDreamUseCase
+import se.onemanstudio.playaroundwithai.data.dream.domain.usecase.SaveDreamImageUseCase
 import se.onemanstudio.playaroundwithai.data.dream.domain.usecase.SaveDreamUseCase
 import se.onemanstudio.playaroundwithai.feature.dream.states.DreamError
 import se.onemanstudio.playaroundwithai.feature.dream.states.DreamImageState
@@ -76,16 +78,20 @@ class DreamViewModelTest {
     }
 
     @Test
-    fun `interpretDream success sets image state to Generated`() = runTest {
+    fun `interpretDream success sets image state to Generated with artist name`() = runTest {
         val interpretation = createTestInterpretation()
-        val viewModel = createViewModel(interpretResult = Result.success(interpretation))
+        val dreamImage = DreamImage(imageBase64 = "AAAA", mimeType = "image/png", artistName = "Salvador Dali")
+        val viewModel = createViewModel(
+            interpretResult = Result.success(interpretation),
+            imageResult = Result.success(dreamImage),
+        )
 
         viewModel.interpretDream("I was flying")
         advanceUntilIdle()
 
         val imageState = viewModel.screenState.value.imageState
         assert(imageState is DreamImageState.Generated)
-        assertEquals("Lorem ipsum", (imageState as DreamImageState.Generated).artistName)
+        assertEquals("Salvador Dali", (imageState as DreamImageState.Generated).artistName)
     }
 
     @Test
@@ -140,7 +146,7 @@ class DreamViewModelTest {
     }
 
     @Test
-    fun `clearResult resets to Initial`() = runTest {
+    fun `clearResult resets to Initial and Idle`() = runTest {
         val interpretation = createTestInterpretation()
         val viewModel = createViewModel(interpretResult = Result.success(interpretation))
 
@@ -159,6 +165,7 @@ class DreamViewModelTest {
         val interpretation = createTestInterpretation()
         val dreamRepository = mockk<DreamRepository> {
             coEvery { saveDream(any()) } returns 1L
+            coEvery { saveDreamImage(any(), any(), any(), any()) } returns "/path/image.png"
             every { getDreamHistory() } returns flowOf(emptyList())
         }
         val viewModel = createViewModel(
@@ -197,7 +204,7 @@ class DreamViewModelTest {
     }
 
     @Test
-    fun `restoreDream without imagePath sets Generated state with placeholder artist`() = runTest {
+    fun `restoreDream without imagePath sets Idle image state`() = runTest {
         val viewModel = createViewModel()
         val scene = createTestInterpretation().scene
 
@@ -213,22 +220,66 @@ class DreamViewModelTest {
         advanceUntilIdle()
 
         val imageState = viewModel.screenState.value.imageState
-        assert(imageState is DreamImageState.Generated)
-        assertEquals("Lorem ipsum", (imageState as DreamImageState.Generated).artistName)
+        assertEquals(DreamImageState.Idle, imageState)
+    }
+
+    @Test
+    fun `image generation failure does not affect interpretation result`() = runTest {
+        val interpretation = createTestInterpretation()
+        val viewModel = createViewModel(
+            interpretResult = Result.success(interpretation),
+            imageResult = Result.failure(IOException("Image gen failed")),
+        )
+
+        viewModel.interpretDream("A dream")
+        advanceUntilIdle()
+
+        val dreamState = viewModel.screenState.value.dreamState
+        assert(dreamState is DreamUiState.Result)
+        assertEquals(interpretation.textAnalysis, (dreamState as DreamUiState.Result).interpretation)
+
+        val imageState = viewModel.screenState.value.imageState
+        assert(imageState is DreamImageState.Error)
+    }
+
+    @Test
+    fun `clearResult resets both dream and image states`() = runTest {
+        val interpretation = createTestInterpretation()
+        val dreamImage = DreamImage(imageBase64 = "AAAA", mimeType = "image/png", artistName = "Monet")
+        val viewModel = createViewModel(
+            interpretResult = Result.success(interpretation),
+            imageResult = Result.success(dreamImage),
+        )
+
+        viewModel.interpretDream("Dream text")
+        advanceUntilIdle()
+
+        assert(viewModel.screenState.value.dreamState is DreamUiState.Result)
+        assert(viewModel.screenState.value.imageState is DreamImageState.Generated)
+
+        viewModel.clearResult()
+        advanceUntilIdle()
+
+        assertEquals(DreamUiState.Initial, viewModel.screenState.value.dreamState)
+        assertEquals(DreamImageState.Idle, viewModel.screenState.value.imageState)
+        assertEquals("", viewModel.screenState.value.currentDescription)
     }
 
     private fun createViewModel(
         interpretResult: Result<DreamInterpretation>? = null,
+        imageResult: Result<DreamImage>? = null,
         dreamHistory: List<Dream> = emptyList(),
         dreamRepository: DreamRepository? = null,
         apiKeyAvailability: ApiKeyAvailability = ApiKeyAvailability(isGeminiKeyAvailable = true, isMapsKeyAvailable = true),
     ): DreamViewModel {
         val geminiRepository = mockk<DreamGeminiRepository> {
             interpretResult?.let { coEvery { interpretDream(any()) } returns it }
+            coEvery { generateDreamImage(any()) } returns (imageResult ?: Result.failure(RuntimeException("Not configured")))
         }
 
         val effectiveDreamRepository = dreamRepository ?: mockk<DreamRepository> {
             coEvery { saveDream(any()) } returns 1L
+            coEvery { saveDreamImage(any(), any(), any(), any()) } returns "/path/image.png"
             coEvery { deleteDream(any()) } returns Unit
             every { getDreamHistory() } returns flowOf(dreamHistory)
         }
@@ -237,6 +288,8 @@ class DreamViewModelTest {
             InterpretDreamUseCase(geminiRepository),
             SaveDreamUseCase(effectiveDreamRepository),
             GetDreamHistoryUseCase(effectiveDreamRepository),
+            GenerateDreamImageUseCase(geminiRepository),
+            SaveDreamImageUseCase(effectiveDreamRepository),
             apiKeyAvailability,
         )
     }

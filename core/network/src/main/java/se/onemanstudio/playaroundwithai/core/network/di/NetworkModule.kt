@@ -18,7 +18,7 @@ import java.util.concurrent.TimeUnit
 import javax.inject.Singleton
 
 private const val TIMEOUT_SECONDS = 30L
-private const val MAX_LOG_LINE_LENGTH = 500
+private const val MAX_LOG_LINE_LENGTH = 800
 
 @Module
 @InstallIn(SingletonComponent::class)
