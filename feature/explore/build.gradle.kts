@@ -48,6 +48,7 @@ dependencies {
     implementation(libs.kotlinx.collections.immutable)
 
     implementation(libs.timber)
+    implementation(libs.coil.compose)
 
     // Hilt
     implementation(libs.hilt.android)
