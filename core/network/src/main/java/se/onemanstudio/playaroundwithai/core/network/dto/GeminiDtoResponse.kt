@@ -7,7 +7,7 @@ data class GeminiResponse(
     @SerializedName("usageMetadata") val usageMetadata: UsageMetadata? = null,
 ) {
     fun extractText(): String? {
-        return candidates.firstOrNull()?.content?.parts?.firstOrNull { it.text != null }?.text
+        return candidates.firstOrNull()?.content?.parts?.firstOrNull { it.text != null && it.thought != true }?.text
     }
 
     fun extractImageData(): ImageData? {

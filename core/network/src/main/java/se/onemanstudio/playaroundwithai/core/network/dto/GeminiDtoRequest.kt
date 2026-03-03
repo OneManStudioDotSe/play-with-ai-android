@@ -22,7 +22,8 @@ data class Part(
     @SerializedName(value = "inlineData", alternate = ["inline_data"]) val inlineData: ImageData? = null,
     @SerializedName("functionCall") val functionCall: FunctionCallDto? = null,
     @SerializedName("functionResponse") val functionResponse: FunctionResponseDto? = null,
-    @SerializedName("thought_signature") val thoughtSignature: String? = null,
+    @SerializedName("thought") val thought: Boolean? = null,
+    @SerializedName(value = "thoughtSignature", alternate = ["thought_signature"]) val thoughtSignature: String? = null,
 )
 
 data class ImageData(

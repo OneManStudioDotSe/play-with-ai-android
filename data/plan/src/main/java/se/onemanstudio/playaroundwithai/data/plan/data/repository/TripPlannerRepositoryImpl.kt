@@ -88,7 +88,7 @@ class TripPlannerRepositoryImpl @Inject constructor(
                     emit(PlanEvent.ToolResult(functionCall.name, summarizeResult(functionCall.name, result)))
                     emit(PlanEvent.Thinking("Analyzing results..."))
                 } else {
-                    val text = modelContent.parts.firstOrNull { it.text != null }?.text.orEmpty()
+                    val text = modelContent.parts.firstOrNull { it.text != null && it.thought != true }?.text.orEmpty()
                     val plan = buildTripPlan(text, collectedStops, routeResult)
                     emit(PlanEvent.Complete(plan))
                     return@flow
