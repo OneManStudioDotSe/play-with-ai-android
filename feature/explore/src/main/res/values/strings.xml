@@ -46,4 +46,12 @@
     <string name="loading_message_3">Consulting the oracle…</string>
     <string name="loading_message_4">Polishing pixels…</string>
     <string name="loading_message_5">Waking up the AI…</string>
+
+    <string name="suggested_place_coordinates">Coordinates</string>
+    <string name="suggested_place_coordinates_format">%.4f°%s, %.4f°%s</string>
+    <string name="suggested_place_image_content_description">Photo of %s</string>
+    <string name="north_abbreviation">N</string>
+    <string name="south_abbreviation">S</string>
+    <string name="east_abbreviation">E</string>
+    <string name="west_abbreviation">W</string>
 </resources>

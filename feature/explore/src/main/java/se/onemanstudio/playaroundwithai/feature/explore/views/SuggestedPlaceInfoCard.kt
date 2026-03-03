@@ -9,9 +9,11 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Close
 import androidx.compose.material.icons.filled.Category
+import androidx.compose.material.icons.filled.LocationOn
 import androidx.compose.material.icons.filled.Stars
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
@@ -20,15 +22,21 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
+import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
+import androidx.compose.ui.unit.dp
+import coil.compose.AsyncImage
 import se.onemanstudio.playaroundwithai.data.explore.domain.model.SuggestedPlace
 import se.onemanstudio.playaroundwithai.core.ui.sofa.NeoBrutalCard
 import se.onemanstudio.playaroundwithai.core.ui.sofa.NeoBrutalIconButton
 import se.onemanstudio.playaroundwithai.core.ui.theme.Dimensions
 import se.onemanstudio.playaroundwithai.core.ui.theme.SofaAiTheme
 import se.onemanstudio.playaroundwithai.feature.explore.R
+
+private const val IMAGE_HEIGHT = 120
 
 @Composable
 fun SuggestedPlaceInfoCard(
@@ -88,6 +96,51 @@ fun SuggestedPlaceInfoCard(
             Spacer(modifier = Modifier.height(Dimensions.paddingLarge))
             HorizontalDivider(color = MaterialTheme.colorScheme.onSurface)
             Spacer(modifier = Modifier.height(Dimensions.paddingLarge))
+
+            AsyncImage(
+                model = "https://picsum.photos/seed/${place.name.replace(" ", "")}/400/200",
+                contentDescription = stringResource(R.string.suggested_place_image_content_description, place.name),
+                contentScale = ContentScale.Crop,
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .height(IMAGE_HEIGHT.dp)
+                    .clip(RoundedCornerShape(Dimensions.paddingMedium)),
+            )
+
+            Spacer(modifier = Modifier.height(Dimensions.paddingLarge))
+
+            Row(verticalAlignment = Alignment.CenterVertically) {
+                Icon(
+                    imageVector = Icons.Default.LocationOn,
+                    contentDescription = stringResource(R.string.suggested_place_coordinates),
+                    modifier = Modifier.size(Dimensions.iconSizeSmall),
+                    tint = MaterialTheme.colorScheme.onSurfaceVariant
+                )
+                Spacer(modifier = Modifier.width(Dimensions.paddingSmall))
+                val latDirection = if (place.lat >= 0) {
+                    stringResource(R.string.north_abbreviation)
+                } else {
+                    stringResource(R.string.south_abbreviation)
+                }
+                val lngDirection = if (place.lng >= 0) {
+                    stringResource(R.string.east_abbreviation)
+                } else {
+                    stringResource(R.string.west_abbreviation)
+                }
+                Text(
+                    text = stringResource(
+                        R.string.suggested_place_coordinates_format,
+                        kotlin.math.abs(place.lat),
+                        latDirection,
+                        kotlin.math.abs(place.lng),
+                        lngDirection
+                    ),
+                    style = MaterialTheme.typography.labelSmall,
+                    color = MaterialTheme.colorScheme.onSurfaceVariant
+                )
+            }
+
+            Spacer(modifier = Modifier.height(Dimensions.paddingMedium))
 
             Text(
                 text = place.description,
