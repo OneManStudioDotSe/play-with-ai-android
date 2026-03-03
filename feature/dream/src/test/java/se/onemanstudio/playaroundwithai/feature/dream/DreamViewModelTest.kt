@@ -236,7 +236,6 @@ class DreamViewModelTest {
         return DreamViewModel(
             InterpretDreamUseCase(geminiRepository),
             SaveDreamUseCase(effectiveDreamRepository),
-            DeleteDreamUseCase(effectiveDreamRepository),
             GetDreamHistoryUseCase(effectiveDreamRepository),
             apiKeyAvailability,
         )

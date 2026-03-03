@@ -45,14 +45,15 @@ import androidx.compose.material.icons.rounded.VpnKey
 import androidx.compose.material.icons.rounded.Warning
 import androidx.compose.material.icons.rounded.WifiOff
 import androidx.compose.material3.ExperimentalMaterial3ExpressiveApi
-import androidx.compose.material3.LoadingIndicator
-import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Icon
+import androidx.compose.material3.LoadingIndicator
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Snackbar
 import androidx.compose.material3.SnackbarHost
 import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.SnackbarResult
+import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
@@ -89,8 +90,6 @@ import com.google.maps.android.compose.Polyline
 import com.google.maps.android.compose.rememberCameraPositionState
 import com.google.maps.android.compose.rememberUpdatedMarkerState
 import kotlinx.coroutines.launch
-import se.onemanstudio.playaroundwithai.data.explore.domain.model.SuggestedPlace
-import se.onemanstudio.playaroundwithai.data.explore.domain.model.VehicleType
 import se.onemanstudio.playaroundwithai.core.ui.sofa.NeoBrutalButton
 import se.onemanstudio.playaroundwithai.core.ui.sofa.NeoBrutalCard
 import se.onemanstudio.playaroundwithai.core.ui.sofa.NeoBrutalIconButton
@@ -99,6 +98,8 @@ import se.onemanstudio.playaroundwithai.core.ui.theme.Alphas
 import se.onemanstudio.playaroundwithai.core.ui.theme.Dimensions
 import se.onemanstudio.playaroundwithai.core.ui.theme.SofaAiTheme
 import se.onemanstudio.playaroundwithai.core.ui.theme.energeticOrange
+import se.onemanstudio.playaroundwithai.data.explore.domain.model.SuggestedPlace
+import se.onemanstudio.playaroundwithai.data.explore.domain.model.VehicleType
 import se.onemanstudio.playaroundwithai.feature.explore.ExploreConstants.STOCKHOLM_LAT
 import se.onemanstudio.playaroundwithai.feature.explore.ExploreConstants.STOCKHOLM_LNG
 import se.onemanstudio.playaroundwithai.feature.explore.models.ExploreItemUiModel
@@ -279,195 +280,195 @@ fun ExploreScreen(
                 .padding(top = paddingValues.calculateTopPadding())
         ) {
             GoogleMap(
-            modifier = Modifier.fillMaxSize(),
-            cameraPositionState = cameraPositionState,
-            properties = MapProperties(
-                mapStyleOptions = MapStyleOptions.loadRawResourceStyle(
-                    context,
-                    if (isSystemInDarkTheme()) {
-                        ExploreFeatureR.raw.custom_map_style_dark
-                    } else {
-                        ExploreFeatureR.raw.custom_map_style_light
-                    }
+                modifier = Modifier.fillMaxSize(),
+                cameraPositionState = cameraPositionState,
+                properties = MapProperties(
+                    mapStyleOptions = MapStyleOptions.loadRawResourceStyle(
+                        context,
+                        if (isSystemInDarkTheme()) {
+                            ExploreFeatureR.raw.custom_map_style_dark
+                        } else {
+                            ExploreFeatureR.raw.custom_map_style_light
+                        }
+                    ),
+                    isMyLocationEnabled = hasLocationPermission
                 ),
-                isMyLocationEnabled = hasLocationPermission
-            ),
-            uiSettings = MapUiSettings(
-                compassEnabled = false,
-                indoorLevelPickerEnabled = false,
-                mapToolbarEnabled = false,
-                rotationGesturesEnabled = true,
-                zoomControlsEnabled = false,
-                zoomGesturesEnabled = true,
-                myLocationButtonEnabled = false,
-            ),
-            onMapClick = {
-                viewModel.selectMarker(null)
-                viewModel.selectSuggestedPlace(null)
-            }
-        ) {
-            if (uiState.optimalRoute.isNotEmpty()) {
-                @Suppress("COMPOSE_APPLIER_CALL_MISMATCH")
-                Polyline(
-                    points = uiState.optimalRoute,
-                    color = MaterialTheme.colorScheme.onSurface,
-                    width = 12f,
-                    geodesic = true
-                )
-            }
-
-            uiState.visibleLocations.forEach { item ->
-                key(item.id) {
-                    val isSelected = uiState.selectedLocations.any { it.id == item.id } || uiState.focusedMarker?.id == item.id
-
-                    val icon =
-                        if (item.type == VehicleType.Bicycle) Icons.AutoMirrored.Filled.DirectionsBike else Icons.Default.ElectricScooter
-
-                    MarkerComposable(
-                        keys = arrayOf<Any>(item.id, isSelected),
-                        state = rememberUpdatedMarkerState(position = item.position),
-                        title = item.name,
-                        zIndex = if (isSelected) 10f else 1f,
-                        onClick = {
-                            scope.launch {
-                                cameraPositionState.animate(
-                                    update = CameraUpdateFactory.newLatLng(item.position),
-                                    durationMs = ExploreConstants.MOVE_TO_POINT_DURATION
-                                )
-                            }
-
-                            if (uiState.isPathMode) {
-                                viewModel.toggleSelection(item)
-                            } else {
-                                viewModel.selectMarker(item)
-                            }
-                            true
-                        }
-                    ) {
-                        CustomMarkerIcon(
-                            icon,
-                            stringResource(id = ExploreFeatureR.string.marker_content_description, item.name),
-                            isSelected
-                        )
-                    }
+                uiSettings = MapUiSettings(
+                    compassEnabled = false,
+                    indoorLevelPickerEnabled = false,
+                    mapToolbarEnabled = false,
+                    rotationGesturesEnabled = true,
+                    zoomControlsEnabled = false,
+                    zoomGesturesEnabled = true,
+                    myLocationButtonEnabled = false,
+                ),
+                onMapClick = {
+                    viewModel.selectMarker(null)
+                    viewModel.selectSuggestedPlace(null)
                 }
-            }
-
-            uiState.suggestedPlaces.forEach { place ->
-                key(place.name + place.lat + place.lng) {
-                    val syntheticId = "suggested_${place.name}_${place.lat}_${place.lng}"
-                    val isSelected = uiState.focusedSuggestedPlace == place ||
-                        uiState.selectedLocations.any { it.id == syntheticId }
-
-                    MarkerComposable(
-                        keys = arrayOf<Any>(place.name, place.lat, place.lng, isSelected),
-                        state = rememberUpdatedMarkerState(position = LatLng(place.lat, place.lng)),
-                        title = place.name,
-                        snippet = place.description,
-                        zIndex = if (isSelected) 10f else 2f,
-                        onClick = {
-                            scope.launch {
-                                cameraPositionState.animate(
-                                    update = CameraUpdateFactory.newLatLng(LatLng(place.lat, place.lng)),
-                                    durationMs = ExploreConstants.MOVE_TO_POINT_DURATION
-                                )
-                            }
-                            if (uiState.isPathMode) {
-                                viewModel.toggleSuggestedPlaceSelection(place)
-                            } else {
-                                viewModel.selectSuggestedPlace(place)
-                            }
-                            true
-                        }
-                    ) {
-                        CustomMarkerIcon(
-                            Icons.Filled.Stars,
-                            stringResource(id = ExploreFeatureR.string.ai_suggested_place_marker_content_description, place.name),
-                            isSelected
-                        )
-                    }
+            ) {
+                if (uiState.optimalRoute.isNotEmpty()) {
+                    @Suppress("COMPOSE_APPLIER_CALL_MISMATCH")
+                    Polyline(
+                        points = uiState.optimalRoute,
+                        color = MaterialTheme.colorScheme.onSurface,
+                        width = 12f,
+                        geodesic = true
+                    )
                 }
-            }
-        }
 
-        TopActions(
-            uiState = uiState,
-            onToggleFilter = { type -> viewModel.toggleFilter(type) },
-            onSuggestPlaces = { viewModel.getAiSuggestedPlaces(userLocation) },
-        )
+                uiState.visibleLocations.forEach { item ->
+                    key(item.id) {
+                        val isSelected = uiState.selectedLocations.any { it.id == item.id } || uiState.focusedMarker?.id == item.id
 
-        PathModeHint(isVisible = uiState.isPathMode)
+                        val icon =
+                            if (item.type == VehicleType.Bicycle) Icons.AutoMirrored.Filled.DirectionsBike else Icons.Default.ElectricScooter
 
-        ExploreControls(
-            uiState = uiState,
-            cameraPositionState = cameraPositionState,
-            onMyLocationClick = {
-                val hasPermission = ContextCompat.checkSelfPermission(
-                    context,
-                    Manifest.permission.ACCESS_FINE_LOCATION
-                ) == PackageManager.PERMISSION_GRANTED
+                        MarkerComposable(
+                            keys = arrayOf<Any>(item.id, isSelected),
+                            state = rememberUpdatedMarkerState(position = item.position),
+                            title = item.name,
+                            zIndex = if (isSelected) 10f else 1f,
+                            onClick = {
+                                scope.launch {
+                                    cameraPositionState.animate(
+                                        update = CameraUpdateFactory.newLatLng(item.position),
+                                        durationMs = ExploreConstants.MOVE_TO_POINT_DURATION
+                                    )
+                                }
 
-                if (hasPermission) {
-                    fusedLocationClient.lastLocation.addOnSuccessListener { location ->
-                        location?.let {
-                            val userLatLng = LatLng(it.latitude, it.longitude)
-                            scope.launch {
-                                cameraPositionState.animate(
-                                    update = CameraUpdateFactory.newLatLngZoom(
-                                        userLatLng,
-                                        ExploreConstants.MAX_ZOOM_LEVEL
-                                    ),
-                                    durationMs = ExploreConstants.MOVE_TO_POINT_DURATION
-                                )
+                                if (uiState.isPathMode) {
+                                    viewModel.toggleSelection(item)
+                                } else {
+                                    viewModel.selectMarker(item)
+                                }
+                                true
                             }
+                        ) {
+                            CustomMarkerIcon(
+                                icon,
+                                stringResource(id = ExploreFeatureR.string.marker_content_description, item.name),
+                                isSelected
+                            )
                         }
                     }
-                } else {
-                    permissionLauncher.launch(Manifest.permission.ACCESS_FINE_LOCATION)
                 }
-            },
-            onSetPathMode = { isCurrentlyPathMode -> viewModel.setPathMode(!isCurrentlyPathMode) },
-        )
 
-        PathModePanel(
-            isVisible = uiState.isPathMode,
-            selectedCount = uiState.selectedLocations.size,
-            distanceMeters = uiState.routeDistanceMeters,
-            durationMinutes = uiState.routeDurationMinutes,
-            onGoClick = {
-                if (userLocation != null) {
-                    viewModel.calculateOptimalRoute(userLocation)
+                uiState.suggestedPlaces.forEach { place ->
+                    key(place.name + place.lat + place.lng) {
+                        val syntheticId = "suggested_${place.name}_${place.lat}_${place.lng}"
+                        val isSelected = uiState.focusedSuggestedPlace == place ||
+                                uiState.selectedLocations.any { it.id == syntheticId }
+
+                        MarkerComposable(
+                            keys = arrayOf<Any>(place.name, place.lat, place.lng, isSelected),
+                            state = rememberUpdatedMarkerState(position = LatLng(place.lat, place.lng)),
+                            title = place.name,
+                            snippet = place.description,
+                            zIndex = if (isSelected) 10f else 2f,
+                            onClick = {
+                                scope.launch {
+                                    cameraPositionState.animate(
+                                        update = CameraUpdateFactory.newLatLng(LatLng(place.lat, place.lng)),
+                                        durationMs = ExploreConstants.MOVE_TO_POINT_DURATION
+                                    )
+                                }
+                                if (uiState.isPathMode) {
+                                    viewModel.toggleSuggestedPlaceSelection(place)
+                                } else {
+                                    viewModel.selectSuggestedPlace(place)
+                                }
+                                true
+                            }
+                        ) {
+                            CustomMarkerIcon(
+                                Icons.Filled.Stars,
+                                stringResource(id = ExploreFeatureR.string.ai_suggested_place_marker_content_description, place.name),
+                                isSelected
+                            )
+                        }
+                    }
                 }
-            },
-        )
-
-        MarkerInfoPanel(
-            marker = uiState.focusedMarker,
-            isPathMode = uiState.isPathMode,
-            onClose = { viewModel.selectMarker(null) },
-        )
-
-        SuggestedPlaceInfoPanel(
-            place = uiState.focusedSuggestedPlace,
-            isPathMode = uiState.isPathMode,
-            onClose = { viewModel.selectSuggestedPlace(null) },
-        )
-
-        SnackbarContainer(snackbarHostState)
-
-        LoadingState(
-            isLoading = uiState.isLoading,
-            currentLoadingMessage = currentLoadingMessage
-        )
-
-        ErrorState(
-            error = uiState.error,
-            onRetry = {
-                val lat = userLocation?.latitude ?: STOCKHOLM_LAT
-                val lng = userLocation?.longitude ?: STOCKHOLM_LNG
-                viewModel.loadMapData(lat, lng)
             }
-        )
+
+            TopActions(
+                uiState = uiState,
+                onToggleFilter = { type -> viewModel.toggleFilter(type) },
+                onSuggestPlaces = { viewModel.getAiSuggestedPlaces(userLocation) },
+            )
+
+            PathModeHint(isVisible = uiState.isPathMode)
+
+            ExploreControls(
+                uiState = uiState,
+                cameraPositionState = cameraPositionState,
+                onMyLocationClick = {
+                    val hasPermission = ContextCompat.checkSelfPermission(
+                        context,
+                        Manifest.permission.ACCESS_FINE_LOCATION
+                    ) == PackageManager.PERMISSION_GRANTED
+
+                    if (hasPermission) {
+                        fusedLocationClient.lastLocation.addOnSuccessListener { location ->
+                            location?.let {
+                                val userLatLng = LatLng(it.latitude, it.longitude)
+                                scope.launch {
+                                    cameraPositionState.animate(
+                                        update = CameraUpdateFactory.newLatLngZoom(
+                                            userLatLng,
+                                            ExploreConstants.MAX_ZOOM_LEVEL
+                                        ),
+                                        durationMs = ExploreConstants.MOVE_TO_POINT_DURATION
+                                    )
+                                }
+                            }
+                        }
+                    } else {
+                        permissionLauncher.launch(Manifest.permission.ACCESS_FINE_LOCATION)
+                    }
+                },
+                onSetPathMode = { isCurrentlyPathMode -> viewModel.setPathMode(!isCurrentlyPathMode) },
+            )
+
+            PathModePanel(
+                isVisible = uiState.isPathMode,
+                selectedCount = uiState.selectedLocations.size,
+                distanceMeters = uiState.routeDistanceMeters,
+                durationMinutes = uiState.routeDurationMinutes,
+                onGoClick = {
+                    if (userLocation != null) {
+                        viewModel.calculateOptimalRoute(userLocation)
+                    }
+                },
+            )
+
+            MarkerInfoPanel(
+                marker = uiState.focusedMarker,
+                isPathMode = uiState.isPathMode,
+                onClose = { viewModel.selectMarker(null) },
+            )
+
+            SuggestedPlaceInfoPanel(
+                place = uiState.focusedSuggestedPlace,
+                isPathMode = uiState.isPathMode,
+                onClose = { viewModel.selectSuggestedPlace(null) },
+            )
+
+            SnackbarContainer(snackbarHostState)
+
+            LoadingState(
+                isLoading = uiState.isLoading,
+                currentLoadingMessage = currentLoadingMessage
+            )
+
+            ErrorState(
+                error = uiState.error,
+                onRetry = {
+                    val lat = userLocation?.latitude ?: STOCKHOLM_LAT
+                    val lng = userLocation?.longitude ?: STOCKHOLM_LNG
+                    viewModel.loadMapData(lat, lng)
+                }
+            )
         }
     }
 
@@ -868,10 +869,12 @@ private fun LoadingState(
 @Composable
 private fun LoadingStatePreview() {
     SofaAiTheme {
-        LoadingState(
-            isLoading = true,
-            currentLoadingMessage = "Consulting the oracle..."
-        )
+        Surface {
+            LoadingState(
+                isLoading = true,
+                currentLoadingMessage = "Consulting the oracle..."
+            )
+        }
     }
 }
 
@@ -879,12 +882,14 @@ private fun LoadingStatePreview() {
 @Composable
 private fun TopActionsPreview() {
     SofaAiTheme {
-        Box(modifier = Modifier.fillMaxSize()) {
-            TopActions(
-                uiState = ExploreUiState(isLoadingMarkers = true),
-                onToggleFilter = {},
-                onSuggestPlaces = {},
-            )
+        Surface {
+            Box(modifier = Modifier.fillMaxSize()) {
+                TopActions(
+                    uiState = ExploreUiState(isLoadingMarkers = true),
+                    onToggleFilter = {},
+                    onSuggestPlaces = {},
+                )
+            }
         }
     }
 }
@@ -893,8 +898,10 @@ private fun TopActionsPreview() {
 @Composable
 private fun PathModeHintPreview() {
     SofaAiTheme {
-        Box(modifier = Modifier.fillMaxSize()) {
-            PathModeHint(isVisible = true)
+        Surface {
+            Box(modifier = Modifier.fillMaxSize()) {
+                PathModeHint(isVisible = true)
+            }
         }
     }
 }
@@ -903,18 +910,20 @@ private fun PathModeHintPreview() {
 @Composable
 private fun SuggestedPlaceInfoPanelPreview() {
     SofaAiTheme {
-        Box(modifier = Modifier.fillMaxSize()) {
-            SuggestedPlaceInfoPanel(
-                place = SuggestedPlace(
-                    name = "Royal Palace",
-                    lat = 59.3268,
-                    lng = 18.0717,
-                    description = "The official residence of the Swedish monarch. A baroque-style palace with over 600 rooms.",
-                    category = "Landmark"
-                ),
-                isPathMode = false,
-                onClose = {},
-            )
+        Surface {
+            Box(modifier = Modifier.fillMaxSize()) {
+                SuggestedPlaceInfoPanel(
+                    place = SuggestedPlace(
+                        name = "Royal Palace",
+                        lat = 59.3268,
+                        lng = 18.0717,
+                        description = "The official residence of the Swedish monarch. A baroque-style palace with over 600 rooms.",
+                        category = "Landmark"
+                    ),
+                    isPathMode = false,
+                    onClose = {},
+                )
+            }
         }
     }
 }

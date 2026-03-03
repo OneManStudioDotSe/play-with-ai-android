@@ -13,6 +13,7 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.material3.Surface
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
@@ -35,6 +36,7 @@ import se.onemanstudio.playaroundwithai.data.dream.domain.model.DreamParticle
 import se.onemanstudio.playaroundwithai.data.dream.domain.model.DreamScene
 import se.onemanstudio.playaroundwithai.data.dream.domain.model.ElementShape
 import se.onemanstudio.playaroundwithai.data.dream.domain.model.ParticleShape
+import timber.log.Timber
 import kotlin.math.E
 import kotlin.math.PI
 import kotlin.math.cos
@@ -216,7 +218,16 @@ fun DreamscapeCanvas(
         }.sortedWith(compareBy({ it.third.ordinal }, { it.second }))
     }
 
+    LaunchedEffect(scene) {
+        Timber.d(
+            "DreamCanvas - Scene: %d layers, %d classified elements, %d particle types",
+            scene.layers.size, classified.size, scene.particles.size,
+        )
+        Timber.d("DreamCanvas - Palette: sky=0x%08X, horizon=0x%08X", scene.palette.sky.toInt(), scene.palette.horizon.toInt())
+    }
+
     Canvas(modifier = modifier) {
+        //Timber.d("DreamCanvas - DRAW size=%.0fx%.0f", size.width, size.height)
         drawClampedGradient(scene.palette)
 
         classified.forEach { (element, layerDepth, band) ->
@@ -275,8 +286,8 @@ private fun clampBrightness(color: Color, maxLuminance: Float): Color {
 // region Background
 
 private fun DrawScope.drawClampedGradient(palette: DreamPalette) {
-    val skyColor = clampBrightness(Color(palette.sky), MAX_BACKGROUND_LUMINANCE)
-    val horizonColor = clampBrightness(Color(palette.horizon), MAX_BACKGROUND_LUMINANCE)
+    val skyColor = clampBrightness(Color(palette.sky.toInt()), MAX_BACKGROUND_LUMINANCE)
+    val horizonColor = clampBrightness(Color(palette.horizon.toInt()), MAX_BACKGROUND_LUMINANCE)
     drawRect(
         brush = Brush.verticalGradient(colors = listOf(skyColor, horizonColor)),
         size = size,
@@ -296,7 +307,7 @@ private fun DrawScope.drawNonGroundElement(
     val baseX = element.x * size.width
     val offsetX = (baseX + layerOffset) % (size.width * PARALLAX_WRAP) - size.width * PARALLAX_OFFSET
     val elementSize = element.scale * size.width * ELEMENT_SIZE_RATIO
-    val baseColor = Color(element.color).copy(alpha = element.alpha)
+    val baseColor = Color(element.color.toInt()).copy(alpha = element.alpha)
     val slowPhase = slowTime * TWO_PI
 
     when (element.shape) {
@@ -352,7 +363,7 @@ private fun DrawScope.drawGroundElement(
     val baseX = element.x * size.width
     val offsetX = (baseX + layerOffset) % (size.width * PARALLAX_WRAP) - size.width * PARALLAX_OFFSET
     val elementSize = element.scale * size.width * ELEMENT_SIZE_RATIO
-    val baseColor = Color(element.color).copy(alpha = element.alpha)
+    val baseColor = Color(element.color.toInt()).copy(alpha = element.alpha)
     val upwardOffset = element.y * elementSize * GROUND_Y_VARIETY
     val slowPhase = slowTime * TWO_PI
 
@@ -615,7 +626,7 @@ private fun DrawScope.drawLotusAnchored(color: Color, x: Float, elementSize: Flo
 @Suppress("CyclomaticComplexity", "LongMethod")
 private fun DrawScope.drawParticles(particles: List<DreamParticle>, time: Float, slowTime: Float) {
     particles.forEach { particle ->
-        val color = Color(particle.color)
+        val color = Color(particle.color.toInt())
         val effectiveCount = particle.count.coerceAtMost(MAX_PARTICLE_COUNT)
         val usableWidth = size.width * (1f - 2f * PARTICLE_MARGIN)
         val usableHeight = size.height * (1f - 2f * PARTICLE_MARGIN)

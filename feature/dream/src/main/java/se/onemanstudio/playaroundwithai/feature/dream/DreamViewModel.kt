@@ -9,6 +9,7 @@ import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import se.onemanstudio.playaroundwithai.core.config.model.ApiKeyAvailability
 import se.onemanstudio.playaroundwithai.data.dream.domain.model.Dream
+import se.onemanstudio.playaroundwithai.data.dream.domain.model.DreamScene
 import se.onemanstudio.playaroundwithai.data.dream.domain.usecase.GetDreamHistoryUseCase
 import se.onemanstudio.playaroundwithai.data.dream.domain.usecase.InterpretDreamUseCase
 import se.onemanstudio.playaroundwithai.data.dream.domain.usecase.SaveDreamUseCase
@@ -62,6 +63,7 @@ class DreamViewModel @Inject constructor(
         viewModelScope.launch {
             interpretDreamUseCase(description)
                 .onSuccess { interpretation ->
+                    logSceneSpecs(interpretation.scene)
                     _screenState.update {
                         it.copy(
                             dreamState = DreamUiState.Result(
@@ -129,5 +131,24 @@ class DreamViewModel @Inject constructor(
 
     fun clearResult() {
         _screenState.update { it.copy(dreamState = DreamUiState.Initial, imageState = DreamImageState.Idle, currentDescription = "") }
+    }
+
+    @Suppress("MagicNumber")
+    private fun logSceneSpecs(scene: DreamScene) {
+        fun colorHex(c: Long) = "0x${c.toInt().toUInt().toString(16).uppercase().padStart(8, '0')}"
+
+        val sb = StringBuilder()
+        sb.appendLine("=== Dream Scene Specs ===")
+        sb.appendLine("Palette: sky=${colorHex(scene.palette.sky)}, horizon=${colorHex(scene.palette.horizon)}, accent=${colorHex(scene.palette.accent)}")
+        scene.layers.forEachIndexed { i, layer ->
+            sb.appendLine("Layer $i (depth=${layer.depth}):")
+            layer.elements.forEach { e ->
+                sb.appendLine("  ${e.shape} at (${e.x}, ${e.y}) scale=${e.scale} color=${colorHex(e.color)} alpha=${e.alpha}")
+            }
+        }
+        scene.particles.forEach { p ->
+            sb.appendLine("Particles: ${p.count}x ${p.shape} color=${colorHex(p.color)} speed=${p.speed} size=${p.size}")
+        }
+        Timber.d(sb.toString())
     }
 }

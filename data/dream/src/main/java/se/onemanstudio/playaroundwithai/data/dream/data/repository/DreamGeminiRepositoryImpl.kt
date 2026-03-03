@@ -98,8 +98,26 @@ class DreamGeminiRepositoryImpl @Inject constructor(
         }
     }
 
+    @Suppress("LongMethod")
     private fun parseInterpretation(json: String): DreamInterpretation {
         val parsed = gson.fromJson(json, GeminiDreamResponse::class.java)
+
+        Timber.d(
+            "DreamGemini - Parsed palette: sky=%d (0x%X), horizon=%d (0x%X), accent=%d (0x%X)",
+            parsed.scene.palette.sky, parsed.scene.palette.sky,
+            parsed.scene.palette.horizon, parsed.scene.palette.horizon,
+            parsed.scene.palette.accent, parsed.scene.palette.accent,
+        )
+        Timber.d("DreamGemini - Parsed %d layers, %d particle types", parsed.scene.layers.size, parsed.scene.particles.size)
+        parsed.scene.layers.forEachIndexed { i, layer ->
+            Timber.d("DreamGemini - Layer %d: %d elements, depth=%.2f", i, layer.elements.size, layer.depth)
+            layer.elements.forEach { e ->
+                Timber.d(
+                    "DreamGemini -   %s at (%.2f,%.2f) scale=%.2f color=%d (0x%X) alpha=%.2f",
+                    e.shape, e.x, e.y, e.scale, e.color, e.color, e.alpha,
+                )
+            }
+        }
 
         val mood = runCatching { DreamMood.valueOf(parsed.mood.uppercase()) }.getOrDefault(DreamMood.MYSTERIOUS)
 
@@ -127,6 +145,23 @@ class DreamGeminiRepositoryImpl @Inject constructor(
     }
 }
 
+// Alpha channel constants for color correction
+private const val ALPHA_MASK = 0xFF000000L
+private const val ALPHA_SHIFT = 24
+private const val ALPHA_CHANNEL = 0xFFL
+
+/**
+ * Forces the alpha channel to 0xFF when it is 0x00. Gemini often returns RGB color values
+ * (e.g. 16711680 = 0x00FF0000) without the alpha byte, making them fully transparent.
+ */
+private fun ensureAlpha(color: Long): Long {
+    return if ((color shr ALPHA_SHIFT) and ALPHA_CHANNEL == 0L) {
+        color or ALPHA_MASK
+    } else {
+        color
+    }
+}
+
 // Internal DTOs for Gson parsing of the Gemini JSON response
 private data class GeminiDreamResponse(
     val interpretation: String = "",
@@ -145,7 +180,11 @@ private data class GeminiPaletteDto(
     val horizon: Long = 0xFF16213E,
     val accent: Long = 0xFF0F3460,
 ) {
-    fun toDomain() = se.onemanstudio.playaroundwithai.data.dream.domain.model.DreamPalette(sky = sky, horizon = horizon, accent = accent)
+    fun toDomain() = se.onemanstudio.playaroundwithai.data.dream.domain.model.DreamPalette(
+        sky = ensureAlpha(sky),
+        horizon = ensureAlpha(horizon),
+        accent = ensureAlpha(accent),
+    )
 }
 
 private data class GeminiLayerDto(
@@ -171,7 +210,7 @@ private data class GeminiElementDto(
         shape = runCatching {
             se.onemanstudio.playaroundwithai.data.dream.domain.model.ElementShape.valueOf(shape.uppercase())
         }.getOrDefault(se.onemanstudio.playaroundwithai.data.dream.domain.model.ElementShape.CIRCLE),
-        x = x, y = y, scale = scale, color = color, alpha = alpha,
+        x = x, y = y, scale = scale, color = ensureAlpha(color), alpha = alpha,
     )
 }
 
@@ -187,6 +226,6 @@ private data class GeminiParticleDto(
         shape = runCatching {
             se.onemanstudio.playaroundwithai.data.dream.domain.model.ParticleShape.valueOf(shape.uppercase())
         }.getOrDefault(se.onemanstudio.playaroundwithai.data.dream.domain.model.ParticleShape.DOT),
-        count = count, color = color, speed = speed, size = size,
+        count = count, color = ensureAlpha(color), speed = speed, size = size,
     )
 }

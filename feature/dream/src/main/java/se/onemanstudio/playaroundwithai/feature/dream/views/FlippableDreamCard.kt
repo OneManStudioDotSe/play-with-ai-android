@@ -12,10 +12,9 @@ import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.aspectRatio
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.heightIn
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.CircleShape
@@ -56,10 +55,9 @@ import se.onemanstudio.playaroundwithai.data.dream.domain.model.ElementShape
 import se.onemanstudio.playaroundwithai.data.dream.domain.model.ParticleShape
 import se.onemanstudio.playaroundwithai.feature.dream.R
 import se.onemanstudio.playaroundwithai.feature.dream.states.DreamImageState
+import timber.log.Timber
 
-private const val CANVAS_HEIGHT_MIN = 220
 private const val CANVAS_HEIGHT_MAX = 280
-private const val IMAGE_ASPECT_RATIO = 1f
 private const val ARTIST_LABEL_ALPHA = 0.85f
 private const val FLIP_DURATION_MS = 600
 private const val FLIP_HALF_ANGLE = 90f
@@ -78,6 +76,13 @@ fun FlippableDreamCard(
 
     LaunchedEffect(isImageReady) {
         if (!isImageReady) isFlipped = false
+    }
+
+    LaunchedEffect(scene, imageState) {
+        Timber.d(
+            "FlippableCard - scene layers=%d, imageState=%s, isFlipped=%s",
+            scene.layers.size, imageState::class.simpleName, isFlipped,
+        )
     }
 
     val rotation by animateFloatAsState(
@@ -114,12 +119,13 @@ private fun FrontSide(
     scene: DreamScene,
     isImageReady: Boolean,
 ) {
+    Timber.d("FrontSide - isImageReady: $isImageReady and scene is $scene")
     Box {
         DreamscapeCanvas(
             scene = scene,
             modifier = Modifier
                 .fillMaxWidth()
-                .heightIn(min = CANVAS_HEIGHT_MIN.dp, max = CANVAS_HEIGHT_MAX.dp)
+                .height(CANVAS_HEIGHT_MAX.dp)
                 .clipToBounds(),
         )
 
@@ -163,7 +169,7 @@ private fun BackSide(imageState: DreamImageState, scene: DreamScene) {
                 contentScale = ContentScale.Crop,
                 modifier = Modifier
                     .fillMaxWidth()
-                    .aspectRatio(IMAGE_ASPECT_RATIO),
+                    .height(CANVAS_HEIGHT_MAX.dp),
             )
         } else {
             PlaceholderSurface(scene = scene)
@@ -185,13 +191,13 @@ private fun PlaceholderSurface(scene: DreamScene) {
     Box(
         modifier = Modifier
             .fillMaxWidth()
-            .aspectRatio(IMAGE_ASPECT_RATIO)
+            .height(CANVAS_HEIGHT_MAX.dp)
             .background(
                 Brush.verticalGradient(
                     colors = listOf(
-                        androidx.compose.ui.graphics.Color(palette.sky),
-                        androidx.compose.ui.graphics.Color(palette.horizon),
-                        androidx.compose.ui.graphics.Color(palette.accent),
+                        androidx.compose.ui.graphics.Color(palette.sky.toInt()),
+                        androidx.compose.ui.graphics.Color(palette.horizon.toInt()),
+                        androidx.compose.ui.graphics.Color(palette.accent.toInt()),
                     ),
                 )
             ),
@@ -277,7 +283,7 @@ private fun previewDarkScene() = DreamScene(
     ),
 )
 
-@Suppress("MagicNumber")
+@Suppress("MagicNumber", "LongMethod")
 private fun previewWarmScene() = DreamScene(
     palette = DreamPalette(
         sky = 0xFFFF6B35,
