@@ -5,6 +5,7 @@ import androidx.compose.material.icons.filled.AutoAwesome
 import androidx.compose.material.icons.filled.Chair
 import androidx.compose.material.icons.filled.Map
 import androidx.compose.material.icons.filled.NightsStay
+import androidx.compose.material.icons.filled.Palette
 import kotlinx.serialization.Serializable
 
 sealed interface Route
@@ -21,9 +22,13 @@ object Dreams : Route
 @Serializable
 object Agents : Route
 
+@Serializable
+object Showcase : Route
+
 val navItems = listOf(
     NavItem(Chat, "Chat", Icons.Default.Chair),
     NavItem(Dreams, "Explain", Icons.Default.NightsStay),
     NavItem(Agents, "Plan", Icons.Default.AutoAwesome),
     NavItem(Maps, "Explore", Icons.Default.Map),
+    NavItem(Showcase, "SoFa", Icons.Default.Palette),
 )

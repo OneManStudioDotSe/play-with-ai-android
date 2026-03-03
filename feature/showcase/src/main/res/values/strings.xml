@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="showcase_title">SoFa</string>
+
+    <!-- Section Headers -->
+    <string name="section_typography">Typography</string>
+    <string name="section_colors">Colors</string>
+    <string name="section_components">Components</string>
+
+    <!-- Typography Section -->
+    <string name="font_sample_text">The quick brown fox</string>
+    <string name="font_weight_normal">Normal (400)</string>
+    <string name="font_weight_medium">Medium (500)</string>
+    <string name="font_weight_semibold">SemiBold (600)</string>
+    <string name="font_weight_bold">Bold (700)</string>
+    <string name="toggle_standard">Standard</string>
+    <string name="toggle_emphasized">Emphasized</string>
+
+    <!-- Color Subsections -->
+    <string name="colors_accents">Accents</string>
+    <string name="colors_containers">Containers</string>
+    <string name="colors_functional">Functional</string>
+    <string name="colors_disabled">Disabled</string>
+
+    <!-- Component Demo Content -->
+    <string name="demo_card_title">Card Title</string>
+    <string name="demo_card_body">This is a neo-brutalist card with bold borders and offset shadow.</string>
+    <string name="demo_button_enabled">Enabled</string>
+    <string name="demo_button_with_icon">With Icon</string>
+    <string name="demo_button_disabled">Disabled</string>
+    <string name="demo_text_field_placeholder">Type something…</string>
+    <string name="demo_chip_design">Design</string>
+    <string name="demo_chip_system">System</string>
+    <string name="demo_chip_sofa">SoFa</string>
+    <string name="demo_segment_first">First</string>
+    <string name="demo_segment_second">Second</string>
+    <string name="demo_segment_third">Third</string>
+    <string name="demo_top_bar_title">App Title</string>
+</resources>

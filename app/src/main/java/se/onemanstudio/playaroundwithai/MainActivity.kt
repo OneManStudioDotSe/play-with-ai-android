@@ -43,11 +43,13 @@ import se.onemanstudio.playaroundwithai.feature.plan.PlanScreen
 import se.onemanstudio.playaroundwithai.feature.chat.ChatScreen
 import se.onemanstudio.playaroundwithai.feature.dream.DreamScreen
 import se.onemanstudio.playaroundwithai.feature.explore.ExploreScreen
+import se.onemanstudio.playaroundwithai.feature.showcase.ShowcaseScreen
 import se.onemanstudio.playaroundwithai.settings.SettingsBottomSheetContainer
 import se.onemanstudio.playaroundwithai.navigation.Agents
 import se.onemanstudio.playaroundwithai.navigation.Chat
 import se.onemanstudio.playaroundwithai.navigation.Dreams
 import se.onemanstudio.playaroundwithai.navigation.Maps
+import se.onemanstudio.playaroundwithai.navigation.Showcase
 import se.onemanstudio.playaroundwithai.navigation.navItems
 
 @AndroidEntryPoint
@@ -161,6 +163,9 @@ private fun SoFaApp() {
                 }
                 composable<Agents> {
                     PlanScreen(settingsContent = { onDismiss -> SettingsBottomSheetContainer(onDismiss = onDismiss) })
+                }
+                composable<Showcase> {
+                    ShowcaseScreen()
                 }
             }
         }

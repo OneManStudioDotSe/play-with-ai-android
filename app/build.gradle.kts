@@ -88,6 +88,7 @@ dependencies {
     implementation(project(":feature:plan"))
     implementation(project(":feature:dream"))
     implementation(project(":feature:explore"))
+    implementation(project(":feature:showcase"))
 
     implementation(libs.material3)
     implementation(libs.androidx.material.icons.extended)
