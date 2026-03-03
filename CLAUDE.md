@@ -30,11 +30,11 @@
 
 ```
 :app                    → Application entry point, navigation, main activity
-:core:network           → OkHttp, Retrofit, Gson, GeminiApiService, DTOs (incl. function calling), interceptor, AiPrompts
+:core:network           → OkHttp, Retrofit, Gson, GeminiApiService, DTOs (incl. function calling & thinking support), interceptor, AiPrompts
 :core:auth              → Firebase Auth, AuthRepository (interface+impl), auth use cases, AuthSession
 :core:config            → ApiKeyAvailability, ConfigurationModule, qualifier annotations, BuildConfig
 :core:theme             → Design system: colors, typography ("SoFa" design language)
-:core:ui                → Reusable Compose UI components
+:core:ui                → Reusable Compose UI components (NeoBrutalCard, NeoBrutalIconButton, NeoBrutalIconButtonSmall, TopAppBar, etc.)
 :data:plan              → Plan domain + data: agent loop, tool dispatch, route calculator, Gemini function calling
 :data:explore           → Explore domain + data: fake API, explore items, suggested places
 :data:chat              → Chat domain + data: Room DB (v5, 3 tables: prompt_history, token_usage, dreams), Firestore sync, prompt history
@@ -43,9 +43,11 @@
 :feature:chat           → Chat presentation: ChatViewModel, ChatScreen
 :feature:explore        → Explore presentation: ExploreViewModel, ExploreScreen
 :feature:dream          → Dream presentation: DreamViewModel, DreamScreen
+:feature:showcase       → Showcase presentation: ShowcaseScreen (design system style guide, no ViewModel)
 ```
 
 Dependencies flow: `feature → data → core:network + core:config`, `feature → core:ui → core:theme`
+Exception: `:feature:showcase` is presentation-only (no ViewModel, no data layer, no Hilt) — depends only on `:core:ui` and `:core:theme`.
 
 ## Architecture
 
@@ -186,15 +188,15 @@ service cloud.firestore {
 ┌──────────────────────────────────────────────────────────────────────────────────┐
 │                              FEATURE MODULES (presentation)                       │
 │                                                                                  │
-│  ┌──────────────────┐ ┌────────────────┐ ┌───────────────┐ ┌───────────────────┐  │
-│  │  :feature:chat   │ │:feature:explore│ │ :feature:dream│ │ :feature:plan     │  │
-│  │  ChatViewModel   │ │ExploreViewModel│ │ DreamViewModel│ │ PlanViewModel     │  │
-│  │  ChatScreen      │ │ ExploreScreen  │ │ DreamScreen   │ │ PlanScreen        │  │
-│  └───────┬──────────┘ └──────┬─────────┘ └──────┬────────┘ └────────┬──────────┘  │
-│          │                   │                │                    │             │
-└──────────┼───────────────────┼────────────────┼────────────────────┼─────────────┘
-           │                   │                │                    │
-           ▼                   ▼                ▼                    ▼
+│  ┌──────────────┐ ┌──────────────┐ ┌──────────────┐ ┌──────────────┐ ┌──────────────┐  │
+│  │:feature:chat │ │:feat:explore │ │:feature:dream│ │:feature:plan │ │:feat:showcase│  │
+│  │ ChatViewModel│ │ExploreViewMdl│ │DreamViewModel│ │PlanViewModel │ │ (no VM)      │  │
+│  │ ChatScreen   │ │ ExploreScreen│ │ DreamScreen  │ │ PlanScreen   │ │ShowcaseScreen│  │
+│  └──────┬───────┘ └──────┬───────┘ └──────┬───────┘ └──────┬───────┘ └──────┬───────┘  │
+│         │                │               │               │               │           │
+└─────────┼────────────────┼───────────────┼───────────────┼───────────────┼───────────┘
+          │                │               │               │               │
+          ▼                ▼               ▼               ▼               ▼ (→ core only)
 ┌──────────────────────────────────────────────────────────────────────────────────┐
 │                          DATA MODULES (domain + data)                             │
 │                                                                                  │
@@ -234,11 +236,14 @@ service cloud.firestore {
 │  ┌──────────────────────────────────────────────────────────────────────────┐    │
 │  │  Google Gemini API                                                       │    │
 │  │  Base: https://generativelanguage.googleapis.com/                        │    │
-│  │  Endpoint: POST /v1beta/models/gemini-3-flash-preview:generateContent    │    │
+│  │  Text: POST /v1beta/models/gemini-3-flash-preview:generateContent        │    │
+│  │  Image: POST /v1beta/models/gemini-2.5-flash-image:generateContent       │    │
 │  │  Auth: ?key={GEMINI_API_KEY} (query param via AuthenticationInterceptor) │    │
 │  │                                                                          │    │
 │  │  Standard:  { contents: [{ parts: [{ text, inlineData? }] }] }           │    │
 │  │  With tools: + { tools: [{ functionDeclarations }] }  (agent feature)    │    │
+│  │  With image: + { generationConfig: { responseModalities: [IMAGE, TEXT] }}│    │
+│  │  Parts may include: thought, thought_signature (for thinking support)    │    │
 │  │  Response: { candidates: [{ content: { parts: [text|functionCall] } }] } │    │
 │  └──────────────────────────────────────────────────────────────────────────┘    │
 │                                                                                  │
@@ -495,7 +500,10 @@ Request with tools:
 {
   "contents": [
     { "role": "user",     "parts": [{ "text": "system prompt + goal" }] },
-    { "role": "model",    "parts": [{ "functionCall": { "name": "search_places", "args": {...} } }] },
+    { "role": "model",    "parts": [
+        { "text": "...", "thought": true, "thought_signature": "..." },
+        { "functionCall": { "name": "search_places", "args": {...} } }
+    ]},
     { "role": "function", "parts": [{ "functionResponse": { "name": "search_places", "response": {...} } }] }
   ],
   "tools": [{
@@ -505,6 +513,10 @@ Request with tools:
     ]
   }]
 }
+
+Note: Gemini may include thinking parts (thought: true + thought_signature) in model
+responses. These must be preserved verbatim when replaying conversation history, or the
+API returns HTTP 400. extractText() filters out thinking parts to get the final response.
 ```
 
 #### UI States

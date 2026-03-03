@@ -197,10 +197,10 @@ Scene structure guided by the AI prompt: 3–5 layers, 2–4 elements each.
 
 | Timer      | Duration | Used By                                        |
 |------------|----------|------------------------------------------------|
-| `time`     | 20 s     | Most element animations, all particle movement |
-| `slowTime` | 35 s     | Aurora undulation, spiral secondary motion      |
+| `time`     | 28 s     | Most element animations, all particle movement |
+| `slowTime` | 42 s     | Aurora undulation, spiral secondary motion      |
 
-Both loop infinitely via `rememberInfiniteTransition`.
+Both loop infinitely via `rememberInfiniteTransition`. Constants are defined in `DreamscapeConstants.kt` (`ANIMATION_DURATION_MS = 28_000`, `SLOW_ANIMATION_DURATION_MS = 42_000`).
 
 ---
 
