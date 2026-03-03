@@ -15,4 +15,6 @@
     <string name="settings_weekly_usage">Token burnt</string>
     <string name="settings_no_usage_data">No AI usage data yet</string>
     <string name="settings_icon_description">Settings</string>
+    <string name="settings_general">General</string>
+    <string name="settings_show_token_usage">Show token usage</string>
 </resources>

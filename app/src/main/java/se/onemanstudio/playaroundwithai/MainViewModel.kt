@@ -14,6 +14,7 @@ import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import se.onemanstudio.playaroundwithai.core.auth.usecase.SignInAnonymouslyUseCase
 import se.onemanstudio.playaroundwithai.core.network.tracking.TokenUsageTracker
+import se.onemanstudio.playaroundwithai.data.explore.data.settings.AppSettingsHolder
 import timber.log.Timber
 import java.text.NumberFormat
 import javax.inject.Inject
@@ -24,6 +25,7 @@ private const val MAX_AUTH_ATTEMPTS = 3
 class MainViewModel @Inject constructor(
     private val signInAnonymouslyUseCase: SignInAnonymouslyUseCase,
     private val tokenUsageTracker: TokenUsageTracker,
+    appSettingsHolder: AppSettingsHolder,
 ) : ViewModel() {
 
     private val _authError = MutableStateFlow(false)
@@ -31,6 +33,8 @@ class MainViewModel @Inject constructor(
 
     private val _authRetriesExhausted = MutableStateFlow(false)
     val authRetriesExhausted: StateFlow<Boolean> = _authRetriesExhausted.asStateFlow()
+
+    val showTokenUsage: StateFlow<Boolean> = appSettingsHolder.showTokenUsage
 
     val tokenUsageMessage: SharedFlow<String> = tokenUsageTracker.lastUsageEvent.map { event ->
         NumberFormat.getIntegerInstance().format(event.totalTokens)

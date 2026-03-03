@@ -75,10 +75,12 @@ private fun SoFaApp() {
 
     LaunchedEffect(Unit) {
         viewModel.tokenUsageMessage.collect { formattedTokens ->
-            snackbarHostState.showSnackbar(
-                message = String.format(tokenUsageTemplate, formattedTokens),
-                duration = SnackbarDuration.Short,
-            )
+            if (viewModel.showTokenUsage.value) {
+                snackbarHostState.showSnackbar(
+                    message = String.format(tokenUsageTemplate, formattedTokens),
+                    duration = SnackbarDuration.Short,
+                )
+            }
         }
     }
 

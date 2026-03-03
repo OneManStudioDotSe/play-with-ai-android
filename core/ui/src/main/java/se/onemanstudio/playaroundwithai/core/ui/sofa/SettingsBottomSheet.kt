@@ -1,3 +1,5 @@
+@file:Suppress("TooManyFunctions")
+
 package se.onemanstudio.playaroundwithai.core.ui.sofa
 
 import androidx.compose.foundation.background
@@ -23,6 +25,7 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.ModalBottomSheet
 import androidx.compose.material3.Slider
 import androidx.compose.material3.SliderDefaults
+import androidx.compose.material3.Switch
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.remember
@@ -36,6 +39,7 @@ import se.onemanstudio.playaroundwithai.core.ui.theme.Alphas
 import se.onemanstudio.playaroundwithai.core.ui.theme.Dimensions
 import se.onemanstudio.playaroundwithai.core.ui.theme.SofaAiTheme
 import se.onemanstudio.playaroundwithai.core.ui.theme.electricBlue
+import se.onemanstudio.playaroundwithai.core.ui.theme.energeticOrange
 import se.onemanstudio.playaroundwithai.core.ui.theme.vividPink
 import se.onemanstudio.playaroundwithai.core.ui.theme.zestyLime
 import se.onemanstudio.playaroundwithai.core.ui.views.R
@@ -50,6 +54,7 @@ private val DragHandleCornerRadius = 2.dp
 fun SettingsBottomSheet(
     state: SettingsState,
     onDismiss: () -> Unit,
+    onShowTokenUsageChange: (Boolean) -> Unit,
     onVehicleCountChange: (Int) -> Unit,
     onSearchRadiusChange: (Float) -> Unit,
     onContactClick: () -> Unit,
@@ -66,6 +71,7 @@ fun SettingsBottomSheet(
     ) {
         SettingsBottomSheetContent(
             state = state,
+            onShowTokenUsageChange = onShowTokenUsageChange,
             onVehicleCountChange = onVehicleCountChange,
             onSearchRadiusChange = onSearchRadiusChange,
             onContactClick = onContactClick,
@@ -80,6 +86,7 @@ fun SettingsBottomSheet(
 @Composable
 private fun SettingsBottomSheetContent(
     state: SettingsState,
+    onShowTokenUsageChange: (Boolean) -> Unit,
     onVehicleCountChange: (Int) -> Unit,
     onSearchRadiusChange: (Float) -> Unit,
     onContactClick: () -> Unit,
@@ -126,6 +133,14 @@ private fun SettingsBottomSheetContent(
 
                 Spacer(modifier = Modifier.height(Dimensions.paddingLarge))
 
+                // General section
+                GeneralSection(
+                    showTokenUsage = state.showTokenUsage,
+                    onShowTokenUsageChange = onShowTokenUsageChange,
+                )
+
+                Spacer(modifier = Modifier.height(Dimensions.paddingLarge))
+
                 // Map Controls section
                 MapControlsSection(
                     vehicleCount = state.vehicleCount,
@@ -163,6 +178,35 @@ private fun SectionHeader(
     modifier: Modifier = Modifier,
 ) {
     MarkerText(text = text, lineColor = lineColor, modifier = modifier)
+}
+
+@Composable
+private fun GeneralSection(
+    showTokenUsage: Boolean,
+    onShowTokenUsageChange: (Boolean) -> Unit,
+) {
+    Column(verticalArrangement = Arrangement.spacedBy(Dimensions.paddingMedium)) {
+        SectionHeader(
+            text = stringResource(R.string.settings_general),
+            lineColor = electricBlue,
+        )
+
+        Row(
+            modifier = Modifier.fillMaxWidth(),
+            horizontalArrangement = Arrangement.SpaceBetween,
+            verticalAlignment = Alignment.CenterVertically,
+        ) {
+            Text(
+                text = stringResource(R.string.settings_show_token_usage),
+                style = MaterialTheme.typography.bodyLarge,
+                color = MaterialTheme.colorScheme.onSurface,
+            )
+            Switch(
+                checked = showTokenUsage,
+                onCheckedChange = onShowTokenUsageChange,
+            )
+        }
+    }
 }
 
 @Composable
@@ -257,7 +301,7 @@ private fun MapControlsSection(
     Column(verticalArrangement = Arrangement.spacedBy(Dimensions.paddingMedium)) {
         SectionHeader(
             text = stringResource(R.string.settings_map_controls),
-            lineColor = electricBlue,
+            lineColor = vividPink,
         )
 
         Text(
@@ -298,7 +342,7 @@ private fun UsageSection(
     Column(verticalArrangement = Arrangement.spacedBy(Dimensions.paddingMedium)) {
         SectionHeader(
             text = stringResource(R.string.settings_weekly_usage),
-            lineColor = vividPink,
+            lineColor = energeticOrange,
         )
 
         if (usageBars.size == WEEKDAY_COUNT) {
@@ -339,6 +383,7 @@ private fun SettingsContentLightPreview() {
     SofaAiTheme {
         SettingsBottomSheetContent(
             state = SettingsState(appVersion = "1.0.0"),
+            onShowTokenUsageChange = {},
             onVehicleCountChange = {},
             onSearchRadiusChange = {},
             onContactClick = {},
@@ -356,6 +401,7 @@ private fun SettingsContentDarkPreview() {
     SofaAiTheme(darkTheme = true) {
         SettingsBottomSheetContent(
             state = SettingsState(appVersion = "1.0.0"),
+            onShowTokenUsageChange = {},
             onVehicleCountChange = {},
             onSearchRadiusChange = {},
             onContactClick = {},
@@ -375,8 +421,9 @@ private fun SectionHeadersPreview() {
             modifier = Modifier.padding(Dimensions.paddingLarge),
             verticalArrangement = Arrangement.spacedBy(Dimensions.paddingLarge),
         ) {
-            SectionHeader(text = "Map Controls", lineColor = electricBlue)
-            SectionHeader(text = "Weekly Usage", lineColor = vividPink)
+            SectionHeader(text = "General", lineColor = electricBlue)
+            SectionHeader(text = "Map Controls", lineColor = vividPink)
+            SectionHeader(text = "Weekly Usage", lineColor = energeticOrange)
             SectionHeader(text = "About", lineColor = zestyLime)
         }
     }

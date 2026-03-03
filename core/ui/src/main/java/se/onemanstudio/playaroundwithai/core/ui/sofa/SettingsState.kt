@@ -5,6 +5,7 @@ import androidx.compose.runtime.Immutable
 @Immutable
 data class SettingsState(
     val appVersion: String,
+    val showTokenUsage: Boolean = false,
     val vehicleCount: Int = DEFAULT_VEHICLE_COUNT,
     val searchRadiusKm: Float = DEFAULT_SEARCH_RADIUS_KM,
 ) {

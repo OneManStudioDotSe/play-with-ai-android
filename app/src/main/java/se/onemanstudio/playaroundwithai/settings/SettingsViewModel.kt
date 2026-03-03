@@ -9,6 +9,7 @@ import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.stateIn
 import se.onemanstudio.playaroundwithai.core.network.tracking.DailyTokenUsage
 import se.onemanstudio.playaroundwithai.data.chat.domain.usecase.GetWeeklyTokenUsageUseCase
+import se.onemanstudio.playaroundwithai.data.explore.data.settings.AppSettingsHolder
 import se.onemanstudio.playaroundwithai.data.explore.data.settings.ExploreSettingsHolder
 import javax.inject.Inject
 
@@ -16,11 +17,13 @@ import javax.inject.Inject
 class SettingsViewModel @Inject constructor(
     getWeeklyTokenUsageUseCase: GetWeeklyTokenUsageUseCase,
     private val exploreSettingsHolder: ExploreSettingsHolder,
+    private val appSettingsHolder: AppSettingsHolder,
 ) : ViewModel() {
 
     val weeklyUsage: StateFlow<List<DailyTokenUsage>> = getWeeklyTokenUsageUseCase()
         .stateIn(viewModelScope, SharingStarted.WhileSubscribed(), emptyList())
 
+    val showTokenUsage: StateFlow<Boolean> = appSettingsHolder.showTokenUsage
     val vehicleCount: StateFlow<Int> = exploreSettingsHolder.vehicleCount
     val searchRadiusKm: StateFlow<Float> = exploreSettingsHolder.searchRadiusKm
 
@@ -37,5 +40,9 @@ class SettingsViewModel @Inject constructor(
 
     fun onSearchRadiusChange(radius: Float) {
         exploreSettingsHolder.updateSearchRadiusKm(radius)
+    }
+
+    fun onShowTokenUsageChange(enabled: Boolean) {
+        appSettingsHolder.updateShowTokenUsage(enabled)
     }
 }

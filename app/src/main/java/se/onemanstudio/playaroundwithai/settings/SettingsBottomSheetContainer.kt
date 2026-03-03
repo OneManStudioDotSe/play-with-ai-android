@@ -22,6 +22,7 @@ fun SettingsBottomSheetContainer(
 ) {
     val weeklyUsage by viewModel.weeklyUsage.collectAsStateWithLifecycle()
     val selectedDayIndex by viewModel.selectedDayIndex.collectAsStateWithLifecycle()
+    val showTokenUsage by viewModel.showTokenUsage.collectAsStateWithLifecycle()
     val vehicleCount by viewModel.vehicleCount.collectAsStateWithLifecycle()
     val searchRadiusKm by viewModel.searchRadiusKm.collectAsStateWithLifecycle()
     val context = LocalContext.current
@@ -38,10 +39,12 @@ fun SettingsBottomSheetContainer(
     SettingsBottomSheet(
         state = SettingsState(
             appVersion = BuildConfig.VERSION_NAME,
+            showTokenUsage = showTokenUsage,
             vehicleCount = vehicleCount,
             searchRadiusKm = searchRadiusKm,
         ),
         onDismiss = onDismiss,
+        onShowTokenUsageChange = { viewModel.onShowTokenUsageChange(it) },
         onVehicleCountChange = { viewModel.onVehicleCountChange(it) },
         onSearchRadiusChange = { viewModel.onSearchRadiusChange(it) },
         onContactClick = {
