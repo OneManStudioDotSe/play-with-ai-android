@@ -69,11 +69,11 @@ Dream: "$description"
     """.trimIndent()
 
     fun dreamImagePrompt(description: String): String = """
-Generate a painting inspired by the following dream. Paint it in the distinctive style of a famous artist whose work resonates with the dream's mood and imagery. Choose from artists like Dalí, Monet, Van Gogh, Klimt, Kahlo, Hokusai, Magritte, Munch, Rothko, or any other renowned painter.
+Create an image of a painting inspired by the following dream. Paint it in the distinctive style of a famous artist whose work resonates with the dream's mood and imagery. Choose from artists like Dalí, Monet, Van Gogh, Klimt, Kahlo, Hokusai, Magritte, Munch, Rothko, or any other renowned painter.
 
 The painting should be vivid, atmospheric, and capture the emotional essence of the dream.
 
-In your text response, include ONLY the artist's name in this exact format:
+Along with the generated image, include a single line of text with the artist's name in this exact format:
 Artist: <Full Name>
 
 Dream: "$description"

@@ -3,8 +3,8 @@ package se.onemanstudio.playaroundwithai.feature.dream.views
 import kotlin.math.PI
 
 // Animation timing
-internal const val ANIMATION_DURATION_MS = 40_000
-internal const val SLOW_ANIMATION_DURATION_MS = 60_000
+internal const val ANIMATION_DURATION_MS = 28_000
+internal const val SLOW_ANIMATION_DURATION_MS = 42_000
 
 // Background luminance clamping
 internal const val MAX_BACKGROUND_LUMINANCE = 0.55f
