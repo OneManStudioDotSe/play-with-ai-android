@@ -9,7 +9,7 @@ data class GeminiRequest(
 )
 
 data class GenerationConfig(
-    @SerializedName("response_modalities") val responseModalities: List<String>? = null,
+    @SerializedName("responseModalities") val responseModalities: List<String>? = null,
 )
 
 data class Content(

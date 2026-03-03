@@ -23,6 +23,7 @@ import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import se.onemanstudio.playaroundwithai.core.ui.sofa.NeoBrutalCard
+import se.onemanstudio.playaroundwithai.core.ui.theme.Alphas
 import se.onemanstudio.playaroundwithai.core.ui.theme.Dimensions
 import se.onemanstudio.playaroundwithai.core.ui.theme.SofaAiTheme
 import se.onemanstudio.playaroundwithai.data.dream.domain.model.Dream
@@ -34,7 +35,7 @@ import java.time.format.DateTimeFormatter
 private val dateFormatter = DateTimeFormatter.ofPattern("MMM dd")
 private const val CARD_WIDTH = 180
 private const val DESCRIPTION_MAX_LINES = 4
-private const val EMOJI_BACKGROUND_ALPHA = 0.2f
+private const val EMOJI_BACKGROUND_ALPHA = 0.15f
 
 @Composable
 fun DreamGalleryRow(
@@ -46,7 +47,7 @@ fun DreamGalleryRow(
         modifier = modifier
             .fillMaxWidth()
             .wrapContentHeight(),
-        horizontalArrangement = Arrangement.spacedBy(Dimensions.paddingMedium),
+        horizontalArrangement = Arrangement.spacedBy(Dimensions.paddingLarge),
     ) {
         items(dreams, key = { it.id }) { dream ->
             DreamGalleryCard(
@@ -89,7 +90,7 @@ private fun DreamGalleryCard(
                 Text(
                     text = dream.timestamp.atZone(ZoneId.systemDefault()).format(dateFormatter),
                     style = MaterialTheme.typography.labelSmall,
-                    color = MaterialTheme.colorScheme.onSurface.copy(alpha = se.onemanstudio.playaroundwithai.core.ui.theme.Alphas.medium),
+                    color = MaterialTheme.colorScheme.onSurface.copy(alpha = Alphas.medium),
                 )
             }
         }

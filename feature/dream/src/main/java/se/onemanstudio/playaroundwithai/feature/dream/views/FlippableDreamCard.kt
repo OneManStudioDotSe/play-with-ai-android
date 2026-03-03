@@ -4,10 +4,12 @@ package se.onemanstudio.playaroundwithai.feature.dream.views
 
 import android.graphics.BitmapFactory
 import androidx.compose.animation.AnimatedVisibility
+import androidx.compose.animation.core.MutableTransitionState
 import androidx.compose.animation.core.animateFloatAsState
 import androidx.compose.animation.core.tween
 import androidx.compose.animation.fadeIn
 import androidx.compose.animation.fadeOut
+import androidx.compose.animation.scaleIn
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
@@ -64,6 +66,7 @@ private const val FLIP_HALF_ANGLE = 90f
 private const val FLIP_FULL_ANGLE = 180f
 private const val CAMERA_DISTANCE_FACTOR = 12f
 private const val PLACEHOLDER_ICON_ALPHA = 0.4f
+private const val FLIP_ICON_APPEAR_MS = 400
 
 @Composable
 fun FlippableDreamCard(
@@ -73,6 +76,9 @@ fun FlippableDreamCard(
 ) {
     val isImageReady = imageState is DreamImageState.Generated
     var isFlipped by remember { mutableStateOf(false) }
+
+    val flipIconVisible = remember { MutableTransitionState(isImageReady) }
+    flipIconVisible.targetState = isImageReady
 
     LaunchedEffect(isImageReady) {
         if (!isImageReady) isFlipped = false
@@ -107,7 +113,7 @@ fun FlippableDreamCard(
             },
     ) {
         if (rotation < FLIP_HALF_ANGLE) {
-            FrontSide(scene = scene, isImageReady = isImageReady)
+            FrontSide(scene = scene, flipIconVisible = flipIconVisible)
         } else {
             BackSide(imageState = imageState, scene = scene)
         }
@@ -117,9 +123,9 @@ fun FlippableDreamCard(
 @Composable
 private fun FrontSide(
     scene: DreamScene,
-    isImageReady: Boolean,
+    flipIconVisible: MutableTransitionState<Boolean>,
 ) {
-    Timber.d("FrontSide - isImageReady: $isImageReady and scene is $scene")
+    Timber.d("FrontSide - flipIconVisible: ${flipIconVisible.targetState} and scene is $scene")
     Box {
         DreamscapeCanvas(
             scene = scene,
@@ -129,19 +135,20 @@ private fun FrontSide(
                 .clipToBounds(),
         )
 
-        if (isImageReady) {
-            Box(
-                modifier = Modifier
-                    .align(Alignment.BottomEnd)
-                    .padding(Dimensions.paddingMedium),
-            ) {
-                Icon(
-                    imageVector = Icons.Rounded.Autorenew,
-                    contentDescription = stringResource(R.string.dream_flip_hint),
-                    tint = MaterialTheme.colorScheme.onSurface,
-                    modifier = Modifier.size(Dimensions.iconSizeLarge),
-                )
-            }
+        AnimatedVisibility(
+            visibleState = flipIconVisible,
+            enter = fadeIn(tween(FLIP_ICON_APPEAR_MS)) + scaleIn(tween(FLIP_ICON_APPEAR_MS)),
+            exit = fadeOut(),
+            modifier = Modifier
+                .align(Alignment.BottomEnd)
+                .padding(Dimensions.paddingMedium),
+        ) {
+            Icon(
+                imageVector = Icons.Rounded.Autorenew,
+                contentDescription = stringResource(R.string.dream_flip_hint),
+                tint = MaterialTheme.colorScheme.onSurface,
+                modifier = Modifier.size(Dimensions.iconSizeLarge),
+            )
         }
     }
 }
