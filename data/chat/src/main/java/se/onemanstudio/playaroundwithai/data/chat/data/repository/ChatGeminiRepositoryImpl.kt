@@ -58,9 +58,12 @@ class ChatGeminiRepositoryImpl @Inject constructor(
             parts.add(Part(text = fullPrompt))
 
             imageBytes?.let {
-                val bitmap = BitmapFactory.decodeByteArray(it, 0, it.size)
-                Timber.d("Gemini - Encoding image: ${bitmap.width}x${bitmap.height} → scaled to max ${MAX_IMAGE_SIZE}px, JPEG @ $COMPRESSION_QUALITY%%")
-                parts.add(Part(inlineData = bitmap.toImageData()))
+                val inlineData = withContext(Dispatchers.Default) {
+                    val bitmap = BitmapFactory.decodeByteArray(it, 0, it.size)
+                    Timber.d("Gemini - Encoding image: ${bitmap.width}x${bitmap.height} → scaled to max ${MAX_IMAGE_SIZE}px, JPEG @ $COMPRESSION_QUALITY%%")
+                    bitmap.toImageData()
+                }
+                parts.add(Part(inlineData = inlineData))
             }
 
             val request = GeminiRequest(contents = listOf(Content(parts = parts)))
