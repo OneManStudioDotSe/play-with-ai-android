@@ -6,6 +6,7 @@ import com.google.android.gms.maps.model.LatLng
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.collections.immutable.persistentListOf
 import kotlinx.collections.immutable.toPersistentList
+import kotlinx.collections.immutable.toPersistentSet
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -138,9 +139,9 @@ class ExploreViewModel @Inject constructor(
     fun toggleFilter(type: VehicleType) {
         _uiState.update { currentState ->
             val newFilters = if (currentState.markers.activeFilter.contains(type)) {
-                currentState.markers.activeFilter - type
+                (currentState.markers.activeFilter - type).toPersistentSet()
             } else {
-                currentState.markers.activeFilter + type
+                (currentState.markers.activeFilter + type).toPersistentSet()
             }
 
             val filtered = currentState.markers.allLocations

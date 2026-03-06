@@ -69,7 +69,7 @@ internal fun DreamResultContent(
                 .height(280.dp),
             contentAlignment = Alignment.Center,
         ) {
-            AnimatedVisibility(
+            androidx.compose.animation.AnimatedVisibility(
                 visible = !hasResult,
                 exit = fadeOut(),
             ) {
@@ -83,7 +83,7 @@ internal fun DreamResultContent(
                 }
             }
 
-            AnimatedVisibility(
+            androidx.compose.animation.AnimatedVisibility(
                 visible = hasResult,
                 enter = fadeIn(),
             ) {
