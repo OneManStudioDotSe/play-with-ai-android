@@ -16,6 +16,7 @@
             <option value="$PROJECT_DIR$/core/config" />
             <option value="$PROJECT_DIR$/core/database" />
             <option value="$PROJECT_DIR$/core/network" />
+            <option value="$PROJECT_DIR$/core/testing" />
             <option value="$PROJECT_DIR$/core/theme" />
             <option value="$PROJECT_DIR$/core/tracking" />
             <option value="$PROJECT_DIR$/core/ui" />

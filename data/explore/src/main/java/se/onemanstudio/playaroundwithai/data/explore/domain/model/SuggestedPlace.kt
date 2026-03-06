@@ -7,3 +7,14 @@ data class SuggestedPlace(
     val description: String,
     val category: String
 )
+
+fun SuggestedPlace.toExploreItem(): ExploreItem = ExploreItem(
+    id = "suggested_${name}_${lat}_${lng}",
+    lat = lat,
+    lng = lng,
+    name = name,
+    type = VehicleType.Scooter,
+    batteryLevel = 0,
+    vehicleCode = "",
+    nickname = name,
+)

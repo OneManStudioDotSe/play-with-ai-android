@@ -85,7 +85,8 @@ class SyncWorker @AssistedInject constructor(
                 Result.success()
             }
 
-            runAttemptCount < MAX_RETRY_COUNT - 1 -> {
+            // Retry as long as we haven't used all MAX_RETRY_COUNT attempts yet
+            runAttemptCount + 1 < MAX_RETRY_COUNT -> {
                 Timber.w("SyncWorker - Attempt ${runAttemptCount + 1} failed, will retry")
                 Result.retry()
             }

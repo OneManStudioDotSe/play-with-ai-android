@@ -56,6 +56,8 @@ class ChatViewModel @Inject constructor(
     private val _screenState = MutableStateFlow(ChatScreenState())
     val screenState = _screenState.asStateFlow()
 
+    private var cachedSuggestions: List<String>? = null
+
     private val _snackbarEvent = MutableSharedFlow<SnackbarEvent>(
         replay = 0,
         extraBufferCapacity = 1,
@@ -113,10 +115,16 @@ class ChatViewModel @Inject constructor(
             _screenState.update { it.copy(isSuggestionsLoading = true) }
             getSuggestionsUseCase()
                 .onSuccess { topics ->
+                    cachedSuggestions = topics
                     _screenState.update { it.copy(suggestions = topics) }
                 }
                 .onFailure {
-                    _screenState.update { it.copy(useFallbackSuggestions = true) }
+                    val cached = cachedSuggestions
+                    if (cached != null) {
+                        _screenState.update { it.copy(suggestions = cached) }
+                    } else {
+                        _screenState.update { it.copy(useFallbackSuggestions = true) }
+                    }
                 }
 
             _screenState.update { it.copy(isSuggestionsLoading = false) }
@@ -156,21 +164,18 @@ class ChatViewModel @Inject constructor(
 
             val fileText = fileResult?.getOrNull()
 
-            val savedId = try {
-                savePromptUseCase(
-                    Prompt(
-                        text = prompt,
-                        timestamp = Instant.now(),
-                        syncStatus = SyncStatus.Pending,
-                        imageAttachment = imageBytes,
-                        documentAttachment = fileText
-                    )
+            val savedId = savePromptUseCase(
+                Prompt(
+                    text = prompt,
+                    timestamp = Instant.now(),
+                    syncStatus = SyncStatus.Pending,
+                    imageAttachment = imageBytes,
+                    documentAttachment = fileText
                 )
-            } catch (e: Exception) {
+            ).onFailure { e ->
                 Timber.e(e, "ChatVM - Failed to save prompt to local DB")
                 _snackbarEvent.tryEmit(SnackbarEvent.LocalSaveFailed)
-                null
-            }
+            }.getOrNull()
 
             askAiUseCase(
                 prompt = prompt,

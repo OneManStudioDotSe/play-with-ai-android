@@ -2,8 +2,10 @@ package se.onemanstudio.playaroundwithai.data.dream.data.repository
 
 import android.content.Context
 import dagger.hilt.android.qualifiers.ApplicationContext
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.map
+import kotlinx.coroutines.withContext
 import se.onemanstudio.playaroundwithai.core.database.dao.DreamsDao
 import se.onemanstudio.playaroundwithai.data.dream.domain.model.Dream
 import se.onemanstudio.playaroundwithai.data.dream.domain.repository.DreamRepository
@@ -43,6 +45,8 @@ class DreamRepositoryImpl @Inject constructor(
     override suspend fun deleteDream(id: Long) {
         Timber.d("DreamRepo - Deleting dream id=$id")
         val dream = dreamsDao.getDreamById(id)
+        // Delete DB record first so the dream disappears from UI even if file deletion fails
+        dreamsDao.deleteDream(id)
         dream?.imagePath?.let { path ->
             val file = File(path)
             if (file.exists()) {
@@ -50,23 +54,23 @@ class DreamRepositoryImpl @Inject constructor(
                 Timber.d("DreamRepo - Deleted image file: $path")
             }
         }
-        dreamsDao.deleteDream(id)
     }
 
-    override suspend fun saveDreamImage(dreamId: Long, imageBytes: ByteArray, mimeType: String, artistName: String): String {
-        val ext = when {
-            mimeType.contains("png") -> "png"
-            mimeType.contains("webp") -> "webp"
-            else -> "jpg"
+    override suspend fun saveDreamImage(dreamId: Long, imageBytes: ByteArray, mimeType: String, artistName: String): String =
+        withContext(Dispatchers.IO) {
+            val ext = when {
+                mimeType.contains("png") -> "png"
+                mimeType.contains("webp") -> "webp"
+                else -> "jpg"
+            }
+            val dir = File(context.filesDir, DREAM_IMAGES_DIR)
+            if (!dir.exists()) dir.mkdirs()
+
+            val file = File(dir, "dream_${dreamId}.$ext")
+            file.writeBytes(imageBytes)
+            Timber.d("DreamRepo - Saved dream image to ${file.absolutePath} (${imageBytes.size} bytes)")
+
+            dreamsDao.updateDreamImage(dreamId, file.absolutePath, artistName)
+            file.absolutePath
         }
-        val dir = File(context.filesDir, DREAM_IMAGES_DIR)
-        if (!dir.exists()) dir.mkdirs()
-
-        val file = File(dir, "dream_${dreamId}.$ext")
-        file.writeBytes(imageBytes)
-        Timber.d("DreamRepo - Saved dream image to ${file.absolutePath} (${imageBytes.size} bytes)")
-
-        dreamsDao.updateDreamImage(dreamId, file.absolutePath, artistName)
-        return file.absolutePath
-    }
 }
