@@ -14,6 +14,14 @@ Chat with Gemini, analyze documents, or plan a tour around your location by visi
 |:------------------------------------------------:|:------------------------------------------------:|:------------------------------------------------:|:-------------------------------------------------:|
 | <img src="screenshots/screen6.png" width="180"/> | <img src="screenshots/screen8.png" width="180"/> | <img src="screenshots/screen9.png" width="180"/> | <img src="screenshots/screen10.png" width="180"/> |
 
+|                  Dream input                     |                Animated dream canvas             |               AI-generated painting              |                  Dream gallery                   |
+|:------------------------------------------------:|:------------------------------------------------:|:------------------------------------------------:|:------------------------------------------------:|
+| <!-- screenshot coming soon -->                  | <!-- screenshot coming soon -->                  | <!-- screenshot coming soon -->                  | <!-- screenshot coming soon -->                  |
+
+|                  Trip planner                    |               Agent thinking steps              |              Trip plan with map                  |              Design system showcase              |
+|:------------------------------------------------:|:------------------------------------------------:|:------------------------------------------------:|:------------------------------------------------:|
+| <!-- screenshot coming soon -->                  | <!-- screenshot coming soon -->                  | <!-- screenshot coming soon -->                  | <!-- screenshot coming soon -->                  |
+
 ## The idea
 
 This app was built to showcase how modern Android tech can be both powerful and fun. 🚀
@@ -112,18 +120,30 @@ Smooth for both the developer and the user:
 ## Meaningful scalability
 
 A highly modular structure that scales regardless of team size:
-- **`:core:network`**: Shared networking — Retrofit, OkHttp, GeminiApiService, DTOs, interceptor
-- **`:core:auth`**: Firebase Auth, AuthRepository, auth use cases
-- **`:core:config`**: API key management, BuildConfig fields, Hilt qualifier annotations
+
+**Core modules — shared infrastructure:**
+- **`:core:network`**: Retrofit, OkHttp, GeminiApiService, request/response DTOs, AuthenticationInterceptor, NetworkMonitor
+- **`:core:auth`**: Firebase Auth, AuthRepository, auth use cases, AuthSession
+- **`:core:config`**: API key management, BuildConfig fields, Hilt qualifiers, AppSettingsHolder
+- **`:core:database`**: Shared Room database — all entities (prompts, dreams, token usage), DAOs, TypeConverters, migrations
+- **`:core:tracking`**: Token usage tracking — TokenUsageTracker/Query interfaces, TrackerImpl, GetWeeklyTokenUsageUseCase
 - **`:core:theme`**: Centralized design system (colors, typography)
 - **`:core:ui`**: Reusable Compose components
-- **`:feature:chat`**: Complete chat feature — domain, data, and presentation layers (Room, Firestore, WorkManager)
-- **`:feature:explore`**: Complete explore feature — domain, data, and presentation layers (fake API, route calculation)
-- **`:feature:dream`**: Complete dream feature — domain, data, and presentation layers (Room, Gemini-powered interpretation + image generation)
-- **`:feature:plan`**: Complete plan feature — domain, data, and presentation layers (agentic AI loop, Gemini function calling)
-- **`:feature:showcase`**: Presentation-only feature — interactive design system showcase (no ViewModel, no data layer, no Hilt)
 
-Each feature module is self-contained with its own domain models, repository interfaces, use case classes, and data layer implementations. Shared infrastructure (networking, auth, config) lives in focused core modules. Multiple teams can work on separate features without conflicts.
+**Data modules — domain models, repositories, use cases:**
+- **`:data:chat`**: Chat use cases, ChatGeminiRepository, PromptRepository, Firestore sync, SyncWorker
+- **`:data:explore`**: Explore use cases, ExploreRepository, FakeExploreItemsService, route calculation, AI place suggestions
+- **`:data:dream`**: Dream use cases, DreamGeminiRepository, DreamRepository
+- **`:data:plan`**: Trip planner use cases, TripPlannerRepository, agentic AI loop with Gemini function calling
+
+**Feature modules — presentation only (Compose UI + ViewModels):**
+- **`:feature:chat`**: ChatViewModel, ChatScreen
+- **`:feature:explore`**: ExploreViewModel, ExploreScreen
+- **`:feature:dream`**: DreamViewModel, DreamScreen
+- **`:feature:plan`**: PlanViewModel, PlanScreen
+- **`:feature:showcase`**: ShowcaseScreen — interactive design system guide (no ViewModel, no data layer, no Hilt)
+
+The dependency flow runs strictly one way: `feature → data → core`. Shared infrastructure (DB, tracking, networking) lives in focused core modules. Multiple teams can work on separate features without conflicts.
 
 ## Future-proofing
 

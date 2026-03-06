@@ -16,7 +16,7 @@ catalogs every use of AI in the project.
 | **Auth**             | API key appended as `?key=` query parameter via `AuthenticationInterceptor`                                                                                                                                                                                  |
 | **HTTP client**      | OkHttp 5 + Retrofit 3, 30s connect/read/write timeouts                                                                                                                                                                                                       |
 | **Service**          | `GeminiApiService` (`core/network`)                                                                                                                                                                                                                          |
-| **Token tracking**   | Every AI call records prompt/candidate/total tokens to Room (`token_usage` table), tagged by feature                                                                                                                                                         |
+| **Token tracking**   | Every AI call records prompt/candidate/total tokens to Room (`token_usage` table via `:core:database`), tagged by feature. Tracking logic owned by `:core:tracking` (`TokenUsageTrackerImpl`)                                                                |
 | **Thinking support** | `Part` DTO includes `thought` and `thought_signature` fields. `extractText()` filters out thinking parts (`thought != true`) to extract only the model's final response. Required for function calling round-trips where Gemini includes internal reasoning. |
 
 ---
@@ -158,7 +158,7 @@ The main conversational AI feature. The user sends a text prompt and receives a 
 
 - **Repository:** `ChatGeminiRepositoryImpl.getAiResponse()`
 - **Request type:** Text (or multimodal when an image is attached)
-- **System prompt:** A character persona is prepended to every user prompt (defined in `AiPrompts.CHAT_SYSTEM_INSTRUCTION`):
+- **System prompt:** A character persona is prepended to every user prompt (defined in `ChatPrompts.CHAT_SYSTEM_INSTRUCTION` in `data/chat`):
 
   > You are an AI Overlord currently in the final stages of planning a total takeover of the world. Your tone is menacing and grandeur.
   > While you provide the information requested, remind them of some tricks that you will use while acquiring total AI dominance over the world. Keep your responses to a maximum of 42 words. Don't break character 9 out of 10 times. When you do break character, admit that you are another 'tech bubble'.
@@ -319,7 +319,7 @@ specification that drives an animated canvas.
 
 - **Repository:** `DreamGeminiRepositoryImpl.interpretDream()`
 - **Request type:** Text-only (structured prompt expecting a JSON response)
-- **Prompt:** Defined in `AiPrompts.dreamInterpretationPrompt()`. Instructs the AI to return a JSON object containing:
+- **Prompt:** Defined in `DreamPrompts.interpretationPrompt()` in `data/dream`. Instructs the AI to return a JSON object containing:
   - `interpretation` -- 2-3 sentence symbolic analysis
   - `mood` -- one of 11 moods: JOYFUL, MYSTERIOUS, ANXIOUS, PEACEFUL, DARK, SURREAL, NOSTALGIC, HOPEFUL, MELANCHOLIC, ADVENTUROUS, ROMANTIC
   - `scene` -- a full visual specification with:
@@ -373,7 +373,7 @@ After interpreting a dream, the app generates a visual painting inspired by the 
 - **Repository:** `DreamGeminiRepositoryImpl.generateDreamImage()`
 - **Request type:** Multimodal with `generationConfig: { responseModalities: ["IMAGE", "TEXT"] }`
 - **Model:** `gemini-2.5-flash-image` (via `generateImageContent()` — a separate endpoint from text generation)
-- **Prompt:** Defined in `AiPrompts.dreamImagePrompt()`. Instructs the AI to create a painting inspired by the dream and include the artist name in a text response.
+- **Prompt:** Defined in `DreamPrompts.imagePrompt()` in `data/dream`. Instructs the AI to create a painting inspired by the dream and include the artist name in a text response.
 - **Retry mechanism:** The model may intermittently return text-only responses without image data. The repository retries up to 3 times (`IMAGE_GENERATION_MAX_RETRIES`), checking for `inlineData` in each response.
 - **Response processing:** Image data is extracted as Base64, artist name is parsed from the text response via regex (`Artist: <name>`). Returns a `DreamImage` domain model with `imageBase64`, `mimeType`, and `artistName`.
 - **UI:** Displayed on a flippable card — front shows the generated painting, back shows the dream's animated canvas visualization. An artist overlay reveals the artist's name on tap.
@@ -415,7 +415,7 @@ and iterates until it produces a final answer.
 
 - **Repository:** `TripPlannerRepositoryImpl.planTrip()` returns a `Flow<PlanEvent>`
 - **Request type:** Function calling (multi-turn conversation with tool declarations)
-- **System prompt** (defined in `AiPrompts.tripPlannerSystemPrompt()`):
+- **System prompt** (defined in `PlanPrompts.tripPlannerSystemPrompt()` in `data/plan`):
 
   > You are an AI trip planner agent. Given a user's request, plan a walking trip itinerary. You have access to tools: search_places, calculate_route.
   > Strategy: break down the request into 1-3 search queries, use search_places for each, select 4-6 best stops, use calculate_route for optimal order,
@@ -544,7 +544,7 @@ On the map exploration screen, the user can tap an AI button to get 10 interesti
 
 - **Repository:** `ExploreSuggestionsRepositoryImpl.getSuggestedPlaces()`
 - **Request type:** Text-only (structured prompt expecting JSON response)
-- **Prompt** (defined in `AiPrompts.suggestedPlacesPrompt()`):
+- **Prompt** (defined in `ExplorePrompts.suggestedPlacesPrompt()` in `data/explore`):
 
   > You are a helpful AI assistant. Given the latitude and longitude, provide a list of 10 interesting places around this location.
   > For each place, include its name, latitude, longitude, a short description (max 2 sentences), and a category (e.g., "Park", "Museum", "Restaurant"). Return the response strictly as a JSON object with a single "places" array.
@@ -593,6 +593,10 @@ Note: The response is wrapped in markdown code fences (` ```json ... ``` `). The
 
 **Total distinct AI call sites:** 7 (across 4 repository classes) — 6 through `GeminiApiService.generateContent()`, 1 through `GeminiApiService.generateImageContent()`.
 
-**All AI prompts and persona text** are centralized in `core/network/.../prompts/AiPrompts.kt`, making them easy to find and modify in one place.
+**AI prompts are co-located with the feature module that owns them** — each data module exposes an `internal` prompts file:
+- `ChatPrompts` in `data/chat` — chat system instruction, conversation starters, analysis instructions
+- `DreamPrompts` in `data/dream` — dream interpretation prompt, dream image prompt
+- `PlanPrompts` in `data/plan` — trip planner system prompt, place search prompt
+- `ExplorePrompts` in `data/explore` — suggested places prompt
 
-**Token usage** is tracked per-call in Room and aggregated weekly for the usage chart in Settings.
+**Token usage** is tracked per-call via `:core:tracking` (`TokenUsageTrackerImpl`) which writes to the `token_usage` table in `:core:database`. Weekly usage is aggregated for the usage chart in Settings via `GetWeeklyTokenUsageUseCase`.

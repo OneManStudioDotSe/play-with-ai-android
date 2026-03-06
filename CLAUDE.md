@@ -30,15 +30,17 @@
 
 ```
 :app                    → Application entry point, navigation, main activity
-:core:network           → OkHttp, Retrofit, Gson, GeminiApiService, DTOs (incl. function calling & thinking support), interceptor, AiPrompts
+:core:network           → OkHttp, Retrofit, Gson, GeminiApiService, DTOs (incl. function calling & thinking support), interceptor, NetworkMonitor
 :core:auth              → Firebase Auth, AuthRepository (interface+impl), auth use cases, AuthSession
-:core:config            → ApiKeyAvailability, ConfigurationModule, qualifier annotations, BuildConfig
+:core:config            → ApiKeyAvailability, AppSettingsHolder, ConfigurationModule, qualifier annotations, BuildConfig
+:core:database          → Shared Room DB (v6): AppDatabase, all entities (PromptEntity, DreamEntity, TokenUsageEntity), all DAOs, SyncStatusConverter, DatabaseModule
+:core:tracking          → TokenUsageTracker + TokenUsageQuery interfaces, TokenUsageTrackerImpl, GetWeeklyTokenUsageUseCase, TrackingModule
 :core:theme             → Design system: colors, typography ("SoFa" design language)
 :core:ui                → Reusable Compose UI components (NeoBrutalCard, NeoBrutalIconButton, NeoBrutalIconButtonSmall, TopAppBar, etc.)
-:data:plan              → Plan domain + data: agent loop, tool dispatch, route calculator, Gemini function calling
-:data:explore           → Explore domain + data: fake API, explore items, suggested places
-:data:chat              → Chat domain + data: Room DB (v5, 3 tables: prompt_history, token_usage, dreams), Firestore sync, prompt history
-:data:dream             → Dream domain + data: dream entity, DAO, interpretation (DB hosted in :data:chat)
+:data:plan              → Plan domain + data: agent loop, tool dispatch, route calculator, Gemini function calling, PlanPrompts
+:data:explore           → Explore domain + data: fake API, explore items, suggested places, ExplorePrompts
+:data:chat              → Chat domain + data: Firestore sync, prompt history, SyncWorker, ChatPrompts
+:data:dream             → Dream domain + data: interpretation, image generation, DreamPrompts
 :feature:plan           → Plan presentation: PlanViewModel, PlanScreen (trip planner UI + map)
 :feature:chat           → Chat presentation: ChatViewModel, ChatScreen
 :feature:explore        → Explore presentation: ExploreViewModel, ExploreScreen
@@ -46,7 +48,7 @@
 :feature:showcase       → Showcase presentation: ShowcaseScreen (design system style guide, no ViewModel)
 ```
 
-Dependencies flow: `feature → data → core:network + core:config`, `feature → core:ui → core:theme`
+Dependencies flow: `feature → data → core:network + core:config + core:database + core:tracking`, `feature → core:ui → core:theme`
 Exception: `:feature:showcase` is presentation-only (no ViewModel, no data layer, no Hilt) — depends only on `:core:ui` and `:core:theme`.
 
 ## Architecture
@@ -204,8 +206,9 @@ service cloud.firestore {
 │  │   :data:chat     │ │ :data:explore  │ │  :data:dream  │ │  :data:plan       │  │
 │  │ PromptRepository │ │ExploreRepositry│ │ DreamGeminiRep│ │ TripPlannerRepo   │  │
 │  │ ChatGeminiRepo   │ │ExploreGeminiRep│ │ DreamReposito.│ │ PlanTripUseCase   │  │
-│  │ Room, Firestore  │ │ FakeExploreApi │ │ Dream entity  │ │ Agent loop, tools │  │
-│  │ SyncWorker       │ │ RouteCalc      │ │               │ │ RouteCalculator   │  │
+│  │ Firestore sync   │ │ FakeExploreApi │ │ ChatPrompts   │ │ Agent loop, tools │  │
+│  │ SyncWorker       │ │ RouteCalc      │ │ DreamPrompts  │ │ RouteCalculator   │  │
+│  │ ChatPrompts      │ │ ExplorePrompts │ │               │ │ PlanPrompts       │  │
 │  └───────┬──────────┘ └──────┬─────────┘ └──────┬────────┘ └────────┬──────────┘  │
 │          │                   │                │                    │             │
 └──────────┼───────────────────┼────────────────┼────────────────────┼─────────────┘
@@ -217,16 +220,21 @@ service cloud.firestore {
 │  ┌──────────────────┐  ┌──────────────────┐  ┌───────────────────────────────┐  │
 │  │   :core:network   │  │   :core:auth     │  │       :core:config            │  │
 │  │  GeminiApiService │  │  AuthRepository  │  │  ApiKeyAvailability           │  │
-│  │  DTOs (text +     │  │  AuthSession     │  │  @GeminiApiKey, @BaseUrl      │  │
-│  │  function calling)│  │  Firebase Auth   │  │  ConfigurationModule          │  │
-│  │  AiPrompts        │  │  Auth Use Cases  │  │  BuildConfig fields           │  │
-│  │  Interceptor      │  │                  │  │                               │  │
+│  │  DTOs (text +     │  │  AuthSession     │  │  AppSettingsHolder            │  │
+│  │  function calling)│  │  Firebase Auth   │  │  @GeminiApiKey, @BaseUrl      │  │
+│  │  NetworkMonitor   │  │  Auth Use Cases  │  │  ConfigurationModule          │  │
+│  │  Interceptor      │  │                  │  │  BuildConfig fields           │  │
 │  └──────────────────┘  └──────────────────┘  └───────────────────────────────┘  │
 │                                                                                  │
-│  ┌──────────────────┐  ┌──────────────────┐                                     │
-│  │   :core:theme     │  │    :core:ui      │                                     │
-│  │  Colors, Typo     │  │  Compose widgets │                                     │
-│  └──────────────────┘  └──────────────────┘                                     │
+│  ┌──────────────────┐  ┌──────────────────┐  ┌───────────────────────────────┐  │
+│  │  :core:database   │  │  :core:tracking  │  │  :core:theme / :core:ui      │  │
+│  │  AppDatabase (v6) │  │ TokenUsageTracker│  │  Colors, Typography (theme)  │  │
+│  │  PromptEntity     │  │ TokenUsageQuery  │  │  Compose widgets (ui)        │  │
+│  │  DreamEntity      │  │ TrackerImpl      │  │                              │  │
+│  │  TokenUsageEntity │  │ GetWeeklyToken   │  │                              │  │
+│  │  All DAOs         │  │ UsageUseCase     │  │                              │  │
+│  │  DatabaseModule   │  │ TrackingModule   │  │                              │  │
+│  └──────────────────┘  └──────────────────┘  └───────────────────────────────┘  │
 └──────────────────────────────────────────────────────────────────────────────────┘
                 │
                 ▼
@@ -290,7 +298,7 @@ AskAiUseCase.invoke(prompt, imageBytes?, fileText?, analysisType?)
   ▼
 ChatGeminiRepositoryImpl.getAiResponse()
   │
-  ├─ Prepend system instruction from AiPrompts ("AI Overlord" persona, max 42 words)
+  ├─ Prepend system instruction from ChatPrompts ("AI Overlord" persona, max 42 words)
   ├─ Append file content if present
   ├─ Build GeminiRequest { contents: [{ parts: [{ text }, { inlineData? }] }] }
   │
@@ -425,7 +433,7 @@ PlanTripUseCase.invoke(goal, lat, lng)
   ▼
 TripPlannerRepositoryImpl.planTrip() → Flow<PlanEvent>
   │
-  ├─ Build system prompt from AiPrompts (agent persona + tool strategy instructions)
+  ├─ Build system prompt from PlanPrompts (agent persona + tool strategy instructions)
   ├─ Initialize conversation history: [user message with system prompt + goal]
   ├─ Attach tool declarations: search_places, calculate_route
   │

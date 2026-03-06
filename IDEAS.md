@@ -29,7 +29,7 @@ There is no way to turn this off.
 The chat uses a hardcoded "AI Overlord" persona with a 42-word max response length. Offer preset personas (e.g., concise
 assistant, creative storyteller, technical expert) or a free-text system instruction field.
 
-- **Code:** `core/network/src/main/java/.../prompts/AiPrompts.kt` — `CHAT_SYSTEM_INSTRUCTION` constant (all prompts are now centralized here)
+- **Code:** `data/chat/src/main/java/.../prompts/ChatPrompts.kt` — `CHAT_SYSTEM_INSTRUCTION` constant
 
 ### 4. Walking Speed
 
@@ -64,7 +64,7 @@ The agentic trip planner loop hard-stops at 10 iterations and the system prompt 
 pick a budget (quick 5 / standard 10 / thorough 15) to trade speed for depth.
 
 - **Code:** `data/plan/src/main/java/.../repository/TripPlannerRepositoryImpl.kt` — `MAX_ITERATIONS = 10`, `DEFAULT_COUNT = 5`
-- **Code:** `core/network/src/main/java/.../prompts/AiPrompts.kt` — `tripPlannerSystemPrompt()` contains `"Do NOT call more than 5 tools total"`
+- **Code:** `data/plan/src/main/java/.../prompts/PlanPrompts.kt` — `tripPlannerSystemPrompt()` contains `"Do NOT call more than 5 tools total"`
 
 ### 8. Image Quality / Compression
 
@@ -78,7 +78,7 @@ would let users balance upload size vs. detail.
 The map feature asks Gemini for exactly 10 suggested places. A slider (5–20) would let users control how many AI suggestions
 appear.
 
-- **Code:** `core/network/src/main/java/.../prompts/AiPrompts.kt` — `SUGGESTED_PLACES_COUNT = 10` (inside `AiPrompts` object)
+- **Code:** `data/explore/src/main/java/.../prompts/ExplorePrompts.kt` — `SUGGESTED_PLACES_COUNT = 10`
 
 ### 10. Max Route Points
 
@@ -110,15 +110,15 @@ Stockholm (59.3293, 18.0686) if unavailable. A "home location" setting could let
 The agent system prompt targets "4–6 stops for a half-day trip." Offer presets (quick 2–3 stops / standard 4–6 / extended
 7–10) so the user can control itinerary size.
 
-- **Code:** `core/network/src/main/java/.../prompts/AiPrompts.kt` — `tripPlannerSystemPrompt()` contains `"Keep the itinerary to 4-6 stops for a half-day trip."`
+- **Code:** `data/plan/src/main/java/.../prompts/PlanPrompts.kt` — `tripPlannerSystemPrompt()` contains `"Keep the itinerary to 4-6 stops for a half-day trip."`
 
 ### 14. Token Usage Tracking Toggle
 
 Token usage is always tracked to the local Room database. Some users may want to disable tracking for privacy or storage 
 reasons.
 
-- **Code:** `data/chat/src/main/java/.../tracking/TokenUsageTrackerImpl` — tracking runs unconditionally
-- **Code:** `data/chat/src/main/java/.../local/dao/TokenUsageDao.kt` — always written to
+- **Code:** `core/tracking/src/main/java/.../TokenUsageTrackerImpl.kt` — tracking runs unconditionally
+- **Code:** `core/database/src/main/java/.../dao/TokenUsageDao.kt` — always written to
 
 ### 15. Map Theme Override
 

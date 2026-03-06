@@ -1,9 +1,9 @@
 ## Architecture Diagram — API Endpoints, Services & Data Flow
 
 ```
-┌──────────────────────────────────────────────────────────────────────────────────────────────────────┐
-│                                       PRESENTATION LAYER                                              │
-│                                                                                                      │
+┌───────────────────────────────────────────────────────────────────────────────────────────────────────────┐
+│                                       PRESENTATION LAYER                                                  │
+│                                                                                                           │
 │  ┌──────────────────┐ ┌──────────────────┐ ┌──────────────────┐ ┌──────────────────┐ ┌──────────────────┐ │
 │  │  :feature:chat   │ │ :feature:explore │ │  :feature:dream  │ │  :feature:plan   │ │:feature:showcase │ │
 │  │                  │ │                  │ │                  │ │                  │ │                  │ │
@@ -20,7 +20,7 @@
            │                    │                    │                    │                    │
            ▼                    ▼                    ▼                    ▼                    │
 ┌──────────────────────────────────────────────────────────────────────────────────────────────────────┐
-│                              DOMAIN + DATA LAYER (co-located per feature)                              │
+│                              DOMAIN + DATA LAYER (co-located per feature)                            │
 │                                                                                                      │
 │  ┌──────────────────────┐ ┌──────────────────────┐ ┌──────────────────────┐ ┌──────────────────────┐ │
 │  │    :data:chat        │ │   :data:explore      │ │    :data:dream       │ │    :data:plan        │ │
@@ -38,47 +38,55 @@
 │  │  ChatGeminiRepo      │ │  RouteCalculator     │ │  Room (dreams table) │ │                      │ │
 │  │  PromptRepository    │ │                      │ │                      │ │                      │ │
 │  │                      │ │                      │ │                      │ │                      │ │
-│  │ Data Sources:        │ │                      │ │                      │ │                      │ │
-│  │  Room (prompt_history│ │                      │ │                      │ │                      │ │
-│  │  FirestoreDataSource │ │                      │ │                      │ │                      │ │
-│  │  SyncWorker          │ │                      │ │                      │ │                      │ │
+│  │ Data Sources:        │ │                      │ │ Data Sources:        │ │                      │ │
+│  │  FirestoreDataSource │ │                      │ │  (DB → :core:database│ │                      │ │
+│  │  SyncWorker          │ │                      │ │   DreamsDao hosted   │ │                      │ │
+│  │  (DB → :core:database│ │                      │ │   in shared module)  │ │                      │ │
 │  └───────┬──────────────┘ └───────┬──────────────┘ └───────┬──────────────┘ └───────┬──────────────┘ │
 │          │                        │                        │                        │                │
 └──────────┼────────────────────────┼────────────────────────┼────────────────────────┼────────────────┘
            │                        │                        │                        │
            ▼                        ▼                        ▼                        ▼
-┌──────────────────────────────────────────────────────────────────────────────────────────────────────┐
-│                                       SHARED CORE MODULES                                             │
-│                                                                                                      │
+┌─────────────────────────────────────────────────────────────────────────────────────────────────────┐
+│                                       SHARED CORE MODULES                                           │
+│                                                                                                     │
 │  ┌──────────────────────┐  ┌──────────────────────┐  ┌──────────────────────────────────────────┐   │
 │  │   :core:network      │  │    :core:auth        │  │          :core:config                    │   │
 │  │  GeminiApiService    │  │  AuthRepository      │  │  ApiKeyAvailability                      │   │
-│  │  DTOs (text +        │  │  AuthSession         │  │  @GeminiApiKey, @BaseUrl, @LoggingLevel  │   │
-│  │  function calling)   │  │  Firebase Auth       │  │  ConfigurationModule                     │   │
-│  │  Interceptor         │  │  Auth Use Cases      │  │  BuildConfig fields                      │   │
+│  │  DTOs (text +        │  │  AuthSession         │  │  AppSettingsHolder                       │   │
+│  │  function calling)   │  │  Firebase Auth       │  │  @GeminiApiKey, @BaseUrl, @LoggingLevel  │   │
+│  │  NetworkMonitor      │  │  Auth Use Cases      │  │  ConfigurationModule                     │   │
+│  │  Interceptor         │  │                      │  │  BuildConfig fields                      │   │
 │  └──────────────────────┘  └──────────────────────┘  └──────────────────────────────────────────┘   │
-│                                                                                                      │
-│  ┌──────────────────────┐  ┌──────────────────────┐                                                 │
-│  │   :core:theme        │  │    :core:ui          │                                                 │
-│  │  Colors, Typography  │  │  Compose widgets     │                                                 │
-│  └──────────────────────┘  └──────────────────────┘                                                 │
-└──────────────────────────────────────────────────────────────────────────────────────────────────────┘
+│                                                                                                     │
+│  ┌──────────────────────┐  ┌──────────────────────┐  ┌──────────────────────────────────────────┐   │
+│  │   :core:database     │  │   :core:tracking     │  │          :core:theme / :core:ui          │   │
+│  │  AppDatabase (v6)    │  │  TokenUsageTracker   │  │  Colors, Typography (theme)              │   │
+│  │  PromptEntity        │  │  TokenUsageQuery     │  │  Compose widgets (ui)                    │   │
+│  │  DreamEntity         │  │  TokenUsageTrackerIml│  │                                          │   │
+│  │  TokenUsageEntity    │  │  GetWeeklyTokenUsage │  │                                          │   │
+│  │  PromptsHistoryDao   │  │  UseCase             │  │                                          │   │
+│  │  DreamsDao           │  │                      │  │                                          │   │
+│  │  TokenUsageDao       │  │  (used by all 4 AI   │  │                                          │   │
+│  │  SyncStatusConverter │  │   data modules)      │  │                                          │   │
+│  └──────────────────────┘  └──────────────────────┘  └──────────────────────────────────────────┘   │
+└─────────────────────────────────────────────────────────────────────────────────────────────────────┘
            │
            ▼
 ┌──────────────────────────────────────────────────────────────────────────────────────────────────────┐
-│                                       EXTERNAL SERVICES                                               │
+│                                       EXTERNAL SERVICES                                              │
 │                                                                                                      │
 │  ┌──────────────────────────────────────────────────────────────────────────────────────────────┐    │
 │  │  Google Gemini API                                                                           │    │
 │  │  Base: https://generativelanguage.googleapis.com/                                            │    │
 │  │  Text:  POST /v1beta/models/gemini-3-flash-preview:generateContent                           │    │
 │  │  Image: POST /v1beta/models/gemini-2.5-flash-image:generateContent                           │    │
-│  │  Auth: ?key={GEMINI_API_KEY} (query param via AuthenticationInterceptor)                      │    │
+│  │  Auth: ?key={GEMINI_API_KEY} (query param via AuthenticationInterceptor)                     │    │
 │  │                                                                                              │    │
 │  │  Standard:  { contents: [{ parts: [{ text, inlineData? }] }] }                               │    │
 │  │  With tools: + { tools: [{ functionDeclarations }] }  (plan feature — agent loop)            │    │
 │  │  With image: + { generationConfig: { responseModalities: ["IMAGE", "TEXT"] } }               │    │
-│  │  Parts may include: thought + thought_signature (Gemini thinking, preserved in history)       │    │
+│  │  Parts may include: thought + thought_signature (Gemini thinking, preserved in history)      │    │
 │  │  Response: { candidates: [{ content: { parts: [text | functionCall] } }] }                   │    │
 │  └──────────────────────────────────────────────────────────────────────────────────────────────┘    │
 │                                                                                                      │
@@ -90,12 +98,12 @@
 │  └──────────────────────────────────────────────────────────────────────────────────────────────┘    │
 │                                                                                                      │
 │  ┌──────────────────────────────────────────────────────────────────────────────────────────────┐    │
-│  │  Firebase Auth — Method: Anonymous sign-in                                                    │    │
+│  │  Firebase Auth — Method: Anonymous sign-in                                                   │    │
 │  └──────────────────────────────────────────────────────────────────────────────────────────────┘    │
 │                                                                                                      │
 │  ┌──────────────────────────────────────────────────────────────────────────────────────────────┐    │
-│  │  Google Maps SDK — Auth: MAPS_API_KEY (manifest placeholder)                                  │    │
-│  │  Services: Map tiles, markers, polylines, camera, FusedLocationProviderClient                 │    │
+│  │  Google Maps SDK — Auth: MAPS_API_KEY (manifest placeholder)                                 │    │
+│  │  Services: Map tiles, markers, polylines, camera, FusedLocationProviderClient                │    │
 │  └──────────────────────────────────────────────────────────────────────────────────────────────┘    │
 │                                                                                                      │
 └──────────────────────────────────────────────────────────────────────────────────────────────────────┘
