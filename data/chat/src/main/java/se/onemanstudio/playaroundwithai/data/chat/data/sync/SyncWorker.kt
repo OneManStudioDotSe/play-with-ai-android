@@ -12,10 +12,10 @@ import androidx.work.WorkerParameters
 import dagger.assisted.Assisted
 import dagger.assisted.AssistedInject
 import se.onemanstudio.playaroundwithai.core.auth.repository.AuthRepository
+import se.onemanstudio.playaroundwithai.core.database.dao.PromptsHistoryDao
+import se.onemanstudio.playaroundwithai.core.database.entity.SyncStatus
 import se.onemanstudio.playaroundwithai.data.chat.R
-import se.onemanstudio.playaroundwithai.data.chat.data.local.dao.PromptsHistoryDao
 import se.onemanstudio.playaroundwithai.data.chat.data.remote.FirestoreDataSource
-import se.onemanstudio.playaroundwithai.data.chat.domain.model.SyncStatus
 import timber.log.Timber
 
 private const val SYNC_CHANNEL_FOR_DB = "sync_channel"
@@ -52,11 +52,12 @@ class SyncWorker @AssistedInject constructor(
 
         var allSuccessful = true
         pendingPrompts.forEach { entity ->
-            val hasFirestoreDoc = entity.firestoreDocId != null
+            val firestoreDocId = entity.firestoreDocId
+            val hasFirestoreDoc = firestoreDocId != null
             Timber.d("SyncWorker - Syncing prompt id=${entity.id} (${if (hasFirestoreDoc) "UPDATE" else "CREATE"})...")
 
-            val success = if (hasFirestoreDoc) {
-                val result = firestoreDataSource.updatePrompt(entity.firestoreDocId, entity.text)
+            val success = if (firestoreDocId != null) {
+                val result = firestoreDataSource.updatePrompt(firestoreDocId, entity.text)
                 result.isSuccess
             } else {
                 val result = firestoreDataSource.savePrompt(entity.text, entity.timestamp)

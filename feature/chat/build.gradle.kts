@@ -41,6 +41,7 @@ android {
 dependencies {
     implementation(project(":core:auth"))
     implementation(project(":core:config"))
+    implementation(project(":core:database"))
     implementation(project(":core:theme"))
     implementation(project(":core:ui"))
     implementation(project(":data:chat"))

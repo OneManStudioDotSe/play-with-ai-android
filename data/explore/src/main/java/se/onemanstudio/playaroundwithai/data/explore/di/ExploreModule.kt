@@ -14,8 +14,8 @@ import se.onemanstudio.playaroundwithai.data.explore.data.repository.ExploreSugg
 import se.onemanstudio.playaroundwithai.data.explore.data.repository.ExplorePointsRepositoryImpl
 import se.onemanstudio.playaroundwithai.data.explore.domain.repository.ExploreSuggestionsRepository
 import se.onemanstudio.playaroundwithai.data.explore.domain.repository.ExplorePointsRepository
-import se.onemanstudio.playaroundwithai.data.explore.util.ConnectivityNetworkMonitor
-import se.onemanstudio.playaroundwithai.data.explore.util.NetworkMonitor
+import se.onemanstudio.playaroundwithai.core.network.monitor.ConnectivityNetworkMonitor
+import se.onemanstudio.playaroundwithai.core.network.monitor.NetworkMonitor
 import javax.inject.Singleton
 
 @Module

@@ -9,13 +9,13 @@ import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.flow.flowOn
 import se.onemanstudio.playaroundwithai.core.network.api.GeminiApiService
 import se.onemanstudio.playaroundwithai.core.network.dto.Content
-import se.onemanstudio.playaroundwithai.core.network.tracking.TokenUsageTracker
 import se.onemanstudio.playaroundwithai.core.network.dto.FunctionCallDto
+import se.onemanstudio.playaroundwithai.core.tracking.TokenUsageTracker
 import se.onemanstudio.playaroundwithai.core.network.dto.FunctionResponseDto
 import se.onemanstudio.playaroundwithai.core.network.dto.GeminiRequest
 import se.onemanstudio.playaroundwithai.core.network.dto.Part
-import se.onemanstudio.playaroundwithai.core.network.prompts.AiPrompts
 import se.onemanstudio.playaroundwithai.data.plan.data.tools.RouteCalculator
+import se.onemanstudio.playaroundwithai.data.plan.prompts.PlanPrompts
 import se.onemanstudio.playaroundwithai.data.plan.data.tools.buildToolDeclarations
 import se.onemanstudio.playaroundwithai.data.plan.domain.model.PlanEvent
 import se.onemanstudio.playaroundwithai.data.plan.domain.model.TripPlan
@@ -45,7 +45,7 @@ class TripPlannerRepositoryImpl @Inject constructor(
             val collectedStops = mutableListOf<TripStop>()
             var routeResult: se.onemanstudio.playaroundwithai.data.plan.data.tools.RouteResult? = null
 
-            val systemPrompt = AiPrompts.tripPlannerSystemPrompt(latitude, longitude)
+            val systemPrompt = PlanPrompts.tripPlannerSystemPrompt(latitude, longitude)
             history.add(Content(role = "user", parts = listOf(Part(text = "$systemPrompt\n\nUser request: $goal"))))
 
             emit(PlanEvent.Thinking("Understanding your request..."))
@@ -137,7 +137,7 @@ class TripPlannerRepositoryImpl @Inject constructor(
 
         Timber.d("$LOG_TAG - search_places: query='$query' lat=$lat lng=$lng count=$count")
 
-        val prompt = AiPrompts.searchPlacesPrompt(query, lat, lng, count)
+        val prompt = PlanPrompts.searchPlacesPrompt(query, lat, lng, count)
         val request = GeminiRequest(contents = listOf(Content(role = "user", parts = listOf(Part(text = prompt)))))
         val response = apiService.generateContent(request)
         tokenUsageTracker.record("agents", response.usageMetadata)

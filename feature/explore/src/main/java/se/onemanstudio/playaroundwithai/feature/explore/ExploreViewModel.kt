@@ -21,7 +21,7 @@ import se.onemanstudio.playaroundwithai.data.explore.domain.model.SuggestedPlace
 import se.onemanstudio.playaroundwithai.data.explore.domain.model.VehicleType
 import se.onemanstudio.playaroundwithai.data.explore.domain.usecase.GetExploreItemsUseCase
 import se.onemanstudio.playaroundwithai.data.explore.domain.usecase.GetSuggestedPlacesUseCase
-import se.onemanstudio.playaroundwithai.data.explore.util.NetworkMonitor
+import se.onemanstudio.playaroundwithai.core.network.monitor.NetworkMonitor
 import se.onemanstudio.playaroundwithai.feature.explore.models.ExploreItemUiModel
 import se.onemanstudio.playaroundwithai.feature.explore.models.toUiModel
 import se.onemanstudio.playaroundwithai.feature.explore.states.ExploreError

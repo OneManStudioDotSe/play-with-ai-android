@@ -11,10 +11,10 @@ import java.util.concurrent.TimeUnit
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.map
 import se.onemanstudio.playaroundwithai.core.auth.repository.AuthRepository
-import se.onemanstudio.playaroundwithai.data.chat.data.local.dao.PromptsHistoryDao
+import se.onemanstudio.playaroundwithai.core.database.dao.PromptsHistoryDao
+import se.onemanstudio.playaroundwithai.core.database.entity.SyncStatus
 import se.onemanstudio.playaroundwithai.data.chat.data.sync.SyncWorker
 import se.onemanstudio.playaroundwithai.data.chat.domain.model.Prompt
-import se.onemanstudio.playaroundwithai.data.chat.domain.model.SyncStatus
 import se.onemanstudio.playaroundwithai.data.chat.domain.repository.PromptRepository
 import timber.log.Timber
 import javax.inject.Inject

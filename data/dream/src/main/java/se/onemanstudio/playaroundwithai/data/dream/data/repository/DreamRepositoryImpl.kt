@@ -4,7 +4,7 @@ import android.content.Context
 import dagger.hilt.android.qualifiers.ApplicationContext
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.map
-import se.onemanstudio.playaroundwithai.data.dream.data.local.dao.DreamsDao
+import se.onemanstudio.playaroundwithai.core.database.dao.DreamsDao
 import se.onemanstudio.playaroundwithai.data.dream.domain.model.Dream
 import se.onemanstudio.playaroundwithai.data.dream.domain.repository.DreamRepository
 import timber.log.Timber

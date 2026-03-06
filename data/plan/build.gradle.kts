@@ -29,6 +29,7 @@ android {
 
 dependencies {
     implementation(project(":core:network"))
+    implementation(project(":core:tracking"))
 
     // Network (for Retrofit HttpException in repository)
     implementation(libs.retrofit)

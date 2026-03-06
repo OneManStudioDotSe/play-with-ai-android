@@ -30,12 +30,8 @@ android {
 dependencies {
     implementation(project(":core:auth"))
     implementation(project(":core:network"))
-    implementation(project(":data:dream"))
-
-    // Room
-    implementation(libs.room.runtime)
-    ksp(libs.room.compiler)
-    implementation(libs.room.ktx)
+    implementation(project(":core:database"))
+    implementation(project(":core:tracking"))
 
     // Firebase
     implementation(platform(libs.firebase.bom))

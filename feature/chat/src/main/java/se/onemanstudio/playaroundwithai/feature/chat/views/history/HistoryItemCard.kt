@@ -28,7 +28,7 @@ import se.onemanstudio.playaroundwithai.core.ui.sofa.NeoBrutalCard
 import se.onemanstudio.playaroundwithai.core.ui.theme.Dimensions
 import se.onemanstudio.playaroundwithai.core.ui.theme.SofaAiTheme
 import se.onemanstudio.playaroundwithai.data.chat.domain.model.Prompt
-import se.onemanstudio.playaroundwithai.data.chat.domain.model.SyncStatus
+import se.onemanstudio.playaroundwithai.core.database.entity.SyncStatus
 import se.onemanstudio.playaroundwithai.feature.chat.R
 import java.time.Instant
 import java.time.ZoneId

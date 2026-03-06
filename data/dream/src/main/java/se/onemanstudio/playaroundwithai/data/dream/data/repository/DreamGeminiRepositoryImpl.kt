@@ -10,8 +10,8 @@ import se.onemanstudio.playaroundwithai.core.network.dto.Content
 import se.onemanstudio.playaroundwithai.core.network.dto.GeminiRequest
 import se.onemanstudio.playaroundwithai.core.network.dto.GenerationConfig
 import se.onemanstudio.playaroundwithai.core.network.dto.Part
-import se.onemanstudio.playaroundwithai.core.network.prompts.AiPrompts
-import se.onemanstudio.playaroundwithai.core.network.tracking.TokenUsageTracker
+import se.onemanstudio.playaroundwithai.core.tracking.TokenUsageTracker
+import se.onemanstudio.playaroundwithai.data.dream.prompts.DreamPrompts
 import se.onemanstudio.playaroundwithai.data.dream.domain.model.DreamImage
 import se.onemanstudio.playaroundwithai.data.dream.domain.model.DreamInterpretation
 import se.onemanstudio.playaroundwithai.data.dream.domain.model.DreamMood
@@ -34,7 +34,7 @@ class DreamGeminiRepositoryImpl @Inject constructor(
         try {
             Timber.d("DreamGemini - Interpreting dream...")
 
-            val prompt = AiPrompts.dreamInterpretationPrompt(description)
+            val prompt = DreamPrompts.interpretationPrompt(description)
             val parts = listOf(Part(text = prompt))
             val request = GeminiRequest(contents = listOf(Content(parts = parts)))
 
@@ -67,7 +67,7 @@ class DreamGeminiRepositoryImpl @Inject constructor(
         try {
             Timber.d("DreamGemini - Generating dream image...")
 
-            val prompt = AiPrompts.dreamImagePrompt(description)
+            val prompt = DreamPrompts.imagePrompt(description)
             val parts = listOf(Part(text = prompt))
             val request = GeminiRequest(
                 contents = listOf(Content(parts = parts)),

@@ -29,9 +29,8 @@ android {
 
 dependencies {
     implementation(project(":core:network"))
-
-    // Room (annotations only — DB is in :data:chat)
-    implementation(libs.room.runtime)
+    implementation(project(":core:database"))
+    implementation(project(":core:tracking"))
 
     // Network (for Retrofit HttpException in repository)
     implementation(libs.retrofit)

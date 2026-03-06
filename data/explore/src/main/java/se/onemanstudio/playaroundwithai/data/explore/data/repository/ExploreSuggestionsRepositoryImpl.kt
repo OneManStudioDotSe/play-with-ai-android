@@ -9,13 +9,13 @@ import java.io.IOException
 import se.onemanstudio.playaroundwithai.data.explore.data.dto.SuggestedPlacesResponseDto
 import se.onemanstudio.playaroundwithai.data.explore.data.dto.toSuggestedPlaceDomain
 import se.onemanstudio.playaroundwithai.data.explore.domain.model.SuggestedPlace
-import se.onemanstudio.playaroundwithai.data.explore.domain.repository.ExploreSuggestionsRepository
 import se.onemanstudio.playaroundwithai.core.network.api.GeminiApiService
-import se.onemanstudio.playaroundwithai.core.network.tracking.TokenUsageTracker
 import se.onemanstudio.playaroundwithai.core.network.dto.Content
 import se.onemanstudio.playaroundwithai.core.network.dto.GeminiRequest
 import se.onemanstudio.playaroundwithai.core.network.dto.Part
-import se.onemanstudio.playaroundwithai.core.network.prompts.AiPrompts
+import se.onemanstudio.playaroundwithai.core.tracking.TokenUsageTracker
+import se.onemanstudio.playaroundwithai.data.explore.domain.repository.ExploreSuggestionsRepository
+import se.onemanstudio.playaroundwithai.data.explore.prompts.ExplorePrompts
 import timber.log.Timber
 import javax.inject.Inject
 import javax.inject.Singleton
@@ -34,7 +34,7 @@ class ExploreSuggestionsRepositoryImpl @Inject constructor(
         try {
             Timber.d("Gemini - Getting suggested places for lat=$latitude, lng=$longitude")
 
-            val prompt = AiPrompts.suggestedPlacesPrompt(latitude, longitude)
+            val prompt = ExplorePrompts.suggestedPlacesPrompt(latitude, longitude)
             val parts = listOf(Part(text = prompt))
             val request = GeminiRequest(contents = listOf(Content(parts = parts)))
             val response = apiService.generateContent(request)

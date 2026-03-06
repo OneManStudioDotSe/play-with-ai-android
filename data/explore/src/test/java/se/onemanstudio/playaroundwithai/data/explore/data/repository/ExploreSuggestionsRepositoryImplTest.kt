@@ -24,7 +24,7 @@ import se.onemanstudio.playaroundwithai.core.network.dto.Content
 import se.onemanstudio.playaroundwithai.core.network.dto.GeminiResponse
 import se.onemanstudio.playaroundwithai.core.network.dto.Part
 import se.onemanstudio.playaroundwithai.core.network.dto.UsageMetadata
-import se.onemanstudio.playaroundwithai.core.network.tracking.TokenUsageTracker
+import se.onemanstudio.playaroundwithai.core.tracking.TokenUsageTracker
 import java.io.IOException
 
 @OptIn(ExperimentalCoroutinesApi::class)

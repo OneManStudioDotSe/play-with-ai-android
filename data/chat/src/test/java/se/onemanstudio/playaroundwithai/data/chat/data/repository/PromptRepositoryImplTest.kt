@@ -14,10 +14,10 @@ import kotlinx.coroutines.test.runTest
 import org.junit.Before
 import org.junit.Test
 import se.onemanstudio.playaroundwithai.core.auth.repository.AuthRepository
-import se.onemanstudio.playaroundwithai.data.chat.data.local.dao.PromptsHistoryDao
-import se.onemanstudio.playaroundwithai.data.chat.data.local.entity.PromptEntity
+import se.onemanstudio.playaroundwithai.core.database.dao.PromptsHistoryDao
+import se.onemanstudio.playaroundwithai.core.database.entity.PromptEntity
 import se.onemanstudio.playaroundwithai.data.chat.domain.model.Prompt
-import se.onemanstudio.playaroundwithai.data.chat.domain.model.SyncStatus
+import se.onemanstudio.playaroundwithai.core.database.entity.SyncStatus
 import java.time.Instant
 
 class PromptRepositoryImplTest {

@@ -15,8 +15,8 @@ import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import se.onemanstudio.playaroundwithai.core.auth.usecase.ObserveAuthReadyUseCase
 import se.onemanstudio.playaroundwithai.core.config.model.ApiKeyAvailability
+import se.onemanstudio.playaroundwithai.core.database.entity.SyncStatus
 import se.onemanstudio.playaroundwithai.data.chat.domain.model.Prompt
-import se.onemanstudio.playaroundwithai.data.chat.domain.model.SyncStatus
 import se.onemanstudio.playaroundwithai.data.chat.domain.usecase.AskAiUseCase
 import se.onemanstudio.playaroundwithai.data.chat.domain.usecase.GetFailedSyncCountUseCase
 import se.onemanstudio.playaroundwithai.data.chat.domain.usecase.GetPromptHistoryUseCase

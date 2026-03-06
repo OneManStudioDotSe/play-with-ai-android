@@ -31,7 +31,7 @@ import se.onemanstudio.playaroundwithai.feature.explore.models.toUiModel
 import se.onemanstudio.playaroundwithai.feature.explore.states.ExploreUiState
 import se.onemanstudio.playaroundwithai.feature.explore.util.MainCoroutineRule
 import se.onemanstudio.playaroundwithai.data.explore.data.settings.ExploreSettingsHolder
-import se.onemanstudio.playaroundwithai.data.explore.util.NetworkMonitor
+import se.onemanstudio.playaroundwithai.core.network.monitor.NetworkMonitor
 
 @OptIn(ExperimentalCoroutinesApi::class)
 class ExploreViewModelTest {

@@ -34,7 +34,8 @@
       "WebFetch(domain:android-developers.googleblog.com)",
       "WebFetch(domain:medium.com)",
       "WebFetch(domain:developers.googleblog.com)",
-      "Bash(./gradlew assembleDebug:*)"
+      "Bash(./gradlew assembleDebug:*)",
+      "Bash(sed:*)"
     ]
   }
 }

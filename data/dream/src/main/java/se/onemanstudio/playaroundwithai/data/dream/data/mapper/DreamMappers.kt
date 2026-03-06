@@ -1,7 +1,7 @@
 package se.onemanstudio.playaroundwithai.data.dream.data.mapper
 
 import com.google.gson.Gson
-import se.onemanstudio.playaroundwithai.data.dream.data.local.entity.DreamEntity
+import se.onemanstudio.playaroundwithai.core.database.entity.DreamEntity
 import se.onemanstudio.playaroundwithai.data.dream.domain.model.Dream
 import se.onemanstudio.playaroundwithai.data.dream.domain.model.DreamMood
 import se.onemanstudio.playaroundwithai.data.dream.domain.model.DreamScene

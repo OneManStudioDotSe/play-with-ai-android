@@ -79,8 +79,10 @@ kotlin {
 
 dependencies {
     implementation(project(":core:auth"))
+    implementation(project(":core:config"))
     implementation(project(":core:network"))
     implementation(project(":core:theme"))
+    implementation(project(":core:tracking"))
     implementation(project(":core:ui"))
     implementation(project(":data:chat"))
     implementation(project(":data:explore"))

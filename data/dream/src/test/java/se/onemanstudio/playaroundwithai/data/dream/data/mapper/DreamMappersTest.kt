@@ -2,7 +2,7 @@ package se.onemanstudio.playaroundwithai.data.dream.data.mapper
 
 import com.google.common.truth.Truth.assertThat
 import org.junit.Test
-import se.onemanstudio.playaroundwithai.data.dream.data.local.entity.DreamEntity
+import se.onemanstudio.playaroundwithai.core.database.entity.DreamEntity
 import se.onemanstudio.playaroundwithai.data.dream.domain.model.Dream
 import se.onemanstudio.playaroundwithai.data.dream.domain.model.DreamMood
 import java.time.Instant

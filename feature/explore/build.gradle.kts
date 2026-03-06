@@ -39,6 +39,7 @@ android {
 
 dependencies {
     implementation(project(":core:config"))
+    implementation(project(":core:network"))
     implementation(project(":core:theme"))
     implementation(project(":core:ui"))
     implementation(project(":data:explore"))

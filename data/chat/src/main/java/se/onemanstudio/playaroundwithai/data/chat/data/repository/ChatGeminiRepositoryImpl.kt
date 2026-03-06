@@ -14,8 +14,8 @@ import se.onemanstudio.playaroundwithai.core.network.dto.Content
 import se.onemanstudio.playaroundwithai.core.network.dto.GeminiRequest
 import se.onemanstudio.playaroundwithai.core.network.dto.ImageData
 import se.onemanstudio.playaroundwithai.core.network.dto.Part
-import se.onemanstudio.playaroundwithai.core.network.prompts.AiPrompts
-import se.onemanstudio.playaroundwithai.core.network.tracking.TokenUsageTracker
+import se.onemanstudio.playaroundwithai.core.tracking.TokenUsageTracker
+import se.onemanstudio.playaroundwithai.data.chat.prompts.ChatPrompts
 import se.onemanstudio.playaroundwithai.data.chat.domain.model.AnalysisType
 import se.onemanstudio.playaroundwithai.data.chat.domain.repository.ChatGeminiRepository
 import timber.log.Timber
@@ -44,10 +44,10 @@ class ChatGeminiRepositoryImpl @Inject constructor(
                     "${imageBytes != null}, hasFile: ${fileText != null} and analysisType: $analysisType")
 
             val parts = mutableListOf<Part>()
-            var fullPrompt = AiPrompts.CHAT_SYSTEM_INSTRUCTION + prompt
+            var fullPrompt = ChatPrompts.CHAT_SYSTEM_INSTRUCTION + prompt
 
             if (analysisType != null) {
-                fullPrompt = AiPrompts.CHAT_SYSTEM_INSTRUCTION + "${getAnalysisInstruction(analysisType)}\n\nUser prompt: $prompt"
+                fullPrompt = ChatPrompts.CHAT_SYSTEM_INSTRUCTION + "${getAnalysisInstruction(analysisType)}\n\nUser prompt: $prompt"
             }
 
             if (!fileText.isNullOrBlank()) {
@@ -86,7 +86,7 @@ class ChatGeminiRepositoryImpl @Inject constructor(
         try {
             Timber.d("Gemini - Generating conversation starters from API...")
 
-            val suggestionPrompt = AiPrompts.CONVERSATION_STARTERS_PROMPT
+            val suggestionPrompt = ChatPrompts.CONVERSATION_STARTERS_PROMPT
 
             val parts = listOf(Part(text = suggestionPrompt))
             val request = GeminiRequest(contents = listOf(Content(parts = parts)))
@@ -113,7 +113,7 @@ class ChatGeminiRepositoryImpl @Inject constructor(
     }
 
     private fun getAnalysisInstruction(analysisType: AnalysisType): String {
-        return AiPrompts.ANALYSIS_INSTRUCTIONS[analysisType.name].orEmpty()
+        return ChatPrompts.ANALYSIS_INSTRUCTIONS[analysisType.name].orEmpty()
     }
 
     private fun Bitmap.toImageData(): ImageData {

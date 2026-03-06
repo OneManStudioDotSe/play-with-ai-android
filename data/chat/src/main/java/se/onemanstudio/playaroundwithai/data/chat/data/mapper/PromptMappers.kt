@@ -1,6 +1,6 @@
 package se.onemanstudio.playaroundwithai.data.chat.data.mapper
 
-import se.onemanstudio.playaroundwithai.data.chat.data.local.entity.PromptEntity
+import se.onemanstudio.playaroundwithai.core.database.entity.PromptEntity
 import se.onemanstudio.playaroundwithai.data.chat.domain.model.Prompt
 import java.time.Instant
 

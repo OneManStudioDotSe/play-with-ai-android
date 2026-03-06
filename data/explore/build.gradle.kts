@@ -29,6 +29,7 @@ android {
 
 dependencies {
     implementation(project(":core:network"))
+    implementation(project(":core:tracking"))
 
     implementation(libs.retrofit)
     implementation(libs.retrofit.converter.gson)

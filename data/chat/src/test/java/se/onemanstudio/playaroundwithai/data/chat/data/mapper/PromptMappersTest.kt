@@ -2,9 +2,9 @@ package se.onemanstudio.playaroundwithai.data.chat.data.mapper
 
 import com.google.common.truth.Truth.assertThat
 import org.junit.Test
-import se.onemanstudio.playaroundwithai.data.chat.data.local.entity.PromptEntity
+import se.onemanstudio.playaroundwithai.core.database.entity.PromptEntity
 import se.onemanstudio.playaroundwithai.data.chat.domain.model.Prompt
-import se.onemanstudio.playaroundwithai.data.chat.domain.model.SyncStatus
+import se.onemanstudio.playaroundwithai.core.database.entity.SyncStatus
 import java.time.Instant
 
 class PromptMappersTest {

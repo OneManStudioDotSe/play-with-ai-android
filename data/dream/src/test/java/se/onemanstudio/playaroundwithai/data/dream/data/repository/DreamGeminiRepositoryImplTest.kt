@@ -26,7 +26,7 @@ import se.onemanstudio.playaroundwithai.core.network.dto.GeminiRequest
 import se.onemanstudio.playaroundwithai.core.network.dto.GeminiResponse
 import se.onemanstudio.playaroundwithai.core.network.dto.Part
 import se.onemanstudio.playaroundwithai.core.network.dto.UsageMetadata
-import se.onemanstudio.playaroundwithai.core.network.tracking.TokenUsageTracker
+import se.onemanstudio.playaroundwithai.core.tracking.TokenUsageTracker
 import se.onemanstudio.playaroundwithai.data.dream.domain.model.DreamMood
 import se.onemanstudio.playaroundwithai.data.dream.domain.model.ParticleShape
 import java.io.IOException

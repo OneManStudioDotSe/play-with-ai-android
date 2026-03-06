@@ -13,8 +13,8 @@ import kotlinx.coroutines.flow.shareIn
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import se.onemanstudio.playaroundwithai.core.auth.usecase.SignInAnonymouslyUseCase
-import se.onemanstudio.playaroundwithai.core.network.tracking.TokenUsageTracker
-import se.onemanstudio.playaroundwithai.data.explore.data.settings.AppSettingsHolder
+import se.onemanstudio.playaroundwithai.core.config.settings.AppSettingsHolder
+import se.onemanstudio.playaroundwithai.core.tracking.TokenUsageTracker
 import timber.log.Timber
 import java.text.NumberFormat
 import javax.inject.Inject

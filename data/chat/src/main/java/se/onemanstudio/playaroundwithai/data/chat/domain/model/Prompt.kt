@@ -1,6 +1,7 @@
 package se.onemanstudio.playaroundwithai.data.chat.domain.model
 
 import java.time.Instant
+import se.onemanstudio.playaroundwithai.core.database.entity.SyncStatus
 
 data class Prompt(
     val id: Long = 0,
