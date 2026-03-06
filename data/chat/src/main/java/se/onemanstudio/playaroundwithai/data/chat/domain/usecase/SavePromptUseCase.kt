@@ -9,10 +9,13 @@ private const val MAX_PROMPT_TEXT_LENGTH = 50_000
 class SavePromptUseCase @Inject constructor(
     private val repository: PromptRepository
 ) {
-    suspend operator fun invoke(prompt: Prompt): Long {
-        require(prompt.text.isNotBlank()) { "Prompt text must not be blank" }
-        require(prompt.text.length <= MAX_PROMPT_TEXT_LENGTH) { "Prompt text exceeds maximum length of $MAX_PROMPT_TEXT_LENGTH" }
-
-        return repository.savePrompt(prompt)
+    suspend operator fun invoke(prompt: Prompt): Result<Long> {
+        if (prompt.text.isBlank()) {
+            return Result.failure(IllegalArgumentException("Prompt text must not be blank"))
+        }
+        if (prompt.text.length > MAX_PROMPT_TEXT_LENGTH) {
+            return Result.failure(IllegalArgumentException("Prompt text exceeds maximum length of $MAX_PROMPT_TEXT_LENGTH"))
+        }
+        return runCatching { repository.savePrompt(prompt) }
     }
 }
