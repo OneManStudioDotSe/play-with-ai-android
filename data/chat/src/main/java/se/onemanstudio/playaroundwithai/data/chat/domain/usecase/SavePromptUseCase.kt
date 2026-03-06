@@ -9,6 +9,7 @@ private const val MAX_PROMPT_TEXT_LENGTH = 50_000
 class SavePromptUseCase @Inject constructor(
     private val repository: PromptRepository
 ) {
+    @Suppress("ReturnCount")
     suspend operator fun invoke(prompt: Prompt): Result<Long> {
         if (prompt.text.isBlank()) {
             return Result.failure(IllegalArgumentException("Prompt text must not be blank"))
