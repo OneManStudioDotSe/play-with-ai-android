@@ -166,7 +166,7 @@ class TripPlannerRepositoryImpl @Inject constructor(
                     longitude = placeLng,
                     description = description,
                     category = category,
-                    orderIndex = collectedStops.size + index,
+                    orderIndex = collectedStops.size,
                 )
             )
         }

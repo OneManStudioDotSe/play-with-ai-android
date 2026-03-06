@@ -16,6 +16,8 @@ data class OptimalRouteResult(
     val durationMinutes: Int,
 )
 
+private const val DISTANCE = 1_000
+
 class CalculateOptimalRouteUseCase @Inject constructor() {
 
     operator fun invoke(startPoint: LatLng, pointsToVisit: List<LatLng>): OptimalRouteResult {
@@ -25,7 +27,7 @@ class CalculateOptimalRouteUseCase @Inject constructor() {
 
         val fullPath = (listOf(startPoint) + bestPermutation).toPersistentList()
         val totalDistanceKm = calculatePathDistance(startPoint, bestPermutation)
-        val distanceMeters = (totalDistanceKm * 1000).roundToInt()
+        val distanceMeters = (totalDistanceKm * DISTANCE).roundToInt()
         val durationMinutes = (distanceMeters / WALKING_SPEED_METERS_PER_MIN).roundToInt()
 
         return OptimalRouteResult(

@@ -70,6 +70,7 @@ class DreamViewModel @Inject constructor(
             it.copy(dreamState = DreamUiState.Interpreting, imageState = DreamImageState.Generating, currentDescription = description)
         }
 
+        imageGenerationJob?.cancel()
         val dreamIdDeferred = CompletableDeferred<Long>()
         viewModelScope.launch { runInterpretation(description, dreamIdDeferred) }
         imageGenerationJob = viewModelScope.launch { runImageGeneration(description, dreamIdDeferred) }

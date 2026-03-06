@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
-<resources>
+<resources xmlns:tools="http://schemas.android.com/tools">
     <string name="plan_title">Trip Planner</string>
     <string name="plan_input_placeholder">Describe your ideal trip\u2026</string>
     <string name="plan_plan_button">Plan my trip</string>
@@ -7,7 +7,7 @@
     <string name="plan_thinking">Thinking\u2026</string>
     <string name="plan_step_searching">Searching for %s</string>
     <string name="plan_step_calculating_route">Calculating optimal route</string>
-    <string name="plan_step_found_places">Found %d places</string>
+    <string name="plan_step_found_places" tools:ignore="PluralsCandidate">Found %d places</string>
     <string name="plan_step_route_ready">Route calculated</string>
     <string name="plan_your_itinerary">Your Itinerary</string>
     <string name="plan_walking_distance">Walking distance: %.1f km</string>

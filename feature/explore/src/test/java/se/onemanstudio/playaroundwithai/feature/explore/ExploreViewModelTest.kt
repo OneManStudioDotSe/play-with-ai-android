@@ -287,7 +287,14 @@ class ExploreViewModelTest {
     private fun createViewModel(
         apiKeyAvailability: ApiKeyAvailability = ApiKeyAvailability(isGeminiKeyAvailable = true, isMapsKeyAvailable = true)
     ): ExploreViewModel {
-        return ExploreViewModel(GetExploreItemsUseCase(repository), getSuggestedPlacesUseCase, CalculateOptimalRouteUseCase(), apiKeyAvailability, networkMonitor, exploreSettingsHolder)
+        return ExploreViewModel(
+            getExploreItemsUseCase = GetExploreItemsUseCase(repository),
+            getSuggestedPlacesUseCase = getSuggestedPlacesUseCase,
+            calculateOptimalRouteUseCase = CalculateOptimalRouteUseCase(),
+            apiKeyAvailability = apiKeyAvailability,
+            networkMonitor = networkMonitor,
+            exploreSettingsHolder = exploreSettingsHolder
+        )
     }
 
     private fun captureStates(viewModel: ExploreViewModel): List<ExploreUiState> {

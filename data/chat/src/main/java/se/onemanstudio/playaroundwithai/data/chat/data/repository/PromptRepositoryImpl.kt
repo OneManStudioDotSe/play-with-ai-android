@@ -52,7 +52,7 @@ class PromptRepositoryImpl @Inject constructor(
     override suspend fun updatePromptText(id: Long, text: String) {
         Timber.d("PromptRepo - Updating prompt text for id=$id, text='${text.take(LOG_PREVIEW_LENGTH)}...'")
         promptsHistoryDao.updatePromptText(id, text)
-        promptsHistoryDao.updateSyncStatus(id, SyncStatus.Pending.name)
+        promptsHistoryDao.updateSyncStatus(id, SyncStatus.Pending)
 
         if (authRepository.isUserSignedIn()) {
             Timber.d("PromptRepo - Text updated. Scheduling sync for the complete Q&A...")
@@ -64,7 +64,7 @@ class PromptRepositoryImpl @Inject constructor(
 
     override suspend fun retryPendingSyncs() {
         Timber.d("PromptRepo - Retrying failed syncs: resetting Failed → Pending")
-        promptsHistoryDao.updateAllSyncStatuses(SyncStatus.Failed.name, SyncStatus.Pending.name)
+        promptsHistoryDao.updateAllSyncStatuses(SyncStatus.Failed, SyncStatus.Pending)
 
         if (authRepository.isUserSignedIn()) {
             Timber.d("PromptRepo - Re-enqueuing SyncWorker for failed prompts")
@@ -91,7 +91,7 @@ class PromptRepositoryImpl @Inject constructor(
     }
 
     override fun getFailedSyncCount(): Flow<Int> {
-        return promptsHistoryDao.getCountBySyncStatus(SyncStatus.Failed.name)
+        return promptsHistoryDao.getCountBySyncStatus(SyncStatus.Failed)
     }
 
     private fun scheduleSync() {

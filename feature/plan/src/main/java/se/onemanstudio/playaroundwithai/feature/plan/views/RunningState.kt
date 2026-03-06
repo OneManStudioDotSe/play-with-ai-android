@@ -50,7 +50,7 @@ import androidx.compose.ui.semantics.liveRegion
 import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.tooling.preview.Preview
-import androidx.compose.ui.unit.Dp
+import androidx.compose.ui.unit.IntOffset
 import androidx.compose.ui.unit.dp
 import kotlinx.collections.immutable.persistentListOf
 import se.onemanstudio.playaroundwithai.core.ui.sofa.MarkerText
@@ -223,7 +223,7 @@ private fun BouncingDots() {
                 label = "bounce_$index",
             )
 
-            val animatedOffset: Dp by animateDpAsState(
+            val animatedOffset = animateDpAsState(
                 targetValue = BOUNCE_AMPLITUDE * offset,
                 animationSpec = spring(stiffness = Spring.StiffnessLow),
                 label = "dpOffset_$index",
@@ -233,7 +233,7 @@ private fun BouncingDots() {
                 text = ".",
                 style = MaterialTheme.typography.bodyMedium,
                 color = MaterialTheme.colorScheme.onSurface,
-                modifier = Modifier.offset(y = animatedOffset),
+                modifier = Modifier.offset { IntOffset(0, animatedOffset.value.roundToPx()) },
             )
         }
     }

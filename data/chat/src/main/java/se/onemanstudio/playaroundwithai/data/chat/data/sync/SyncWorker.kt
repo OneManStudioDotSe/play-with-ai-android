@@ -41,7 +41,7 @@ class SyncWorker @AssistedInject constructor(
             return Result.failure()
         }
 
-        val pendingPrompts = promptsDao.getPromptsBySyncStatus(SyncStatus.Pending.name)
+        val pendingPrompts = promptsDao.getPromptsBySyncStatus(SyncStatus.Pending)
         if (pendingPrompts.isEmpty()) {
             Timber.d("SyncWorker - No pending prompts found, all good!")
             return Result.success()
@@ -69,7 +69,7 @@ class SyncWorker @AssistedInject constructor(
             }
 
             if (success) {
-                val rowsUpdated = promptsDao.markSyncedIfTextMatches(entity.id.toLong(), entity.text, SyncStatus.Synced.name)
+                val rowsUpdated = promptsDao.markSyncedIfTextMatches(entity.id.toLong(), entity.text, SyncStatus.Synced)
                 if (rowsUpdated > 0) {
                     Timber.d("SyncWorker - Prompt id=${entity.id} marked as Synced")
                 }
@@ -93,9 +93,9 @@ class SyncWorker @AssistedInject constructor(
 
             else -> {
                 Timber.e("SyncWorker - All $MAX_RETRY_COUNT attempts exhausted. Marking remaining prompts as Failed")
-                val stillPending = promptsDao.getPromptsBySyncStatus(SyncStatus.Pending.name)
+                val stillPending = promptsDao.getPromptsBySyncStatus(SyncStatus.Pending)
                 stillPending.forEach { entity ->
-                    promptsDao.updateSyncStatus(entity.id.toLong(), SyncStatus.Failed.name)
+                    promptsDao.updateSyncStatus(entity.id.toLong(), SyncStatus.Failed)
                 }
                 showFailureNotification(stillPending.size)
                 Result.failure()
