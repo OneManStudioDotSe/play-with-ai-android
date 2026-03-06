@@ -34,14 +34,17 @@ object DatabaseModule {
     }
 
     @Provides
+    @Singleton
     fun providePromptsHistoryDao(appDatabase: AppDatabase): PromptsHistoryDao =
         appDatabase.historyDao()
 
     @Provides
+    @Singleton
     fun provideTokenUsageDao(appDatabase: AppDatabase): TokenUsageDao =
         appDatabase.tokenUsageDao()
 
     @Provides
+    @Singleton
     fun provideDreamsDao(appDatabase: AppDatabase): DreamsDao =
         appDatabase.dreamsDao()
 }
