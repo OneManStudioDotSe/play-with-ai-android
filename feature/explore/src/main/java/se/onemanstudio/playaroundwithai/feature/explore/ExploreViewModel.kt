@@ -16,9 +16,9 @@ import kotlinx.coroutines.isActive
 import kotlinx.coroutines.launch
 import se.onemanstudio.playaroundwithai.core.config.model.ApiKeyAvailability
 import se.onemanstudio.playaroundwithai.data.explore.data.settings.ExploreSettingsHolder
-import se.onemanstudio.playaroundwithai.data.explore.domain.model.ExploreItem
 import se.onemanstudio.playaroundwithai.data.explore.domain.model.SuggestedPlace
 import se.onemanstudio.playaroundwithai.data.explore.domain.model.VehicleType
+import se.onemanstudio.playaroundwithai.data.explore.domain.model.toExploreItem
 import se.onemanstudio.playaroundwithai.data.explore.domain.usecase.GetExploreItemsUseCase
 import se.onemanstudio.playaroundwithai.data.explore.domain.usecase.GetSuggestedPlacesUseCase
 import se.onemanstudio.playaroundwithai.core.network.monitor.NetworkMonitor
@@ -26,15 +26,15 @@ import se.onemanstudio.playaroundwithai.feature.explore.models.ExploreItemUiMode
 import se.onemanstudio.playaroundwithai.feature.explore.models.toUiModel
 import se.onemanstudio.playaroundwithai.feature.explore.states.ExploreError
 import se.onemanstudio.playaroundwithai.feature.explore.states.ExploreUiState
+import se.onemanstudio.playaroundwithai.feature.explore.states.MarkersState
+import se.onemanstudio.playaroundwithai.feature.explore.states.PathModeState
 import se.onemanstudio.playaroundwithai.feature.explore.states.SuggestedPlacesError
-import se.onemanstudio.playaroundwithai.feature.explore.utils.calculatePathDistance
-import se.onemanstudio.playaroundwithai.feature.explore.utils.permutations
+import se.onemanstudio.playaroundwithai.feature.explore.states.SuggestionsState
+import se.onemanstudio.playaroundwithai.feature.explore.usecase.CalculateOptimalRouteUseCase
 import timber.log.Timber
 import java.io.IOException
 import javax.inject.Inject
-import kotlin.math.roundToInt
 
-private const val WALKING_SPEED_METERS_PER_MIN = 83.0 // approx 5km/h
 private const val LOADING_MESSAGE_DURATION = 3000L
 
 private val LOADING_MESSAGE_RES_IDS = listOf(
@@ -50,6 +50,7 @@ private val LOADING_MESSAGE_RES_IDS = listOf(
 class ExploreViewModel @Inject constructor(
     private val getExploreItemsUseCase: GetExploreItemsUseCase,
     private val getSuggestedPlacesUseCase: GetSuggestedPlacesUseCase,
+    private val calculateOptimalRouteUseCase: CalculateOptimalRouteUseCase,
     private val apiKeyAvailability: ApiKeyAvailability,
     private val networkMonitor: NetworkMonitor,
     private val exploreSettingsHolder: ExploreSettingsHolder,
@@ -76,13 +77,9 @@ class ExploreViewModel @Inject constructor(
                 .collect {
                     val lat = lastCenterLat ?: return@collect
                     val lng = lastCenterLng ?: return@collect
-                    reloadMapData(lat, lng)
+                    loadMapData(lat, lng)
                 }
         }
-    }
-
-    private fun reloadMapData(centerLat: Double, centerLng: Double) {
-        loadMapData(centerLat, centerLng)
     }
 
     @Suppress("TooGenericExceptionCaught")
@@ -90,15 +87,15 @@ class ExploreViewModel @Inject constructor(
         lastCenterLat = centerLat
         lastCenterLng = centerLng
         if (!apiKeyAvailability.isMapsKeyAvailable) {
-            _uiState.update { it.copy(isLoadingMarkers = false, error = ExploreError.ApiKeyMissing) }
+            _uiState.update { it.copy(markers = it.markers.copy(isLoading = false), error = ExploreError.ApiKeyMissing) }
             return
         }
 
-        _uiState.update { it.copy(isLoadingMarkers = true, error = null) }
+        _uiState.update { it.copy(markers = it.markers.copy(isLoading = true), error = null) }
 
         if (!networkMonitor.isNetworkAvailable()) {
             Timber.w("ExploreViewModel - No network available, cannot load map data")
-            _uiState.update { it.copy(isLoadingMarkers = false, error = ExploreError.NetworkError) }
+            _uiState.update { it.copy(markers = it.markers.copy(isLoading = false), error = ExploreError.NetworkError) }
             return
         }
 
@@ -107,14 +104,14 @@ class ExploreViewModel @Inject constructor(
                 val data = getExploreItemsUseCase(exploreSettingsHolder.vehicleCount.value, centerLat, centerLng)
                     .map { it.toUiModel() }.toPersistentList()
                 _uiState.update {
-                    it.copy(isLoadingMarkers = false, allLocations = data, visibleLocations = data)
+                    it.copy(markers = it.markers.copy(isLoading = false, allLocations = data, visibleLocations = data))
                 }
             } catch (e: IOException) {
                 Timber.e(e, "ExploreViewModel - Failed to load map data (network)")
-                _uiState.update { it.copy(isLoadingMarkers = false, error = ExploreError.NetworkError) }
+                _uiState.update { it.copy(markers = it.markers.copy(isLoading = false), error = ExploreError.NetworkError) }
             } catch (e: Exception) {
                 Timber.e(e, "ExploreViewModel - Failed to load map data")
-                _uiState.update { it.copy(isLoadingMarkers = false, error = ExploreError.Unknown(e.localizedMessage)) }
+                _uiState.update { it.copy(markers = it.markers.copy(isLoading = false), error = ExploreError.Unknown(e.localizedMessage)) }
             }
         }
     }
@@ -122,46 +119,50 @@ class ExploreViewModel @Inject constructor(
     fun setPathMode(active: Boolean) {
         _uiState.update {
             it.copy(
-                isPathMode = active,
-                focusedMarker = null,
-                focusedSuggestedPlace = null,
-                selectedLocations = persistentListOf(),
-                optimalRoute = persistentListOf(),
-                routeDistanceMeters = 0,
-                routeDurationMinutes = 0,
+                markers = it.markers.copy(focusedMarker = null),
+                pathMode = PathModeState(isActive = active),
+                suggestions = it.suggestions.copy(focusedPlace = null),
             )
         }
     }
 
     fun selectMarker(marker: ExploreItemUiModel?) {
-        _uiState.update { it.copy(focusedMarker = marker, focusedSuggestedPlace = null) }
+        _uiState.update {
+            it.copy(
+                markers = it.markers.copy(focusedMarker = marker),
+                suggestions = it.suggestions.copy(focusedPlace = null),
+            )
+        }
     }
 
     fun toggleFilter(type: VehicleType) {
         _uiState.update { currentState ->
-            val newFilters = if (currentState.activeFilter.contains(type)) {
-                currentState.activeFilter - type
+            val newFilters = if (currentState.markers.activeFilter.contains(type)) {
+                currentState.markers.activeFilter - type
             } else {
-                currentState.activeFilter + type
+                currentState.markers.activeFilter + type
             }
 
-            val filtered = currentState.allLocations.filter { newFilters.contains(it.type) }.toPersistentList()
+            val filtered = currentState.markers.allLocations
+                .filter { newFilters.contains(it.type) }
+                .toPersistentList()
 
             currentState.copy(
-                activeFilter = newFilters,
-                visibleLocations = filtered,
-                selectedLocations = persistentListOf(),
-                optimalRoute = persistentListOf(),
-                focusedMarker = null
+                markers = currentState.markers.copy(
+                    activeFilter = newFilters,
+                    visibleLocations = filtered,
+                    focusedMarker = null,
+                ),
+                pathMode = PathModeState(isActive = currentState.pathMode.isActive),
             )
         }
     }
 
     fun toggleSelection(location: ExploreItemUiModel) {
-        if (!_uiState.value.isPathMode) return
+        if (!_uiState.value.pathMode.isActive) return
 
         _uiState.update { state ->
-            val currentSelected = state.selectedLocations
+            val currentSelected = state.pathMode.selectedLocations
             val isAlreadySelected = currentSelected.any { it.id == location.id }
 
             val newSelected = if (isAlreadySelected) {
@@ -170,37 +171,27 @@ class ExploreViewModel @Inject constructor(
                 if (currentSelected.size < ExploreConstants.MAX_SELECTABLE_POINTS) {
                     (currentSelected + location.copy(isSelected = true)).toPersistentList()
                 } else {
-                    currentSelected // Limit reached, do not add
+                    currentSelected
                 }
             }
             state.copy(
-                selectedLocations = newSelected,
-                optimalRoute = persistentListOf(),
-                routeDistanceMeters = 0
+                pathMode = state.pathMode.copy(
+                    selectedLocations = newSelected,
+                    optimalRoute = persistentListOf(),
+                    routeDistanceMeters = 0,
+                )
             )
         }
     }
 
     fun toggleSuggestedPlaceSelection(place: SuggestedPlace) {
-        if (!_uiState.value.isPathMode) return
+        if (!_uiState.value.pathMode.isActive) return
 
-        val syntheticId = "suggested_${place.name}_${place.lat}_${place.lng}"
-        val syntheticUiModel = ExploreItemUiModel(
-            mapItem = ExploreItem(
-                id = syntheticId,
-                lat = place.lat,
-                lng = place.lng,
-                name = place.name,
-                type = VehicleType.Scooter,
-                batteryLevel = 0,
-                vehicleCode = "",
-                nickname = place.name
-            ),
-            isSelected = true
-        )
+        val syntheticUiModel = ExploreItemUiModel(mapItem = place.toExploreItem(), isSelected = true)
+        val syntheticId = syntheticUiModel.id
 
         _uiState.update { state ->
-            val currentSelected = state.selectedLocations
+            val currentSelected = state.pathMode.selectedLocations
             val isAlreadySelected = currentSelected.any { it.id == syntheticId }
 
             val newSelected = if (isAlreadySelected) {
@@ -213,57 +204,50 @@ class ExploreViewModel @Inject constructor(
                 }
             }
             state.copy(
-                selectedLocations = newSelected,
-                optimalRoute = persistentListOf(),
-                routeDistanceMeters = 0
+                pathMode = state.pathMode.copy(
+                    selectedLocations = newSelected,
+                    optimalRoute = persistentListOf(),
+                    routeDistanceMeters = 0,
+                )
             )
         }
     }
 
     fun calculateOptimalRoute(userLocation: LatLng?) {
-        val points = _uiState.value.selectedLocations.map { it.position }
+        val points = _uiState.value.pathMode.selectedLocations.map { it.position }
         if (points.isEmpty()) return
 
         val startPoint = userLocation ?: points.first()
-        // Ensure we visit all selected points, starting from user location
-        val pointsToVisit = points
-
-        val bestPermutation = permutations(pointsToVisit)
-            .minByOrNull { path -> calculatePathDistance(startPoint, path) }
-            ?: pointsToVisit
-
-        val fullPath = (listOf(startPoint) + bestPermutation).toPersistentList()
-        val totalDistance = calculatePathDistance(startPoint, bestPermutation)
+        val result = calculateOptimalRouteUseCase(startPoint, points)
 
         _uiState.update {
             it.copy(
-                optimalRoute = fullPath,
-                routeDistanceMeters = (totalDistance * 1000).roundToInt(),
-                routeDurationMinutes = ((totalDistance * 1000) / WALKING_SPEED_METERS_PER_MIN).roundToInt()
+                pathMode = it.pathMode.copy(
+                    optimalRoute = result.orderedPath,
+                    routeDistanceMeters = result.distanceMeters,
+                    routeDurationMinutes = result.durationMinutes,
+                )
             )
         }
     }
 
     fun getAiSuggestedPlaces(userLocation: LatLng?) {
         if (!apiKeyAvailability.isGeminiKeyAvailable) {
-            _uiState.update { it.copy(suggestedPlacesError = SuggestedPlacesError.FetchFailed) }
+            _uiState.update { it.copy(suggestions = it.suggestions.copy(error = SuggestedPlacesError.FetchFailed)) }
             return
         }
 
         if (userLocation == null) {
             _uiState.update {
-                it.copy(focusedSuggestedPlace = null, suggestedPlacesError = SuggestedPlacesError.LocationUnavailable)
+                it.copy(suggestions = it.suggestions.copy(focusedPlace = null, error = SuggestedPlacesError.LocationUnavailable))
             }
             return
         }
 
         _uiState.update {
             it.copy(
-                isLoading = true,
-                focusedMarker = null,
-                suggestedPlaces = persistentListOf(),
-                focusedSuggestedPlace = null,
-                suggestedPlacesError = null
+                markers = it.markers.copy(focusedMarker = null),
+                suggestions = SuggestionsState(isLoading = true),
             )
         }
         startLoadingMessageCycle()
@@ -273,32 +257,30 @@ class ExploreViewModel @Inject constructor(
                 .onSuccess { places ->
                     stopLoadingMessageCycle()
                     _uiState.update {
-                        it.copy(
-                            isLoading = false,
-                            suggestedPlaces = places.toPersistentList(),
-                            suggestedPlacesError = null
-                        )
+                        it.copy(suggestions = it.suggestions.copy(isLoading = false, places = places.toPersistentList(), error = null))
                     }
                 }
                 .onFailure { exception ->
                     Timber.e(exception, "Failed to get AI suggested places")
                     stopLoadingMessageCycle()
                     _uiState.update {
-                        it.copy(
-                            isLoading = false,
-                            suggestedPlacesError = SuggestedPlacesError.FetchFailed
-                        )
+                        it.copy(suggestions = it.suggestions.copy(isLoading = false, error = SuggestedPlacesError.FetchFailed))
                     }
                 }
         }
     }
 
     fun dismissSuggestedPlacesError() {
-        _uiState.update { it.copy(suggestedPlacesError = null) }
+        _uiState.update { it.copy(suggestions = it.suggestions.copy(error = null)) }
     }
 
     fun selectSuggestedPlace(place: SuggestedPlace?) {
-        _uiState.update { it.copy(focusedMarker = null, focusedSuggestedPlace = place) }
+        _uiState.update {
+            it.copy(
+                markers = it.markers.copy(focusedMarker = null),
+                suggestions = it.suggestions.copy(focusedPlace = place),
+            )
+        }
     }
 
     private fun startLoadingMessageCycle() {
@@ -306,7 +288,7 @@ class ExploreViewModel @Inject constructor(
         loadingMessageJob = viewModelScope.launch {
             var index = 0
             while (isActive) {
-                _uiState.update { it.copy(loadingMessageResId = LOADING_MESSAGE_RES_IDS[index]) }
+                _uiState.update { it.copy(suggestions = it.suggestions.copy(loadingMessageResId = LOADING_MESSAGE_RES_IDS[index])) }
                 delay(LOADING_MESSAGE_DURATION)
                 index = (index + 1) % LOADING_MESSAGE_RES_IDS.size
             }

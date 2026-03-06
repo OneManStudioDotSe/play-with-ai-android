@@ -4,6 +4,7 @@ import androidx.annotation.StringRes
 import androidx.compose.runtime.Immutable
 import com.google.android.gms.maps.model.LatLng
 import kotlinx.collections.immutable.PersistentList
+import kotlinx.collections.immutable.PersistentSet
 import kotlinx.collections.immutable.persistentListOf
 import kotlinx.collections.immutable.persistentSetOf
 import se.onemanstudio.playaroundwithai.data.explore.domain.model.SuggestedPlace
@@ -24,21 +25,36 @@ sealed interface SuggestedPlacesError {
 }
 
 @Immutable
-data class ExploreUiState(
-    val isLoading: Boolean = false,
-    val isLoadingMarkers: Boolean = true,
-    val isPathMode: Boolean = false,
-    val error: ExploreError? = null,
+data class MarkersState(
+    val isLoading: Boolean = true,
     val allLocations: PersistentList<ExploreItemUiModel> = persistentListOf(),
     val visibleLocations: PersistentList<ExploreItemUiModel> = persistentListOf(),
-    val selectedLocations: PersistentList<ExploreItemUiModel> = persistentListOf(),
-    val activeFilter: Set<VehicleType> = persistentSetOf(VehicleType.Scooter, VehicleType.Bicycle),
+    val activeFilter: PersistentSet<VehicleType> = persistentSetOf(VehicleType.Scooter, VehicleType.Bicycle),
     val focusedMarker: ExploreItemUiModel? = null,
+)
+
+@Immutable
+data class PathModeState(
+    val isActive: Boolean = false,
+    val selectedLocations: PersistentList<ExploreItemUiModel> = persistentListOf(),
     val optimalRoute: PersistentList<LatLng> = persistentListOf(),
     val routeDistanceMeters: Int = 0,
     val routeDurationMinutes: Int = 0,
-    val suggestedPlaces: PersistentList<SuggestedPlace> = persistentListOf(),
-    val focusedSuggestedPlace: SuggestedPlace? = null,
-    val suggestedPlacesError: SuggestedPlacesError? = null,
-    @get:StringRes val loadingMessageResId: Int = 0
+)
+
+@Immutable
+data class SuggestionsState(
+    val isLoading: Boolean = false,
+    @get:StringRes val loadingMessageResId: Int? = null,
+    val places: PersistentList<SuggestedPlace> = persistentListOf(),
+    val focusedPlace: SuggestedPlace? = null,
+    val error: SuggestedPlacesError? = null,
+)
+
+@Immutable
+data class ExploreUiState(
+    val markers: MarkersState = MarkersState(),
+    val pathMode: PathModeState = PathModeState(),
+    val suggestions: SuggestionsState = SuggestionsState(),
+    val error: ExploreError? = null,
 )

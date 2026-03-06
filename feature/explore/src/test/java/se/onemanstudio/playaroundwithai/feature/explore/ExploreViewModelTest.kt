@@ -26,10 +26,11 @@ import se.onemanstudio.playaroundwithai.data.explore.domain.repository.ExploreSu
 import se.onemanstudio.playaroundwithai.data.explore.domain.repository.ExplorePointsRepository
 import se.onemanstudio.playaroundwithai.data.explore.domain.usecase.GetExploreItemsUseCase
 import se.onemanstudio.playaroundwithai.data.explore.domain.usecase.GetSuggestedPlacesUseCase
+import se.onemanstudio.playaroundwithai.feature.explore.usecase.CalculateOptimalRouteUseCase
 import se.onemanstudio.playaroundwithai.feature.explore.states.ExploreError
 import se.onemanstudio.playaroundwithai.feature.explore.models.toUiModel
 import se.onemanstudio.playaroundwithai.feature.explore.states.ExploreUiState
-import se.onemanstudio.playaroundwithai.feature.explore.util.MainCoroutineRule
+import se.onemanstudio.playaroundwithai.core.testing.MainCoroutineRule
 import se.onemanstudio.playaroundwithai.data.explore.data.settings.ExploreSettingsHolder
 import se.onemanstudio.playaroundwithai.core.network.monitor.NetworkMonitor
 
@@ -74,9 +75,9 @@ class ExploreViewModelTest {
 
         // Then
         val finalState = states.last()
-        assertFalse(finalState.isLoading)
-        assertEquals(expectedUiModels, finalState.allLocations)
-        assertEquals(expectedUiModels, finalState.visibleLocations)
+        assertFalse(finalState.markers.isLoading)
+        assertEquals(expectedUiModels, finalState.markers.allLocations)
+        assertEquals(expectedUiModels, finalState.markers.visibleLocations)
 
         viewModel.viewModelScope.cancel()
     }
@@ -94,13 +95,13 @@ class ExploreViewModelTest {
         viewModel.selectMarker(scooterItemUi)
 
         // Then
-        assertEquals(scooterItemUi, states.last().focusedMarker)
+        assertEquals(scooterItemUi, states.last().markers.focusedMarker)
 
         // When (Deselect)
         viewModel.selectMarker(null)
 
         // Then
-        assertNull(states.last().focusedMarker)
+        assertNull(states.last().markers.focusedMarker)
 
         viewModel.viewModelScope.cancel()
     }
@@ -122,16 +123,16 @@ class ExploreViewModelTest {
 
         // Then
         val state = states.last()
-        assertTrue(state.isPathMode)
-        assertNull(state.focusedMarker)
-        assertTrue(state.selectedLocations.isEmpty())
-        assertTrue(state.optimalRoute.isEmpty())
+        assertTrue(state.pathMode.isActive)
+        assertNull(state.markers.focusedMarker)
+        assertTrue(state.pathMode.selectedLocations.isEmpty())
+        assertTrue(state.pathMode.optimalRoute.isEmpty())
 
         // When (Turn off)
         viewModel.setPathMode(false)
 
         // Then
-        assertFalse(states.last().isPathMode)
+        assertFalse(states.last().pathMode.isActive)
 
         viewModel.viewModelScope.cancel()
     }
@@ -145,22 +146,22 @@ class ExploreViewModelTest {
         viewModel.loadMapData(TEST_CENTER_LAT, TEST_CENTER_LNG)
 
         // Initial state
-        assertEquals(2, states.last().visibleLocations.size)
+        assertEquals(2, states.last().markers.visibleLocations.size)
 
         // When: Toggle OFF Scooters
         viewModel.toggleFilter(VehicleType.Scooter)
 
         // Then: Only Bikes visible
         val bikeState = states.last()
-        assertFalse(bikeState.activeFilter.contains(VehicleType.Scooter))
-        assertEquals(1, bikeState.visibleLocations.size)
-        assertEquals(VehicleType.Bicycle, bikeState.visibleLocations.first().type)
+        assertFalse(bikeState.markers.activeFilter.contains(VehicleType.Scooter))
+        assertEquals(1, bikeState.markers.visibleLocations.size)
+        assertEquals(VehicleType.Bicycle, bikeState.markers.visibleLocations.first().type)
 
         // When: Toggle ON Scooters
         viewModel.toggleFilter(VehicleType.Scooter)
 
         // Then: Both visible again
-        assertEquals(2, states.last().visibleLocations.size)
+        assertEquals(2, states.last().markers.visibleLocations.size)
 
         viewModel.viewModelScope.cancel()
     }
@@ -180,21 +181,21 @@ class ExploreViewModelTest {
         viewModel.toggleSelection(scooterItemUi)
 
         // Then
-        assertEquals(1, states.last().selectedLocations.size)
-        assertEquals(scooterItemUi.id, states.last().selectedLocations.first().id)
+        assertEquals(1, states.last().pathMode.selectedLocations.size)
+        assertEquals(scooterItemUi.id, states.last().pathMode.selectedLocations.first().id)
 
         // When: Select second item
         viewModel.toggleSelection(bikeItemUi)
 
         // Then
-        assertEquals(2, states.last().selectedLocations.size)
+        assertEquals(2, states.last().pathMode.selectedLocations.size)
 
         // When: Toggle first item again (Deselect)
         viewModel.toggleSelection(scooterItemUi)
 
         // Then
-        assertEquals(1, states.last().selectedLocations.size)
-        assertEquals(bikeItemUi.id, states.last().selectedLocations.first().id)
+        assertEquals(1, states.last().pathMode.selectedLocations.size)
+        assertEquals(bikeItemUi.id, states.last().pathMode.selectedLocations.first().id)
 
         viewModel.viewModelScope.cancel()
     }
@@ -223,13 +224,13 @@ class ExploreViewModelTest {
         }
 
         // Then: Verify max selected
-        assertEquals(ExploreConstants.MAX_SELECTABLE_POINTS, states.last().selectedLocations.size)
+        assertEquals(ExploreConstants.MAX_SELECTABLE_POINTS, states.last().pathMode.selectedLocations.size)
 
         // When: Try to add one more item beyond the limit
         viewModel.toggleSelection(manyItemsUi[ExploreConstants.MAX_SELECTABLE_POINTS])
 
         // Then: Still at max (limit is enforced)
-        assertEquals(ExploreConstants.MAX_SELECTABLE_POINTS, states.last().selectedLocations.size)
+        assertEquals(ExploreConstants.MAX_SELECTABLE_POINTS, states.last().pathMode.selectedLocations.size)
 
         viewModel.viewModelScope.cancel()
     }
@@ -253,11 +254,11 @@ class ExploreViewModelTest {
 
         // Then
         val state = states.last()
-        assertTrue("Route should not be empty", state.optimalRoute.isNotEmpty())
-        assertEquals(3, state.optimalRoute.size) // user location + 2 selected points
-        assertEquals(userLocation, state.optimalRoute.first())
-        assertTrue(state.routeDistanceMeters > 0)
-        assertTrue(state.routeDurationMinutes > 0)
+        assertTrue("Route should not be empty", state.pathMode.optimalRoute.isNotEmpty())
+        assertEquals(3, state.pathMode.optimalRoute.size) // user location + 2 selected points
+        assertEquals(userLocation, state.pathMode.optimalRoute.first())
+        assertTrue(state.pathMode.routeDistanceMeters > 0)
+        assertTrue(state.pathMode.routeDurationMinutes > 0)
 
         viewModel.viewModelScope.cancel()
     }
@@ -276,7 +277,7 @@ class ExploreViewModelTest {
 
         // Then
         val finalState = states.last()
-        assertFalse(finalState.isLoading)
+        assertFalse(finalState.markers.isLoading)
         assertEquals(ExploreError.ApiKeyMissing, finalState.error)
 
         viewModel.viewModelScope.cancel()
@@ -286,7 +287,7 @@ class ExploreViewModelTest {
     private fun createViewModel(
         apiKeyAvailability: ApiKeyAvailability = ApiKeyAvailability(isGeminiKeyAvailable = true, isMapsKeyAvailable = true)
     ): ExploreViewModel {
-        return ExploreViewModel(GetExploreItemsUseCase(repository), getSuggestedPlacesUseCase, apiKeyAvailability, networkMonitor, exploreSettingsHolder)
+        return ExploreViewModel(GetExploreItemsUseCase(repository), getSuggestedPlacesUseCase, CalculateOptimalRouteUseCase(), apiKeyAvailability, networkMonitor, exploreSettingsHolder)
     }
 
     private fun captureStates(viewModel: ExploreViewModel): List<ExploreUiState> {

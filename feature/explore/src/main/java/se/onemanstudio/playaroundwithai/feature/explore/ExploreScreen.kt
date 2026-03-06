@@ -23,7 +23,7 @@ import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.SnackbarResult
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.runtime.collectAsState
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.key
 import androidx.compose.runtime.mutableStateOf
@@ -72,6 +72,12 @@ import se.onemanstudio.playaroundwithai.feature.explore.R as ExploreFeatureR
 
 private const val CAMERA_PADDING = 150
 
+private sealed interface LocationState {
+    object Pending : LocationState
+    object Denied : LocationState
+    data class Ready(val location: LatLng) : LocationState
+}
+
 @SuppressLint("MissingPermission", "GoogleMapComposable")
 @OptIn(MapsComposeExperimentalApi::class)
 @Composable
@@ -85,12 +91,10 @@ fun ExploreScreen(
     val fusedLocationClient = remember { LocationServices.getFusedLocationProviderClient(context) }
     val scope = rememberCoroutineScope()
 
-    val uiState by viewModel.uiState.collectAsState()
-    val currentLoadingMessage = if (uiState.loadingMessageResId != 0) {
-        stringResource(uiState.loadingMessageResId)
-    } else {
-        ""
-    }
+    val uiState by viewModel.uiState.collectAsStateWithLifecycle()
+    val currentLoadingMessage = uiState.suggestions.loadingMessageResId
+        ?.let { stringResource(it) }
+        ?: ""
 
     val stockholm = LatLng(STOCKHOLM_LAT, STOCKHOLM_LNG)
 
@@ -100,51 +104,50 @@ fun ExploreScreen(
 
     val snackbarHostState = remember { SnackbarHostState() }
 
-    var hasLocationPermission by remember { mutableStateOf(false) }
-    var permissionChecked by remember { mutableStateOf(false) }
-    var userLocation by remember { mutableStateOf<LatLng?>(null) }
-    var dataLoaded by remember { mutableStateOf(false) }
+    var locationState by remember { mutableStateOf<LocationState>(LocationState.Pending) }
     var cameraSettled by remember { mutableStateOf(false) }
+    var dataLoaded by remember { mutableStateOf(false) }
     var showSettings by remember { mutableStateOf(false) }
+
+    val hasLocationPermission = locationState !is LocationState.Pending && locationState !is LocationState.Denied
+    val userLocation = (locationState as? LocationState.Ready)?.location
 
     val permissionLauncher = rememberLauncherForActivityResult(
         contract = ActivityResultContracts.RequestPermission()
     ) { isGranted ->
-        hasLocationPermission = isGranted
-        permissionChecked = true
+        if (isGranted) {
+            fusedLocationClient.lastLocation
+                .addOnSuccessListener { location ->
+                    locationState = if (location != null) {
+                        LocationState.Ready(LatLng(location.latitude, location.longitude))
+                    } else {
+                        LocationState.Denied
+                    }
+                }
+                .addOnFailureListener {
+                    locationState = LocationState.Denied
+                }
+        } else {
+            locationState = LocationState.Denied
+        }
     }
 
     LaunchedEffect(Unit) {
         permissionLauncher.launch(Manifest.permission.ACCESS_FINE_LOCATION)
     }
 
-    LaunchedEffect(permissionChecked) {
-        if (!permissionChecked) return@LaunchedEffect
-
-        if (hasLocationPermission) {
-            fusedLocationClient.lastLocation
-                .addOnSuccessListener { location ->
-                    location?.let {
-                        val loc = LatLng(it.latitude, it.longitude)
-                        userLocation = loc
-                        scope.launch {
-                            cameraPositionState.animate(
-                                update = CameraUpdateFactory.newLatLngZoom(loc, ExploreConstants.MAX_ZOOM_LEVEL),
-                                durationMs = ExploreConstants.MOVE_TO_POINT_DURATION
-                            )
-                        }
-                    } ?: run {
-                        // No last location available, stay at Stockholm default
-                        cameraSettled = true
-                    }
+    LaunchedEffect(locationState) {
+        when (val state = locationState) {
+            is LocationState.Ready -> {
+                scope.launch {
+                    cameraPositionState.animate(
+                        update = CameraUpdateFactory.newLatLngZoom(state.location, ExploreConstants.MAX_ZOOM_LEVEL),
+                        durationMs = ExploreConstants.MOVE_TO_POINT_DURATION
+                    )
                 }
-                .addOnFailureListener {
-                    // Location fetch failed, stay at Stockholm default
-                    cameraSettled = true
-                }
-        } else {
-            // No permission, stay at Stockholm default
-            cameraSettled = true
+            }
+            is LocationState.Denied -> cameraSettled = true
+            is LocationState.Pending -> Unit
         }
     }
 
@@ -165,9 +168,9 @@ fun ExploreScreen(
         }
     }
 
-    LaunchedEffect(uiState.visibleLocations) {
+    LaunchedEffect(uiState.markers.visibleLocations) {
         val allPoints = mutableListOf<LatLng>()
-        uiState.visibleLocations.forEach { allPoints.add(it.position) }
+        uiState.markers.visibleLocations.forEach { allPoints.add(it.position) }
 
         if (allPoints.isNotEmpty()) {
             val boundsBuilder = LatLngBounds.builder()
@@ -179,17 +182,17 @@ fun ExploreScreen(
         }
     }
 
-    LaunchedEffect(uiState.suggestedPlaces) {
-        if (uiState.suggestedPlaces.isNotEmpty()) {
+    LaunchedEffect(uiState.suggestions.places) {
+        if (uiState.suggestions.places.isNotEmpty()) {
             view.performHapticFeedback(HapticFeedbackConstants.CONTEXT_CLICK)
         }
     }
 
-    LaunchedEffect(uiState.optimalRoute) {
-        if (uiState.optimalRoute.isNotEmpty()) {
+    LaunchedEffect(uiState.pathMode.optimalRoute) {
+        if (uiState.pathMode.optimalRoute.isNotEmpty()) {
             view.performHapticFeedback(HapticFeedbackConstants.CONTEXT_CLICK)
             val boundsBuilder = LatLngBounds.builder()
-            uiState.optimalRoute.forEach { boundsBuilder.include(it) }
+            uiState.pathMode.optimalRoute.forEach { boundsBuilder.include(it) }
             cameraPositionState.animate(
                 update = CameraUpdateFactory.newLatLngBounds(boundsBuilder.build(), CAMERA_PADDING),
                 durationMs = ExploreConstants.MOVE_TO_POINT_DURATION
@@ -201,8 +204,8 @@ fun ExploreScreen(
     val fetchErrorMessage = stringResource(ExploreFeatureR.string.ai_places_fetch_error)
     val dismissLabel = stringResource(ExploreFeatureR.string.dismiss)
 
-    LaunchedEffect(uiState.suggestedPlacesError) {
-        val error = uiState.suggestedPlacesError ?: return@LaunchedEffect
+    LaunchedEffect(uiState.suggestions.error) {
+        val error = uiState.suggestions.error ?: return@LaunchedEffect
         val message = when (error) {
             is SuggestedPlacesError.LocationUnavailable -> locationErrorMessage
             is SuggestedPlacesError.FetchFailed -> fetchErrorMessage
@@ -263,19 +266,19 @@ fun ExploreScreen(
                     viewModel.selectSuggestedPlace(null)
                 }
             ) {
-                if (uiState.optimalRoute.isNotEmpty()) {
+                if (uiState.pathMode.optimalRoute.isNotEmpty()) {
                     @Suppress("COMPOSE_APPLIER_CALL_MISMATCH")
                     Polyline(
-                        points = uiState.optimalRoute,
+                        points = uiState.pathMode.optimalRoute,
                         color = MaterialTheme.colorScheme.onSurface,
                         width = 12f,
                         geodesic = true
                     )
                 }
 
-                uiState.visibleLocations.forEach { item ->
+                uiState.markers.visibleLocations.forEach { item ->
                     key(item.id) {
-                        val isSelected = uiState.selectedLocations.any { it.id == item.id } || uiState.focusedMarker?.id == item.id
+                        val isSelected = uiState.pathMode.selectedLocations.any { it.id == item.id } || uiState.markers.focusedMarker?.id == item.id
 
                         val icon =
                             if (item.type == VehicleType.Bicycle) Icons.AutoMirrored.Filled.DirectionsBike else Icons.Default.ElectricScooter
@@ -293,7 +296,7 @@ fun ExploreScreen(
                                     )
                                 }
 
-                                if (uiState.isPathMode) {
+                                if (uiState.pathMode.isActive) {
                                     viewModel.toggleSelection(item)
                                 } else {
                                     viewModel.selectMarker(item)
@@ -310,11 +313,11 @@ fun ExploreScreen(
                     }
                 }
 
-                uiState.suggestedPlaces.forEach { place ->
+                uiState.suggestions.places.forEach { place ->
                     key(place.name + place.lat + place.lng) {
                         val syntheticId = "suggested_${place.name}_${place.lat}_${place.lng}"
-                        val isSelected = uiState.focusedSuggestedPlace == place ||
-                                uiState.selectedLocations.any { it.id == syntheticId }
+                        val isSelected = uiState.suggestions.focusedPlace == place ||
+                                uiState.pathMode.selectedLocations.any { it.id == syntheticId }
 
                         MarkerComposable(
                             keys = arrayOf<Any>(place.name, place.lat, place.lng, isSelected),
@@ -329,7 +332,7 @@ fun ExploreScreen(
                                         durationMs = ExploreConstants.MOVE_TO_POINT_DURATION
                                     )
                                 }
-                                if (uiState.isPathMode) {
+                                if (uiState.pathMode.isActive) {
                                     viewModel.toggleSuggestedPlaceSelection(place)
                                 } else {
                                     viewModel.selectSuggestedPlace(place)
@@ -353,30 +356,22 @@ fun ExploreScreen(
                 onSuggestPlaces = { viewModel.getAiSuggestedPlaces(userLocation) },
             )
 
-            PathModeHint(isVisible = uiState.isPathMode)
+            PathModeHint(isVisible = uiState.pathMode.isActive)
 
             ExploreControls(
                 uiState = uiState,
                 cameraPositionState = cameraPositionState,
                 onMyLocationClick = {
-                    val hasPermission = ContextCompat.checkSelfPermission(
+                    val currentPermission = ContextCompat.checkSelfPermission(
                         context,
                         Manifest.permission.ACCESS_FINE_LOCATION
                     ) == PackageManager.PERMISSION_GRANTED
 
-                    if (hasPermission) {
+                    if (currentPermission) {
                         fusedLocationClient.lastLocation.addOnSuccessListener { location ->
                             location?.let {
-                                val userLatLng = LatLng(it.latitude, it.longitude)
-                                scope.launch {
-                                    cameraPositionState.animate(
-                                        update = CameraUpdateFactory.newLatLngZoom(
-                                            userLatLng,
-                                            ExploreConstants.MAX_ZOOM_LEVEL
-                                        ),
-                                        durationMs = ExploreConstants.MOVE_TO_POINT_DURATION
-                                    )
-                                }
+                                val loc = LatLng(it.latitude, it.longitude)
+                                locationState = LocationState.Ready(loc)
                             }
                         }
                     } else {
@@ -387,10 +382,10 @@ fun ExploreScreen(
             )
 
             PathModePanel(
-                isVisible = uiState.isPathMode,
-                selectedCount = uiState.selectedLocations.size,
-                distanceMeters = uiState.routeDistanceMeters,
-                durationMinutes = uiState.routeDurationMinutes,
+                isVisible = uiState.pathMode.isActive,
+                selectedCount = uiState.pathMode.selectedLocations.size,
+                distanceMeters = uiState.pathMode.routeDistanceMeters,
+                durationMinutes = uiState.pathMode.routeDurationMinutes,
                 onGoClick = {
                     if (userLocation != null) {
                         viewModel.calculateOptimalRoute(userLocation)
@@ -399,21 +394,21 @@ fun ExploreScreen(
             )
 
             MarkerInfoPanel(
-                marker = uiState.focusedMarker,
-                isPathMode = uiState.isPathMode,
+                marker = uiState.markers.focusedMarker,
+                isPathMode = uiState.pathMode.isActive,
                 onClose = { viewModel.selectMarker(null) },
             )
 
             SuggestedPlaceInfoPanel(
-                place = uiState.focusedSuggestedPlace,
-                isPathMode = uiState.isPathMode,
+                place = uiState.suggestions.focusedPlace,
+                isPathMode = uiState.pathMode.isActive,
                 onClose = { viewModel.selectSuggestedPlace(null) },
             )
 
             SnackbarContainer(snackbarHostState)
 
             LoadingState(
-                isLoading = uiState.isLoading,
+                isLoading = uiState.suggestions.isLoading,
                 currentLoadingMessage = currentLoadingMessage
             )
 

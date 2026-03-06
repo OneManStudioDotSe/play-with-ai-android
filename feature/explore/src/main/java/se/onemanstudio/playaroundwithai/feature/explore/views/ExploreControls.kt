@@ -14,6 +14,7 @@ import com.google.maps.android.compose.rememberCameraPositionState
 import se.onemanstudio.playaroundwithai.core.ui.theme.Dimensions
 import se.onemanstudio.playaroundwithai.core.ui.theme.SofaAiTheme
 import se.onemanstudio.playaroundwithai.feature.explore.states.ExploreUiState
+import se.onemanstudio.playaroundwithai.feature.explore.states.PathModeState
 
 @Composable
 internal fun BoxScope.ExploreControls(
@@ -43,7 +44,7 @@ private fun ExploreControlsPathModeOffPreview() {
         Surface {
             Box(modifier = Modifier.fillMaxSize()) {
                 ExploreControls(
-                    uiState = ExploreUiState(isPathMode = false),
+                    uiState = ExploreUiState(pathMode = PathModeState(isActive = false)),
                     cameraPositionState = rememberCameraPositionState(),
                     onMyLocationClick = {},
                     onSetPathMode = {}
@@ -60,7 +61,7 @@ private fun ExploreControlsPathModeOnPreview() {
         Surface {
             Box(modifier = Modifier.fillMaxSize()) {
                 ExploreControls(
-                    uiState = ExploreUiState(isPathMode = true),
+                    uiState = ExploreUiState(pathMode = PathModeState(isActive = true)),
                     cameraPositionState = rememberCameraPositionState(),
                     onMyLocationClick = {},
                     onSetPathMode = {}

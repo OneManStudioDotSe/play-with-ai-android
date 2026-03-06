@@ -25,6 +25,7 @@ import se.onemanstudio.playaroundwithai.core.ui.theme.SofaAiTheme
 import se.onemanstudio.playaroundwithai.core.ui.theme.solarYellow
 import se.onemanstudio.playaroundwithai.feature.explore.R
 import se.onemanstudio.playaroundwithai.feature.explore.states.ExploreUiState
+import se.onemanstudio.playaroundwithai.feature.explore.states.PathModeState
 
 private const val DURATION_FOR_ANIMATION = 500
 
@@ -66,17 +67,17 @@ fun SideControls(
 
         // path mode
         NeoBrutalIconButton(
-            contentDescription = if (uiState.isPathMode) stringResource(id = R.string.exit_path_mode_button_content_description) else stringResource(
+            contentDescription = if (uiState.pathMode.isActive) stringResource(id = R.string.exit_path_mode_button_content_description) else stringResource(
                 id = R.string.enter_path_mode_button_content_description
             ),
-            imageVector = if (uiState.isPathMode) Icons.Default.Close else Icons.Default.LinearScale,
-            backgroundColor = if (uiState.isPathMode) {
+            imageVector = if (uiState.pathMode.isActive) Icons.Default.Close else Icons.Default.LinearScale,
+            backgroundColor = if (uiState.pathMode.isActive) {
                 MaterialTheme.colorScheme.errorContainer
             } else {
                 solarYellow
             },
             shadowColor =  MaterialTheme.colorScheme.onSurface,
-            onClick = { onSetPathMode(uiState.isPathMode) },
+            onClick = { onSetPathMode(uiState.pathMode.isActive) },
         )
     }
 }
@@ -86,7 +87,7 @@ fun SideControls(
 private fun SideControlsPreview() {
     SofaAiTheme {
         SideControls(
-            uiState = ExploreUiState(isPathMode = false),
+            uiState = ExploreUiState(pathMode = PathModeState(isActive = false)),
             cameraPositionState = rememberCameraPositionState(),
             onMyLocationClick = {},
             onSetPathMode = {}
@@ -99,7 +100,7 @@ private fun SideControlsPreview() {
 private fun SideControlsPathModePreview() {
     SofaAiTheme {
         SideControls(
-            uiState = ExploreUiState(isPathMode = true),
+            uiState = ExploreUiState(pathMode = PathModeState(isActive = true)),
             cameraPositionState = rememberCameraPositionState(),
             onMyLocationClick = {},
             onSetPathMode = {}

@@ -35,6 +35,7 @@ import se.onemanstudio.playaroundwithai.data.explore.domain.model.VehicleType
 import se.onemanstudio.playaroundwithai.feature.explore.AnimationConstants
 import se.onemanstudio.playaroundwithai.feature.explore.R
 import se.onemanstudio.playaroundwithai.feature.explore.states.ExploreUiState
+import se.onemanstudio.playaroundwithai.feature.explore.states.MarkersState
 
 @Composable
 internal fun BoxScope.TopActions(
@@ -45,7 +46,7 @@ internal fun BoxScope.TopActions(
     val view = LocalView.current
 
     AnimatedVisibility(
-        visible = !uiState.isPathMode,
+        visible = !uiState.pathMode.isActive,
         enter = slideInHorizontally(
             initialOffsetX = { -it * 2 },
             animationSpec = tween(
@@ -73,7 +74,7 @@ internal fun BoxScope.TopActions(
         ) {
             FilterChip(
                 text = stringResource(id = R.string.scooters_filter_chip_label),
-                selected = uiState.activeFilter.contains(VehicleType.Scooter)
+                selected = uiState.markers.activeFilter.contains(VehicleType.Scooter)
             ) {
                 view.performHapticFeedback(HapticFeedbackConstants.CONTEXT_CLICK)
                 onToggleFilter(VehicleType.Scooter)
@@ -83,7 +84,7 @@ internal fun BoxScope.TopActions(
 
             FilterChip(
                 text = stringResource(id = R.string.bicycles_filter_chip_label),
-                selected = uiState.activeFilter.contains(VehicleType.Bicycle)
+                selected = uiState.markers.activeFilter.contains(VehicleType.Bicycle)
             ) {
                 view.performHapticFeedback(HapticFeedbackConstants.CONTEXT_CLICK)
                 onToggleFilter(VehicleType.Bicycle)
@@ -92,7 +93,7 @@ internal fun BoxScope.TopActions(
             Spacer(modifier = Modifier.width(Dimensions.paddingMedium))
 
             @OptIn(ExperimentalMaterial3ExpressiveApi::class)
-            AnimatedVisibility(visible = uiState.isLoadingMarkers) {
+            AnimatedVisibility(visible = uiState.markers.isLoading) {
                 LoadingIndicator(
                     modifier = Modifier
                         .padding(end = Dimensions.paddingSmall)
@@ -124,7 +125,7 @@ private fun TopActionsPreview() {
         Surface {
             Box(modifier = Modifier.fillMaxSize()) {
                 TopActions(
-                    uiState = ExploreUiState(isLoadingMarkers = true),
+                    uiState = ExploreUiState(markers = MarkersState(isLoading = true)),
                     onToggleFilter = {},
                     onSuggestPlaces = {},
                 )
