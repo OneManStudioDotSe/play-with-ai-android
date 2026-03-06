@@ -4,9 +4,9 @@ import dagger.Binds
 import dagger.Module
 import dagger.hilt.InstallIn
 import dagger.hilt.components.SingletonComponent
-import se.onemanstudio.playaroundwithai.core.tracking.TokenUsageQuery
-import se.onemanstudio.playaroundwithai.core.tracking.TokenUsageTracker
-import se.onemanstudio.playaroundwithai.core.tracking.TokenUsageTrackerImpl
+import se.onemanstudio.playaroundwithai.core.tracking.repository.TokenUsageQuery
+import se.onemanstudio.playaroundwithai.core.tracking.repository.TokenUsageTracker
+import se.onemanstudio.playaroundwithai.core.tracking.repository.TokenUsageTrackerImpl
 import javax.inject.Singleton
 
 @Module

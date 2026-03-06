@@ -10,7 +10,7 @@ import se.onemanstudio.playaroundwithai.core.network.dto.Content
 import se.onemanstudio.playaroundwithai.core.network.dto.GeminiRequest
 import se.onemanstudio.playaroundwithai.core.network.dto.GenerationConfig
 import se.onemanstudio.playaroundwithai.core.network.dto.Part
-import se.onemanstudio.playaroundwithai.core.tracking.TokenUsageTracker
+import se.onemanstudio.playaroundwithai.core.tracking.repository.TokenUsageTracker
 import se.onemanstudio.playaroundwithai.data.dream.prompts.DreamPrompts
 import se.onemanstudio.playaroundwithai.data.dream.domain.model.DreamImage
 import se.onemanstudio.playaroundwithai.data.dream.domain.model.DreamInterpretation

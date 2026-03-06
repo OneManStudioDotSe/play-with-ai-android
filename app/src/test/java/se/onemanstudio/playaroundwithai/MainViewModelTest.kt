@@ -12,8 +12,8 @@ import org.junit.Rule
 import org.junit.Test
 import se.onemanstudio.playaroundwithai.core.auth.model.AuthSession
 import se.onemanstudio.playaroundwithai.core.auth.usecase.SignInAnonymouslyUseCase
-import se.onemanstudio.playaroundwithai.core.tracking.TokenUsageEvent
-import se.onemanstudio.playaroundwithai.core.tracking.TokenUsageTracker
+import se.onemanstudio.playaroundwithai.core.tracking.model.TokenUsageEvent
+import se.onemanstudio.playaroundwithai.core.tracking.repository.TokenUsageTracker
 import se.onemanstudio.playaroundwithai.core.config.settings.AppSettingsHolder
 import se.onemanstudio.playaroundwithai.util.MainCoroutineRule
 import java.time.Instant

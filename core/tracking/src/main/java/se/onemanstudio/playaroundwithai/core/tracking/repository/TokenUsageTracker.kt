@@ -1,9 +1,8 @@
-package se.onemanstudio.playaroundwithai.core.tracking
+package se.onemanstudio.playaroundwithai.core.tracking.repository
 
 import kotlinx.coroutines.flow.SharedFlow
 import se.onemanstudio.playaroundwithai.core.network.dto.UsageMetadata
-
-data class TokenUsageEvent(val feature: String, val totalTokens: Int)
+import se.onemanstudio.playaroundwithai.core.tracking.model.TokenUsageEvent
 
 interface TokenUsageTracker {
     val lastUsageEvent: SharedFlow<TokenUsageEvent>

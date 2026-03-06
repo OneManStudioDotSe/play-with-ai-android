@@ -10,7 +10,7 @@ import kotlinx.coroutines.flow.flowOn
 import se.onemanstudio.playaroundwithai.core.network.api.GeminiApiService
 import se.onemanstudio.playaroundwithai.core.network.dto.Content
 import se.onemanstudio.playaroundwithai.core.network.dto.FunctionCallDto
-import se.onemanstudio.playaroundwithai.core.tracking.TokenUsageTracker
+import se.onemanstudio.playaroundwithai.core.tracking.repository.TokenUsageTracker
 import se.onemanstudio.playaroundwithai.core.network.dto.FunctionResponseDto
 import se.onemanstudio.playaroundwithai.core.network.dto.GeminiRequest
 import se.onemanstudio.playaroundwithai.core.network.dto.Part

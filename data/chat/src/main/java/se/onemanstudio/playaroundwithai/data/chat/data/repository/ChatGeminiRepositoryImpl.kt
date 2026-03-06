@@ -14,7 +14,7 @@ import se.onemanstudio.playaroundwithai.core.network.dto.Content
 import se.onemanstudio.playaroundwithai.core.network.dto.GeminiRequest
 import se.onemanstudio.playaroundwithai.core.network.dto.ImageData
 import se.onemanstudio.playaroundwithai.core.network.dto.Part
-import se.onemanstudio.playaroundwithai.core.tracking.TokenUsageTracker
+import se.onemanstudio.playaroundwithai.core.tracking.repository.TokenUsageTracker
 import se.onemanstudio.playaroundwithai.data.chat.prompts.ChatPrompts
 import se.onemanstudio.playaroundwithai.data.chat.domain.model.AnalysisType
 import se.onemanstudio.playaroundwithai.data.chat.domain.repository.ChatGeminiRepository

@@ -14,7 +14,7 @@ import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import se.onemanstudio.playaroundwithai.core.auth.usecase.SignInAnonymouslyUseCase
 import se.onemanstudio.playaroundwithai.core.config.settings.AppSettingsHolder
-import se.onemanstudio.playaroundwithai.core.tracking.TokenUsageTracker
+import se.onemanstudio.playaroundwithai.core.tracking.repository.TokenUsageTracker
 import timber.log.Timber
 import java.text.NumberFormat
 import javax.inject.Inject

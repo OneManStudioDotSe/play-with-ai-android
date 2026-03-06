@@ -1,4 +1,4 @@
-package se.onemanstudio.playaroundwithai.core.tracking
+package se.onemanstudio.playaroundwithai.core.tracking.repository
 
 import kotlinx.coroutines.channels.BufferOverflow
 import kotlinx.coroutines.flow.Flow
@@ -10,6 +10,8 @@ import se.onemanstudio.playaroundwithai.core.database.dao.DailyUsageRow
 import se.onemanstudio.playaroundwithai.core.database.dao.TokenUsageDao
 import se.onemanstudio.playaroundwithai.core.database.entity.TokenUsageEntity
 import se.onemanstudio.playaroundwithai.core.network.dto.UsageMetadata
+import se.onemanstudio.playaroundwithai.core.tracking.model.DailyTokenUsage
+import se.onemanstudio.playaroundwithai.core.tracking.model.TokenUsageEvent
 import timber.log.Timber
 import java.time.LocalDate
 import java.time.ZoneId

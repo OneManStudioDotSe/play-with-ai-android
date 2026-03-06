@@ -13,7 +13,7 @@ import se.onemanstudio.playaroundwithai.core.network.api.GeminiApiService
 import se.onemanstudio.playaroundwithai.core.network.dto.Content
 import se.onemanstudio.playaroundwithai.core.network.dto.GeminiRequest
 import se.onemanstudio.playaroundwithai.core.network.dto.Part
-import se.onemanstudio.playaroundwithai.core.tracking.TokenUsageTracker
+import se.onemanstudio.playaroundwithai.core.tracking.repository.TokenUsageTracker
 import se.onemanstudio.playaroundwithai.data.explore.domain.repository.ExploreSuggestionsRepository
 import se.onemanstudio.playaroundwithai.data.explore.prompts.ExplorePrompts
 import timber.log.Timber
