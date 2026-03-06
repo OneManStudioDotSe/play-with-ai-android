@@ -104,7 +104,7 @@ class PromptRepositoryImplTest {
 
     @Test
     fun `getFailedSyncCount delegates to DAO with Failed status`() = runTest {
-        every { dao.getCountBySyncStatus(SyncStatus.Failed.name) } returns flowOf(3)
+        every { dao.getCountBySyncStatus(SyncStatus.Failed) } returns flowOf(3)
 
         val count = repository.getFailedSyncCount().first()
 
@@ -124,12 +124,12 @@ class PromptRepositoryImplTest {
     @Test
     fun `updatePromptText updates text resets sync status and schedules sync`() = runTest {
         coEvery { dao.updatePromptText(5L, "Updated text") } returns Unit
-        coEvery { dao.updateSyncStatus(5L, SyncStatus.Pending.name) } returns Unit
+        coEvery { dao.updateSyncStatus(5L, SyncStatus.Pending) } returns Unit
 
         repository.updatePromptText(5L, "Updated text")
 
         coVerify { dao.updatePromptText(5L, "Updated text") }
-        coVerify { dao.updateSyncStatus(5L, SyncStatus.Pending.name) }
+        coVerify { dao.updateSyncStatus(5L, SyncStatus.Pending) }
         verify { workManager.enqueueUniqueWork(any(), any(), any<androidx.work.OneTimeWorkRequest>()) }
     }
 
@@ -137,22 +137,22 @@ class PromptRepositoryImplTest {
     fun `updatePromptText does not schedule sync when user is not authenticated`() = runTest {
         every { authRepository.isUserSignedIn() } returns false
         coEvery { dao.updatePromptText(5L, "Updated text") } returns Unit
-        coEvery { dao.updateSyncStatus(5L, SyncStatus.Pending.name) } returns Unit
+        coEvery { dao.updateSyncStatus(5L, SyncStatus.Pending) } returns Unit
 
         repository.updatePromptText(5L, "Updated text")
 
         coVerify { dao.updatePromptText(5L, "Updated text") }
-        coVerify { dao.updateSyncStatus(5L, SyncStatus.Pending.name) }
+        coVerify { dao.updateSyncStatus(5L, SyncStatus.Pending) }
         verify(exactly = 0) { workManager.enqueueUniqueWork(any(), any(), any<androidx.work.OneTimeWorkRequest>()) }
     }
 
     @Test
     fun `retryPendingSyncs resets Failed to Pending and schedules sync`() = runTest {
-        coEvery { dao.updateAllSyncStatuses(SyncStatus.Failed.name, SyncStatus.Pending.name) } returns Unit
+        coEvery { dao.updateAllSyncStatuses(SyncStatus.Failed, SyncStatus.Pending) } returns Unit
 
         repository.retryPendingSyncs()
 
-        coVerify { dao.updateAllSyncStatuses(SyncStatus.Failed.name, SyncStatus.Pending.name) }
+        coVerify { dao.updateAllSyncStatuses(SyncStatus.Failed, SyncStatus.Pending) }
         verify { workManager.enqueueUniqueWork(any(), any(), any<androidx.work.OneTimeWorkRequest>()) }
     }
 
@@ -163,7 +163,7 @@ class PromptRepositoryImplTest {
 
         repository.retryPendingSyncs()
 
-        coVerify { dao.updateAllSyncStatuses(SyncStatus.Failed.name, SyncStatus.Pending.name) }
+        coVerify { dao.updateAllSyncStatuses(SyncStatus.Failed, SyncStatus.Pending) }
         verify(exactly = 0) { workManager.enqueueUniqueWork(any(), any(), any<androidx.work.OneTimeWorkRequest>()) }
     }
 }
