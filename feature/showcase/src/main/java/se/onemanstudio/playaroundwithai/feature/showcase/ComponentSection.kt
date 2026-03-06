@@ -46,15 +46,6 @@ import se.onemanstudio.playaroundwithai.core.ui.theme.solarYellow
 import se.onemanstudio.playaroundwithai.core.ui.theme.vividPink
 import se.onemanstudio.playaroundwithai.core.ui.theme.zestyLime
 
-private val sampleChartBars = listOf(
-    ChartBarData(label = "Mon", value = 5f, detailText = "5 prompts"),
-    ChartBarData(label = "Tue", value = 12f, detailText = "12 prompts"),
-    ChartBarData(label = "Wed", value = 8f, detailText = "8 prompts"),
-    ChartBarData(label = "Thu", value = 15f, detailText = "15 prompts"),
-    ChartBarData(label = "Fri", value = 3f, detailText = "3 prompts"),
-    ChartBarData(label = "Sat", value = 0f, detailText = "0 prompts"),
-    ChartBarData(label = "Sun", value = 7f, detailText = "7 prompts"),
-)
 
 @Composable
 fun ComponentSection() {
@@ -124,7 +115,7 @@ private fun ButtonDemo() {
         NeoBrutalButton(
             text = stringResource(R.string.demo_button_with_icon),
             icon = Icons.AutoMirrored.Filled.Send,
-            iconContentDescription = "Send",
+            iconContentDescription = stringResource(R.string.ic_send),
             onClick = {},
             modifier = Modifier.fillMaxWidth()
         )
@@ -143,19 +134,19 @@ private fun IconButtonDemo() {
     Row(horizontalArrangement = Arrangement.spacedBy(Dimensions.paddingMedium)) {
         NeoBrutalIconButton(
             imageVector = Icons.Default.Star,
-            contentDescription = "Star",
+            contentDescription = stringResource(R.string.ic_star),
             backgroundColor = electricBlue,
             onClick = {}
         )
         NeoBrutalIconButton(
             imageVector = Icons.Default.Favorite,
-            contentDescription = "Favorite",
+            contentDescription = stringResource(R.string.ic_favorite),
             backgroundColor = vividPink,
             onClick = {}
         )
         NeoBrutalIconButton(
             imageVector = Icons.Default.ThumbUp,
-            contentDescription = "ThumbUp",
+            contentDescription = stringResource(R.string.ic_thumb_up),
             backgroundColor = zestyLime,
             onClick = {}
         )
@@ -168,17 +159,17 @@ private fun IconButtonSmallDemo() {
     Row(horizontalArrangement = Arrangement.spacedBy(Dimensions.paddingMedium)) {
         NeoBrutalIconButtonSmall(
             imageVector = Icons.Default.Star,
-            contentDescription = "Star",
+            contentDescription = stringResource(R.string.ic_star),
             onClick = {}
         )
         NeoBrutalIconButtonSmall(
             imageVector = Icons.Default.Favorite,
-            contentDescription = "Favorite",
+            contentDescription = stringResource(R.string.ic_favorite),
             onClick = {}
         )
         NeoBrutalIconButtonSmall(
             imageVector = Icons.Default.Share,
-            contentDescription = "Share",
+            contentDescription = stringResource(R.string.ic_share),
             onClick = {}
         )
     }
@@ -231,7 +222,7 @@ private fun TopAppBarDemo() {
             actions = {
                 NeoBrutalIconButtonSmall(
                     imageVector = Icons.Default.Settings,
-                    contentDescription = "Settings",
+                    contentDescription = stringResource(R.string.ic_settings),
                     onClick = {}
                 )
             }
@@ -243,17 +234,26 @@ private fun TopAppBarDemo() {
 private fun MarkerTextDemo() {
     ComponentLabel("MarkerText")
     Column(verticalArrangement = Arrangement.spacedBy(Dimensions.paddingMedium)) {
-        MarkerText(text = "Electric Blue", lineColor = electricBlue)
-        MarkerText(text = "Vivid Pink", lineColor = vividPink)
-        MarkerText(text = "Zesty Lime", lineColor = zestyLime)
-        MarkerText(text = "Solar Yellow", lineColor = solarYellow)
-        MarkerText(text = "Energetic Orange", lineColor = energeticOrange)
+        MarkerText(text = stringResource(R.string.color_electric_blue), lineColor = electricBlue)
+        MarkerText(text = stringResource(R.string.color_vivid_pink), lineColor = vividPink)
+        MarkerText(text = stringResource(R.string.color_zesty_lime), lineColor = zestyLime)
+        MarkerText(text = stringResource(R.string.color_solar_yellow), lineColor = solarYellow)
+        MarkerText(text = stringResource(R.string.color_energetic_orange), lineColor = energeticOrange)
     }
 }
 
 @Composable
 private fun UsageChartDemo() {
     ComponentLabel("UsageChart")
+    val sampleChartBars = listOf(
+        ChartBarData(label = stringResource(R.string.chart_day_mon), value = 5f, detailText = stringResource(R.string.chart_detail_prompts, 5)),
+        ChartBarData(label = stringResource(R.string.chart_day_tue), value = 12f, detailText = stringResource(R.string.chart_detail_prompts, 12)),
+        ChartBarData(label = stringResource(R.string.chart_day_wed), value = 8f, detailText = stringResource(R.string.chart_detail_prompts, 8)),
+        ChartBarData(label = stringResource(R.string.chart_day_thu), value = 15f, detailText = stringResource(R.string.chart_detail_prompts, 15)),
+        ChartBarData(label = stringResource(R.string.chart_day_fri), value = 3f, detailText = stringResource(R.string.chart_detail_prompts, 3)),
+        ChartBarData(label = stringResource(R.string.chart_day_sat), value = 0f, detailText = stringResource(R.string.chart_detail_prompts, 0)),
+        ChartBarData(label = stringResource(R.string.chart_day_sun), value = 7f, detailText = stringResource(R.string.chart_detail_prompts, 7)),
+    )
     var selectedBarIndex by remember { mutableStateOf<Int?>(null) }
     UsageChart(
         bars = sampleChartBars,

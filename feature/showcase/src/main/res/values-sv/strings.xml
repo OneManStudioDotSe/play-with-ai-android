@@ -1,0 +1,57 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="showcase_title">SoFa</string>
+
+    <!-- Section Headers -->
+    <string name="section_typography">Typografi</string>
+    <string name="section_colors">Färger</string>
+    <string name="section_components">Komponenter</string>
+
+    <!-- Typography Section -->
+    <string name="font_sample_text">Den snabba bruna räven</string>
+    <string name="font_weight_normal">Normal (400)</string>
+    <string name="font_weight_medium">Medium (500)</string>
+    <string name="font_weight_semibold">Halvfet (600)</string>
+    <string name="font_weight_bold">Fet (700)</string>
+    <string name="toggle_standard">Standard</string>
+    <string name="toggle_emphasized">Betonad</string>
+
+    <!-- Color Subsections -->
+    <string name="colors_accents">Accentfärger</string>
+    <string name="colors_containers">Behållare</string>
+    <string name="colors_functional">Funktionella</string>
+    <string name="colors_disabled">Inaktiva</string>
+
+    <!-- Component Demo Content -->
+    <string name="demo_card_title">Korttitel</string>
+    <string name="demo_card_body">Det här är ett neo-brutalistiskt kort med djärva kanter och förskjuten skugga.</string>
+    <string name="demo_button_enabled">Aktiverad</string>
+    <string name="demo_button_with_icon">Med ikon</string>
+    <string name="demo_button_disabled">Inaktiverad</string>
+    <string name="demo_text_field_placeholder">Skriv något…</string>
+    <string name="demo_chip_design">Design</string>
+    <string name="demo_chip_system">System</string>
+    <string name="demo_chip_sofa">SoFa</string>
+    <string name="demo_segment_first">Första</string>
+    <string name="demo_segment_second">Andra</string>
+    <string name="demo_segment_third">Tredje</string>
+    <string name="demo_top_bar_title">Apptitel</string>
+
+    <!-- Icon content descriptions -->
+    <string name="ic_send">Skicka</string>
+    <string name="ic_star">Stjärna</string>
+    <string name="ic_favorite">Favorit</string>
+    <string name="ic_thumb_up">Tumme upp</string>
+    <string name="ic_share">Dela</string>
+    <string name="ic_settings">Inställningar</string>
+
+    <!-- Chart day labels -->
+    <string name="chart_day_mon">Mån</string>
+    <string name="chart_day_tue">Tis</string>
+    <string name="chart_day_wed">Ons</string>
+    <string name="chart_day_thu">Tor</string>
+    <string name="chart_day_fri">Fre</string>
+    <string name="chart_day_sat">Lör</string>
+    <string name="chart_day_sun">Sön</string>
+    <string name="chart_detail_prompts">%d prompter</string>
+</resources>

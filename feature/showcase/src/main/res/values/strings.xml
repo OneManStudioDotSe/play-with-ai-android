@@ -36,4 +36,29 @@
     <string name="demo_segment_second">Second</string>
     <string name="demo_segment_third">Third</string>
     <string name="demo_top_bar_title">App Title</string>
+
+    <!-- Icon content descriptions -->
+    <string name="ic_send">Send</string>
+    <string name="ic_star">Star</string>
+    <string name="ic_favorite">Favorite</string>
+    <string name="ic_thumb_up">Thumb up</string>
+    <string name="ic_share">Share</string>
+    <string name="ic_settings">Settings</string>
+
+    <!-- Chart day labels -->
+    <string name="chart_day_mon">Mon</string>
+    <string name="chart_day_tue">Tue</string>
+    <string name="chart_day_wed">Wed</string>
+    <string name="chart_day_thu">Thu</string>
+    <string name="chart_day_fri">Fri</string>
+    <string name="chart_day_sat">Sat</string>
+    <string name="chart_day_sun">Sun</string>
+    <string name="chart_detail_prompts">%d prompts</string>
+
+    <!-- MarkerText color display names -->
+    <string name="color_electric_blue" translatable="false">Electric Blue</string>
+    <string name="color_vivid_pink" translatable="false">Vivid Pink</string>
+    <string name="color_zesty_lime" translatable="false">Zesty Lime</string>
+    <string name="color_solar_yellow" translatable="false">Solar Yellow</string>
+    <string name="color_energetic_orange" translatable="false">Energetic Orange</string>
 </resources>
