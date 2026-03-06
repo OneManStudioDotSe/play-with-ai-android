@@ -328,7 +328,7 @@ private fun ContentState(
             )
         }
 
-        NeoBrutalIconButton(
+        NeoBrutalIconButtonSmall(
             modifier = Modifier
                 .padding(end = Dimensions.paddingExtraSmall)
                 .align(Alignment.TopEnd)

@@ -25,6 +25,7 @@ import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.layout.wrapContentHeight
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
@@ -84,7 +85,7 @@ internal fun RunningState(state: PlanUiState.Running) {
             .padding(Dimensions.paddingExtraLarge),
         horizontalAlignment = Alignment.CenterHorizontally,
     ) {
-        AgentPulse(modifier = Modifier.size(PlanConstants.AGENT_PULSE_SIZE.dp))
+        AgentPulse(modifier = Modifier.fillMaxWidth().wrapContentHeight())
 
         Spacer(modifier = Modifier.height(Dimensions.paddingExtraLarge))
 

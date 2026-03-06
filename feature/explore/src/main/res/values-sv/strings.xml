@@ -47,7 +47,7 @@
     <string name="loading_message_5">Väcker datatomtarna…</string>
 
     <string name="suggested_place_coordinates">Koordinater</string>
-    <string name="suggested_place_coordinates_format">%.4f°%s, %.4f°%s</string>
+    <string name="suggested_place_coordinates_format" formatted="false">%.4f°%s, %.4f°%s</string>
     <string name="suggested_place_image_content_description">Foto av %s</string>
     <string name="north_abbreviation">N</string>
     <string name="south_abbreviation">S</string>
