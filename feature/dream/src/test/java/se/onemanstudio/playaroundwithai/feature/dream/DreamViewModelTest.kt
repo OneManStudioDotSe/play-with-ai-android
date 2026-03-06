@@ -34,7 +34,7 @@ import se.onemanstudio.playaroundwithai.data.dream.domain.usecase.SaveDreamUseCa
 import se.onemanstudio.playaroundwithai.feature.dream.states.DreamError
 import se.onemanstudio.playaroundwithai.feature.dream.states.DreamImageState
 import se.onemanstudio.playaroundwithai.feature.dream.states.DreamUiState
-import se.onemanstudio.playaroundwithai.feature.dream.util.MainCoroutineRule
+import se.onemanstudio.playaroundwithai.core.testing.MainCoroutineRule
 import java.io.IOException
 import kotlin.test.assertEquals
 

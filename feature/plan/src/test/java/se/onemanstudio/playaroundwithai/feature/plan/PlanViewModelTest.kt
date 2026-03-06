@@ -24,7 +24,7 @@ import se.onemanstudio.playaroundwithai.data.plan.domain.usecase.PlanTripUseCase
 import se.onemanstudio.playaroundwithai.feature.plan.states.PlanError
 import se.onemanstudio.playaroundwithai.feature.plan.states.PlanUiState
 import se.onemanstudio.playaroundwithai.feature.plan.states.StepIcon
-import se.onemanstudio.playaroundwithai.feature.plan.util.MainCoroutineRule
+import se.onemanstudio.playaroundwithai.core.testing.MainCoroutineRule
 import java.io.IOException
 
 private const val TEST_LAT = 59.3293

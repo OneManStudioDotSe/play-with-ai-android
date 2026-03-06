@@ -34,7 +34,7 @@ import se.onemanstudio.playaroundwithai.feature.chat.models.SnackbarEvent
 import se.onemanstudio.playaroundwithai.feature.chat.states.ChatError
 import se.onemanstudio.playaroundwithai.feature.chat.states.ChatUiState
 import se.onemanstudio.playaroundwithai.feature.chat.util.FileUtils
-import se.onemanstudio.playaroundwithai.feature.chat.util.MainCoroutineRule
+import se.onemanstudio.playaroundwithai.core.testing.MainCoroutineRule
 import java.io.IOException
 import kotlin.test.assertEquals
 

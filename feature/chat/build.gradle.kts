@@ -63,6 +63,7 @@ dependencies {
     debugImplementation(libs.ui.tooling)
 
     // Testing
+    testImplementation(project(":core:testing"))
     testImplementation(libs.junit4)
     testImplementation(libs.mockk)
     testImplementation(libs.kotlinx.coroutines.test)

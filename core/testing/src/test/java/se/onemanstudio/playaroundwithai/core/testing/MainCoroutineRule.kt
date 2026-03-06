@@ -1,4 +1,4 @@
-package se.onemanstudio.playaroundwithai.util
+package se.onemanstudio.playaroundwithai.core.testing
 
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
