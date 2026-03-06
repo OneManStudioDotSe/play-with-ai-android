@@ -2,7 +2,7 @@ package se.onemanstudio.playaroundwithai.data.plan.prompts
 
 internal object PlanPrompts {
 
-    fun tripPlannerSystemPrompt(latitude: Double, longitude: Double): String = """
+    private const val TRIP_PLANNER_SYSTEM_PROMPT = """
 You are an AI trip planner agent. Given a user's request, plan a walking trip itinerary.
 
 You have access to these tools:
@@ -16,14 +16,14 @@ Strategy:
 4. Use calculate_route to find the optimal walking order
 5. Provide a final summary describing the trip with personality and helpful tips
 
-Keep the itinerary to 4-6 stops for a half-day trip. The user is near latitude $latitude, longitude $longitude.
+Keep the itinerary to 4-6 stops for a half-day trip. The user is near latitude %s, longitude %s.
 
 When you have finished planning, respond with a text summary of the itinerary. The summary should describe each stop in order, mention what makes each place special, and include practical tips.
 Do NOT call more than 5 tools total.
-    """.trimIndent()
+    """
 
-    fun searchPlacesPrompt(query: String, latitude: Double, longitude: Double, count: Int): String = """
-Return a JSON array of $count real places matching "$query" near latitude $latitude, longitude $longitude.
+    private const val SEARCH_PLACES_PROMPT = """
+Return a JSON array of %d real places matching "%s" near latitude %s, longitude %s.
 
 Each place must be a real, existing establishment or location. Return ONLY a JSON array with this format:
 [
@@ -37,5 +37,11 @@ Each place must be a real, existing establishment or location. Return ONLY a JSO
 ]
 
 Use realistic coordinates near the specified location. Return ONLY valid JSON, no markdown, no backticks, no extra text.
-    """.trimIndent()
+    """
+
+    fun tripPlannerSystemPrompt(latitude: Double, longitude: Double): String =
+        TRIP_PLANNER_SYSTEM_PROMPT.trimIndent().format(latitude.toString(), longitude.toString())
+
+    fun searchPlacesPrompt(query: String, latitude: Double, longitude: Double, count: Int): String =
+        SEARCH_PLACES_PROMPT.trimIndent().format(count, query, latitude.toString(), longitude.toString())
 }

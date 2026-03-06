@@ -2,7 +2,7 @@ package se.onemanstudio.playaroundwithai.data.dream.prompts
 
 internal object DreamPrompts {
 
-    fun interpretationPrompt(description: String): String = """
+    private const val INTERPRETATION_PROMPT = """
 You are a dream interpreter and visual artist. Given the user's dream description below, return a JSON object with exactly this structure:
 {
   "interpretation": "A 2-3 sentence analysis of symbolism, emotional meaning, and themes",
@@ -33,10 +33,10 @@ Use diverse shapes across layers. Mix 3-5 different element shapes and 2-3 parti
 Keep particle count between 5-15 per type to avoid cluttering the scene.
 Return ONLY valid JSON, no markdown, no backticks, no extra text.
 
-Dream: "$description"
-    """.trimIndent()
+Dream: "%s"
+    """
 
-    fun imagePrompt(description: String): String = """
+    private const val IMAGE_PROMPT = """
 Create an image of a painting inspired by the following dream. Paint it in the distinctive style of a famous artist whose work resonates with the dream's mood and imagery. Choose from artists like Dalí, Monet, Van Gogh, Klimt, Kahlo, Hokusai, Magritte, Munch, Rothko, or any other renowned painter.
 
 The painting should be vivid, atmospheric, and capture the emotional essence of the dream.
@@ -44,6 +44,11 @@ The painting should be vivid, atmospheric, and capture the emotional essence of 
 Along with the generated image, include a single line of text with the artist's name in this exact format:
 Artist: <Full Name>
 
-Dream: "$description"
-    """.trimIndent()
+Dream: "%s"
+    """
+
+    fun interpretationPrompt(description: String): String =
+        INTERPRETATION_PROMPT.trimIndent().format(description)
+
+    fun imagePrompt(description: String): String = IMAGE_PROMPT.trimIndent().format(description)
 }

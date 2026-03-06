@@ -20,8 +20,8 @@ internal object PlanConstants {
     // Agent pulse animation
     const val AGENT_PULSE_SIZE = 64
     const val AGENT_PULSE_DOT_COUNT = 3
-    const val AGENT_PULSE_DOT_RADIUS = 6f
-    const val AGENT_PULSE_LINE_WIDTH = 2f
+    const val AGENT_PULSE_DOT_RADIUS = 12f
+    const val AGENT_PULSE_LINE_WIDTH = 4f
     const val AGENT_PULSE_DURATION_MS = 600
     const val AGENT_PULSE_STAGGER_MS = 200
 
