@@ -22,6 +22,8 @@ import timber.log.Timber
 import java.io.IOException
 import javax.inject.Inject
 
+private const val PLAN_STARTING_ACTION = "Starting…"
+
 @HiltViewModel
 class PlanViewModel @Inject constructor(
     private val planTripUseCase: PlanTripUseCase,
@@ -33,19 +35,19 @@ class PlanViewModel @Inject constructor(
 
     init {
         if (!apiKeyAvailability.isGeminiKeyAvailable) {
-            _uiState.value = PlanUiState.Error(PlanError.ApiKeyMissing)
+            _uiState.update { PlanUiState.Error(PlanError.ApiKeyMissing) }
         }
     }
 
     @Suppress("TooGenericExceptionCaught")
     fun planTrip(goal: String, latitude: Double, longitude: Double) {
         if (!apiKeyAvailability.isGeminiKeyAvailable) {
-            _uiState.value = PlanUiState.Error(PlanError.ApiKeyMissing)
+            _uiState.update { PlanUiState.Error(PlanError.ApiKeyMissing) }
             return
         }
 
         val steps = mutableListOf<PlanStepUi>()
-        _uiState.value = PlanUiState.Running(steps = persistentListOf(), currentAction = "Starting...")
+        _uiState.update { PlanUiState.Running(steps = persistentListOf(), currentAction = PLAN_STARTING_ACTION) }
 
         viewModelScope.launch {
             try {
@@ -54,10 +56,10 @@ class PlanViewModel @Inject constructor(
                 }
             } catch (e: IOException) {
                 Timber.e(e, "PlanVM - Network error")
-                _uiState.value = PlanUiState.Error(PlanError.NetworkMissing)
+                _uiState.update { PlanUiState.Error(PlanError.NetworkMissing) }
             } catch (e: Exception) {
                 Timber.e(e, "PlanVM - Unexpected error")
-                _uiState.value = PlanUiState.Error(PlanError.Unknown(e.message))
+                _uiState.update { PlanUiState.Error(PlanError.Unknown(e.message)) }
             }
         }
     }
@@ -82,24 +84,26 @@ class PlanViewModel @Inject constructor(
             }
 
             is PlanEvent.Complete -> {
-                _uiState.value = PlanUiState.Result(steps = steps.toPersistentList(), plan = event.plan.toUi())
+                _uiState.update { PlanUiState.Result(steps = steps.toPersistentList(), plan = event.plan.toUi()) }
             }
 
             is PlanEvent.Error -> {
-                _uiState.value = PlanUiState.Error(PlanError.Unknown(event.message))
+                _uiState.update { PlanUiState.Error(PlanError.Unknown(event.message)) }
             }
         }
     }
 
     fun resetToInitial() {
-        _uiState.value = PlanUiState.Initial
+        _uiState.update { PlanUiState.Initial }
     }
 
     fun loadSampleData() {
-        _uiState.value = PlanUiState.Result(
-            steps = samplePlanSteps(),
-            plan = sampleTripPlan(),
-        )
+        _uiState.update {
+            PlanUiState.Result(
+                steps = samplePlanSteps(),
+                plan = sampleTripPlan(),
+            )
+        }
     }
 
     private fun se.onemanstudio.playaroundwithai.data.plan.domain.model.TripPlan.toUi(): TripPlanUi {

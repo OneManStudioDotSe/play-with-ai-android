@@ -23,6 +23,7 @@
     <string name="plan_example_parks">Parks and nature walks</string>
     <string name="plan_try_suggestions">Try one of these:</string>
     <string name="plan_planning_trip">Planning your trip…</string>
+    <string name="plan_starting">Starting…</string>
     <string name="plan_icon_planning">Planning in progress</string>
     <string name="plan_icon_step_thinking">Thinking</string>
     <string name="plan_icon_step_tool_call">Calling tool</string>
