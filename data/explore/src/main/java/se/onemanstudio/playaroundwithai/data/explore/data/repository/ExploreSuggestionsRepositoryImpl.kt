@@ -13,6 +13,7 @@ import se.onemanstudio.playaroundwithai.core.network.api.GeminiApiService
 import se.onemanstudio.playaroundwithai.core.network.dto.Content
 import se.onemanstudio.playaroundwithai.core.network.dto.GeminiRequest
 import se.onemanstudio.playaroundwithai.core.network.dto.Part
+import se.onemanstudio.playaroundwithai.core.network.util.JsonExtractor
 import se.onemanstudio.playaroundwithai.core.tracking.repository.TokenUsageTracker
 import se.onemanstudio.playaroundwithai.data.explore.domain.repository.ExploreSuggestionsRepository
 import se.onemanstudio.playaroundwithai.data.explore.prompts.ExplorePrompts
@@ -45,7 +46,7 @@ class ExploreSuggestionsRepositoryImpl @Inject constructor(
                 return@withContext Result.failure(IOException("No JSON response from Gemini."))
             }
 
-            val jsonText = extractJson(rawText)
+            val jsonText = JsonExtractor.extract(rawText)
             val dto = gson.fromJson(jsonText, SuggestedPlacesResponseDto::class.java)
 
             Timber.d("Gemini - Received ${dto.places.size} suggested places")
@@ -62,9 +63,4 @@ class ExploreSuggestionsRepositoryImpl @Inject constructor(
         }
     }
 
-    private fun extractJson(text: String): String {
-        val codeFencePattern = Regex("""```\w*\s*([\s\S]*?)```""")
-        val match = codeFencePattern.find(text)
-        return (match?.groupValues?.getOrNull(1) ?: text).trim()
-    }
 }

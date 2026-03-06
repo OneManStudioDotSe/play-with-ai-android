@@ -3,11 +3,15 @@
 package se.onemanstudio.playaroundwithai.data.plan.data.repository
 
 import com.google.gson.Gson
+import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.currentCoroutineContext
+import kotlinx.coroutines.ensureActive
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.flow.flowOn
 import se.onemanstudio.playaroundwithai.core.network.api.GeminiApiService
+import se.onemanstudio.playaroundwithai.core.network.util.JsonExtractor
 import se.onemanstudio.playaroundwithai.core.network.dto.Content
 import se.onemanstudio.playaroundwithai.core.network.dto.FunctionCallDto
 import se.onemanstudio.playaroundwithai.core.tracking.repository.TokenUsageTracker
@@ -52,6 +56,7 @@ class TripPlannerRepositoryImpl @Inject constructor(
 
             var iterations = 0
             while (iterations < MAX_ITERATIONS) {
+                currentCoroutineContext().ensureActive()
                 iterations++
                 Timber.d("$LOG_TAG - Iteration $iterations")
 
@@ -96,6 +101,8 @@ class TripPlannerRepositoryImpl @Inject constructor(
             }
 
             emit(PlanEvent.Error("Agent reached maximum iterations without completing"))
+        } catch (e: CancellationException) {
+            throw e
         } catch (e: retrofit2.HttpException) {
             val errorBody = e.response()?.errorBody()?.string()
             Timber.e(e, "$LOG_TAG - HTTP ${e.code()} error. Body: $errorBody")
@@ -222,11 +229,7 @@ class TripPlannerRepositoryImpl @Inject constructor(
 
     @Suppress("UNCHECKED_CAST")
     private fun parsePlacesFromResponse(text: String): List<Map<String, Any>> {
-        val cleaned = text.trim()
-            .removePrefix("```json")
-            .removePrefix("```")
-            .removeSuffix("```")
-            .trim()
+        val cleaned = JsonExtractor.extract(text)
 
         return try {
             val list = gson.fromJson(cleaned, List::class.java) as? List<Map<String, Any>>

@@ -6,6 +6,7 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 import retrofit2.HttpException
 import se.onemanstudio.playaroundwithai.core.network.api.GeminiApiService
+import se.onemanstudio.playaroundwithai.core.network.util.JsonExtractor
 import se.onemanstudio.playaroundwithai.core.network.dto.Content
 import se.onemanstudio.playaroundwithai.core.network.dto.GeminiRequest
 import se.onemanstudio.playaroundwithai.core.network.dto.GenerationConfig
@@ -44,7 +45,7 @@ class DreamGeminiRepositoryImpl @Inject constructor(
             val text = response.extractText() ?: return@withContext Result.failure(Exception("No response text from Gemini"))
             Timber.d("DreamGemini - API response received (${text.length} chars)")
 
-            val cleanedJson = cleanJsonResponse(text)
+            val cleanedJson = JsonExtractor.extract(text)
             val interpretation = parseInterpretation(cleanedJson)
             Result.success(interpretation)
         } catch (e: IOException) {
@@ -147,12 +148,6 @@ class DreamGeminiRepositoryImpl @Inject constructor(
             mood = mood,
         )
     }
-
-    private fun cleanJsonResponse(text: String): String =
-        text.trim()
-            .removeSurrounding("```json", "```")
-            .removeSurrounding("```")
-            .trim()
 
     companion object {
         private const val IMAGE_GENERATION_MAX_RETRIES = 3
