@@ -6,6 +6,7 @@ import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.CompletableDeferred
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.withTimeoutOrNull
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
@@ -25,6 +26,8 @@ import timber.log.Timber
 import java.io.IOException
 import java.time.Instant
 import javax.inject.Inject
+
+private const val DREAM_ID_TIMEOUT_MS = 5_000L
 
 @HiltViewModel
 class DreamViewModel @Inject constructor(
@@ -124,7 +127,11 @@ class DreamViewModel @Inject constructor(
                 }
 
                 try {
-                    val dreamId = dreamIdDeferred.await()
+                    val dreamId = withTimeoutOrNull(DREAM_ID_TIMEOUT_MS) { dreamIdDeferred.await() }
+                    if (dreamId == null) {
+                        Timber.w("DreamVM - Timed out waiting for dream ID; image will not be persisted")
+                        return@onSuccess
+                    }
                     val imageBytes = java.util.Base64.getDecoder().decode(dreamImage.imageBase64)
                     val imagePath = saveDreamImageUseCase(dreamId, imageBytes, dreamImage.mimeType, dreamImage.artistName)
                     _screenState.update { state ->
