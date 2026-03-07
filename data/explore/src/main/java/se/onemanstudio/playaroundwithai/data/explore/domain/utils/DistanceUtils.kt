@@ -1,4 +1,4 @@
-package se.onemanstudio.playaroundwithai.data.explore.domain.util
+package se.onemanstudio.playaroundwithai.data.explore.domain.utils
 
 import kotlin.math.atan2
 import kotlin.math.cos

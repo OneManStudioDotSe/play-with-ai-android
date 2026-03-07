@@ -28,10 +28,7 @@ class ExploreSuggestionsRepositoryImpl @Inject constructor(
     private val tokenUsageTracker: TokenUsageTracker,
 ) : ExploreSuggestionsRepository {
 
-    override suspend fun getSuggestedPlaces(
-        latitude: Double,
-        longitude: Double,
-    ): Result<List<SuggestedPlace>> = withContext(Dispatchers.IO) {
+    override suspend fun getSuggestedPlaces(latitude: Double, longitude: Double): Result<List<SuggestedPlace>> = withContext(Dispatchers.IO) {
         try {
             Timber.d("Gemini - Getting suggested places for lat=$latitude, lng=$longitude")
 
@@ -62,5 +59,4 @@ class ExploreSuggestionsRepositoryImpl @Inject constructor(
             Result.failure(e)
         }
     }
-
 }

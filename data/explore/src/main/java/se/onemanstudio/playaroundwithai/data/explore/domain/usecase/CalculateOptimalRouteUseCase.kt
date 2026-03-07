@@ -1,7 +1,7 @@
 package se.onemanstudio.playaroundwithai.data.explore.domain.usecase
 
-import se.onemanstudio.playaroundwithai.data.explore.domain.util.calculatePathDistance
-import se.onemanstudio.playaroundwithai.data.explore.domain.util.permutations
+import se.onemanstudio.playaroundwithai.data.explore.domain.utils.calculatePathDistance
+import se.onemanstudio.playaroundwithai.data.explore.domain.utils.permutations
 import javax.inject.Inject
 import kotlin.math.roundToInt
 
@@ -16,11 +16,7 @@ data class OptimalRouteResult(
 
 class CalculateOptimalRouteUseCase @Inject constructor() {
 
-    operator fun invoke(
-        startLat: Double,
-        startLng: Double,
-        pointsToVisit: List<Pair<Double, Double>>,
-    ): OptimalRouteResult {
+    operator fun invoke(startLat: Double, startLng: Double, pointsToVisit: List<Pair<Double, Double>>): OptimalRouteResult {
         val bestPermutation = permutations(pointsToVisit)
             .minByOrNull { path -> calculatePathDistance(startLat, startLng, path) }
             ?: pointsToVisit

@@ -18,7 +18,6 @@ data class RouteResult(
 )
 
 object RouteCalculator {
-
     fun findOptimalRoute(places: List<Pair<Double, Double>>): RouteResult {
         if (places.size <= 1) {
             return RouteResult(

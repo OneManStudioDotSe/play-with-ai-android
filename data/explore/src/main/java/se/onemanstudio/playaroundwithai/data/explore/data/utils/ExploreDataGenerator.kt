@@ -1,4 +1,4 @@
-package se.onemanstudio.playaroundwithai.data.explore.data.util
+package se.onemanstudio.playaroundwithai.data.explore.data.utils
 
 import se.onemanstudio.playaroundwithai.data.explore.data.dto.VehicleTypeDto
 import kotlin.random.Random

@@ -10,10 +10,7 @@ private const val MAX_LONGITUDE = 180.0
 class GetSuggestedPlacesUseCase @Inject constructor(
     private val exploreSuggestionsRepository: ExploreSuggestionsRepository
 ) {
-    suspend operator fun invoke(
-        latitude: Double,
-        longitude: Double,
-    ): Result<List<SuggestedPlace>> {
+    suspend operator fun invoke(latitude: Double, longitude: Double): Result<List<SuggestedPlace>> {
         if (latitude !in -MAX_LATITUDE..MAX_LATITUDE || longitude !in -MAX_LONGITUDE..MAX_LONGITUDE) {
             val message = when {
                 latitude !in -MAX_LATITUDE..MAX_LATITUDE -> "Latitude must be between -$MAX_LATITUDE and $MAX_LATITUDE, was $latitude"
