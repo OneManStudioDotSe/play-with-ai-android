@@ -32,23 +32,25 @@
 :app                    → Application entry point, navigation, main activity
 :core:network           → OkHttp, Retrofit, Gson, GeminiApiService, DTOs (incl. function calling & thinking support), interceptor, NetworkMonitor
 :core:auth              → Firebase Auth, AuthRepository (interface+impl), auth use cases, AuthSession
-:core:config            → ApiKeyAvailability, AppSettingsHolder, ConfigurationModule, qualifier annotations, BuildConfig
+:core:config            → ApiKeyAvailability, AppSettingsHolder, ExploreSettingsHolder, ConfigurationModule, qualifier annotations (@GeminiApiKey, @MapsApiKey, @BaseUrl, @LoggingLevel, @AppVersion), BuildConfig
 :core:database          → Shared Room DB (v6): AppDatabase, all entities (PromptEntity, DreamEntity, TokenUsageEntity), all DAOs, SyncStatusConverter, DatabaseModule
 :core:tracking          → TokenUsageTracker + TokenUsageQuery interfaces, TokenUsageTrackerImpl, GetWeeklyTokenUsageUseCase, TrackingModule
 :core:theme             → Design system: colors, typography ("SoFa" design language)
 :core:ui                → Reusable Compose UI components (NeoBrutalCard, NeoBrutalIconButton, NeoBrutalIconButtonSmall, TopAppBar, etc.)
 :data:plan              → Plan domain + data: agent loop, tool dispatch, route calculator, Gemini function calling, PlanPrompts
-:data:explore           → Explore domain + data: fake API, explore items, suggested places, ExplorePrompts
+:data:explore           → Explore domain + data: fake API, explore items, suggested places, ExplorePrompts (depends on :core:config for ExploreSettingsHolder)
 :data:chat              → Chat domain + data: Firestore sync, prompt history, SyncWorker, ChatPrompts
 :data:dream             → Dream domain + data: interpretation, image generation, DreamPrompts
 :feature:plan           → Plan presentation: PlanViewModel, PlanScreen (trip planner UI + map)
 :feature:chat           → Chat presentation: ChatViewModel, ChatScreen
 :feature:explore        → Explore presentation: ExploreViewModel, ExploreScreen
 :feature:dream          → Dream presentation: DreamViewModel, DreamScreen
+:feature:settings       → Settings presentation: SettingsViewModel, SettingsBottomSheet, SettingsBottomSheetContainer, SettingsState
 :feature:showcase       → Showcase presentation: ShowcaseScreen (design system style guide, no ViewModel)
 ```
 
 Dependencies flow: `feature → data → core:network + core:config + core:database + core:tracking`, `feature → core:ui → core:theme`
+Exception: `:feature:settings` depends only on `core` modules (no `data` module dependency) — `ExploreSettingsHolder` and `AppSettingsHolder` live in `:core:config`.
 Exception: `:feature:showcase` is presentation-only (no ViewModel, no data layer, no Hilt) — depends only on `:core:ui` and `:core:theme`.
 
 ## Architecture
@@ -182,7 +184,7 @@ service cloud.firestore {
 
 - CI injects these via GitHub Secrets (environment variables with the same names)
 - Accessed in code via `BuildConfig` fields
-- Custom Hilt qualifiers: `@GeminiApiKey`, `@BaseUrl`, `@LoggingLevel`
+- Custom Hilt qualifiers: `@GeminiApiKey`, `@MapsApiKey`, `@BaseUrl`, `@LoggingLevel`, `@AppVersion`
 
 ## Architecture Diagram — API Endpoints, Services & Data Flow
 
@@ -195,6 +197,11 @@ service cloud.firestore {
 │  │ ChatViewModel│ │ExploreViewMdl│ │DreamViewModel│ │PlanViewModel │ │ (no VM)      │  │
 │  │ ChatScreen   │ │ ExploreScreen│ │ DreamScreen  │ │ PlanScreen   │ │ShowcaseScreen│  │
 │  └──────┬───────┘ └──────┬───────┘ └──────┬───────┘ └──────┬───────┘ └──────┬───────┘  │
+│                                                                                          │
+│  ┌──────────────────────────────────────────┐                                           │
+│  │         :feature:settings                │                                           │
+│  │  SettingsViewModel, SettingsBottomSheet  │ (→ core only, no data module dependency)  │
+│  └──────────────────────────────────────────┘                                           │
 │         │                │               │               │               │           │
 └─────────┼────────────────┼───────────────┼───────────────┼───────────────┼───────────┘
           │                │               │               │               │
@@ -221,9 +228,10 @@ service cloud.firestore {
 │  │   :core:network   │  │   :core:auth     │  │       :core:config            │  │
 │  │  GeminiApiService │  │  AuthRepository  │  │  ApiKeyAvailability           │  │
 │  │  DTOs (text +     │  │  AuthSession     │  │  AppSettingsHolder            │  │
-│  │  function calling)│  │  Firebase Auth   │  │  @GeminiApiKey, @BaseUrl      │  │
-│  │  NetworkMonitor   │  │  Auth Use Cases  │  │  ConfigurationModule          │  │
-│  │  Interceptor      │  │                  │  │  BuildConfig fields           │  │
+│  │  function calling)│  │  Firebase Auth   │  │  ExploreSettingsHolder        │  │
+│  │  NetworkMonitor   │  │  Auth Use Cases  │  │  @GeminiApiKey, @AppVersion   │  │
+│  │  Interceptor      │  │                  │  │  @BaseUrl, @LoggingLevel      │  │
+│  │                   │  │                  │  │  ConfigurationModule          │  │
 │  └──────────────────┘  └──────────────────┘  └───────────────────────────────┘  │
 │                                                                                  │
 │  ┌──────────────────┐  ┌──────────────────┐  ┌───────────────────────────────┐  │

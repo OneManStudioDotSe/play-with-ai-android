@@ -44,7 +44,7 @@ import se.onemanstudio.playaroundwithai.feature.chat.ChatScreen
 import se.onemanstudio.playaroundwithai.feature.dream.DreamScreen
 import se.onemanstudio.playaroundwithai.feature.explore.ExploreScreen
 import se.onemanstudio.playaroundwithai.feature.showcase.ShowcaseScreen
-import se.onemanstudio.playaroundwithai.settings.SettingsBottomSheetContainer
+import se.onemanstudio.playaroundwithai.feature.settings.SettingsBottomSheetContainer
 import se.onemanstudio.playaroundwithai.navigation.Agents
 import se.onemanstudio.playaroundwithai.navigation.Chat
 import se.onemanstudio.playaroundwithai.navigation.Dreams

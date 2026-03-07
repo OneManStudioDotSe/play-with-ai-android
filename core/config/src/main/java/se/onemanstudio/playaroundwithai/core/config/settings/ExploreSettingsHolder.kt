@@ -1,4 +1,4 @@
-package se.onemanstudio.playaroundwithai.data.explore.data.settings
+package se.onemanstudio.playaroundwithai.core.config.settings
 
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow

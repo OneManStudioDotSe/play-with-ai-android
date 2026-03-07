@@ -17,7 +17,7 @@ import kotlinx.coroutines.isActive
 import kotlinx.coroutines.launch
 import se.onemanstudio.playaroundwithai.core.config.model.ApiKeyAvailability
 import se.onemanstudio.playaroundwithai.core.network.monitor.NetworkMonitor
-import se.onemanstudio.playaroundwithai.data.explore.data.settings.ExploreSettingsHolder
+import se.onemanstudio.playaroundwithai.core.config.settings.ExploreSettingsHolder
 import se.onemanstudio.playaroundwithai.data.explore.domain.model.SuggestedPlace
 import se.onemanstudio.playaroundwithai.data.explore.domain.model.VehicleType
 import se.onemanstudio.playaroundwithai.data.explore.domain.model.toExploreItem

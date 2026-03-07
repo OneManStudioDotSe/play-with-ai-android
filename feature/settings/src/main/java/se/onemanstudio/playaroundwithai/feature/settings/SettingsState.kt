@@ -1,4 +1,4 @@
-package se.onemanstudio.playaroundwithai.core.ui.sofa
+package se.onemanstudio.playaroundwithai.feature.settings
 
 import androidx.compose.runtime.Immutable
 

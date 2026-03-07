@@ -85,11 +85,11 @@ dependencies {
     implementation(project(":core:tracking"))
     implementation(project(":core:ui"))
     implementation(project(":data:chat"))
-    implementation(project(":data:explore"))
     implementation(project(":feature:chat"))
     implementation(project(":feature:plan"))
     implementation(project(":feature:dream"))
     implementation(project(":feature:explore"))
+    implementation(project(":feature:settings"))
     implementation(project(":feature:showcase"))
 
     implementation(libs.material3)

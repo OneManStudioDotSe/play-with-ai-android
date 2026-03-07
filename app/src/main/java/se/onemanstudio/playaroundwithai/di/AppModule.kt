@@ -7,6 +7,8 @@ import dagger.Provides
 import dagger.hilt.InstallIn
 import dagger.hilt.android.qualifiers.ApplicationContext
 import dagger.hilt.components.SingletonComponent
+import se.onemanstudio.playaroundwithai.BuildConfig
+import se.onemanstudio.playaroundwithai.core.config.di.AppVersion
 import javax.inject.Singleton
 
 @Module
@@ -18,4 +20,8 @@ object AppModule {
     fun provideWorkManager(@ApplicationContext context: Context): WorkManager {
         return WorkManager.getInstance(context)
     }
+
+    @Provides
+    @AppVersion
+    fun provideAppVersion(): String = BuildConfig.VERSION_NAME
 }

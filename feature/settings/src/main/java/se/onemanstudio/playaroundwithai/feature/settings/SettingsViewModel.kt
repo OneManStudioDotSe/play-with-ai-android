@@ -1,4 +1,4 @@
-package se.onemanstudio.playaroundwithai.settings
+package se.onemanstudio.playaroundwithai.feature.settings
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
@@ -7,10 +7,11 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.stateIn
+import se.onemanstudio.playaroundwithai.core.config.di.AppVersion
 import se.onemanstudio.playaroundwithai.core.config.settings.AppSettingsHolder
 import se.onemanstudio.playaroundwithai.core.tracking.model.DailyTokenUsage
 import se.onemanstudio.playaroundwithai.core.tracking.usecase.GetWeeklyTokenUsageUseCase
-import se.onemanstudio.playaroundwithai.data.explore.data.settings.ExploreSettingsHolder
+import se.onemanstudio.playaroundwithai.core.config.settings.ExploreSettingsHolder
 import javax.inject.Inject
 
 @HiltViewModel
@@ -18,6 +19,7 @@ class SettingsViewModel @Inject constructor(
     getWeeklyTokenUsageUseCase: GetWeeklyTokenUsageUseCase,
     private val exploreSettingsHolder: ExploreSettingsHolder,
     private val appSettingsHolder: AppSettingsHolder,
+    @AppVersion val appVersion: String,
 ) : ViewModel() {
 
     val weeklyUsage: StateFlow<List<DailyTokenUsage>> = getWeeklyTokenUsageUseCase()

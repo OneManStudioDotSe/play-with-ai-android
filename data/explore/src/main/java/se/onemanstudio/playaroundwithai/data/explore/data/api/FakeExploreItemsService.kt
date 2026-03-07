@@ -2,7 +2,7 @@ package se.onemanstudio.playaroundwithai.data.explore.data.api
 
 import kotlinx.coroutines.delay
 import se.onemanstudio.playaroundwithai.data.explore.data.dto.ExploreItemDto
-import se.onemanstudio.playaroundwithai.data.explore.data.settings.ExploreSettingsHolder
+import se.onemanstudio.playaroundwithai.core.config.settings.ExploreSettingsHolder
 import se.onemanstudio.playaroundwithai.data.explore.data.utils.ExploreDataGenerator
 import javax.inject.Inject
 

@@ -1,6 +1,6 @@
 @file:Suppress("TooManyFunctions")
 
-package se.onemanstudio.playaroundwithai.core.ui.sofa
+package se.onemanstudio.playaroundwithai.feature.settings
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
@@ -41,7 +41,10 @@ import se.onemanstudio.playaroundwithai.core.ui.theme.electricBlue
 import se.onemanstudio.playaroundwithai.core.ui.theme.energeticOrange
 import se.onemanstudio.playaroundwithai.core.ui.theme.vividPink
 import se.onemanstudio.playaroundwithai.core.ui.theme.zestyLime
-import se.onemanstudio.playaroundwithai.core.ui.views.R
+import se.onemanstudio.playaroundwithai.core.ui.sofa.ChartBarData
+import se.onemanstudio.playaroundwithai.core.ui.sofa.MarkerText
+import se.onemanstudio.playaroundwithai.core.ui.sofa.NeoBrutalCard
+import se.onemanstudio.playaroundwithai.core.ui.sofa.UsageChart
 import kotlin.math.roundToInt
 
 private val DragHandleWidth = 32.dp

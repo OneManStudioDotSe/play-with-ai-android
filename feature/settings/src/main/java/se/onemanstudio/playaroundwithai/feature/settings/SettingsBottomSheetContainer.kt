@@ -1,4 +1,4 @@
-package se.onemanstudio.playaroundwithai.settings
+package se.onemanstudio.playaroundwithai.feature.settings
 
 import android.content.Intent
 import androidx.compose.runtime.Composable
@@ -6,10 +6,7 @@ import androidx.compose.runtime.getValue
 import androidx.compose.ui.platform.LocalContext
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
-import se.onemanstudio.playaroundwithai.BuildConfig
 import se.onemanstudio.playaroundwithai.core.ui.sofa.ChartBarData
-import se.onemanstudio.playaroundwithai.core.ui.sofa.SettingsBottomSheet
-import se.onemanstudio.playaroundwithai.core.ui.sofa.SettingsState
 import androidx.compose.ui.platform.LocalConfiguration
 import java.text.NumberFormat
 import androidx.core.net.toUri
@@ -37,7 +34,7 @@ fun SettingsBottomSheetContainer(
 
     SettingsBottomSheet(
         state = SettingsState(
-            appVersion = BuildConfig.VERSION_NAME,
+            appVersion = viewModel.appVersion,
             showTokenUsage = showTokenUsage,
             vehicleCount = vehicleCount,
             searchRadiusKm = searchRadiusKm,
