@@ -11,7 +11,7 @@ import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.flow.flowOn
 import se.onemanstudio.playaroundwithai.core.network.api.GeminiApiService
-import se.onemanstudio.playaroundwithai.core.network.util.JsonExtractor
+import se.onemanstudio.playaroundwithai.core.network.utils.JsonExtractor
 import se.onemanstudio.playaroundwithai.core.network.dto.Content
 import se.onemanstudio.playaroundwithai.core.network.dto.FunctionCallDto
 import se.onemanstudio.playaroundwithai.core.tracking.repository.TokenUsageTracker

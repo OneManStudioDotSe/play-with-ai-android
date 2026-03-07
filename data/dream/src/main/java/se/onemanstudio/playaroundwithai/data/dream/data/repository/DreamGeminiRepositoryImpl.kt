@@ -6,7 +6,7 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 import retrofit2.HttpException
 import se.onemanstudio.playaroundwithai.core.network.api.GeminiApiService
-import se.onemanstudio.playaroundwithai.core.network.util.JsonExtractor
+import se.onemanstudio.playaroundwithai.core.network.utils.JsonExtractor
 import se.onemanstudio.playaroundwithai.core.network.dto.Content
 import se.onemanstudio.playaroundwithai.core.network.dto.GeminiRequest
 import se.onemanstudio.playaroundwithai.core.network.dto.GenerationConfig

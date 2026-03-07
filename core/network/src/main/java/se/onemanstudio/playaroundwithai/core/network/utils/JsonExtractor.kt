@@ -1,4 +1,4 @@
-package se.onemanstudio.playaroundwithai.core.network.util
+package se.onemanstudio.playaroundwithai.core.network.utils
 
 object JsonExtractor {
     private val CODE_FENCE = Regex("""```(?:json)?\s*([\s\S]*?)```""")

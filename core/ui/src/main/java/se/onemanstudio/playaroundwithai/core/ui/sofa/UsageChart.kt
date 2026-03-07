@@ -33,12 +33,10 @@ import androidx.compose.ui.geometry.Size
 import androidx.compose.ui.graphics.PathEffect
 import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.input.pointer.pointerInput
-import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import se.onemanstudio.playaroundwithai.core.ui.theme.Alphas
-import se.onemanstudio.playaroundwithai.core.ui.views.R
 import se.onemanstudio.playaroundwithai.core.ui.theme.Dimensions
 import se.onemanstudio.playaroundwithai.core.ui.theme.SofaAiTheme
 import java.text.NumberFormat
@@ -82,7 +80,7 @@ fun UsageChart(
     var animationStarted by remember { mutableStateOf(false) }
     LaunchedEffect(Unit) { animationStarted = true }
 
-    val entryFractions = bars.mapIndexed { index, _ ->
+    val entryFractions = List(bars.size) { index ->
         animateFloatAsState(
             targetValue = if (animationStarted) 1f else 0f,
             animationSpec = tween(
@@ -106,8 +104,8 @@ fun UsageChart(
     val fillComplete by remember(selectedIndex) {
         derivedStateOf {
             selectedIndex != null &&
-                selectedIndex in bars.indices &&
-                selectionFills[selectedIndex].value >= FILL_COMPLETE_THRESHOLD
+                    selectedIndex in bars.indices &&
+                    selectionFills[selectedIndex].value >= FILL_COMPLETE_THRESHOLD
         }
     }
 

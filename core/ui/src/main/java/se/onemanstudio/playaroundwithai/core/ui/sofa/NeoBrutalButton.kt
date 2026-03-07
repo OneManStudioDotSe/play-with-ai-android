@@ -7,7 +7,6 @@ import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
@@ -33,10 +32,10 @@ import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.Dp
 import se.onemanstudio.playaroundwithai.core.ui.theme.Dimensions
+import se.onemanstudio.playaroundwithai.core.ui.theme.SofaAiTheme
 import se.onemanstudio.playaroundwithai.core.ui.theme.disabledBackground
 import se.onemanstudio.playaroundwithai.core.ui.theme.disabledBorder
 import se.onemanstudio.playaroundwithai.core.ui.theme.disabledContent
-import se.onemanstudio.playaroundwithai.core.ui.theme.SofaAiTheme
 
 @Composable
 fun NeoBrutalButton(
