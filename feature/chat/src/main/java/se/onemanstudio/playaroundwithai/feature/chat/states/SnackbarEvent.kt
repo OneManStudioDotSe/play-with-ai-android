@@ -1,6 +1,8 @@
-package se.onemanstudio.playaroundwithai.feature.chat.models
+package se.onemanstudio.playaroundwithai.feature.chat.states
 
-@androidx.compose.runtime.Immutable
+import androidx.compose.runtime.Immutable
+
+@Immutable
 sealed interface SnackbarEvent {
     data object LocalSaveFailed : SnackbarEvent
     data object LocalUpdateFailed : SnackbarEvent

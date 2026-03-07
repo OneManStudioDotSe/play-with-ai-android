@@ -21,6 +21,7 @@ import se.onemanstudio.playaroundwithai.data.explore.data.settings.ExploreSettin
 import se.onemanstudio.playaroundwithai.data.explore.domain.model.SuggestedPlace
 import se.onemanstudio.playaroundwithai.data.explore.domain.model.VehicleType
 import se.onemanstudio.playaroundwithai.data.explore.domain.model.toExploreItem
+import se.onemanstudio.playaroundwithai.data.explore.domain.usecase.CalculateOptimalRouteUseCase
 import se.onemanstudio.playaroundwithai.data.explore.domain.usecase.GetExploreItemsUseCase
 import se.onemanstudio.playaroundwithai.data.explore.domain.usecase.GetSuggestedPlacesUseCase
 import se.onemanstudio.playaroundwithai.feature.explore.models.ExploreItemUiModel
@@ -30,7 +31,6 @@ import se.onemanstudio.playaroundwithai.feature.explore.states.ExploreUiState
 import se.onemanstudio.playaroundwithai.feature.explore.states.PathModeState
 import se.onemanstudio.playaroundwithai.feature.explore.states.SuggestedPlacesError
 import se.onemanstudio.playaroundwithai.feature.explore.states.SuggestionsState
-import se.onemanstudio.playaroundwithai.feature.explore.usecase.CalculateOptimalRouteUseCase
 import timber.log.Timber
 import java.io.IOException
 import javax.inject.Inject
@@ -214,16 +214,17 @@ class ExploreViewModel @Inject constructor(
     }
 
     fun calculateOptimalRoute(userLocation: LatLng?) {
-        val points = _uiState.value.pathMode.selectedLocations.map { it.position }
+        val points = _uiState.value.pathMode.selectedLocations.map { it.position.latitude to it.position.longitude }
         if (points.isEmpty()) return
 
-        val startPoint = userLocation ?: points.first()
-        val result = calculateOptimalRouteUseCase(startPoint, points)
+        val startLat = userLocation?.latitude ?: points.first().first
+        val startLng = userLocation?.longitude ?: points.first().second
+        val result = calculateOptimalRouteUseCase(startLat, startLng, points)
 
         _uiState.update {
             it.copy(
                 pathMode = it.pathMode.copy(
-                    optimalRoute = result.orderedPath,
+                    optimalRoute = result.orderedPath.map { (lat, lng) -> LatLng(lat, lng) }.toPersistentList(),
                     routeDistanceMeters = result.distanceMeters,
                     routeDurationMinutes = result.durationMinutes,
                 )

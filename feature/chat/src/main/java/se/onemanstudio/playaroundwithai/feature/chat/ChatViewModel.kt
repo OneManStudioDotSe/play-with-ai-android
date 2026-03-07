@@ -26,11 +26,11 @@ import se.onemanstudio.playaroundwithai.data.chat.domain.usecase.RetryPendingSyn
 import se.onemanstudio.playaroundwithai.data.chat.domain.usecase.SavePromptUseCase
 import se.onemanstudio.playaroundwithai.data.chat.domain.usecase.UpdatePromptTextUseCase
 import se.onemanstudio.playaroundwithai.feature.chat.models.Attachment
-import se.onemanstudio.playaroundwithai.feature.chat.models.SnackbarEvent
+import se.onemanstudio.playaroundwithai.feature.chat.states.SnackbarEvent
 import se.onemanstudio.playaroundwithai.feature.chat.states.ChatError
 import se.onemanstudio.playaroundwithai.feature.chat.states.ChatScreenState
 import se.onemanstudio.playaroundwithai.feature.chat.states.ChatUiState
-import se.onemanstudio.playaroundwithai.feature.chat.util.FileUtils
+import se.onemanstudio.playaroundwithai.feature.chat.utils.FileUtils
 import timber.log.Timber
 import java.io.FileNotFoundException
 import java.io.IOException
@@ -42,8 +42,8 @@ import javax.inject.Inject
 class ChatViewModel @Inject constructor(
     private val askAiUseCase: AskAiUseCase,
     private val getSuggestionsUseCase: GetSuggestionsUseCase,
-    getPromptHistoryUseCase: GetPromptHistoryUseCase,
-    getSyncStateUseCase: GetSyncStateUseCase,
+    private val getPromptHistoryUseCase: GetPromptHistoryUseCase,
+    private val getSyncStateUseCase: GetSyncStateUseCase,
     private val getFailedSyncCountUseCase: GetFailedSyncCountUseCase,
     private val savePromptUseCase: SavePromptUseCase,
     private val updatePromptTextUseCase: UpdatePromptTextUseCase,

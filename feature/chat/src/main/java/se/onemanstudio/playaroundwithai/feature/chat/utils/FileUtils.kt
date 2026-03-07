@@ -1,4 +1,4 @@
-package se.onemanstudio.playaroundwithai.feature.chat.util
+package se.onemanstudio.playaroundwithai.feature.chat.utils
 
 import android.content.Context
 import android.net.Uri

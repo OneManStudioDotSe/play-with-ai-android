@@ -1,4 +1,4 @@
-package se.onemanstudio.playaroundwithai.feature.dream.views
+package se.onemanstudio.playaroundwithai.feature.dream.views.states
 
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
@@ -30,10 +30,11 @@ import se.onemanstudio.playaroundwithai.core.ui.theme.vividPink
 import se.onemanstudio.playaroundwithai.data.dream.domain.model.Dream
 import se.onemanstudio.playaroundwithai.data.dream.domain.model.DreamMood
 import se.onemanstudio.playaroundwithai.feature.dream.R
+import se.onemanstudio.playaroundwithai.feature.dream.views.DreamGalleryRow
 import java.time.Instant
 
 @Composable
-internal fun DreamInitialContent(
+fun DreamInitialContent(
     textState: TextFieldValue,
     onTextChanged: (TextFieldValue) -> Unit,
     onInterpretClick: () -> Unit,

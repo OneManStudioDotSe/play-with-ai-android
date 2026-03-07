@@ -1,4 +1,4 @@
-package se.onemanstudio.playaroundwithai.feature.dream.views
+package se.onemanstudio.playaroundwithai.feature.dream.views.states
 
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -36,7 +36,7 @@ import se.onemanstudio.playaroundwithai.feature.dream.states.DreamError
 import se.onemanstudio.playaroundwithai.feature.dream.states.DreamUiState
 
 @Composable
-internal fun DreamErrorContent(
+fun DreamErrorContent(
     state: DreamUiState.Error,
     onClearError: () -> Unit,
 ) {

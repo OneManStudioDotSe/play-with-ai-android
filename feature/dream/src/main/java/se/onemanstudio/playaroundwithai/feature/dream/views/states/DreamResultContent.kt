@@ -1,4 +1,4 @@
-package se.onemanstudio.playaroundwithai.feature.dream.views
+package se.onemanstudio.playaroundwithai.feature.dream.views.states
 
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.fadeIn
@@ -45,10 +45,11 @@ import se.onemanstudio.playaroundwithai.data.dream.domain.model.ParticleShape
 import se.onemanstudio.playaroundwithai.feature.dream.R
 import se.onemanstudio.playaroundwithai.feature.dream.states.DreamImageState
 import se.onemanstudio.playaroundwithai.feature.dream.states.DreamUiState
+import se.onemanstudio.playaroundwithai.feature.dream.views.FlippableDreamCard
 
 @OptIn(ExperimentalMaterial3ExpressiveApi::class)
 @Composable
-internal fun DreamResultContent(
+fun DreamResultContent(
     state: DreamUiState.Result?,
     imageState: DreamImageState,
     onNewDream: () -> Unit,
@@ -63,13 +64,14 @@ internal fun DreamResultContent(
             .padding(Dimensions.paddingLarge),
         horizontalAlignment = Alignment.CenterHorizontally,
     ) {
-        Box(
+        Column(
             modifier = Modifier
                 .fillMaxWidth()
                 .height(280.dp),
-            contentAlignment = Alignment.Center,
+            horizontalAlignment = Alignment.CenterHorizontally,
+            verticalArrangement = Arrangement.Center,
         ) {
-            androidx.compose.animation.AnimatedVisibility(
+            AnimatedVisibility(
                 visible = !hasResult,
                 exit = fadeOut(),
             ) {
@@ -83,7 +85,7 @@ internal fun DreamResultContent(
                 }
             }
 
-            androidx.compose.animation.AnimatedVisibility(
+            AnimatedVisibility(
                 visible = hasResult,
                 enter = fadeIn(),
             ) {

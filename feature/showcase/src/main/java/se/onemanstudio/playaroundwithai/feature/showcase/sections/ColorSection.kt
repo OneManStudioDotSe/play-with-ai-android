@@ -1,6 +1,6 @@
 @file:Suppress("MagicNumber")
 
-package se.onemanstudio.playaroundwithai.feature.showcase
+package se.onemanstudio.playaroundwithai.feature.showcase.sections
 
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -36,6 +36,7 @@ import se.onemanstudio.playaroundwithai.core.ui.theme.vividPink
 import se.onemanstudio.playaroundwithai.core.ui.theme.vividPinkContainer
 import se.onemanstudio.playaroundwithai.core.ui.theme.zestyLime
 import se.onemanstudio.playaroundwithai.core.ui.theme.zestyLimeContainer
+import se.onemanstudio.playaroundwithai.feature.showcase.R
 
 private val SwatchWidth = 72.dp
 private val SwatchHeight = 48.dp

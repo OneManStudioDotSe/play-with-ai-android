@@ -13,6 +13,9 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
 import se.onemanstudio.playaroundwithai.core.ui.sofa.NeoBrutalTopAppBar
 import se.onemanstudio.playaroundwithai.core.ui.theme.Dimensions
+import se.onemanstudio.playaroundwithai.feature.showcase.sections.ColorSection
+import se.onemanstudio.playaroundwithai.feature.showcase.sections.ComponentSection
+import se.onemanstudio.playaroundwithai.feature.showcase.sections.TypographySection
 
 @Composable
 fun ShowcaseScreen() {

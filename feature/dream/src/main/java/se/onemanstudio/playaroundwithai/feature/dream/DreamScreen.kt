@@ -25,9 +25,9 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import se.onemanstudio.playaroundwithai.core.ui.sofa.NeoBrutalIconButtonSmall
 import se.onemanstudio.playaroundwithai.core.ui.sofa.NeoBrutalTopAppBar
 import se.onemanstudio.playaroundwithai.feature.dream.states.DreamUiState
-import se.onemanstudio.playaroundwithai.feature.dream.views.DreamErrorContent
-import se.onemanstudio.playaroundwithai.feature.dream.views.DreamInitialContent
-import se.onemanstudio.playaroundwithai.feature.dream.views.DreamResultContent
+import se.onemanstudio.playaroundwithai.feature.dream.views.states.DreamErrorContent
+import se.onemanstudio.playaroundwithai.feature.dream.views.states.DreamInitialContent
+import se.onemanstudio.playaroundwithai.feature.dream.views.states.DreamResultContent
 import androidx.compose.ui.platform.LocalSoftwareKeyboardController
 
 @Composable

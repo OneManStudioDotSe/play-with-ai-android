@@ -30,10 +30,10 @@ import se.onemanstudio.playaroundwithai.data.chat.domain.usecase.SavePromptUseCa
 import se.onemanstudio.playaroundwithai.data.chat.domain.usecase.UpdatePromptTextUseCase
 import se.onemanstudio.playaroundwithai.core.auth.usecase.ObserveAuthReadyUseCase
 import se.onemanstudio.playaroundwithai.core.config.model.ApiKeyAvailability
-import se.onemanstudio.playaroundwithai.feature.chat.models.SnackbarEvent
+import se.onemanstudio.playaroundwithai.feature.chat.states.SnackbarEvent
 import se.onemanstudio.playaroundwithai.feature.chat.states.ChatError
 import se.onemanstudio.playaroundwithai.feature.chat.states.ChatUiState
-import se.onemanstudio.playaroundwithai.feature.chat.util.FileUtils
+import se.onemanstudio.playaroundwithai.feature.chat.utils.FileUtils
 import se.onemanstudio.playaroundwithai.core.testing.MainCoroutineRule
 import java.io.IOException
 import kotlin.test.assertEquals

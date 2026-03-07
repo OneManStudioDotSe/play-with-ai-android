@@ -26,7 +26,7 @@ import se.onemanstudio.playaroundwithai.data.explore.domain.repository.ExploreSu
 import se.onemanstudio.playaroundwithai.data.explore.domain.repository.ExplorePointsRepository
 import se.onemanstudio.playaroundwithai.data.explore.domain.usecase.GetExploreItemsUseCase
 import se.onemanstudio.playaroundwithai.data.explore.domain.usecase.GetSuggestedPlacesUseCase
-import se.onemanstudio.playaroundwithai.feature.explore.usecase.CalculateOptimalRouteUseCase
+import se.onemanstudio.playaroundwithai.data.explore.domain.usecase.CalculateOptimalRouteUseCase
 import se.onemanstudio.playaroundwithai.feature.explore.states.ExploreError
 import se.onemanstudio.playaroundwithai.feature.explore.models.toUiModel
 import se.onemanstudio.playaroundwithai.feature.explore.states.ExploreUiState

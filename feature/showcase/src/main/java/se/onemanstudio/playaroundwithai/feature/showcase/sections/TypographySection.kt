@@ -1,4 +1,4 @@
-package se.onemanstudio.playaroundwithai.feature.showcase
+package se.onemanstudio.playaroundwithai.feature.showcase.sections
 
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
@@ -8,6 +8,7 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.ExperimentalMaterial3ExpressiveApi
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
+import androidx.compose.material3.Typography
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableIntStateOf
@@ -25,6 +26,7 @@ import se.onemanstudio.playaroundwithai.core.ui.theme.Alphas
 import se.onemanstudio.playaroundwithai.core.ui.theme.Dimensions
 import se.onemanstudio.playaroundwithai.core.ui.theme.IbmPlexMono
 import se.onemanstudio.playaroundwithai.core.ui.theme.electricBlue
+import se.onemanstudio.playaroundwithai.feature.showcase.R
 
 @OptIn(ExperimentalMaterial3ExpressiveApi::class)
 @Composable
@@ -104,7 +106,7 @@ private fun TextStyleItem(name: String, style: TextStyle) {
     Spacer(modifier = Modifier.height(Dimensions.paddingMedium))
 }
 
-private fun standardStyles(typography: androidx.compose.material3.Typography): List<Pair<String, TextStyle>> = listOf(
+private fun standardStyles(typography: Typography): List<Pair<String, TextStyle>> = listOf(
     "Display Large" to typography.displayLarge,
     "Display Medium" to typography.displayMedium,
     "Display Small" to typography.displaySmall,
@@ -123,7 +125,7 @@ private fun standardStyles(typography: androidx.compose.material3.Typography): L
 )
 
 @OptIn(ExperimentalMaterial3ExpressiveApi::class)
-private fun emphasizedStyles(typography: androidx.compose.material3.Typography): List<Pair<String, TextStyle>> = listOf(
+private fun emphasizedStyles(typography: Typography): List<Pair<String, TextStyle>> = listOf(
     "Display Large" to typography.displayLargeEmphasized,
     "Display Medium" to typography.displayMediumEmphasized,
     "Display Small" to typography.displaySmallEmphasized,

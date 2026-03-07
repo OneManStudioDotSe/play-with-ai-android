@@ -1,6 +1,6 @@
 @file:Suppress("TooManyFunctions", "MagicNumber")
 
-package se.onemanstudio.playaroundwithai.feature.showcase
+package se.onemanstudio.playaroundwithai.feature.showcase.sections
 
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
@@ -45,6 +45,7 @@ import se.onemanstudio.playaroundwithai.core.ui.theme.energeticOrange
 import se.onemanstudio.playaroundwithai.core.ui.theme.solarYellow
 import se.onemanstudio.playaroundwithai.core.ui.theme.vividPink
 import se.onemanstudio.playaroundwithai.core.ui.theme.zestyLime
+import se.onemanstudio.playaroundwithai.feature.showcase.R
 
 
 @Composable
