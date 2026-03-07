@@ -6,21 +6,29 @@ Chat with Gemini, analyze documents, or plan a tour around your location by visi
 
 ## How it looks
 
-|                       Chat                       |                  Image analysis                  |                   AI response                    |                  Prompt history                  |
-|:------------------------------------------------:|:------------------------------------------------:|:------------------------------------------------:|:------------------------------------------------:|
-| <img src="screenshots/screen1.png" width="180"/> | <img src="screenshots/screen4.png" width="180"/> | <img src="screenshots/screen5.png" width="180"/> | <img src="screenshots/screen2.png" width="180"/> |
+|                 Chat / Welcome                 |               Chat / Processing                |             Chat / Image analysis              |               Chat / AI response               |
+|:----------------------------------------------:|:----------------------------------------------:|:----------------------------------------------:|:----------------------------------------------:|
+| <img src="screenshots/chat1.png" width="180"/> | <img src="screenshots/chat5.png" width="180"/> | <img src="screenshots/chat4.png" width="180"/> | <img src="screenshots/chat6.png" width="180"/> |
 
-|                   Map overview                   |                  AI suggestions                  |                  Path selection                  |                 Calculated route                  |
-|:------------------------------------------------:|:------------------------------------------------:|:------------------------------------------------:|:-------------------------------------------------:|
-| <img src="screenshots/screen6.png" width="180"/> | <img src="screenshots/screen8.png" width="180"/> | <img src="screenshots/screen9.png" width="180"/> | <img src="screenshots/screen10.png" width="180"/> |
 
-|                  Dream input                     |                Animated dream canvas             |               AI-generated painting              |                  Dream gallery                   |
-|:------------------------------------------------:|:------------------------------------------------:|:------------------------------------------------:|:------------------------------------------------:|
-| <!-- screenshot coming soon -->                  | <!-- screenshot coming soon -->                  | <!-- screenshot coming soon -->                  | <!-- screenshot coming soon -->                  |
+|               Explain / Dream list                |          Explain / Dream interpretating           |           Explain / Dream visualization           |         Explain / Dream image generation          |
+|:-------------------------------------------------:|:-------------------------------------------------:|:-------------------------------------------------:|:-------------------------------------------------:|
+| <img src="screenshots/explain4.png" width="180"/> | <img src="screenshots/explain1.png" width="180"/> | <img src="screenshots/explain2.png" width="180"/> | <img src="screenshots/explain3.png" width="180"/> |
 
-|                  Trip planner                    |               Agent thinking steps              |              Trip plan with map                  |              Design system showcase              |
-|:------------------------------------------------:|:------------------------------------------------:|:------------------------------------------------:|:------------------------------------------------:|
-| <!-- screenshot coming soon -->                  | <!-- screenshot coming soon -->                  | <!-- screenshot coming soon -->                  | <!-- screenshot coming soon -->                  |
+
+|                  Trip planner                  |              Agent thinking steps              |               Trip plan with map               |               Trip plan details                |
+|:----------------------------------------------:|:----------------------------------------------:|:----------------------------------------------:|:----------------------------------------------:|
+| <img src="screenshots/plan2.png" width="180"/> | <img src="screenshots/plan5.png" width="180"/> | <img src="screenshots/plan7.png" width="180"/> | <img src="screenshots/plan9.png" width="180"/> |
+
+
+|              Explore / Map overview               |                  Explore / AI suggestions                  |                  Explore / Path selection                  |             Explore / Market details              |
+|:-------------------------------------------------:|:----------------------------------------------------------:|:----------------------------------------------------------:|:-------------------------------------------------:|
+| <img src="screenshots/explore1.png" width="180"/> |     <img src="screenshots/explore6.png" width="180"/>      |     <img src="screenshots/explore3.png" width="180"/>      | <img src="screenshots/explore5.png" width="180"/> |
+
+
+|            Design system showcase            |            Design system showcase            |            Design system showcase            |                      Settings                      |
+|:--------------------------------------------:|:--------------------------------------------:|:--------------------------------------------:|:--------------------------------------------------:|
+| <img src="screenshots/ds1.png" width="180"/> | <img src="screenshots/ds2.png" width="180"/> | <img src="screenshots/ds3.png" width="180"/> | <img src="screenshots/settings1.png" width="180"/> |
 
 ## The idea
 
