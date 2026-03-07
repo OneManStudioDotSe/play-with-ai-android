@@ -295,11 +295,11 @@ fun ChatScreen(
                 .imePadding(),
             contentAlignment = Alignment.Center
         ) {
-            when (val state = uiState) {
+            when (uiState) {
                 is ChatUiState.Initial -> AmoebaShapeAnimation(state = AmoebaState.IDLE)
                 is ChatUiState.Loading -> AmoebaShapeAnimation(state = AmoebaState.SPIKY) //CircularProgressIndicator()
-                is ChatUiState.Success -> ContentState(state, onClearResponse = { viewModel.clearResponse() })
-                is ChatUiState.Error -> ErrorState(state, onClearResponse = { viewModel.clearResponse() })
+                is ChatUiState.Success -> ContentState(uiState, onClearResponse = { viewModel.clearResponse() })
+                is ChatUiState.Error -> ErrorState(uiState, onClearResponse = { viewModel.clearResponse() })
             }
         }
     }

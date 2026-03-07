@@ -82,13 +82,14 @@ fun PromptInputSection(
         verticalArrangement = Arrangement.spacedBy(Dimensions.paddingMedium)
     ) {
         // our conversation starters
-        Box(
+        Column(
             modifier = Modifier
                 .fillMaxWidth()
                 .height(Dimensions.heightMedium),
-            contentAlignment = Alignment.CenterStart
+            horizontalAlignment = Alignment.Start,
+            verticalArrangement = Arrangement.Center
         ) {
-            androidx.compose.animation.AnimatedVisibility(
+            AnimatedVisibility(
                 visible = inputMode == InputMode.TEXT,
                 enter = fadeIn(),
                 exit = fadeOut(),

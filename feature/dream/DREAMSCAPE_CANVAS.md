@@ -20,21 +20,21 @@ Each `ElementShape` is locked to a vertical band via `verticalZoneFor()` in `Dre
 
 ### Sky Slot
 
-| Shape     | Y Range     | Purpose              |
-|-----------|-------------|----------------------|
-| `STAR`    | 0.05 – 0.25 | Celestial pinpoints  |
-| `CRESCENT`| 0.08 – 0.30 | Moon-like arcs       |
-| `AURORA`  | 0.10 – 0.35 | Northern-lights bands|
-| `CIRCLE`  | 0.10 – 0.40 | Sun / moon / orb     |
+| Shape      | Y Range     | Purpose               |
+|------------|-------------|-----------------------|
+| `STAR`     | 0.05 – 0.25 | Celestial pinpoints   |
+| `CRESCENT` | 0.08 – 0.30 | Moon-like arcs        |
+| `AURORA`   | 0.10 – 0.35 | Northern-lights bands |
+| `CIRCLE`   | 0.10 – 0.40 | Sun / moon / orb      |
 
 ### Upper Slot
 
-| Shape     | Y Range     | Purpose               |
-|-----------|-------------|------------------------|
-| `CLOUD`   | 0.12 – 0.35 | Atmospheric puffs      |
-| `DIAMOND` | 0.15 – 0.45 | Floating gems          |
-| `SPIRAL`  | 0.20 – 0.50 | Abstract/mystical accent|
-| `CRYSTAL` | 0.20 – 0.50 | Mystical accent        |
+| Shape     | Y Range     | Purpose                  |
+|-----------|-------------|--------------------------|
+| `CLOUD`   | 0.12 – 0.35 | Atmospheric puffs        |
+| `DIAMOND` | 0.15 – 0.45 | Floating gems            |
+| `SPIRAL`  | 0.20 – 0.50 | Abstract/mystical accent |
+| `CRYSTAL` | 0.20 – 0.50 | Mystical accent          |
 
 ### Mid Slot
 
@@ -45,11 +45,11 @@ Each `ElementShape` is locked to a vertical band via `verticalZoneFor()` in `Dre
 
 ### Ground Slot
 
-| Shape   | Y Range     | Purpose           |
-|---------|-------------|-------------------|
-| `TREE`  | 0.65 – 0.85 | Vegetation        |
+| Shape   | Y Range     | Purpose              |
+|---------|-------------|----------------------|
+| `TREE`  | 0.65 – 0.85 | Vegetation           |
 | `LOTUS` | 0.70 – 0.88 | Water/ground flowers |
-| `WAVE`  | 0.70 – 0.90 | Water surface     |
+| `WAVE`  | 0.70 – 0.90 | Water surface        |
 
 ### Horizontal Positioning (X)
 
@@ -69,36 +69,36 @@ pixelSize = element.scale × canvasWidth × 0.1
 
 ### Sky Shapes
 
-| Shape      | Geometry                                        | Animation              | Constants                              |
-|------------|-------------------------------------------------|------------------------|----------------------------------------|
-| `STAR`     | 5-pointed star (inner radius = 40% of outer)    | Full continuous rotation | `STAR_POINTS = 5`, `INNER_RATIO = 0.4` |
-| `CRESCENT` | Arc path with inner-arc cutout                   | Rocking ±10°           | `INNER_OFFSET = 0.3`, `SWEEP = 300°`  |
-| `AURORA`   | 4 parallel cubic Bezier curves                   | Wave undulation (slowTime) | `CURVES = 4`, `SPACING = 0.15`      |
-| `CIRCLE`   | Filled circle                                    | Breathing (scale ±8%)  | `BREATHE_AMPLITUDE = 0.08`             |
+| Shape      | Geometry                                     | Animation                  | Constants                              |
+|------------|----------------------------------------------|----------------------------|----------------------------------------|
+| `STAR`     | 5-pointed star (inner radius = 40% of outer) | Full continuous rotation   | `STAR_POINTS = 5`, `INNER_RATIO = 0.4` |
+| `CRESCENT` | Arc path with inner-arc cutout               | Rocking ±10°               | `INNER_OFFSET = 0.3`, `SWEEP = 300°`   |
+| `AURORA`   | 4 parallel cubic Bezier curves               | Wave undulation (slowTime) | `CURVES = 4`, `SPACING = 0.15`         |
+| `CIRCLE`   | Filled circle                                | Breathing (scale ±8%)      | `BREATHE_AMPLITUDE = 0.08`             |
 
 ### Upper Shapes
 
-| Shape     | Geometry                                           | Animation              | Constants                                      |
-|-----------|----------------------------------------------------|------------------------|-------------------------------------------------|
-| `CLOUD`   | 3 overlapping ovals                                | Vertical bob (±5%)     | `OVAL_RATIO = 0.35`, `BOB_RATIO = 0.05`        |
-| `DIAMOND` | Elongated 4-point rhombus                          | Full continuous rotation | `ELONGATION = 0.7`, `WIDTH_RATIO = 0.5`       |
-| `SPIRAL`  | Logarithmic spiral (60 points, 3 rotations), stroked | Full continuous rotation | `POINTS = 60`, `ROTATIONS = 3`, `GROWTH = 0.15` |
-| `CRYSTAL` | Hexagon with 3 internal facet lines                | Alpha shimmer (0.85 ± 0.15) | `SIDES = 6`, `FACET_ALPHA = 0.4`          |
+| Shape     | Geometry                                             | Animation                   | Constants                                       |
+|-----------|------------------------------------------------------|-----------------------------|-------------------------------------------------|
+| `CLOUD`   | 3 overlapping ovals                                  | Vertical bob (±5%)          | `OVAL_RATIO = 0.35`, `BOB_RATIO = 0.05`         |
+| `DIAMOND` | Elongated 4-point rhombus                            | Full continuous rotation    | `ELONGATION = 0.7`, `WIDTH_RATIO = 0.5`         |
+| `SPIRAL`  | Logarithmic spiral (60 points, 3 rotations), stroked | Full continuous rotation    | `POINTS = 60`, `ROTATIONS = 3`, `GROWTH = 0.15` |
+| `CRYSTAL` | Hexagon with 3 internal facet lines                  | Alpha shimmer (0.85 ± 0.15) | `SIDES = 6`, `FACET_ALPHA = 0.4`                |
 
 ### Mid Shapes
 
-| Shape      | Geometry                               | Animation | Constants              |
-|------------|----------------------------------------|-----------|------------------------|
-| `TRIANGLE` | Filled upward-pointing triangle        | None      | —                      |
-| `MOUNTAIN` | Triangle with peak at 60% of height    | None      | `PEAK_RATIO = 0.6`    |
+| Shape      | Geometry                            | Animation | Constants          |
+|------------|-------------------------------------|-----------|--------------------|
+| `TRIANGLE` | Filled upward-pointing triangle     | None      | —                  |
+| `MOUNTAIN` | Triangle with peak at 60% of height | None      | `PEAK_RATIO = 0.6` |
 
 ### Ground Shapes
 
-| Shape   | Geometry                                 | Animation                  | Constants                                          |
-|---------|------------------------------------------|----------------------------|----------------------------------------------------|
-| `TREE`  | Rectangular trunk + triangular canopy    | Horizontal sway (±3%)     | `TRUNK_W = 0.15`, `TRUNK_H = 0.4`, `CANOPY = 0.5` |
-| `WAVE`  | Cubic Bezier curves, stroked             | Phase shift via `time`     | `CONTROL_OFFSET = 0.15`, `STROKE_RATIO = 0.1`     |
-| `LOTUS` | 6 petals radiating from center           | Breathing (scale ±8%)     | `PETALS = 6`, `PETAL_LENGTH = 0.45`, `WIDTH = 0.15`|
+| Shape   | Geometry                              | Animation              | Constants                                           |
+|---------|---------------------------------------|------------------------|-----------------------------------------------------|
+| `TREE`  | Rectangular trunk + triangular canopy | Horizontal sway (±3%)  | `TRUNK_W = 0.15`, `TRUNK_H = 0.4`, `CANOPY = 0.5`   |
+| `WAVE`  | Cubic Bezier curves, stroked          | Phase shift via `time` | `CONTROL_OFFSET = 0.15`, `STROKE_RATIO = 0.1`       |
+| `LOTUS` | 6 petals radiating from center        | Breathing (scale ±8%)  | `PETALS = 6`, `PETAL_LENGTH = 0.45`, `WIDTH = 0.15` |
 
 ---
 
@@ -106,15 +106,15 @@ pixelSize = element.scale × canvasWidth × 0.1
 
 Particles float in a grid band (5% margin on all sides). Max 15 displayed regardless of `count`.
 
-| Shape          | Geometry                           | Animation                  | Movement                        |
-|----------------|------------------------------------|----------------------------|---------------------------------|
-| `DOT`          | Filled circle                      | —                          | Lissajous drift (freq 0.5, amp 0.01) |
-| `SPARKLE`      | Plus sign (2 crossed lines)        | Alpha twinkle (3× freq)   | Horizontal scroll               |
-| `RING`         | Stroked circle (stroke = 0.3× size)| Breathing scale (±30%)     | Horizontal scroll               |
-| `TEARDROP`     | Cubic Bezier drop shape            | Horizontal sway            | Downward fall                   |
-| `DIAMOND_MOTE` | Small filled diamond               | Continuous rotation         | Horizontal scroll               |
-| `DASH`         | Horizontal line                    | Rocking ±15°              | Horizontal scroll (1.5× speed) |
-| `STARBURST`    | Plus + diagonal lines (8 rays)     | Alpha twinkle (5× freq)   | Horizontal scroll               |
+| Shape          | Geometry                            | Animation               | Movement                             |
+|----------------|-------------------------------------|-------------------------|--------------------------------------|
+| `DOT`          | Filled circle                       | —                       | Lissajous drift (freq 0.5, amp 0.01) |
+| `SPARKLE`      | Plus sign (2 crossed lines)         | Alpha twinkle (3× freq) | Horizontal scroll                    |
+| `RING`         | Stroked circle (stroke = 0.3× size) | Breathing scale (±30%)  | Horizontal scroll                    |
+| `TEARDROP`     | Cubic Bezier drop shape             | Horizontal sway         | Downward fall                        |
+| `DIAMOND_MOTE` | Small filled diamond                | Continuous rotation     | Horizontal scroll                    |
+| `DASH`         | Horizontal line                     | Rocking ±15°            | Horizontal scroll (1.5× speed)       |
+| `STARBURST`    | Plus + diagonal lines (8 rays)      | Alpha twinkle (5× freq) | Horizontal scroll                    |
 
 ### Particle Value Ranges
 
@@ -145,12 +145,12 @@ The canvas draws a full-height linear gradient from `sky` (top) to `horizon` (bo
 
 Colors are ARGB `Long` values generated by the AI. `element.alpha` is multiplied into the color before drawing. The AI prompt provides thematic guidance:
 
-| Theme         | Suggested Shapes                          | Implied Palette                  |
-|---------------|-------------------------------------------|----------------------------------|
+| Theme         | Suggested Shapes                           | Implied Palette                  |
+|---------------|--------------------------------------------|----------------------------------|
 | Nature        | TREE, MOUNTAIN, LOTUS, AURORA, WAVE, CLOUD | Greens, earth tones, sky blues   |
-| Night / space | STAR, CRESCENT, CRYSTAL, CIRCLE           | Deep blues/purples, white/silver |
-| Abstract      | SPIRAL, DIAMOND, AURORA, WAVE             | Vivid/unusual combinations       |
-| Water / ocean | WAVE, CIRCLE, CRESCENT                    | Blues, teals, silvers            |
+| Night / space | STAR, CRESCENT, CRYSTAL, CIRCLE            | Deep blues/purples, white/silver |
+| Abstract      | SPIRAL, DIAMOND, AURORA, WAVE              | Vivid/unusual combinations       |
+| Water / ocean | WAVE, CIRCLE, CRESCENT                     | Blues, teals, silvers            |
 
 ### Particle Colors
 
@@ -198,7 +198,7 @@ Scene structure guided by the AI prompt: 3–5 layers, 2–4 elements each.
 | Timer      | Duration | Used By                                        |
 |------------|----------|------------------------------------------------|
 | `time`     | 28 s     | Most element animations, all particle movement |
-| `slowTime` | 42 s     | Aurora undulation, spiral secondary motion      |
+| `slowTime` | 42 s     | Aurora undulation, spiral secondary motion     |
 
 Both loop infinitely via `rememberInfiniteTransition`. Constants are defined in `DreamscapeConstants.kt` (`ANIMATION_DURATION_MS = 28_000`, `SLOW_ANIMATION_DURATION_MS = 42_000`).
 

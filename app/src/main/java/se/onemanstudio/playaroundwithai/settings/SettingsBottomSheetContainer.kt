@@ -1,7 +1,6 @@
 package se.onemanstudio.playaroundwithai.settings
 
 import android.content.Intent
-import android.net.Uri
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.platform.LocalContext

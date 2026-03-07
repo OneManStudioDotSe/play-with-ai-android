@@ -13,7 +13,7 @@ Production-grade Android showcase app with four distinct Gemini API integration 
 | <img src="screenshots/chat1.png" width="180"/> | <img src="screenshots/chat5.png" width="180"/> | <img src="screenshots/chat4.png" width="180"/> | <img src="screenshots/chat6.png" width="180"/> |
 
 
-|              Dream / History                      |          Dream / Interpreting                     |           Dream / Scene visualization             |         Dream / AI-generated painting             |
+|                  Dream / History                  |               Dream / Interpreting                |            Dream / Scene visualization            |           Dream / AI-generated painting           |
 |:-------------------------------------------------:|:-------------------------------------------------:|:-------------------------------------------------:|:-------------------------------------------------:|
 | <img src="screenshots/explain4.png" width="180"/> | <img src="screenshots/explain1.png" width="180"/> | <img src="screenshots/explain2.png" width="180"/> | <img src="screenshots/explain3.png" width="180"/> |
 

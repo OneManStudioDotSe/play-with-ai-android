@@ -14,7 +14,6 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import se.onemanstudio.playaroundwithai.core.ui.theme.Dimensions
 import se.onemanstudio.playaroundwithai.feature.explore.AnimationConstants
-import se.onemanstudio.playaroundwithai.feature.explore.views.PathModeBar
 
 @Composable
 internal fun BoxScope.PathModePanel(

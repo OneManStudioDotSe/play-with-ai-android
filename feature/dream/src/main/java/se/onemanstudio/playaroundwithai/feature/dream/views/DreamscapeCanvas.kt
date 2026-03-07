@@ -485,7 +485,7 @@ private fun DrawScope.drawLotusAnchored(color: Color, x: Float, elementSize: Flo
 
 // region Particle Drawing
 
-@Suppress("CyclomaticComplexity", "LongMethod")
+@Suppress("LongMethod")
 private fun DrawScope.drawParticles(particles: List<DreamParticle>, time: Float, slowTime: Float) {
     particles.forEach { particle ->
         val color = Color(particle.color.toInt())
