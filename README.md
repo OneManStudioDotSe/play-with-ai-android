@@ -16,7 +16,7 @@ Chat with Gemini, analyze documents, or plan a tour around your location by visi
 | <img src="screenshots/explain4.png" width="180"/> | <img src="screenshots/explain1.png" width="180"/> | <img src="screenshots/explain2.png" width="180"/> | <img src="screenshots/explain3.png" width="180"/> |
 
 
-|                  Trip planner                  |              Agent thinking steps              |               Trip plan with map               |               Trip plan details                |
+|              Plan / Trip planner               |          Plan / Agent thinking steps           |            Plan / Results with map             |            Plan / Trip plan details            |
 |:----------------------------------------------:|:----------------------------------------------:|:----------------------------------------------:|:----------------------------------------------:|
 | <img src="screenshots/plan2.png" width="180"/> | <img src="screenshots/plan5.png" width="180"/> | <img src="screenshots/plan7.png" width="180"/> | <img src="screenshots/plan9.png" width="180"/> |
 
