@@ -1,4 +1,4 @@
-package se.onemanstudio.playaroundwithai.feature.plan.views
+package se.onemanstudio.playaroundwithai.feature.plan.views.states
 
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.core.LinearEasing
@@ -51,7 +51,6 @@ import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.IntOffset
-import androidx.compose.ui.unit.dp
 import kotlinx.collections.immutable.persistentListOf
 import se.onemanstudio.playaroundwithai.core.ui.sofa.MarkerText
 import se.onemanstudio.playaroundwithai.core.ui.sofa.NeoBrutalCard
@@ -61,7 +60,6 @@ import se.onemanstudio.playaroundwithai.core.ui.theme.SofaAiTheme
 import se.onemanstudio.playaroundwithai.core.ui.theme.electricBlue
 import se.onemanstudio.playaroundwithai.core.ui.theme.energeticOrange
 import se.onemanstudio.playaroundwithai.core.ui.theme.zestyLime
-import se.onemanstudio.playaroundwithai.feature.plan.PlanConstants
 import se.onemanstudio.playaroundwithai.feature.plan.PlanConstants.BOUNCE_AMPLITUDE
 import se.onemanstudio.playaroundwithai.feature.plan.PlanConstants.BOUNCE_DOT_COUNT
 import se.onemanstudio.playaroundwithai.feature.plan.PlanConstants.BOUNCE_DURATION_MS
@@ -75,6 +73,7 @@ import se.onemanstudio.playaroundwithai.feature.plan.R
 import se.onemanstudio.playaroundwithai.feature.plan.states.PlanStepUi
 import se.onemanstudio.playaroundwithai.feature.plan.states.PlanUiState
 import se.onemanstudio.playaroundwithai.feature.plan.states.StepIcon
+import se.onemanstudio.playaroundwithai.feature.plan.views.AgentPulse
 
 @Composable
 internal fun RunningState(state: PlanUiState.Running) {

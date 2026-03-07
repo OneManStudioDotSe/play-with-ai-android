@@ -1,4 +1,4 @@
-package se.onemanstudio.playaroundwithai.feature.plan.views
+package se.onemanstudio.playaroundwithai.feature.plan.views.states
 
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box

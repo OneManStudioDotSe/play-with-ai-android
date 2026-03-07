@@ -2,7 +2,7 @@
 <resources xmlns:tools="http://schemas.android.com/tools">
     <string name="explore_title">Explore</string>
     <string name="path_mode_title">PATH MODE</string>
-    <string name="points_selected" tools:ignore="PluralsCandidate">%1$d points Selected</string>
+    <string name="points_selected" tools:ignore="PluralsCandidate">%1$d points selected</string>
     <string name="total_distance">TOTAL DISTANCE</string>
     <string name="distance_duration">%1$d m • %2$d min</string>
     <string name="go">GO</string>

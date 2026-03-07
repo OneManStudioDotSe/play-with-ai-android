@@ -23,7 +23,6 @@ import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.SnackbarResult
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
-import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.key
 import androidx.compose.runtime.mutableStateOf
@@ -32,11 +31,11 @@ import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
-import se.onemanstudio.playaroundwithai.core.ui.theme.Dimensions
 import androidx.compose.ui.platform.LocalView
 import androidx.compose.ui.res.stringResource
 import androidx.core.content.ContextCompat
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.google.android.gms.location.LocationServices
 import com.google.android.gms.maps.CameraUpdateFactory
 import com.google.android.gms.maps.model.CameraPosition
@@ -146,6 +145,7 @@ fun ExploreScreen(
                     )
                 }
             }
+
             is LocationState.Denied -> cameraSettled = true
             is LocationState.Pending -> Unit
         }
@@ -278,7 +278,8 @@ fun ExploreScreen(
 
                 uiState.markers.visibleLocations.forEach { item ->
                     key(item.id) {
-                        val isSelected = uiState.pathMode.selectedLocations.any { it.id == item.id } || uiState.markers.focusedMarker?.id == item.id
+                        val isSelected =
+                            uiState.pathMode.selectedLocations.any { it.id == item.id } || uiState.markers.focusedMarker?.id == item.id
 
                         val icon =
                             if (item.type == VehicleType.Bicycle) Icons.AutoMirrored.Filled.DirectionsBike else Icons.Default.ElectricScooter

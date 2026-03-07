@@ -1,5 +1,3 @@
-@file:Suppress("TooManyFunctions")
-
 package se.onemanstudio.playaroundwithai.feature.plan
 
 import android.Manifest
@@ -38,10 +36,10 @@ import se.onemanstudio.playaroundwithai.core.ui.sofa.NeoBrutalTopAppBar
 import se.onemanstudio.playaroundwithai.feature.plan.PlanConstants.DEFAULT_LAT
 import se.onemanstudio.playaroundwithai.feature.plan.PlanConstants.DEFAULT_LNG
 import se.onemanstudio.playaroundwithai.feature.plan.states.PlanUiState
-import se.onemanstudio.playaroundwithai.feature.plan.views.ErrorState
-import se.onemanstudio.playaroundwithai.feature.plan.views.InitialState
-import se.onemanstudio.playaroundwithai.feature.plan.views.ResultState
-import se.onemanstudio.playaroundwithai.feature.plan.views.RunningState
+import se.onemanstudio.playaroundwithai.feature.plan.views.states.ErrorState
+import se.onemanstudio.playaroundwithai.feature.plan.views.states.InitialState
+import se.onemanstudio.playaroundwithai.feature.plan.views.states.ResultState
+import se.onemanstudio.playaroundwithai.feature.plan.views.states.RunningState
 
 @SuppressLint("MissingPermission")
 @Composable

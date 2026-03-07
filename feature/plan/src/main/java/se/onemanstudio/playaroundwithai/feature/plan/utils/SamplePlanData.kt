@@ -1,4 +1,4 @@
-package se.onemanstudio.playaroundwithai.feature.plan
+package se.onemanstudio.playaroundwithai.feature.plan.utils
 
 import kotlinx.collections.immutable.PersistentList
 import kotlinx.collections.immutable.persistentListOf

@@ -1,4 +1,4 @@
-package se.onemanstudio.playaroundwithai.feature.plan.views
+package se.onemanstudio.playaroundwithai.feature.plan.views.states
 
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
@@ -26,6 +26,7 @@ import se.onemanstudio.playaroundwithai.core.ui.sofa.NeoBrutalTextField
 import se.onemanstudio.playaroundwithai.core.ui.theme.Dimensions
 import se.onemanstudio.playaroundwithai.core.ui.theme.SofaAiTheme
 import se.onemanstudio.playaroundwithai.feature.plan.R
+import se.onemanstudio.playaroundwithai.feature.plan.views.HowItWorksCard
 
 @OptIn(ExperimentalLayoutApi::class)
 @Composable

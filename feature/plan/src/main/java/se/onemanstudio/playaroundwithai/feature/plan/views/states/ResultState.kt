@@ -1,6 +1,4 @@
-@file:Suppress("TooManyFunctions")
-
-package se.onemanstudio.playaroundwithai.feature.plan.views
+package se.onemanstudio.playaroundwithai.feature.plan.views.states
 
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.core.MutableTransitionState
@@ -81,6 +79,7 @@ import se.onemanstudio.playaroundwithai.feature.plan.states.PlanUiState
 import se.onemanstudio.playaroundwithai.feature.plan.states.StepIcon
 import se.onemanstudio.playaroundwithai.feature.plan.states.TripPlanUi
 import se.onemanstudio.playaroundwithai.feature.plan.states.TripStopUi
+import se.onemanstudio.playaroundwithai.feature.plan.views.AgentLogSection
 
 private val accentColors = listOf(electricBlue, vividPink, zestyLime, solarYellow, energeticOrange)
 

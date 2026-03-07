@@ -18,6 +18,8 @@ import se.onemanstudio.playaroundwithai.feature.plan.states.PlanUiState
 import se.onemanstudio.playaroundwithai.feature.plan.states.StepIcon
 import se.onemanstudio.playaroundwithai.feature.plan.states.TripPlanUi
 import se.onemanstudio.playaroundwithai.feature.plan.states.TripStopUi
+import se.onemanstudio.playaroundwithai.feature.plan.utils.samplePlanSteps
+import se.onemanstudio.playaroundwithai.feature.plan.utils.sampleTripPlan
 import timber.log.Timber
 import java.io.IOException
 import javax.inject.Inject

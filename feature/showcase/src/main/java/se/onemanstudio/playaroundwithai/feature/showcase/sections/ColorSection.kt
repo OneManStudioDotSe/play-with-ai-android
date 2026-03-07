@@ -103,9 +103,7 @@ private fun ColorSubsection(title: String, colors: List<ColorInfo>) {
         horizontalArrangement = Arrangement.spacedBy(Dimensions.paddingMedium),
         verticalArrangement = Arrangement.spacedBy(Dimensions.paddingMedium)
     ) {
-        colors.forEach { colorInfo ->
-            ColorSwatch(colorInfo)
-        }
+        colors.forEach { colorInfo -> ColorSwatch(colorInfo) }
     }
 }
 
