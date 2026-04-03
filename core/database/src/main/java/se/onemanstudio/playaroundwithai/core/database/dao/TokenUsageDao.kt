@@ -5,14 +5,7 @@ import androidx.room.Insert
 import androidx.room.Query
 import kotlinx.coroutines.flow.Flow
 import se.onemanstudio.playaroundwithai.core.database.entity.TokenUsageEntity
-
-data class DailyUsageRow(
-    val dateMillis: Long,
-    val totalTokens: Long,
-    val promptTokens: Long,
-    val candidateTokens: Long,
-    val callCount: Int,
-)
+import se.onemanstudio.playaroundwithai.core.database.model.DailyUsageRow
 
 @Dao
 interface TokenUsageDao {

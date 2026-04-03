@@ -6,8 +6,8 @@ import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.SharedFlow
 import kotlinx.coroutines.flow.asSharedFlow
 import kotlinx.coroutines.flow.map
-import se.onemanstudio.playaroundwithai.core.database.dao.DailyUsageRow
 import se.onemanstudio.playaroundwithai.core.database.dao.TokenUsageDao
+import se.onemanstudio.playaroundwithai.core.database.model.DailyUsageRow
 import se.onemanstudio.playaroundwithai.core.database.entity.TokenUsageEntity
 import se.onemanstudio.playaroundwithai.core.network.dto.UsageMetadata
 import se.onemanstudio.playaroundwithai.core.tracking.model.DailyTokenUsage

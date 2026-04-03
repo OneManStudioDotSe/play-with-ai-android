@@ -49,10 +49,10 @@ class DreamViewModel @Inject constructor(
             _screenState.update { it.copy(dreamState = DreamUiState.Error(DreamError.ApiKeyMissing)) }
         }
 
-        observeDreamHistory(getDreamHistoryUseCase)
+        observeDreamHistory()
     }
 
-    private fun observeDreamHistory(getDreamHistoryUseCase: GetDreamHistoryUseCase) {
+    private fun observeDreamHistory() {
         viewModelScope.launch {
             getDreamHistoryUseCase().collect { history ->
                 _screenState.update { it.copy(dreamHistory = history) }

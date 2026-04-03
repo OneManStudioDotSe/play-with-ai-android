@@ -73,11 +73,11 @@ class ChatViewModel @Inject constructor(
             observeSyncFailures()
         }
 
-        observePromptHistory(getPromptHistoryUseCase)
-        observeSyncState(getSyncStateUseCase)
+        observePromptHistory()
+        observeSyncState()
     }
 
-    private fun observePromptHistory(getPromptHistoryUseCase: GetPromptHistoryUseCase) {
+    private fun observePromptHistory() {
         viewModelScope.launch {
             getPromptHistoryUseCase().collect { history ->
                 _screenState.update { it.copy(promptHistory = history) }
@@ -85,7 +85,7 @@ class ChatViewModel @Inject constructor(
         }
     }
 
-    private fun observeSyncState(getSyncStateUseCase: GetSyncStateUseCase) {
+    private fun observeSyncState() {
         viewModelScope.launch {
             getSyncStateUseCase().collect { syncing ->
                 _screenState.update { it.copy(isSyncing = syncing) }
