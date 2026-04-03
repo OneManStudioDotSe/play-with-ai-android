@@ -230,7 +230,7 @@ private fun DreamResultContentLightPreview() {
                     scene = previewScene(),
                     mood = DreamMood.SURREAL,
                 ),
-                imageState = DreamImageState.Generated(mimeType = "image/png", artistName = "Lorem ipsum"),
+                imageState = DreamImageState.Generated(imageBase64 = "", mimeType = "image/png", artistName = "Lorem ipsum"),
                 onNewDream = {},
             )
         }
@@ -248,7 +248,7 @@ private fun DreamResultContentDarkPreview() {
                     scene = previewScene(),
                     mood = DreamMood.MYSTERIOUS,
                 ),
-                imageState = DreamImageState.Generated(mimeType = "image/png", artistName = "Lorem ipsum"),
+                imageState = DreamImageState.Generated(imageBase64 = "", mimeType = "image/png", artistName = "Lorem ipsum"),
                 onNewDream = {},
             )
         }

@@ -18,7 +18,8 @@ internal object PlanPrompts {
         
         Keep the itinerary to 4-6 stops for a half-day trip. The user is near latitude %s, longitude %s.
         
-        When you have finished planning, respond with a text summary of the itinerary. The summary should describe each stop in order, mention what makes each place special, and include practical tips.
+        When you have finished planning, respond with a text summary of the itinerary. 
+        The summary should describe each stop in order, mention what makes each place special, and include practical tips.
         Do NOT call more than 5 tools total.
     """
 

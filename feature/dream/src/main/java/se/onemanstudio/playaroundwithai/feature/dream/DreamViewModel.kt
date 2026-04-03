@@ -136,9 +136,14 @@ class DreamViewModel @Inject constructor(
                     val imageBytes = java.util.Base64.getDecoder().decode(dreamImage.imageBase64)
                     val imagePath = saveDreamImageUseCase(dreamId, imageBytes, dreamImage.mimeType, dreamImage.artistName)
                     _screenState.update { state ->
-                        val current = state.imageState
-                        if (current is DreamImageState.Generated) {
-                            state.copy(imageState = current.copy(imagePath = imagePath))
+                        if (state.imageState is DreamImageState.Generated) {
+                            state.copy(
+                                imageState = DreamImageState.Persisted(
+                                    imagePath = imagePath,
+                                    mimeType = dreamImage.mimeType,
+                                    artistName = dreamImage.artistName,
+                                )
+                            )
                         } else {
                             state
                         }
@@ -166,7 +171,7 @@ class DreamViewModel @Inject constructor(
                 ),
                 currentDescription = dream.description,
                 imageState = if (dream.imagePath != null) {
-                    DreamImageState.Generated(
+                    DreamImageState.Persisted(
                         imagePath = dream.imagePath,
                         mimeType = "image/png",
                         artistName = dream.artistName ?: "",

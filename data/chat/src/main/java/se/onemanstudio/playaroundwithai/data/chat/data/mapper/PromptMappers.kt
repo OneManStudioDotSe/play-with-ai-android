@@ -6,7 +6,7 @@ import java.time.Instant
 
 fun PromptEntity.toDomain(): Prompt {
     return Prompt(
-        id = this.id.toLong(),
+        id = this.id,
         text = this.text,
         timestamp = Instant.ofEpochMilli(this.timestamp),
         syncStatus = this.syncStatus,
@@ -16,7 +16,7 @@ fun PromptEntity.toDomain(): Prompt {
 
 fun Prompt.toEntity(): PromptEntity {
     return PromptEntity(
-        id = this.id.toInt(),
+        id = this.id,
         text = this.text,
         timestamp = this.timestamp.toEpochMilli(),
         syncStatus = this.syncStatus,

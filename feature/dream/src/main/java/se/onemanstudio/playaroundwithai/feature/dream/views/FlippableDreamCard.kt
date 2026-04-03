@@ -80,7 +80,7 @@ fun FlippableDreamCard(
     scene: DreamScene,
     imageState: DreamImageState
 ) {
-    val isImageReady = imageState is DreamImageState.Generated
+    val isImageReady = imageState is DreamImageState.Generated || imageState is DreamImageState.Persisted
     var isFlipped by remember { mutableStateOf(false) }
 
     val flipIconVisible = remember { MutableTransitionState(isImageReady) }
@@ -157,14 +157,14 @@ private fun BackSide(imageState: DreamImageState, scene: DreamScene, onFlipBack:
     Box(
         modifier = Modifier.graphicsLayer { rotationY = FLIP_FULL_ANGLE },
     ) {
-        val generated = imageState as? DreamImageState.Generated
-
-        val bitmap = remember(generated?.imagePath, generated?.imageBase64) {
-            generated?.imagePath?.let { path ->
-                BitmapFactory.decodeFile(path)
-            } ?: generated?.imageBase64?.let { base64 ->
-                val bytes = java.util.Base64.getDecoder().decode(base64)
-                BitmapFactory.decodeByteArray(bytes, 0, bytes.size)
+        val bitmap = remember(imageState) {
+            when (imageState) {
+                is DreamImageState.Persisted -> BitmapFactory.decodeFile(imageState.imagePath)
+                is DreamImageState.Generated -> {
+                    val bytes = java.util.Base64.getDecoder().decode(imageState.imageBase64)
+                    BitmapFactory.decodeByteArray(bytes, 0, bytes.size)
+                }
+                else -> null
             }
         }
 
@@ -181,9 +181,14 @@ private fun BackSide(imageState: DreamImageState, scene: DreamScene, onFlipBack:
             PlaceholderSurface(scene = scene)
         }
 
-        if (generated != null) {
+        val artistName = when (imageState) {
+            is DreamImageState.Generated -> imageState.artistName
+            is DreamImageState.Persisted -> imageState.artistName
+            else -> null
+        }
+        if (artistName != null) {
             ArtistOverlay(
-                artistName = generated.artistName,
+                artistName = artistName,
                 modifier = Modifier.align(Alignment.BottomStart),
             )
         }
@@ -387,6 +392,7 @@ private fun FrontFlippablePreview() {
             FlippableDreamCard(
                 scene = previewDarkScene(),
                 imageState = DreamImageState.Generated(
+                    imageBase64 = "",
                     mimeType = "image/png",
                     artistName = "Lorem ipsum"
                 ),
@@ -403,6 +409,7 @@ private fun FrontFlippableDarkPreview() {
             FlippableDreamCard(
                 scene = previewWarmScene(),
                 imageState = DreamImageState.Generated(
+                    imageBase64 = "",
                     mimeType = "image/png",
                     artistName = "Lorem ipsum"
                 ),

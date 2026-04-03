@@ -10,6 +10,7 @@ import se.onemanstudio.playaroundwithai.core.network.utils.JsonExtractor
 import se.onemanstudio.playaroundwithai.core.network.dto.Content
 import se.onemanstudio.playaroundwithai.core.network.dto.GeminiRequest
 import se.onemanstudio.playaroundwithai.core.network.dto.GenerationConfig
+import se.onemanstudio.playaroundwithai.core.network.dto.ImageData
 import se.onemanstudio.playaroundwithai.core.network.dto.Part
 import se.onemanstudio.playaroundwithai.core.tracking.repository.TokenUsageTracker
 import se.onemanstudio.playaroundwithai.data.dream.prompts.DreamPrompts
@@ -75,7 +76,7 @@ class DreamGeminiRepositoryImpl @Inject constructor(
                 generationConfig = GenerationConfig(responseModalities = listOf("IMAGE", "TEXT")),
             )
 
-            var imageData: se.onemanstudio.playaroundwithai.core.network.dto.ImageData? = null
+            var imageData: ImageData? = null
             var lastText = ""
 
             for (attempt in 1..IMAGE_GENERATION_MAX_RETRIES) {

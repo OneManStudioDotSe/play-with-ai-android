@@ -13,7 +13,7 @@ import androidx.room.PrimaryKey
 )
 data class PromptEntity(
     @PrimaryKey(autoGenerate = true)
-    val id: Int,
+    val id: Long = 0,
     val text: String,
     val timestamp: Long = System.currentTimeMillis(),
     val syncStatus: SyncStatus,

@@ -94,8 +94,17 @@ fun DreamScreen(
                     onDreamClick = { dream -> viewModel.restoreDream(dream) },
                 )
 
-                is DreamUiState.Interpreting, is DreamUiState.Result -> DreamResultContent(
-                    state = uiState as? DreamUiState.Result,
+                is DreamUiState.Interpreting -> DreamResultContent(
+                    state = null,
+                    imageState = imageState,
+                    onNewDream = {
+                        textState = TextFieldValue("")
+                        viewModel.clearResult()
+                    },
+                )
+
+                is DreamUiState.Result -> DreamResultContent(
+                    state = uiState,
                     imageState = imageState,
                     onNewDream = {
                         textState = TextFieldValue("")

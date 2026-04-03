@@ -37,7 +37,9 @@ internal object DreamPrompts {
     """
 
     private const val IMAGE_PROMPT = """
-        Create an image of a painting inspired by the following dream. Paint it in the distinctive style of a famous artist whose work resonates with the dream's mood and imagery. Choose from artists like Dalí, Monet, Van Gogh, Klimt, Kahlo, Hokusai, Magritte, Munch, Rothko, or any other renowned painter.
+        Create an image of a painting inspired by the following dream. 
+        Paint it in the distinctive style of a famous artist whose work resonates with the dream's mood and imagery. 
+        Choose from artists like Dalí, Monet, Van Gogh, Klimt, Kahlo, Hokusai, Magritte, Munch, Rothko, or any other renowned painter.
         
         The painting should be vivid, atmospheric, and capture the emotional essence of the dream.
         

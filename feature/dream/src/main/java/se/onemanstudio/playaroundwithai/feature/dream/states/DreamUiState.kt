@@ -29,12 +29,21 @@ sealed interface DreamError {
 sealed interface DreamImageState {
     data object Idle : DreamImageState
     data object Generating : DreamImageState
+
+    /** Image received from the API, held in memory as base64. */
     data class Generated(
-        val imagePath: String? = null,
-        val imageBase64: String? = null,
+        val imageBase64: String,
         val mimeType: String,
         val artistName: String,
     ) : DreamImageState
+
+    /** Image saved to disk; loaded from file path. */
+    data class Persisted(
+        val imagePath: String,
+        val mimeType: String,
+        val artistName: String,
+    ) : DreamImageState
+
     data class Error(val message: String) : DreamImageState
 }
 

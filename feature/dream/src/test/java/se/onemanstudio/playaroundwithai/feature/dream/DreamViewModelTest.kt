@@ -180,7 +180,7 @@ class DreamViewModelTest {
     }
 
     @Test
-    fun `restoreDream with imagePath sets Generated state with path`() = runTest {
+    fun `restoreDream with imagePath sets Persisted state with path`() = runTest {
         val viewModel = createViewModel()
         val scene = createTestInterpretation().scene
 
@@ -198,8 +198,8 @@ class DreamViewModelTest {
         advanceUntilIdle()
 
         val imageState = viewModel.screenState.value.imageState
-        assert(imageState is DreamImageState.Generated)
-        assertEquals("/some/path.png", (imageState as DreamImageState.Generated).imagePath)
+        assert(imageState is DreamImageState.Persisted)
+        assertEquals("/some/path.png", (imageState as DreamImageState.Persisted).imagePath)
         assertEquals("Van Gogh", imageState.artistName)
     }
 

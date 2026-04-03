@@ -1,5 +1,3 @@
-@file:Suppress("TooManyFunctions")
-
 package se.onemanstudio.playaroundwithai.data.plan.data.repository
 
 import com.google.gson.Gson
@@ -19,6 +17,7 @@ import se.onemanstudio.playaroundwithai.core.network.dto.FunctionResponseDto
 import se.onemanstudio.playaroundwithai.core.network.dto.GeminiRequest
 import se.onemanstudio.playaroundwithai.core.network.dto.Part
 import se.onemanstudio.playaroundwithai.data.plan.data.tools.RouteCalculator
+import se.onemanstudio.playaroundwithai.data.plan.data.tools.RouteResult
 import se.onemanstudio.playaroundwithai.data.plan.prompts.PlanPrompts
 import se.onemanstudio.playaroundwithai.data.plan.data.tools.buildToolDeclarations
 import se.onemanstudio.playaroundwithai.data.plan.domain.model.PlanEvent
@@ -34,6 +33,7 @@ private const val DEFAULT_COUNT = 5
 private const val ERROR_BODY_PREVIEW_LENGTH = 200
 private const val LOG_TAG = "TripPlanner"
 
+@Suppress("UNCHECKED_CAST")
 @Singleton
 class TripPlannerRepositoryImpl @Inject constructor(
     private val apiService: GeminiApiService,
@@ -41,13 +41,12 @@ class TripPlannerRepositoryImpl @Inject constructor(
     private val tokenUsageTracker: TokenUsageTracker,
 ) : TripPlannerRepository {
 
-    @Suppress("TooGenericExceptionCaught", "LongMethod")
     override fun planTrip(goal: String, latitude: Double, longitude: Double): Flow<PlanEvent> = flow {
         try {
             val tools = listOf(buildToolDeclarations())
             val history = mutableListOf<Content>()
             val collectedStops = mutableListOf<TripStop>()
-            var routeResult: se.onemanstudio.playaroundwithai.data.plan.data.tools.RouteResult? = null
+            var routeResult: RouteResult? = null
 
             val systemPrompt = PlanPrompts.tripPlannerSystemPrompt(latitude, longitude)
             history.add(Content(role = "user", parts = listOf(Part(text = "$systemPrompt\n\nUser request: $goal"))))
@@ -130,7 +129,6 @@ class TripPlannerRepositoryImpl @Inject constructor(
         }
     }
 
-    @Suppress("UNCHECKED_CAST")
     private suspend fun handleSearchPlaces(
         args: Map<String, Any>,
         defaultLat: Double,
@@ -152,7 +150,7 @@ class TripPlannerRepositoryImpl @Inject constructor(
 
         val places = parsePlacesFromResponse(text)
 
-        places.forEachIndexed { index, place ->
+        places.forEachIndexed { _, place ->
             val name = place["name"]?.toString() ?: "Place ${collectedStops.size + 1}"
             val placeLat = (place["latitude"] as? Number)?.toDouble() ?: lat
             val placeLng = (place["longitude"] as? Number)?.toDouble() ?: lng
@@ -175,11 +173,7 @@ class TripPlannerRepositoryImpl @Inject constructor(
         return mapOf("places" to places, "count" to places.size)
     }
 
-    @Suppress("UNCHECKED_CAST")
-    private fun handleCalculateRoute(
-        args: Map<String, Any>,
-        collectedStops: MutableList<TripStop>,
-    ): Map<String, Any> {
+    private fun handleCalculateRoute(args: Map<String, Any>, collectedStops: MutableList<TripStop>, ): Map<String, Any> {
         val places = (args["places"] as? List<Map<String, Any>>).orEmpty()
 
         val coordinates = if (places.isNotEmpty()) {
@@ -227,7 +221,6 @@ class TripPlannerRepositoryImpl @Inject constructor(
         )
     }
 
-    @Suppress("UNCHECKED_CAST")
     private fun parsePlacesFromResponse(text: String): List<Map<String, Any>> {
         val cleaned = JsonExtractor.extract(text)
 
@@ -240,22 +233,18 @@ class TripPlannerRepositoryImpl @Inject constructor(
         }
     }
 
-    private fun extractRouteResult(result: Map<String, Any>): se.onemanstudio.playaroundwithai.data.plan.data.tools.RouteResult? {
+    private fun extractRouteResult(result: Map<String, Any>): RouteResult? {
         val distance = (result["total_distance_km"] as? Number)?.toDouble()
         val minutes = (result["total_walking_minutes"] as? Number)?.toInt()
         if (distance == null || minutes == null) return null
-        return se.onemanstudio.playaroundwithai.data.plan.data.tools.RouteResult(
+        return RouteResult(
             orderedIndices = emptyList(),
             totalDistanceKm = distance,
             totalWalkingMinutes = minutes,
         )
     }
 
-    private fun buildTripPlan(
-        summary: String,
-        stops: List<TripStop>,
-        routeResult: se.onemanstudio.playaroundwithai.data.plan.data.tools.RouteResult?,
-    ): TripPlan {
+    private fun buildTripPlan(summary: String, stops: List<TripStop>, routeResult: RouteResult?, ): TripPlan {
         val orderedStops = stops.sortedBy { it.orderIndex }.mapIndexed { index, stop ->
             stop.copy(orderIndex = index)
         }
@@ -273,7 +262,6 @@ class TripPlannerRepositoryImpl @Inject constructor(
         return RouteCalculator.pathDistanceKm(coords)
     }
 
-    @Suppress("MagicNumber")
     private fun calculateFallbackMinutes(stops: List<TripStop>): Int {
         val distance = calculateFallbackDistance(stops)
         return (distance / 5.0 * 60).toInt()
@@ -287,7 +275,6 @@ class TripPlannerRepositoryImpl @Inject constructor(
         }
     }
 
-    @Suppress("UNCHECKED_CAST")
     private fun summarizeResult(name: String, result: Map<String, Any>): String {
         return when (name) {
             "search_places" -> {
@@ -302,5 +289,4 @@ class TripPlannerRepositoryImpl @Inject constructor(
             else -> "Completed"
         }
     }
-
 }
