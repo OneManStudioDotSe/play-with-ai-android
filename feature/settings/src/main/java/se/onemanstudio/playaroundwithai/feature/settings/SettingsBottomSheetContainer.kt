@@ -7,11 +7,13 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import se.onemanstudio.playaroundwithai.core.ui.sofa.ChartBarData
+import android.content.ActivityNotFoundException
 import androidx.compose.runtime.remember
 import androidx.compose.ui.platform.LocalConfiguration
 import java.text.NumberFormat
 import java.util.Locale
 import androidx.core.net.toUri
+import timber.log.Timber
 
 @Composable
 fun SettingsBottomSheetContainer(
@@ -24,7 +26,8 @@ fun SettingsBottomSheetContainer(
     val vehicleCount by viewModel.vehicleCount.collectAsStateWithLifecycle()
     val searchRadiusKm by viewModel.searchRadiusKm.collectAsStateWithLifecycle()
     val context = LocalContext.current
-    val locale = LocalConfiguration.current.locales.getOrNull(0) ?: Locale.getDefault()
+    val localeList = LocalConfiguration.current.locales
+    val locale = if (!localeList.isEmpty) localeList[0] else Locale.getDefault()
     val numberFormat = remember(locale) { NumberFormat.getNumberInstance(locale) }
 
     val usageBars = weeklyUsage.map { day ->
@@ -47,14 +50,22 @@ fun SettingsBottomSheetContainer(
         onVehicleCountChange = { viewModel.onVehicleCountChange(it) },
         onSearchRadiusChange = { viewModel.onSearchRadiusChange(it) },
         onContactClick = {
-            val intent = Intent(Intent.ACTION_SENDTO).apply {
-                data = "mailto:sotiris@onemanstudio.se".toUri()
+            try {
+                val intent = Intent(Intent.ACTION_SENDTO).apply {
+                    data = "mailto:sotiris@onemanstudio.se".toUri()
+                }
+                context.startActivity(intent)
+            } catch (e: ActivityNotFoundException) {
+                Timber.w(e, "Settings - No email app available")
             }
-            context.startActivity(intent)
         },
         onLinkedInClick = {
-            val intent = Intent(Intent.ACTION_VIEW, "https://www.linkedin.com/in/sotirisfalieris/".toUri())
-            context.startActivity(intent)
+            try {
+                val intent = Intent(Intent.ACTION_VIEW, "https://www.linkedin.com/in/sotirisfalieris/".toUri())
+                context.startActivity(intent)
+            } catch (e: ActivityNotFoundException) {
+                Timber.w(e, "Settings - No browser available")
+            }
         },
         usageBars = usageBars,
         selectedDayIndex = selectedDayIndex,

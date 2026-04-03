@@ -7,6 +7,7 @@ import androidx.compose.material.icons.filled.Map
 import androidx.compose.material.icons.filled.NightsStay
 import androidx.compose.material.icons.filled.Palette
 import kotlinx.serialization.Serializable
+import se.onemanstudio.playaroundwithai.R
 
 sealed interface Route
 
@@ -26,9 +27,9 @@ object Agents : Route
 object Showcase : Route
 
 val navItems = listOf(
-    NavItem(Chat, "Chat", Icons.Default.Chair),
-    NavItem(Dreams, "Explain", Icons.Default.NightsStay),
-    NavItem(Agents, "Plan", Icons.Default.AutoAwesome),
-    NavItem(Maps, "Explore", Icons.Default.Map),
-    NavItem(Showcase, "SoFa", Icons.Default.Palette),
+    NavItem(Chat, R.string.nav_label_chat, Icons.Default.Chair),
+    NavItem(Dreams, R.string.nav_label_explain, Icons.Default.NightsStay),
+    NavItem(Agents, R.string.nav_label_plan, Icons.Default.AutoAwesome),
+    NavItem(Maps, R.string.nav_label_explore, Icons.Default.Map),
+    NavItem(Showcase, R.string.nav_label_sofa, Icons.Default.Palette),
 )

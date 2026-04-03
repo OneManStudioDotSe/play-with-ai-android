@@ -1,6 +1,8 @@
 package se.onemanstudio.playaroundwithai.feature.chat.states
 
 import androidx.compose.runtime.Immutable
+import kotlinx.collections.immutable.PersistentList
+import kotlinx.collections.immutable.persistentListOf
 import se.onemanstudio.playaroundwithai.data.chat.domain.model.Prompt
 
 @Immutable
@@ -24,9 +26,9 @@ sealed interface ChatError {
 @Immutable
 data class ChatScreenState(
     val chatState: ChatUiState = ChatUiState.Initial,
-    val suggestions: List<String> = emptyList(),
+    val suggestions: PersistentList<String> = persistentListOf(),
     val useFallbackSuggestions: Boolean = false,
     val isSuggestionsLoading: Boolean = false,
-    val promptHistory: List<Prompt> = emptyList(),
+    val promptHistory: PersistentList<Prompt> = persistentListOf(),
     val isSyncing: Boolean = false,
 )

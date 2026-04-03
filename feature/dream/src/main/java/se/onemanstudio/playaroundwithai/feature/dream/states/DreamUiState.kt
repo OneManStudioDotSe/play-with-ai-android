@@ -1,6 +1,8 @@
 package se.onemanstudio.playaroundwithai.feature.dream.states
 
 import androidx.compose.runtime.Immutable
+import kotlinx.collections.immutable.PersistentList
+import kotlinx.collections.immutable.persistentListOf
 import se.onemanstudio.playaroundwithai.data.dream.domain.model.Dream
 import se.onemanstudio.playaroundwithai.data.dream.domain.model.DreamMood
 import se.onemanstudio.playaroundwithai.data.dream.domain.model.DreamScene
@@ -50,7 +52,7 @@ sealed interface DreamImageState {
 @Immutable
 data class DreamScreenState(
     val dreamState: DreamUiState = DreamUiState.Initial,
-    val dreamHistory: List<Dream> = emptyList(),
+    val dreamHistory: PersistentList<Dream> = persistentListOf(),
     val imageState: DreamImageState = DreamImageState.Idle,
     val currentDescription: String = "",
 )

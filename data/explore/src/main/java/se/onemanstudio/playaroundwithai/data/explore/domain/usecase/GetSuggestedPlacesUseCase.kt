@@ -1,11 +1,10 @@
 package se.onemanstudio.playaroundwithai.data.explore.domain.usecase
 
+import se.onemanstudio.playaroundwithai.core.network.utils.MAX_LATITUDE
+import se.onemanstudio.playaroundwithai.core.network.utils.MAX_LONGITUDE
 import se.onemanstudio.playaroundwithai.data.explore.domain.model.SuggestedPlace
 import se.onemanstudio.playaroundwithai.data.explore.domain.repository.ExploreSuggestionsRepository
 import javax.inject.Inject
-
-private const val MAX_LATITUDE = 90.0
-private const val MAX_LONGITUDE = 180.0
 
 class GetSuggestedPlacesUseCase @Inject constructor(
     private val exploreSuggestionsRepository: ExploreSuggestionsRepository

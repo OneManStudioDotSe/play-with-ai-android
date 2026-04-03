@@ -18,10 +18,9 @@ import se.onemanstudio.playaroundwithai.data.chat.R
 import se.onemanstudio.playaroundwithai.data.chat.data.remote.FirestoreDataSource
 import timber.log.Timber
 
-private const val SYNC_CHANNEL_FOR_DB = "sync_channel"
 private const val NOTIFICATION_ID = 101
 private const val FAILURE_NOTIFICATION_ID = 102
-private const val MAX_RETRY_COUNT = 3
+private const val MAX_SYNC_ATTEMPTS = 3
 
 @HiltWorker
 class SyncWorker @AssistedInject constructor(
@@ -34,7 +33,7 @@ class SyncWorker @AssistedInject constructor(
 
     @Suppress("ReturnCount")
     override suspend fun doWork(): Result {
-        Timber.d("SyncWorker — Started (attempt ${runAttemptCount + 1}/$MAX_RETRY_COUNT)...")
+        Timber.d("SyncWorker — Started (attempt ${runAttemptCount + 1}/$MAX_SYNC_ATTEMPTS)...")
 
         if (!authRepository.isUserSignedIn()) {
             Timber.w("SyncWorker - User is not authenticated. Skipping sync")
@@ -63,13 +62,13 @@ class SyncWorker @AssistedInject constructor(
                 val result = firestoreDataSource.savePrompt(entity.text, entity.timestamp)
                 val docId = result.getOrNull()
                 if (docId != null) {
-                    promptsDao.updateFirestoreDocId(entity.id.toLong(), docId)
+                    promptsDao.updateFirestoreDocId(entity.id, docId)
                 }
                 result.isSuccess
             }
 
             if (success) {
-                val rowsUpdated = promptsDao.markSyncedIfTextMatches(entity.id.toLong(), entity.text, SyncStatus.Synced)
+                val rowsUpdated = promptsDao.markSyncedIfTextMatches(entity.id, entity.text, SyncStatus.Synced)
                 if (rowsUpdated > 0) {
                     Timber.d("SyncWorker - Prompt id=${entity.id} marked as Synced")
                 }
@@ -85,17 +84,17 @@ class SyncWorker @AssistedInject constructor(
                 Result.success()
             }
 
-            // Retry as long as we haven't used all MAX_RETRY_COUNT attempts yet
-            runAttemptCount + 1 < MAX_RETRY_COUNT -> {
+            // Retry as long as we haven't used all MAX_SYNC_ATTEMPTS attempts yet
+            runAttemptCount + 1 < MAX_SYNC_ATTEMPTS -> {
                 Timber.w("SyncWorker - Attempt ${runAttemptCount + 1} failed, will retry")
                 Result.retry()
             }
 
             else -> {
-                Timber.e("SyncWorker - All $MAX_RETRY_COUNT attempts exhausted. Marking remaining prompts as Failed")
+                Timber.e("SyncWorker - All $MAX_SYNC_ATTEMPTS attempts exhausted. Marking remaining prompts as Failed")
                 val stillPending = promptsDao.getPromptsBySyncStatus(SyncStatus.Pending)
                 stillPending.forEach { entity ->
-                    promptsDao.updateSyncStatus(entity.id.toLong(), SyncStatus.Failed)
+                    promptsDao.updateSyncStatus(entity.id, SyncStatus.Failed)
                 }
                 showFailureNotification(stillPending.size)
                 Result.failure()
@@ -122,6 +121,10 @@ class SyncWorker @AssistedInject constructor(
             notification,
             ServiceInfo.FOREGROUND_SERVICE_TYPE_DATA_SYNC
         )
+    }
+
+    companion object {
+        const val SYNC_CHANNEL_FOR_DB = "sync_channel"
     }
 
     private fun showFailureNotification(failedCount: Int) {

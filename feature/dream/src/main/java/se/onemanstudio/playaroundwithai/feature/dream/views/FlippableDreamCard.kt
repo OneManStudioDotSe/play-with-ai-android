@@ -125,7 +125,7 @@ private fun FrontSide(
     flipIconVisible: MutableTransitionState<Boolean>,
     onFlipClick: () -> Unit,
 ) {
-    Timber.d("FrontSide - flipIconVisible: ${flipIconVisible.targetState} and scene is $scene")
+    Timber.d("FrontSide - flipIconVisible: ${flipIconVisible.targetState}")
     Box {
         DreamscapeCanvas(
             scene = scene,
@@ -426,6 +426,7 @@ private fun BackPlaceholderDarkPalettePreview() {
             NeoBrutalCard(modifier = Modifier.fillMaxWidth()) {
                 BackSide(
                     imageState = DreamImageState.Generated(
+                        imageBase64 = "",
                         mimeType = "image/png",
                         artistName = "Lorem ipsum"
                     ),
@@ -445,6 +446,7 @@ private fun BackPlaceholderWarmPalettePreview() {
             NeoBrutalCard(modifier = Modifier.fillMaxWidth()) {
                 BackSide(
                     imageState = DreamImageState.Generated(
+                        imageBase64 = "",
                         mimeType = "image/png",
                         artistName = "Salvador Dalí"
                     ),
@@ -464,6 +466,7 @@ private fun BackPlaceholderDarkThemePreview() {
             NeoBrutalCard(modifier = Modifier.fillMaxWidth()) {
                 BackSide(
                     imageState = DreamImageState.Generated(
+                        imageBase64 = "",
                         mimeType = "image/png",
                         artistName = "Claude Monet"
                     ),

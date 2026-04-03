@@ -6,6 +6,7 @@ import javax.inject.Inject
 
 internal const val MAX_PROMPT_LENGTH = 50_000
 internal const val MAX_FILE_TEXT_LENGTH = 100_000
+internal const val MAX_IMAGE_SIZE_BYTES = 10 * 1024 * 1024 // 10 MB — Gemini inline data limit
 
 class AskAiUseCase @Inject constructor(
     private val repository: ChatGeminiRepository
@@ -27,6 +28,10 @@ class AskAiUseCase @Inject constructor(
 
         if (fileText != null && fileText.length > MAX_FILE_TEXT_LENGTH) {
             return Result.failure(IllegalArgumentException("File content exceeds maximum length of $MAX_FILE_TEXT_LENGTH characters"))
+        }
+
+        if (imageBytes != null && imageBytes.size > MAX_IMAGE_SIZE_BYTES) {
+            return Result.failure(IllegalArgumentException("Image exceeds maximum size of ${MAX_IMAGE_SIZE_BYTES / 1024 / 1024} MB"))
         }
 
         return repository.getAiResponse(prompt, imageBytes, fileText, analysisType)

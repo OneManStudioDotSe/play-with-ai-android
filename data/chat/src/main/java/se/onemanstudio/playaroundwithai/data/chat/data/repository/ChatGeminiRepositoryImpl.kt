@@ -112,11 +112,16 @@ class ChatGeminiRepositoryImpl @Inject constructor(
         } catch (e: HttpException) {
             Timber.e(e, "Gemini - HTTP error during conversation starters (code=${e.code()})")
             Result.failure(e)
+        } catch (e: JsonSyntaxException) {
+            Timber.e(e, "Gemini - Failed to parse conversation starters response")
+            Result.failure(e)
         }
     }
 
     private fun getAnalysisInstruction(analysisType: AnalysisType): String {
-        return ChatPrompts.ANALYSIS_INSTRUCTIONS[analysisType.name].orEmpty()
+        val instruction = ChatPrompts.ANALYSIS_INSTRUCTIONS[analysisType.name].orEmpty()
+        if (instruction.isEmpty()) Timber.w("ChatGemini - No analysis instruction found for type ${analysisType.name}")
+        return instruction
     }
 
     private fun Bitmap.toImageData(): ImageData {

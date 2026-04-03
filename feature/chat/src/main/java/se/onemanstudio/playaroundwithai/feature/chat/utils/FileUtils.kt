@@ -28,7 +28,7 @@ class FileUtils @Inject constructor(
 
     private fun readTextFromUri(uri: Uri): String {
         return context.contentResolver.openInputStream(uri)?.use { inputStream ->
-            inputStream.bufferedReader().use { reader ->
+            inputStream.bufferedReader(Charsets.UTF_8).use { reader ->
                 reader.readText()
             }
         } ?: throw FileNotFoundException("Could not open input stream for URI: $uri")

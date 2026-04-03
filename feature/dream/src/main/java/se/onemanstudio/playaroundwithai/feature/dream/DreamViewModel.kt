@@ -3,6 +3,7 @@ package se.onemanstudio.playaroundwithai.feature.dream
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import dagger.hilt.android.lifecycle.HiltViewModel
+import kotlinx.collections.immutable.toPersistentList
 import kotlinx.coroutines.CompletableDeferred
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -55,7 +56,7 @@ class DreamViewModel @Inject constructor(
     private fun observeDreamHistory() {
         viewModelScope.launch {
             getDreamHistoryUseCase().collect { history ->
-                _screenState.update { it.copy(dreamHistory = history) }
+                _screenState.update { it.copy(dreamHistory = history.toPersistentList()) }
             }
         }
     }
@@ -170,14 +171,16 @@ class DreamViewModel @Inject constructor(
                     mood = dream.mood,
                 ),
                 currentDescription = dream.description,
-                imageState = if (dream.imagePath != null) {
-                    DreamImageState.Persisted(
-                        imagePath = dream.imagePath,
-                        mimeType = "image/png",
-                        artistName = dream.artistName ?: "",
-                    )
-                } else {
-                    DreamImageState.Idle
+                imageState = dream.imagePath.let { imagePath ->
+                    if (imagePath != null) {
+                        DreamImageState.Persisted(
+                            imagePath = imagePath,
+                            mimeType = "image/png",
+                            artistName = dream.artistName ?: "",
+                        )
+                    } else {
+                        DreamImageState.Idle
+                    }
                 },
             )
         }

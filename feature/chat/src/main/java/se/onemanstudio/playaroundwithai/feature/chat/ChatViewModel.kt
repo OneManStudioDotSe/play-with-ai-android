@@ -3,6 +3,7 @@ package se.onemanstudio.playaroundwithai.feature.chat
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import dagger.hilt.android.lifecycle.HiltViewModel
+import kotlinx.collections.immutable.toPersistentList
 import kotlinx.coroutines.channels.BufferOverflow
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -80,7 +81,7 @@ class ChatViewModel @Inject constructor(
     private fun observePromptHistory() {
         viewModelScope.launch {
             getPromptHistoryUseCase().collect { history ->
-                _screenState.update { it.copy(promptHistory = history) }
+                _screenState.update { it.copy(promptHistory = history.toPersistentList()) }
             }
         }
     }
@@ -116,12 +117,12 @@ class ChatViewModel @Inject constructor(
             getSuggestionsUseCase()
                 .onSuccess { topics ->
                     cachedSuggestions = topics
-                    _screenState.update { it.copy(suggestions = topics) }
+                    _screenState.update { it.copy(suggestions = topics.toPersistentList()) }
                 }
                 .onFailure {
                     val cached = cachedSuggestions
                     if (cached != null) {
-                        _screenState.update { it.copy(suggestions = cached) }
+                        _screenState.update { it.copy(suggestions = cached.toPersistentList()) }
                     } else {
                         _screenState.update { it.copy(useFallbackSuggestions = true) }
                     }

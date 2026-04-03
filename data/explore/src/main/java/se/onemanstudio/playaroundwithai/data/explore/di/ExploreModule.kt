@@ -23,6 +23,7 @@ import javax.inject.Singleton
 abstract class ExploreModule {
 
     @Binds
+    @Singleton
     abstract fun bindNetworkMonitor(impl: ConnectivityNetworkMonitor): NetworkMonitor
 
     @Binds

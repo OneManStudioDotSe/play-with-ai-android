@@ -1,12 +1,12 @@
 package se.onemanstudio.playaroundwithai.data.explore.domain.usecase
 
+import se.onemanstudio.playaroundwithai.core.network.utils.MAX_LATITUDE
+import se.onemanstudio.playaroundwithai.core.network.utils.MAX_LONGITUDE
 import se.onemanstudio.playaroundwithai.data.explore.domain.model.ExploreItem
 import se.onemanstudio.playaroundwithai.data.explore.domain.repository.ExplorePointsRepository
 import javax.inject.Inject
 
 internal const val MAX_ITEM_COUNT = 100
-private const val MAX_LATITUDE = 90.0
-private const val MAX_LONGITUDE = 180.0
 
 class GetExploreItemsUseCase @Inject constructor(
     private val repository: ExplorePointsRepository

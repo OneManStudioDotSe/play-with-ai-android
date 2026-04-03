@@ -1,16 +1,11 @@
 package se.onemanstudio.playaroundwithai.data.plan.data.tools
 
+import se.onemanstudio.playaroundwithai.core.network.utils.haversineKm
 import se.onemanstudio.playaroundwithai.core.network.utils.permutations
-import kotlin.math.atan2
-import kotlin.math.cos
-import kotlin.math.pow
-import kotlin.math.sin
-import kotlin.math.sqrt
 
-private const val EARTH_RADIUS_KM = 6371.0
 private const val BRUTE_FORCE_THRESHOLD = 8
-private const val WALKING_SPEED_KMH = 5.0
-private const val MINUTES_PER_HOUR = 60
+internal const val WALKING_SPEED_KMH = 5.0
+internal const val MINUTES_PER_HOUR = 60
 
 data class RouteResult(
     val orderedIndices: List<Int>,
@@ -43,15 +38,6 @@ object RouteCalculator {
             totalDistanceKm = totalDistance,
             totalWalkingMinutes = walkingMinutes,
         )
-    }
-
-    fun haversineKm(lat1: Double, lng1: Double, lat2: Double, lng2: Double): Double {
-        val dLat = Math.toRadians(lat2 - lat1)
-        val dLon = Math.toRadians(lng2 - lng1)
-        val a = sin(dLat / 2).pow(2) +
-            cos(Math.toRadians(lat1)) * cos(Math.toRadians(lat2)) * sin(dLon / 2).pow(2)
-        val c = 2 * atan2(sqrt(a), sqrt(1 - a))
-        return EARTH_RADIUS_KM * c
     }
 
     fun pathDistanceKm(ordered: List<Pair<Double, Double>>): Double {
@@ -100,5 +86,4 @@ object RouteCalculator {
         }
         return visited
     }
-
 }

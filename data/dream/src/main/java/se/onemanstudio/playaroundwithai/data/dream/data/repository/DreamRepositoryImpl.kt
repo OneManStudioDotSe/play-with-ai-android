@@ -48,8 +48,8 @@ class DreamRepositoryImpl @Inject constructor(
         dream?.imagePath?.let { path ->
             val file = File(path)
             if (file.exists()) {
-                file.delete()
-                Timber.d("DreamRepo - Deleted image file: $path")
+                if (!file.delete()) Timber.w("DreamRepo - Failed to delete image file: $path")
+                else Timber.d("DreamRepo - Deleted image file: $path")
             }
         }
     }
@@ -67,7 +67,13 @@ class DreamRepositoryImpl @Inject constructor(
             file.writeBytes(imageBytes)
             Timber.d("DreamRepo - Saved dream image to ${file.absolutePath} (${imageBytes.size} bytes)")
 
-            dreamsDao.updateDreamImage(dreamId, file.absolutePath, artistName)
+            try {
+                dreamsDao.updateDreamImage(dreamId, file.absolutePath, artistName)
+            } catch (e: Exception) {
+                Timber.e(e, "DreamRepo - Failed to update DB after writing image; deleting orphaned file")
+                file.delete()
+                throw e
+            }
             file.absolutePath
         }
 }

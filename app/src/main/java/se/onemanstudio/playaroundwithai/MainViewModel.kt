@@ -3,6 +3,7 @@ package se.onemanstudio.playaroundwithai
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import dagger.hilt.android.lifecycle.HiltViewModel
+import kotlinx.coroutines.Job
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharedFlow
 import kotlinx.coroutines.flow.SharingStarted
@@ -41,13 +42,15 @@ class MainViewModel @Inject constructor(
     }.shareIn(viewModelScope, SharingStarted.Eagerly)
 
     private var authAttemptCount = 0
+    private var signInJob: Job? = null
 
     init {
         signIn()
     }
 
     private fun signIn() {
-        viewModelScope.launch {
+        signInJob?.cancel()
+        signInJob = viewModelScope.launch {
             authAttemptCount++
             signInAnonymouslyUseCase()
                 .onSuccess { session ->

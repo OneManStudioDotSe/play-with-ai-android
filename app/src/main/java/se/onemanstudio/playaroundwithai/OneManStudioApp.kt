@@ -10,6 +10,8 @@ import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.SupervisorJob
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.withTimeoutOrNull
+import se.onemanstudio.playaroundwithai.data.chat.data.sync.SyncWorker
 import se.onemanstudio.playaroundwithai.data.chat.domain.usecase.RetryPendingSyncsUseCase
 import se.onemanstudio.playaroundwithai.data.chat.R
 import timber.log.Timber
@@ -25,6 +27,10 @@ class OneManStudioApp : Application(), Configuration.Provider {
     lateinit var retryPendingSyncsUseCase: RetryPendingSyncsUseCase
 
     private val applicationScope = CoroutineScope(SupervisorJob() + Dispatchers.IO)
+
+    companion object {
+        private const val RETRY_SYNC_TIMEOUT_MS = 30_000L
+    }
 
     override val workManagerConfiguration: Configuration
         get() = Configuration.Builder()
@@ -49,8 +55,14 @@ class OneManStudioApp : Application(), Configuration.Provider {
     private fun retryFailedSyncs() {
         applicationScope.launch {
             try {
-                retryPendingSyncsUseCase()
-                Timber.d("OneManStudioApp - Retried failed syncs on startup")
+                val completed = withTimeoutOrNull(RETRY_SYNC_TIMEOUT_MS) {
+                    retryPendingSyncsUseCase()
+                }
+                if (completed != null) {
+                    Timber.d("OneManStudioApp - Retried failed syncs on startup")
+                } else {
+                    Timber.w("OneManStudioApp - Sync retry timed out after ${RETRY_SYNC_TIMEOUT_MS}ms")
+                }
             } catch (e: Exception) {
                 Timber.e(e, "OneManStudioApp - Failed to retry syncs on startup")
             }
@@ -61,7 +73,7 @@ class OneManStudioApp : Application(), Configuration.Provider {
         val name = getString(R.string.sync_notification_channel_name)
         val descriptionText = getString(R.string.sync_notification_channel_description)
         val importance = NotificationManager.IMPORTANCE_LOW
-        val channel = NotificationChannel("sync_channel", name, importance).apply {
+        val channel = NotificationChannel(SyncWorker.SYNC_CHANNEL_FOR_DB, name, importance).apply {
             description = descriptionText
         }
         val notificationManager: NotificationManager = getSystemService(NOTIFICATION_SERVICE) as NotificationManager

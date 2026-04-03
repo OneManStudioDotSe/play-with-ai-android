@@ -41,8 +41,8 @@ internal object PlanPrompts {
     """
 
     fun tripPlannerSystemPrompt(latitude: Double, longitude: Double): String =
-        TRIP_PLANNER_SYSTEM_PROMPT.trimIndent().format(latitude.toString(), longitude.toString())
+        TRIP_PLANNER_SYSTEM_PROMPT.trimIndent().format(latitude, longitude)
 
     fun searchPlacesPrompt(query: String, latitude: Double, longitude: Double, count: Int): String =
-        SEARCH_PLACES_PROMPT.trimIndent().format(count, query, latitude.toString(), longitude.toString())
+        SEARCH_PLACES_PROMPT.trimIndent().format(count, query, latitude, longitude)
 }

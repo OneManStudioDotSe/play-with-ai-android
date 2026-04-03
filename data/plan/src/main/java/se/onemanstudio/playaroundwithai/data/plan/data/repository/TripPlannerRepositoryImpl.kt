@@ -16,8 +16,10 @@ import se.onemanstudio.playaroundwithai.core.tracking.repository.TokenUsageTrack
 import se.onemanstudio.playaroundwithai.core.network.dto.FunctionResponseDto
 import se.onemanstudio.playaroundwithai.core.network.dto.GeminiRequest
 import se.onemanstudio.playaroundwithai.core.network.dto.Part
+import se.onemanstudio.playaroundwithai.data.plan.data.tools.MINUTES_PER_HOUR
 import se.onemanstudio.playaroundwithai.data.plan.data.tools.RouteCalculator
 import se.onemanstudio.playaroundwithai.data.plan.data.tools.RouteResult
+import se.onemanstudio.playaroundwithai.data.plan.data.tools.WALKING_SPEED_KMH
 import se.onemanstudio.playaroundwithai.data.plan.prompts.PlanPrompts
 import se.onemanstudio.playaroundwithai.data.plan.data.tools.buildToolDeclarations
 import se.onemanstudio.playaroundwithai.data.plan.domain.model.PlanEvent
@@ -154,7 +156,7 @@ class TripPlannerRepositoryImpl @Inject constructor(
 
         val places = parsePlacesFromResponse(text)
 
-        places.forEachIndexed { _, place ->
+        places.forEach { place ->
             val name = place["name"]?.toString() ?: "Place ${collectedStops.size + 1}"
             val placeLat = (place["latitude"] as? Number)?.toDouble() ?: lat
             val placeLng = (place["longitude"] as? Number)?.toDouble() ?: lng
@@ -177,18 +179,8 @@ class TripPlannerRepositoryImpl @Inject constructor(
         return mapOf("places" to places, "count" to places.size)
     }
 
-    private fun handleCalculateRoute(args: Map<String, Any>, collectedStops: MutableList<TripStop>, ): Map<String, Any> {
-        val places = (args["places"] as? List<Map<String, Any>>).orEmpty()
-
-        val coordinates = if (places.isNotEmpty()) {
-            places.mapNotNull { place ->
-                val lat = (place["latitude"] as? Number)?.toDouble()
-                val lng = (place["longitude"] as? Number)?.toDouble()
-                if (lat != null && lng != null) lat to lng else null
-            }
-        } else {
-            collectedStops.map { it.latitude to it.longitude }
-        }
+    private fun handleCalculateRoute(args: Map<String, Any>, collectedStops: MutableList<TripStop>): Map<String, Any> {
+        val coordinates = collectedStops.map { it.latitude to it.longitude }
 
         if (coordinates.isEmpty()) {
             return mapOf("error" to "No places to calculate route for")
@@ -209,16 +201,12 @@ class TripPlannerRepositoryImpl @Inject constructor(
         collectedStops.addAll(reorderedStops)
 
         return mapOf(
-            "ordered_places" to result.orderedIndices.mapNotNull { idx ->
-                if (idx < reorderedStops.size) {
-                    mapOf(
-                        "name" to reorderedStops[idx].name,
-                        "latitude" to reorderedStops[idx].latitude,
-                        "longitude" to reorderedStops[idx].longitude,
-                    )
-                } else {
-                    null
-                }
+            "ordered_places" to reorderedStops.map { stop ->
+                mapOf(
+                    "name" to stop.name,
+                    "latitude" to stop.latitude,
+                    "longitude" to stop.longitude,
+                )
             },
             "total_distance_km" to result.totalDistanceKm,
             "total_walking_minutes" to result.totalWalkingMinutes,
@@ -269,7 +257,7 @@ class TripPlannerRepositoryImpl @Inject constructor(
 
     private fun calculateFallbackMinutes(stops: List<TripStop>): Int {
         val distance = calculateFallbackDistance(stops)
-        return (distance / 5.0 * 60).toInt()
+        return (distance / WALKING_SPEED_KMH * MINUTES_PER_HOUR).toInt()
     }
 
     private fun summarizeArgs(functionCall: FunctionCallDto): String {

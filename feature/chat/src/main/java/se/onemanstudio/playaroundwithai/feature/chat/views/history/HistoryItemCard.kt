@@ -46,7 +46,8 @@ fun HistoryItemCard(
     val dateFormat = stringResource(R.string.date_format_history)
     val timeFormat = stringResource(R.string.time_format_history)
     val dateAtTimePattern = stringResource(R.string.history_date_at)
-    val locale = LocalConfiguration.current.locales.getOrNull(0) ?: Locale.getDefault()
+    val localeList = LocalConfiguration.current.locales
+    val locale = if (!localeList.isEmpty) localeList[0] else Locale.getDefault()
 
     NeoBrutalCard(
         modifier = modifier
@@ -68,10 +69,10 @@ fun HistoryItemCard(
 
             Row(verticalAlignment = Alignment.CenterVertically) {
                 val zoneId = ZoneId.systemDefault()
-                val formattedDate = remember(prompt.timestamp, locale) {
+                val formattedDate = remember(prompt.timestamp, locale, zoneId) {
                     DateTimeFormatter.ofPattern(dateFormat, locale).withZone(zoneId).format(prompt.timestamp)
                 }
-                val formattedTime = remember(prompt.timestamp, locale) {
+                val formattedTime = remember(prompt.timestamp, locale, zoneId) {
                     DateTimeFormatter.ofPattern(timeFormat, locale).withZone(zoneId).format(prompt.timestamp)
                 }
 

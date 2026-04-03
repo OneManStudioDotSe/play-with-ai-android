@@ -130,8 +130,11 @@ private fun SoFaApp() {
                                     restoreState = true
                                 }
                             },
-                            label = { Text(text = screen.label, fontWeight = if (isSelected) Bold else Normal) },
-                            icon = { Icon(screen.icon, contentDescription = "${screen.label} Tab") },
+                            label = {
+                                val label = stringResource(screen.labelRes)
+                                Text(text = label, fontWeight = if (isSelected) Bold else Normal)
+                            },
+                            icon = { Icon(screen.icon, contentDescription = stringResource(screen.labelRes)) },
                             colors = NavigationBarItemDefaults.colors(
                                 selectedIconColor = MaterialTheme.colorScheme.surface,
                                 selectedTextColor = MaterialTheme.colorScheme.onSurface,

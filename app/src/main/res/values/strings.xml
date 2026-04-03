@@ -4,4 +4,9 @@
     <string name="auth_error_retry">Retry</string>
     <string name="auth_error_retries_exhausted">Sign-in failed after multiple attempts. Your prompts will not be synced to the cloud.</string>
     <string name="token_usage_snackbar">Used %s tokens</string>
+    <string name="nav_label_chat">Chat</string>
+    <string name="nav_label_explain">Explain</string>
+    <string name="nav_label_plan">Plan</string>
+    <string name="nav_label_explore">Explore</string>
+    <string name="nav_label_sofa">SoFa</string>
 </resources>

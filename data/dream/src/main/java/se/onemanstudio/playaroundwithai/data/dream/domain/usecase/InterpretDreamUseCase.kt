@@ -1,5 +1,6 @@
 package se.onemanstudio.playaroundwithai.data.dream.domain.usecase
 
+import se.onemanstudio.playaroundwithai.data.dream.domain.MAX_DREAM_LENGTH
 import se.onemanstudio.playaroundwithai.data.dream.domain.model.DreamInterpretation
 import se.onemanstudio.playaroundwithai.data.dream.domain.repository.DreamGeminiRepository
 import javax.inject.Inject

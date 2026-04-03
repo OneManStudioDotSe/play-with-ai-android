@@ -14,10 +14,16 @@ import se.onemanstudio.playaroundwithai.core.network.dto.ImageData
 import se.onemanstudio.playaroundwithai.core.network.dto.Part
 import se.onemanstudio.playaroundwithai.core.tracking.repository.TokenUsageTracker
 import se.onemanstudio.playaroundwithai.data.dream.prompts.DreamPrompts
+import se.onemanstudio.playaroundwithai.data.dream.domain.model.DreamElement
 import se.onemanstudio.playaroundwithai.data.dream.domain.model.DreamImage
 import se.onemanstudio.playaroundwithai.data.dream.domain.model.DreamInterpretation
+import se.onemanstudio.playaroundwithai.data.dream.domain.model.DreamLayer
 import se.onemanstudio.playaroundwithai.data.dream.domain.model.DreamMood
+import se.onemanstudio.playaroundwithai.data.dream.domain.model.DreamPalette
+import se.onemanstudio.playaroundwithai.data.dream.domain.model.DreamParticle
 import se.onemanstudio.playaroundwithai.data.dream.domain.model.DreamScene
+import se.onemanstudio.playaroundwithai.data.dream.domain.model.ElementShape
+import se.onemanstudio.playaroundwithai.data.dream.domain.model.ParticleShape
 import se.onemanstudio.playaroundwithai.data.dream.domain.repository.DreamGeminiRepository
 import timber.log.Timber
 import java.io.IOException
@@ -98,7 +104,7 @@ class DreamGeminiRepositoryImpl @Inject constructor(
                 return@withContext Result.failure(Exception("No image data after $IMAGE_GENERATION_MAX_RETRIES attempts"))
             }
 
-            val artistName = ARTIST_REGEX.find(lastText)?.groupValues?.get(1)?.trim() ?: "Unknown Artist"
+            val artistName = ARTIST_REGEX.find(lastText)?.groupValues?.get(1)?.trim()?.takeIf { it.isNotBlank() } ?: "Unknown Artist"
             Timber.d("DreamGemini - Image generated, artist: $artistName")
 
             Result.success(DreamImage(imageBase64 = imageData.data, mimeType = imageData.mimeType, artistName = artistName))
@@ -135,7 +141,7 @@ class DreamGeminiRepositoryImpl @Inject constructor(
             }
         }
 
-        val mood = runCatching { DreamMood.valueOf(parsed.mood.uppercase()) }.getOrDefault(DreamMood.MYSTERIOUS)
+        val mood = runCatching { DreamMood.valueOf(parsed.mood.trim().uppercase()) }.getOrDefault(DreamMood.MYSTERIOUS)
 
         val scene = DreamScene(
             palette = parsed.scene.palette.toDomain(),
@@ -192,7 +198,7 @@ private data class GeminiPaletteDto(
     val horizon: Long = 0xFF16213E,
     val accent: Long = 0xFF0F3460,
 ) {
-    fun toDomain() = se.onemanstudio.playaroundwithai.data.dream.domain.model.DreamPalette(
+    fun toDomain() = DreamPalette(
         sky = ensureAlpha(sky),
         horizon = ensureAlpha(horizon),
         accent = ensureAlpha(accent),
@@ -203,7 +209,7 @@ private data class GeminiLayerDto(
     val depth: Float = 0.5f,
     val elements: List<GeminiElementDto> = emptyList(),
 ) {
-    fun toDomain() = se.onemanstudio.playaroundwithai.data.dream.domain.model.DreamLayer(
+    fun toDomain() = DreamLayer(
         depth = depth,
         elements = elements.map { it.toDomain() },
     )
@@ -218,10 +224,8 @@ private data class GeminiElementDto(
     val color: Long = 0xFFFFFFFF,
     val alpha: Float = 1.0f,
 ) {
-    fun toDomain() = se.onemanstudio.playaroundwithai.data.dream.domain.model.DreamElement(
-        shape = runCatching {
-            se.onemanstudio.playaroundwithai.data.dream.domain.model.ElementShape.valueOf(shape.uppercase())
-        }.getOrDefault(se.onemanstudio.playaroundwithai.data.dream.domain.model.ElementShape.CIRCLE),
+    fun toDomain() = DreamElement(
+        shape = runCatching { ElementShape.valueOf(shape.uppercase()) }.getOrDefault(ElementShape.CIRCLE),
         x = x, y = y, scale = scale, color = ensureAlpha(color), alpha = alpha,
     )
 }
@@ -234,10 +238,8 @@ private data class GeminiParticleDto(
     val speed: Float = 1.0f,
     val size: Float = 4.0f,
 ) {
-    fun toDomain() = se.onemanstudio.playaroundwithai.data.dream.domain.model.DreamParticle(
-        shape = runCatching {
-            se.onemanstudio.playaroundwithai.data.dream.domain.model.ParticleShape.valueOf(shape.uppercase())
-        }.getOrDefault(se.onemanstudio.playaroundwithai.data.dream.domain.model.ParticleShape.DOT),
+    fun toDomain() = DreamParticle(
+        shape = runCatching { ParticleShape.valueOf(shape.uppercase()) }.getOrDefault(ParticleShape.DOT),
         count = count, color = ensureAlpha(color), speed = speed, size = size,
     )
 }
