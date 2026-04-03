@@ -7,8 +7,10 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import se.onemanstudio.playaroundwithai.core.ui.sofa.ChartBarData
+import androidx.compose.runtime.remember
 import androidx.compose.ui.platform.LocalConfiguration
 import java.text.NumberFormat
+import java.util.Locale
 import androidx.core.net.toUri
 
 @Composable
@@ -22,7 +24,8 @@ fun SettingsBottomSheetContainer(
     val vehicleCount by viewModel.vehicleCount.collectAsStateWithLifecycle()
     val searchRadiusKm by viewModel.searchRadiusKm.collectAsStateWithLifecycle()
     val context = LocalContext.current
-    val numberFormat = NumberFormat.getNumberInstance(LocalConfiguration.current.locales[0])
+    val locale = LocalConfiguration.current.locales.getOrNull(0) ?: Locale.getDefault()
+    val numberFormat = remember(locale) { NumberFormat.getNumberInstance(locale) }
 
     val usageBars = weeklyUsage.map { day ->
         ChartBarData(

@@ -200,9 +200,10 @@ class DreamViewModel @Inject constructor(
         else -> DreamError.Unknown(exception.localizedMessage)
     }
 
-    @Suppress("MagicNumber")
     private fun logSceneSpecs(scene: DreamScene) {
-        fun colorHex(c: Long) = "0x${c.toInt().toUInt().toString(16).uppercase().padStart(8, '0')}"
+        val hexRadix = 16
+        val hexPadLength = 8
+        fun colorHex(c: Long) = "0x${c.toInt().toUInt().toString(hexRadix).uppercase().padStart(hexPadLength, '0')}"
 
         val sb = StringBuilder()
         sb.appendLine("=== Dream Scene Specs ===")

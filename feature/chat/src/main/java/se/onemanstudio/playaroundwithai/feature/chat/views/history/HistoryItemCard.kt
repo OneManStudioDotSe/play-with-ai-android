@@ -18,6 +18,7 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
@@ -34,6 +35,7 @@ import java.time.Instant
 import java.time.ZoneId
 import java.time.format.DateTimeFormatter
 import androidx.compose.ui.platform.LocalConfiguration
+import java.util.Locale
 
 @Composable
 fun HistoryItemCard(
@@ -44,6 +46,7 @@ fun HistoryItemCard(
     val dateFormat = stringResource(R.string.date_format_history)
     val timeFormat = stringResource(R.string.time_format_history)
     val dateAtTimePattern = stringResource(R.string.history_date_at)
+    val locale = LocalConfiguration.current.locales.getOrNull(0) ?: Locale.getDefault()
 
     NeoBrutalCard(
         modifier = modifier
@@ -64,10 +67,13 @@ fun HistoryItemCard(
             Spacer(Modifier.height(Dimensions.paddingLarge))
 
             Row(verticalAlignment = Alignment.CenterVertically) {
-                val locale = LocalConfiguration.current.locales[0]
                 val zoneId = ZoneId.systemDefault()
-                val formattedDate = DateTimeFormatter.ofPattern(dateFormat, locale).withZone(zoneId).format(prompt.timestamp)
-                val formattedTime = DateTimeFormatter.ofPattern(timeFormat, locale).withZone(zoneId).format(prompt.timestamp)
+                val formattedDate = remember(prompt.timestamp, locale) {
+                    DateTimeFormatter.ofPattern(dateFormat, locale).withZone(zoneId).format(prompt.timestamp)
+                }
+                val formattedTime = remember(prompt.timestamp, locale) {
+                    DateTimeFormatter.ofPattern(timeFormat, locale).withZone(zoneId).format(prompt.timestamp)
+                }
 
                 Text(
                     text = String.format(dateAtTimePattern, formattedDate, formattedTime),

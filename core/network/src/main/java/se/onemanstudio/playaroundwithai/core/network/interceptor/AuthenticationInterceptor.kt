@@ -25,7 +25,11 @@ class AuthenticationInterceptor @Inject constructor(
         Timber.d("API request: ${originalRequest.method} ${originalHttpUrl.encodedPath} (API key attached)")
 
         val response = chain.proceed(newRequest)
-        Timber.d("API response: ${response.code} for ${originalHttpUrl.encodedPath}")
+        if (response.isSuccessful) {
+            Timber.d("API response: ${response.code} for ${originalHttpUrl.encodedPath}")
+        } else {
+            Timber.w("API response: ${response.code} for ${originalHttpUrl.encodedPath}")
+        }
         return response
     }
 }
