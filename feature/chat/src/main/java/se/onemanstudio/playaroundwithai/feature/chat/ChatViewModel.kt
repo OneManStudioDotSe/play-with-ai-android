@@ -131,7 +131,7 @@ class ChatViewModel @Inject constructor(
         }
     }
 
-    @Suppress("TooGenericExceptionCaught", "LongMethod")
+    @Suppress("LongMethod")
     fun sendPrompt(prompt: String, attachment: Attachment?) {
         if (!apiKeyAvailability.isGeminiKeyAvailable) {
             _screenState.update { it.copy(chatState = ChatUiState.Error(ChatError.ApiKeyMissing)) }
@@ -187,12 +187,11 @@ class ChatViewModel @Inject constructor(
                     _screenState.update { it.copy(chatState = ChatUiState.Success(responseText)) }
 
                     if (savedId != null) {
-                        try {
-                            updatePromptTextUseCase(savedId, "Q: $prompt\nA: $responseText")
-                        } catch (e: Exception) {
-                            Timber.e(e, "ChatVM - Failed to update prompt text in local DB")
-                            _snackbarEvent.tryEmit(SnackbarEvent.LocalUpdateFailed)
-                        }
+                        updatePromptTextUseCase(savedId, "Q: $prompt\nA: $responseText")
+                            .onFailure { e ->
+                                Timber.e(e, "ChatVM - Failed to update prompt text in local DB")
+                                _snackbarEvent.tryEmit(SnackbarEvent.LocalUpdateFailed)
+                            }
                     }
                 }
                 .onFailure { exception ->

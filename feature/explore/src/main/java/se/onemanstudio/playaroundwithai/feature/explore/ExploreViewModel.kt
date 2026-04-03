@@ -45,7 +45,6 @@ private val LOADING_MESSAGE_RES_IDS = listOf(
     R.string.loading_message_5,
 )
 
-@Suppress("TooManyFunctions")
 @HiltViewModel
 class ExploreViewModel @Inject constructor(
     private val getExploreItemsUseCase: GetExploreItemsUseCase,
@@ -82,7 +81,6 @@ class ExploreViewModel @Inject constructor(
         }
     }
 
-    @Suppress("TooGenericExceptionCaught")
     fun loadMapData(centerLat: Double, centerLng: Double) {
         lastCenterLat = centerLat
         lastCenterLng = centerLng
@@ -100,19 +98,18 @@ class ExploreViewModel @Inject constructor(
         }
 
         viewModelScope.launch {
-            try {
-                val data = getExploreItemsUseCase(exploreSettingsHolder.vehicleCount.value, centerLat, centerLng)
-                    .map { it.toUiModel() }.toPersistentList()
-                _uiState.update {
-                    it.copy(markers = it.markers.copy(isLoading = false, allLocations = data, visibleLocations = data))
+            getExploreItemsUseCase(exploreSettingsHolder.vehicleCount.value, centerLat, centerLng)
+                .onSuccess { items ->
+                    val data = items.map { it.toUiModel() }.toPersistentList()
+                    _uiState.update {
+                        it.copy(markers = it.markers.copy(isLoading = false, allLocations = data, visibleLocations = data))
+                    }
                 }
-            } catch (e: IOException) {
-                Timber.e(e, "ExploreViewModel - Failed to load map data (network)")
-                _uiState.update { it.copy(markers = it.markers.copy(isLoading = false), error = ExploreError.NetworkError) }
-            } catch (e: Exception) {
-                Timber.e(e, "ExploreViewModel - Failed to load map data")
-                _uiState.update { it.copy(markers = it.markers.copy(isLoading = false), error = ExploreError.Unknown(e.localizedMessage)) }
-            }
+                .onFailure { e ->
+                    Timber.e(e, "ExploreViewModel - Failed to load map data")
+                    val error = if (e is IOException) ExploreError.NetworkError else ExploreError.Unknown(e.localizedMessage)
+                    _uiState.update { it.copy(markers = it.markers.copy(isLoading = false), error = error) }
+                }
         }
     }
 

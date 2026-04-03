@@ -33,7 +33,11 @@ private const val DEFAULT_COUNT = 5
 private const val ERROR_BODY_PREVIEW_LENGTH = 200
 private const val LOG_TAG = "TripPlanner"
 
-@Suppress("UNCHECKED_CAST")
+private object ToolNames {
+    const val SEARCH_PLACES = "search_places"
+    const val CALCULATE_ROUTE = "calculate_route"
+}
+
 @Singleton
 class TripPlannerRepositoryImpl @Inject constructor(
     private val apiService: GeminiApiService,
@@ -71,7 +75,7 @@ class TripPlannerRepositoryImpl @Inject constructor(
                     emit(PlanEvent.ToolCalling(functionCall.name, summarizeArgs(functionCall)))
 
                     val result = dispatchTool(functionCall.name, functionCall.args, latitude, longitude, collectedStops)
-                    if (functionCall.name == "calculate_route") {
+                    if (functionCall.name == ToolNames.CALCULATE_ROUTE) {
                         routeResult = extractRouteResult(result)
                     }
 
@@ -123,8 +127,8 @@ class TripPlannerRepositoryImpl @Inject constructor(
         collectedStops: MutableList<TripStop>,
     ): Map<String, Any> {
         return when (name) {
-            "search_places" -> handleSearchPlaces(args, latitude, longitude, collectedStops)
-            "calculate_route" -> handleCalculateRoute(args, collectedStops)
+            ToolNames.SEARCH_PLACES -> handleSearchPlaces(args, latitude, longitude, collectedStops)
+            ToolNames.CALCULATE_ROUTE -> handleCalculateRoute(args, collectedStops)
             else -> mapOf("error" to "Unknown tool: $name")
         }
     }
@@ -221,6 +225,7 @@ class TripPlannerRepositoryImpl @Inject constructor(
         )
     }
 
+    @Suppress("UNCHECKED_CAST")
     private fun parsePlacesFromResponse(text: String): List<Map<String, Any>> {
         val cleaned = JsonExtractor.extract(text)
 
@@ -269,19 +274,19 @@ class TripPlannerRepositoryImpl @Inject constructor(
 
     private fun summarizeArgs(functionCall: FunctionCallDto): String {
         return when (functionCall.name) {
-            "search_places" -> "Searching for \"${functionCall.args["query"]}\""
-            "calculate_route" -> "Calculating optimal walking route"
+            ToolNames.SEARCH_PLACES -> "Searching for \"${functionCall.args["query"]}\""
+            ToolNames.CALCULATE_ROUTE -> "Calculating optimal walking route"
             else -> functionCall.name
         }
     }
 
     private fun summarizeResult(name: String, result: Map<String, Any>): String {
         return when (name) {
-            "search_places" -> {
+            ToolNames.SEARCH_PLACES -> {
                 val count = result["count"] as? Number
                 "Found ${count?.toInt() ?: 0} places"
             }
-            "calculate_route" -> {
+            ToolNames.CALCULATE_ROUTE -> {
                 val distance = result["total_distance_km"] as? Number
                 val minutes = result["total_walking_minutes"] as? Number
                 "Route: %.1f km, ~%d min walk".format(distance?.toDouble() ?: 0.0, minutes?.toInt() ?: 0)

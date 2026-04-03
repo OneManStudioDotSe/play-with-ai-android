@@ -57,3 +57,5 @@ complexity:
   TooManyFunctions:
     # Compose files often contain many small helper composables.
     ignoreAnnotated: ['Composable']
+    # Private helpers are implementation details and shouldn't count toward the public API complexity threshold.
+    ignorePrivate: true

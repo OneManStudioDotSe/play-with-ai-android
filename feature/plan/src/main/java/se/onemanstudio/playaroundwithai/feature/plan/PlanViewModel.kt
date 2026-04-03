@@ -11,6 +11,7 @@ import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import se.onemanstudio.playaroundwithai.core.config.model.ApiKeyAvailability
 import se.onemanstudio.playaroundwithai.data.plan.domain.model.PlanEvent
+import se.onemanstudio.playaroundwithai.data.plan.domain.model.TripPlan
 import se.onemanstudio.playaroundwithai.data.plan.domain.usecase.PlanTripUseCase
 import se.onemanstudio.playaroundwithai.feature.plan.states.PlanError
 import se.onemanstudio.playaroundwithai.feature.plan.states.PlanStepUi
@@ -86,7 +87,7 @@ class PlanViewModel @Inject constructor(
             }
 
             is PlanEvent.Complete -> {
-                _uiState.update { PlanUiState.Result(steps = steps.toPersistentList(), plan = event.plan.toUi()) }
+                _uiState.update { PlanUiState.Result(steps = steps.toPersistentList(), plan = mapPlanToUi(event.plan)) }
             }
 
             is PlanEvent.Error -> {
@@ -108,10 +109,10 @@ class PlanViewModel @Inject constructor(
         }
     }
 
-    private fun se.onemanstudio.playaroundwithai.data.plan.domain.model.TripPlan.toUi(): TripPlanUi {
+    private fun mapPlanToUi(plan: TripPlan): TripPlanUi {
         return TripPlanUi(
-            summary = summary,
-            stops = stops.map { stop ->
+            summary = plan.summary,
+            stops = plan.stops.map { stop ->
                 TripStopUi(
                     name = stop.name,
                     latitude = stop.latitude,
@@ -121,8 +122,8 @@ class PlanViewModel @Inject constructor(
                     orderIndex = stop.orderIndex,
                 )
             }.toPersistentList(),
-            totalDistanceKm = totalDistanceKm,
-            totalWalkingMinutes = totalWalkingMinutes,
+            totalDistanceKm = plan.totalDistanceKm,
+            totalWalkingMinutes = plan.totalWalkingMinutes,
         )
     }
 }
