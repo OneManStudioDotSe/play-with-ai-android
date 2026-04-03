@@ -24,6 +24,8 @@ import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.rounded.DirectionsWalk
+import androidx.compose.material.icons.rounded.Done
+import androidx.compose.material.icons.rounded.OpenWith
 import androidx.compose.material.icons.rounded.Schedule
 import androidx.compose.material3.VerticalDivider
 import androidx.compose.material3.Icon
@@ -31,7 +33,11 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -42,10 +48,19 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import androidx.compose.foundation.border
+import androidx.compose.foundation.isSystemInDarkTheme
+import androidx.compose.ui.platform.LocalContext
+import com.google.android.gms.maps.CameraUpdateFactory
 import com.google.android.gms.maps.model.CameraPosition
 import com.google.android.gms.maps.model.LatLng
+import com.google.android.gms.maps.model.LatLngBounds
+import com.google.android.gms.maps.model.MapStyleOptions
 import com.google.maps.android.compose.GoogleMap
-import com.google.maps.android.compose.Marker
+import com.google.maps.android.compose.MapProperties
+import com.google.maps.android.compose.MapUiSettings
+import com.google.maps.android.compose.MapsComposeExperimentalApi
+import com.google.maps.android.compose.MarkerComposable
 import com.google.maps.android.compose.Polyline
 import com.google.maps.android.compose.rememberCameraPositionState
 import com.google.maps.android.compose.rememberUpdatedMarkerState
@@ -55,6 +70,7 @@ import se.onemanstudio.playaroundwithai.core.ui.sofa.MarkerText
 import se.onemanstudio.playaroundwithai.core.ui.sofa.NeoBrutalButton
 import se.onemanstudio.playaroundwithai.core.ui.sofa.NeoBrutalCard
 import se.onemanstudio.playaroundwithai.core.ui.sofa.NeoBrutalChip
+import se.onemanstudio.playaroundwithai.core.ui.sofa.NeoBrutalIconButton
 import se.onemanstudio.playaroundwithai.core.ui.theme.Dimensions
 import se.onemanstudio.playaroundwithai.core.ui.theme.SofaAiTheme
 import se.onemanstudio.playaroundwithai.core.ui.theme.electricBlue
@@ -64,6 +80,8 @@ import se.onemanstudio.playaroundwithai.core.ui.theme.vividPink
 import se.onemanstudio.playaroundwithai.core.ui.theme.zestyLime
 import se.onemanstudio.playaroundwithai.feature.plan.R
 import se.onemanstudio.playaroundwithai.feature.plan.PlanConstants.ACCENT_COLOR_COUNT
+import se.onemanstudio.playaroundwithai.feature.plan.PlanConstants.MAP_CAMERA_ANIMATE_MS
+import se.onemanstudio.playaroundwithai.feature.plan.PlanConstants.MAP_CAMERA_PADDING
 import se.onemanstudio.playaroundwithai.feature.plan.PlanConstants.MAP_HEIGHT_MAX
 import se.onemanstudio.playaroundwithai.feature.plan.PlanConstants.MAP_HEIGHT_MIN
 import se.onemanstudio.playaroundwithai.feature.plan.PlanConstants.MAP_ZOOM
@@ -88,10 +106,12 @@ internal fun ResultState(
     state: PlanUiState.Result,
     onNewPlan: () -> Unit,
 ) {
+    var mapInteractionEnabled by remember { mutableStateOf(false) }
+
     Column(
         modifier = Modifier
             .fillMaxSize()
-            .verticalScroll(rememberScrollState()),
+            .verticalScroll(rememberScrollState(), enabled = !mapInteractionEnabled),
     ) {
         // Map section
         if (state.plan.stops.isNotEmpty()) {
@@ -110,6 +130,8 @@ internal fun ResultState(
                     NeoBrutalCard(modifier = Modifier.fillMaxWidth()) {
                         TripMap(
                             stops = state.plan.stops,
+                            interactionEnabled = mapInteractionEnabled,
+                            onInteractionChange = { mapInteractionEnabled = it },
                             modifier = Modifier.clip(RectangleShape),
                         )
                     }
@@ -247,42 +269,113 @@ private fun PhasedVisibility(
     }
 }
 
+@OptIn(MapsComposeExperimentalApi::class)
 @Composable
 private fun TripMap(
     stops: PersistentList<TripStopUi>,
+    interactionEnabled: Boolean,
+    onInteractionChange: (Boolean) -> Unit,
     modifier: Modifier = Modifier,
 ) {
-    val firstStop = stops.first()
+    val context = LocalContext.current
+    val isDarkTheme = isSystemInDarkTheme()
+
     val cameraPositionState = rememberCameraPositionState {
         position = CameraPosition.fromLatLngZoom(
-            LatLng(firstStop.latitude, firstStop.longitude),
+            LatLng(stops.first().latitude, stops.first().longitude),
             MAP_ZOOM,
         )
     }
 
+    LaunchedEffect(stops) {
+        if (stops.size >= 2) {
+            val boundsBuilder = LatLngBounds.builder()
+            stops.forEach { boundsBuilder.include(LatLng(it.latitude, it.longitude)) }
+            cameraPositionState.animate(
+                update = CameraUpdateFactory.newLatLngBounds(boundsBuilder.build(), MAP_CAMERA_PADDING),
+                durationMs = MAP_CAMERA_ANIMATE_MS,
+            )
+        }
+    }
+
     val routePoints = stops.map { LatLng(it.latitude, it.longitude) }
 
-    GoogleMap(
+    Box(
         modifier = modifier
             .fillMaxWidth()
             .heightIn(min = MAP_HEIGHT_MIN.dp, max = MAP_HEIGHT_MAX.dp),
-        cameraPositionState = cameraPositionState,
     ) {
-        stops.forEach { stop ->
-            Marker(
-                state = rememberUpdatedMarkerState(position = LatLng(stop.latitude, stop.longitude)),
-                title = "${stop.orderIndex + 1}. ${stop.name}",
-                snippet = stop.category,
-            )
+        GoogleMap(
+            modifier = Modifier.matchParentSize(),
+            cameraPositionState = cameraPositionState,
+            properties = MapProperties(
+                mapStyleOptions = MapStyleOptions.loadRawResourceStyle(
+                    context,
+                    if (isDarkTheme) R.raw.custom_map_style_dark else R.raw.custom_map_style_light,
+                ),
+            ),
+            uiSettings = MapUiSettings(
+                compassEnabled = false,
+                indoorLevelPickerEnabled = false,
+                mapToolbarEnabled = false,
+                rotationGesturesEnabled = false,
+                scrollGesturesEnabled = interactionEnabled,
+                tiltGesturesEnabled = false,
+                zoomControlsEnabled = false,
+                zoomGesturesEnabled = interactionEnabled,
+                myLocationButtonEnabled = false,
+            ),
+        ) {
+            stops.forEach { stop ->
+                MarkerComposable(
+                    keys = arrayOf(stop.orderIndex),
+                    state = rememberUpdatedMarkerState(position = LatLng(stop.latitude, stop.longitude)),
+                    title = stop.name,
+                    snippet = stop.category,
+                ) {
+                    StopMarkerIcon(orderIndex = stop.orderIndex)
+                }
+            }
+
+            if (routePoints.size >= 2) {
+                Polyline(
+                    points = routePoints,
+                    color = MaterialTheme.colorScheme.primary,
+                    width = POLYLINE_WIDTH,
+                    geodesic = true,
+                )
+            }
         }
 
-        if (routePoints.size >= 2) {
-            Polyline(
-                points = routePoints,
-                color = MaterialTheme.colorScheme.primary,
-                width = POLYLINE_WIDTH,
-            )
-        }
+        NeoBrutalIconButton(
+            imageVector = if (interactionEnabled) Icons.Rounded.Done else Icons.Rounded.OpenWith,
+            contentDescription = stringResource(
+                if (interactionEnabled) R.string.plan_map_done else R.string.plan_map_interact
+            ),
+            onClick = { onInteractionChange(!interactionEnabled) },
+            modifier = Modifier
+                .align(Alignment.BottomEnd)
+                .padding(Dimensions.paddingMedium),
+        )
+    }
+}
+
+@Composable
+private fun StopMarkerIcon(orderIndex: Int) {
+    val badgeColor = accentColors[orderIndex % ACCENT_COLOR_COUNT]
+    Box(
+        modifier = Modifier
+            .size(ORDER_BADGE_SIZE.dp)
+            .background(badgeColor)
+            .border(2.dp, Color.Black),
+        contentAlignment = Alignment.Center,
+    ) {
+        Text(
+            text = "${orderIndex + 1}",
+            style = MaterialTheme.typography.titleMedium.copy(fontWeight = FontWeight.Bold),
+            color = Color.Black,
+            textAlign = TextAlign.Center,
+        )
     }
 }
 

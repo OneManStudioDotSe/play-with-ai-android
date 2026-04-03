@@ -30,6 +30,10 @@
     <string name="plan_icon_step_tool_result">Tool result</string>
     <string name="plan_load_sample_data">Load sample data</string>
 
+    <!-- Map interaction toggle -->
+    <string name="plan_map_interact">Explore map</string>
+    <string name="plan_map_done">Done</string>
+
     <!-- Result section headers -->
     <string name="plan_trip_summary">Trip Summary</string>
     <string name="plan_your_route">Your Route</string>
