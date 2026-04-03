@@ -1,7 +1,7 @@
 package se.onemanstudio.playaroundwithai.data.explore.domain.usecase
 
+import se.onemanstudio.playaroundwithai.core.network.utils.permutations
 import se.onemanstudio.playaroundwithai.data.explore.domain.utils.calculatePathDistance
-import se.onemanstudio.playaroundwithai.data.explore.domain.utils.permutations
 import javax.inject.Inject
 import kotlin.math.roundToInt
 

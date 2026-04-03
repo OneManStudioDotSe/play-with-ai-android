@@ -1,5 +1,6 @@
 package se.onemanstudio.playaroundwithai.data.plan.data.tools
 
+import se.onemanstudio.playaroundwithai.core.network.utils.permutations
 import kotlin.math.atan2
 import kotlin.math.cos
 import kotlin.math.pow
@@ -100,16 +101,4 @@ object RouteCalculator {
         return visited
     }
 
-    private fun <T> permutations(list: List<T>): List<List<T>> {
-        if (list.isEmpty()) return listOf(emptyList())
-        val result = mutableListOf<List<T>>()
-        for (i in list.indices) {
-            val elem = list[i]
-            val rest = list.take(i) + list.drop(i + 1)
-            for (p in permutations(rest)) {
-                result.add(listOf(elem) + p)
-            }
-        }
-        return result
-    }
 }

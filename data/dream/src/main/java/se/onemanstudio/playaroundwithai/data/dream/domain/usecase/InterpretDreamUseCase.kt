@@ -4,8 +4,6 @@ import se.onemanstudio.playaroundwithai.data.dream.domain.model.DreamInterpretat
 import se.onemanstudio.playaroundwithai.data.dream.domain.repository.DreamGeminiRepository
 import javax.inject.Inject
 
-internal const val MAX_DREAM_LENGTH = 5_000
-
 class InterpretDreamUseCase @Inject constructor(
     private val repository: DreamGeminiRepository
 ) {
