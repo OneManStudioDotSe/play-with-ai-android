@@ -23,6 +23,9 @@ import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.ModalBottomSheet
+import androidx.compose.material3.SegmentedButton
+import androidx.compose.material3.SegmentedButtonDefaults
+import androidx.compose.material3.SingleChoiceSegmentedButtonRow
 import androidx.compose.material3.Slider
 import androidx.compose.material3.SliderDefaults
 import androidx.compose.material3.Switch
@@ -59,6 +62,7 @@ fun SettingsBottomSheet(
     onShowTokenUsageChange: (Boolean) -> Unit,
     onVehicleCountChange: (Int) -> Unit,
     onSearchRadiusChange: (Float) -> Unit,
+    onWalkingSpeedChange: (Float) -> Unit,
     onContactClick: () -> Unit,
     onLinkedInClick: () -> Unit = {},
     usageBars: List<ChartBarData> = emptyList(),
@@ -76,6 +80,7 @@ fun SettingsBottomSheet(
             onShowTokenUsageChange = onShowTokenUsageChange,
             onVehicleCountChange = onVehicleCountChange,
             onSearchRadiusChange = onSearchRadiusChange,
+            onWalkingSpeedChange = onWalkingSpeedChange,
             onContactClick = onContactClick,
             onLinkedInClick = onLinkedInClick,
             usageBars = usageBars,
@@ -91,6 +96,7 @@ private fun SettingsBottomSheetContent(
     onShowTokenUsageChange: (Boolean) -> Unit,
     onVehicleCountChange: (Int) -> Unit,
     onSearchRadiusChange: (Float) -> Unit,
+    onWalkingSpeedChange: (Float) -> Unit,
     onContactClick: () -> Unit,
     onLinkedInClick: () -> Unit,
     usageBars: List<ChartBarData>,
@@ -147,8 +153,10 @@ private fun SettingsBottomSheetContent(
                 MapControlsSection(
                     vehicleCount = state.vehicleCount,
                     searchRadiusKm = state.searchRadiusKm,
+                    walkingSpeedKmh = state.walkingSpeedKmh,
                     onVehicleCountChange = onVehicleCountChange,
                     onSearchRadiusChange = onSearchRadiusChange,
+                    onWalkingSpeedChange = onWalkingSpeedChange,
                 )
 
                 Spacer(modifier = Modifier.height(Dimensions.paddingLarge))
@@ -287,17 +295,26 @@ private fun AboutSection(
     }
 }
 
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 private fun MapControlsSection(
     vehicleCount: Int,
     searchRadiusKm: Float,
+    walkingSpeedKmh: Float,
     onVehicleCountChange: (Int) -> Unit,
     onSearchRadiusChange: (Float) -> Unit,
+    onWalkingSpeedChange: (Float) -> Unit,
 ) {
     val sliderColors = SliderDefaults.colors(
         thumbColor = MaterialTheme.colorScheme.onSurface,
         activeTrackColor = MaterialTheme.colorScheme.onSurface,
         inactiveTrackColor = MaterialTheme.colorScheme.onSurface.copy(alpha = Alphas.extraLow),
+    )
+
+    val speedOptions = listOf(
+        SettingsState.WALKING_SPEED_SLOW to stringResource(R.string.settings_walking_speed_slow),
+        SettingsState.WALKING_SPEED_NORMAL to stringResource(R.string.settings_walking_speed_normal),
+        SettingsState.WALKING_SPEED_FAST to stringResource(R.string.settings_walking_speed_fast),
     )
 
     Column(verticalArrangement = Arrangement.spacedBy(Dimensions.paddingMedium)) {
@@ -332,6 +349,24 @@ private fun MapControlsSection(
             valueRange = SettingsState.MIN_SEARCH_RADIUS_KM..SettingsState.MAX_SEARCH_RADIUS_KM,
             colors = sliderColors,
         )
+
+        Text(
+            text = stringResource(R.string.settings_walking_speed),
+            style = MaterialTheme.typography.bodyMedium,
+            color = MaterialTheme.colorScheme.onSurface,
+        )
+
+        SingleChoiceSegmentedButtonRow(modifier = Modifier.fillMaxWidth()) {
+            speedOptions.forEachIndexed { index, (speed, label) ->
+                SegmentedButton(
+                    shape = SegmentedButtonDefaults.itemShape(index = index, count = speedOptions.size),
+                    selected = walkingSpeedKmh == speed,
+                    onClick = { onWalkingSpeedChange(speed) },
+                ) {
+                    Text(text = label, style = MaterialTheme.typography.labelMedium)
+                }
+            }
+        }
     }
 }
 
@@ -388,6 +423,7 @@ private fun SettingsContentLightPreview() {
             onShowTokenUsageChange = {},
             onVehicleCountChange = {},
             onSearchRadiusChange = {},
+            onWalkingSpeedChange = {},
             onContactClick = {},
             onLinkedInClick = {},
             usageBars = sampleUsageBars,
@@ -406,6 +442,7 @@ private fun SettingsContentDarkPreview() {
             onShowTokenUsageChange = {},
             onVehicleCountChange = {},
             onSearchRadiusChange = {},
+            onWalkingSpeedChange = {},
             onContactClick = {},
             onLinkedInClick = {},
             usageBars = sampleUsageBars,

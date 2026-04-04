@@ -4,7 +4,6 @@ import se.onemanstudio.playaroundwithai.core.network.utils.haversineKm
 import se.onemanstudio.playaroundwithai.core.network.utils.permutations
 
 private const val BRUTE_FORCE_THRESHOLD = 8
-internal const val WALKING_SPEED_KMH = 5.0
 internal const val MINUTES_PER_HOUR = 60
 
 data class RouteResult(
@@ -14,7 +13,7 @@ data class RouteResult(
 )
 
 object RouteCalculator {
-    fun findOptimalRoute(places: List<Pair<Double, Double>>): RouteResult {
+    fun findOptimalRoute(places: List<Pair<Double, Double>>, walkingSpeedKmh: Double): RouteResult {
         if (places.size <= 1) {
             return RouteResult(
                 orderedIndices = places.indices.toList(),
@@ -31,7 +30,7 @@ object RouteCalculator {
 
         val orderedPlaces = orderedIndices.map { places[it] }
         val totalDistance = pathDistanceKm(orderedPlaces)
-        val walkingMinutes = (totalDistance / WALKING_SPEED_KMH * MINUTES_PER_HOUR).toInt()
+        val walkingMinutes = (totalDistance / walkingSpeedKmh * MINUTES_PER_HOUR).toInt()
 
         return RouteResult(
             orderedIndices = orderedIndices,

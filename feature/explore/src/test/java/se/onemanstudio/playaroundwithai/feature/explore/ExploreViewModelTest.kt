@@ -20,6 +20,7 @@ import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
 import se.onemanstudio.playaroundwithai.core.config.model.ApiKeyAvailability
+import se.onemanstudio.playaroundwithai.core.config.settings.AppSettingsHolder
 import se.onemanstudio.playaroundwithai.data.explore.domain.model.ExploreItem
 import se.onemanstudio.playaroundwithai.data.explore.domain.model.VehicleType
 import se.onemanstudio.playaroundwithai.data.explore.domain.repository.ExploreSuggestionsRepository
@@ -293,7 +294,8 @@ class ExploreViewModelTest {
             calculateOptimalRouteUseCase = CalculateOptimalRouteUseCase(),
             apiKeyAvailability = apiKeyAvailability,
             networkMonitor = networkMonitor,
-            exploreSettingsHolder = exploreSettingsHolder
+            exploreSettingsHolder = exploreSettingsHolder,
+            appSettingsHolder = AppSettingsHolder(),
         )
     }
 

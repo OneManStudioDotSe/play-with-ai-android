@@ -28,6 +28,7 @@ class SettingsViewModel @Inject constructor(
     val showTokenUsage: StateFlow<Boolean> = appSettingsHolder.showTokenUsage
     val vehicleCount: StateFlow<Int> = exploreSettingsHolder.vehicleCount
     val searchRadiusKm: StateFlow<Float> = exploreSettingsHolder.searchRadiusKm
+    val walkingSpeedKmh: StateFlow<Float> = appSettingsHolder.walkingSpeedKmh
 
     private val _selectedDayIndex = MutableStateFlow<Int?>(null)
     val selectedDayIndex: StateFlow<Int?> = _selectedDayIndex
@@ -46,5 +47,9 @@ class SettingsViewModel @Inject constructor(
 
     fun onShowTokenUsageChange(enabled: Boolean) {
         appSettingsHolder.updateShowTokenUsage(enabled)
+    }
+
+    fun onWalkingSpeedChange(speedKmh: Float) {
+        appSettingsHolder.updateWalkingSpeedKmh(speedKmh)
     }
 }

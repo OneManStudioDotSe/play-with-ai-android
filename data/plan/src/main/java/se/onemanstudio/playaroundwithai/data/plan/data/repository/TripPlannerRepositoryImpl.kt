@@ -16,10 +16,10 @@ import se.onemanstudio.playaroundwithai.core.tracking.repository.TokenUsageTrack
 import se.onemanstudio.playaroundwithai.core.network.dto.FunctionResponseDto
 import se.onemanstudio.playaroundwithai.core.network.dto.GeminiRequest
 import se.onemanstudio.playaroundwithai.core.network.dto.Part
+import se.onemanstudio.playaroundwithai.core.config.settings.AppSettingsHolder
 import se.onemanstudio.playaroundwithai.data.plan.data.tools.MINUTES_PER_HOUR
 import se.onemanstudio.playaroundwithai.data.plan.data.tools.RouteCalculator
 import se.onemanstudio.playaroundwithai.data.plan.data.tools.RouteResult
-import se.onemanstudio.playaroundwithai.data.plan.data.tools.WALKING_SPEED_KMH
 import se.onemanstudio.playaroundwithai.data.plan.prompts.PlanPrompts
 import se.onemanstudio.playaroundwithai.data.plan.data.tools.buildToolDeclarations
 import se.onemanstudio.playaroundwithai.data.plan.domain.model.PlanEvent
@@ -45,6 +45,7 @@ class TripPlannerRepositoryImpl @Inject constructor(
     private val apiService: GeminiApiService,
     private val gson: Gson,
     private val tokenUsageTracker: TokenUsageTracker,
+    private val appSettingsHolder: AppSettingsHolder,
 ) : TripPlannerRepository {
 
     @Suppress("LongMethod", "TooGenericExceptionCaught") // agent loop with last-resort catch
@@ -188,7 +189,7 @@ class TripPlannerRepositoryImpl @Inject constructor(
         }
 
         Timber.d("$LOG_TAG - calculate_route for ${coordinates.size} places")
-        val result = RouteCalculator.findOptimalRoute(coordinates)
+        val result = RouteCalculator.findOptimalRoute(coordinates, appSettingsHolder.walkingSpeedKmh.value.toDouble())
 
         val reorderedStops = result.orderedIndices.mapIndexed { newIndex, originalIndex ->
             if (originalIndex < collectedStops.size) {
@@ -258,7 +259,7 @@ class TripPlannerRepositoryImpl @Inject constructor(
 
     private fun calculateFallbackMinutes(stops: List<TripStop>): Int {
         val distance = calculateFallbackDistance(stops)
-        return (distance / WALKING_SPEED_KMH * MINUTES_PER_HOUR).toInt()
+        return (distance / appSettingsHolder.walkingSpeedKmh.value.toDouble() * MINUTES_PER_HOUR).toInt()
     }
 
     private fun summarizeArgs(functionCall: FunctionCallDto): String {

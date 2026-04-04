@@ -16,8 +16,9 @@ import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.isActive
 import kotlinx.coroutines.launch
 import se.onemanstudio.playaroundwithai.core.config.model.ApiKeyAvailability
-import se.onemanstudio.playaroundwithai.core.network.monitor.NetworkMonitor
+import se.onemanstudio.playaroundwithai.core.config.settings.AppSettingsHolder
 import se.onemanstudio.playaroundwithai.core.config.settings.ExploreSettingsHolder
+import se.onemanstudio.playaroundwithai.core.network.monitor.NetworkMonitor
 import se.onemanstudio.playaroundwithai.data.explore.domain.model.SuggestedPlace
 import se.onemanstudio.playaroundwithai.data.explore.domain.model.VehicleType
 import se.onemanstudio.playaroundwithai.data.explore.domain.model.toExploreItem
@@ -53,6 +54,7 @@ class ExploreViewModel @Inject constructor(
     private val apiKeyAvailability: ApiKeyAvailability,
     private val networkMonitor: NetworkMonitor,
     private val exploreSettingsHolder: ExploreSettingsHolder,
+    private val appSettingsHolder: AppSettingsHolder,
 ) : ViewModel() {
 
     private val _uiState = MutableStateFlow(ExploreUiState())
@@ -216,7 +218,7 @@ class ExploreViewModel @Inject constructor(
 
         val startLat = userLocation?.latitude ?: points.first().first
         val startLng = userLocation?.longitude ?: points.first().second
-        val result = calculateOptimalRouteUseCase(startLat, startLng, points)
+        val result = calculateOptimalRouteUseCase(startLat, startLng, points, appSettingsHolder.walkingSpeedKmh.value.toDouble())
 
         _uiState.update {
             it.copy(

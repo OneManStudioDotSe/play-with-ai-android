@@ -5,8 +5,8 @@ import se.onemanstudio.playaroundwithai.data.explore.domain.utils.calculatePathD
 import javax.inject.Inject
 import kotlin.math.roundToInt
 
-private const val WALKING_SPEED_METERS_PER_MIN = 83.0 // approx 5 km/h
 private const val METERS_PER_KM = 1_000
+private const val MINUTES_PER_HOUR = 60.0
 
 data class OptimalRouteResult(
     val orderedPath: List<Pair<Double, Double>>,
@@ -16,7 +16,7 @@ data class OptimalRouteResult(
 
 class CalculateOptimalRouteUseCase @Inject constructor() {
 
-    operator fun invoke(startLat: Double, startLng: Double, pointsToVisit: List<Pair<Double, Double>>): OptimalRouteResult {
+    operator fun invoke(startLat: Double, startLng: Double, pointsToVisit: List<Pair<Double, Double>>, walkingSpeedKmh: Double): OptimalRouteResult {
         val bestPermutation = permutations(pointsToVisit)
             .minByOrNull { path -> calculatePathDistance(startLat, startLng, path) }
             ?: pointsToVisit
@@ -24,7 +24,7 @@ class CalculateOptimalRouteUseCase @Inject constructor() {
         val fullPath = listOf(startLat to startLng) + bestPermutation
         val totalDistanceKm = calculatePathDistance(startLat, startLng, bestPermutation)
         val distanceMeters = (totalDistanceKm * METERS_PER_KM).roundToInt()
-        val durationMinutes = (distanceMeters / WALKING_SPEED_METERS_PER_MIN).roundToInt()
+        val durationMinutes = (totalDistanceKm / walkingSpeedKmh * MINUTES_PER_HOUR).roundToInt()
 
         return OptimalRouteResult(
             orderedPath = fullPath,

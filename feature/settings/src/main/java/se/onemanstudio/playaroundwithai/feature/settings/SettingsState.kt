@@ -8,6 +8,7 @@ data class SettingsState(
     val showTokenUsage: Boolean = false,
     val vehicleCount: Int = DEFAULT_VEHICLE_COUNT,
     val searchRadiusKm: Float = DEFAULT_SEARCH_RADIUS_KM,
+    val walkingSpeedKmh: Float = WALKING_SPEED_NORMAL,
 ) {
     companion object {
         const val MIN_VEHICLE_COUNT = 10
@@ -16,5 +17,8 @@ data class SettingsState(
         const val MIN_SEARCH_RADIUS_KM = 1.0f
         const val MAX_SEARCH_RADIUS_KM = 10.0f
         const val DEFAULT_SEARCH_RADIUS_KM = 4.0f
+        const val WALKING_SPEED_SLOW = 3.0f
+        const val WALKING_SPEED_NORMAL = 5.0f
+        const val WALKING_SPEED_FAST = 7.0f
     }
 }

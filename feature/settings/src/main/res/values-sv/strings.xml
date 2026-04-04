@@ -17,4 +17,8 @@
     <string name="settings_icon_description">Inställningar</string>
     <string name="settings_general">Allmänt</string>
     <string name="settings_show_token_usage">Visa tokenanvändning</string>
+    <string name="settings_walking_speed">Gånghastighet</string>
+    <string name="settings_walking_speed_slow">Långsam · 3 km/h</string>
+    <string name="settings_walking_speed_normal">Normal · 5 km/h</string>
+    <string name="settings_walking_speed_fast">Snabb · 7 km/h</string>
 </resources>

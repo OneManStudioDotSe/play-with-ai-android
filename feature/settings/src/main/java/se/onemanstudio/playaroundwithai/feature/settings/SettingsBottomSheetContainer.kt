@@ -9,9 +9,8 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import se.onemanstudio.playaroundwithai.core.ui.sofa.ChartBarData
 import android.content.ActivityNotFoundException
 import androidx.compose.runtime.remember
-import androidx.compose.ui.platform.LocalConfiguration
+import androidx.compose.ui.platform.LocalLocale
 import java.text.NumberFormat
-import java.util.Locale
 import androidx.core.net.toUri
 import timber.log.Timber
 
@@ -25,9 +24,9 @@ fun SettingsBottomSheetContainer(
     val showTokenUsage by viewModel.showTokenUsage.collectAsStateWithLifecycle()
     val vehicleCount by viewModel.vehicleCount.collectAsStateWithLifecycle()
     val searchRadiusKm by viewModel.searchRadiusKm.collectAsStateWithLifecycle()
+    val walkingSpeedKmh by viewModel.walkingSpeedKmh.collectAsStateWithLifecycle()
     val context = LocalContext.current
-    val localeList = LocalConfiguration.current.locales
-    val locale = if (!localeList.isEmpty) localeList[0] else Locale.getDefault()
+    val locale = LocalLocale.current.platformLocale
     val numberFormat = remember(locale) { NumberFormat.getNumberInstance(locale) }
 
     val usageBars = weeklyUsage.map { day ->
@@ -44,11 +43,13 @@ fun SettingsBottomSheetContainer(
             showTokenUsage = showTokenUsage,
             vehicleCount = vehicleCount,
             searchRadiusKm = searchRadiusKm,
+            walkingSpeedKmh = walkingSpeedKmh,
         ),
         onDismiss = onDismiss,
         onShowTokenUsageChange = { viewModel.onShowTokenUsageChange(it) },
         onVehicleCountChange = { viewModel.onVehicleCountChange(it) },
         onSearchRadiusChange = { viewModel.onSearchRadiusChange(it) },
+        onWalkingSpeedChange = { viewModel.onWalkingSpeedChange(it) },
         onContactClick = {
             try {
                 val intent = Intent(Intent.ACTION_SENDTO).apply {
