@@ -47,6 +47,7 @@ class TripPlannerRepositoryImpl @Inject constructor(
     private val tokenUsageTracker: TokenUsageTracker,
 ) : TripPlannerRepository {
 
+    @Suppress("LongMethod", "TooGenericExceptionCaught") // agent loop with last-resort catch
     override fun planTrip(goal: String, latitude: Double, longitude: Double): Flow<PlanEvent> = flow {
         try {
             val tools = listOf(buildToolDeclarations())
@@ -115,7 +116,7 @@ class TripPlannerRepositoryImpl @Inject constructor(
         } catch (e: java.io.IOException) {
             Timber.e(e, "$LOG_TAG - Network error")
             emit(PlanEvent.Error("Network error: ${e.message ?: "Please check your connection"}"))
-        } catch (e: Exception) {
+        } catch (e: Exception) { // last-resort catch after HttpException and IOException
             Timber.e(e, "$LOG_TAG - Agent error")
             emit(PlanEvent.Error("An unexpected error occurred: ${e.message}"))
         }
@@ -130,7 +131,7 @@ class TripPlannerRepositoryImpl @Inject constructor(
     ): Map<String, Any> {
         return when (name) {
             ToolNames.SEARCH_PLACES -> handleSearchPlaces(args, latitude, longitude, collectedStops)
-            ToolNames.CALCULATE_ROUTE -> handleCalculateRoute(args, collectedStops)
+            ToolNames.CALCULATE_ROUTE -> handleCalculateRoute(collectedStops)
             else -> mapOf("error" to "Unknown tool: $name")
         }
     }
@@ -179,7 +180,7 @@ class TripPlannerRepositoryImpl @Inject constructor(
         return mapOf("places" to places, "count" to places.size)
     }
 
-    private fun handleCalculateRoute(args: Map<String, Any>, collectedStops: MutableList<TripStop>): Map<String, Any> {
+    private fun handleCalculateRoute(collectedStops: MutableList<TripStop>): Map<String, Any> {
         val coordinates = collectedStops.map { it.latitude to it.longitude }
 
         if (coordinates.isEmpty()) {

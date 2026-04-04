@@ -2,11 +2,17 @@ build:
   maxIssues: 0
 
 style:
+  ReturnCount:
+    # Guard-clause validation in use cases (validate → return failure, then return result)
+    # commonly needs 3–4 returns. The default of 2 is too strict for this pattern.
+    max: 5
+
   MagicNumber:
     ignoreAnnotated:
       - "Composable"
       - "Preview"
     ignorePropertyDeclaration: true
+    ignoreLocalVariableDeclaration: true
     ignoreEnums: true
 
   UnusedPrivateMember:

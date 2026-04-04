@@ -67,6 +67,7 @@ class DreamRepositoryImpl @Inject constructor(
             file.writeBytes(imageBytes)
             Timber.d("DreamRepo - Saved dream image to ${file.absolutePath} (${imageBytes.size} bytes)")
 
+            @Suppress("TooGenericExceptionCaught") // cleanup-and-rethrow: unknown Room exception type
             try {
                 dreamsDao.updateDreamImage(dreamId, file.absolutePath, artistName)
             } catch (e: Exception) {

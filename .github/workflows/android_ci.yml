@@ -28,10 +28,16 @@ jobs:
         with:
           java-version: '17'
           distribution: 'temurin'
-      
+
+      # ubuntu-latest ships with Android SDK up to API 35; install 36 explicitly
+      - name: Install Android SDK platform 36
+        run: |
+          echo "y" | $ANDROID_HOME/cmdline-tools/latest/bin/sdkmanager --licenses > /dev/null 2>&1 || true
+          $ANDROID_HOME/cmdline-tools/latest/bin/sdkmanager "platforms;android-36"
+
       # Set up gradle with caching to speed up subsequent builds
       - name: Setup gradle
-        uses: gradle/actions/setup-gradle@v3
+        uses: gradle/actions/setup-gradle@v4
 
       # 1. Check code style (Detekt)
       # This uses the detekt plugin you already have in libs.versions.toml
