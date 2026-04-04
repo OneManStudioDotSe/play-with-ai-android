@@ -26,12 +26,22 @@ private const val SCROLL_BOTTOM_THRESHOLD = 10
 fun TypewriterText(
     modifier: Modifier = Modifier,
     text: String,
-    scrollState: ScrollState? = null
+    scrollState: ScrollState? = null,
+    typewriterDelayMs: Long = 10L,
+    hapticFeedbackEnabled: Boolean = true,
 ) {
     val view = LocalView.current
     var displayedText by remember { mutableStateOf("") }
 
     LaunchedEffect(key1 = text) {
+        if (typewriterDelayMs == 0L) {
+            displayedText = text
+            if (scrollState != null) {
+                scrollState.animateScrollTo(scrollState.maxValue)
+            }
+            return@LaunchedEffect
+        }
+
         displayedText = ""
         text.forEach { char ->
             val wasAtBottom = scrollState?.let {
@@ -40,10 +50,10 @@ fun TypewriterText(
             } ?: false
 
             displayedText += char
-            if (!char.isWhitespace()) {
+            if (!char.isWhitespace() && hapticFeedbackEnabled) {
                 view.performHapticFeedback(HapticFeedbackConstants.CLOCK_TICK)
             }
-            delay(TYPING_DELAY)
+            delay(typewriterDelayMs)
 
             // Only auto-scroll if we were already at the bottom or if it's the very first scroll
             if (scrollState != null && (wasAtBottom || scrollState.maxValue == 0)) {

@@ -7,6 +7,8 @@ import javax.inject.Inject
 import javax.inject.Singleton
 
 const val WALKING_SPEED_KMH_DEFAULT = 5.0f
+const val TYPEWRITER_DELAY_MS_DEFAULT = 10L
+const val HAPTIC_FEEDBACK_ENABLED_DEFAULT = true
 
 @Singleton
 class AppSettingsHolder @Inject constructor() {
@@ -17,11 +19,25 @@ class AppSettingsHolder @Inject constructor() {
     private val _walkingSpeedKmh = MutableStateFlow(WALKING_SPEED_KMH_DEFAULT)
     val walkingSpeedKmh: StateFlow<Float> = _walkingSpeedKmh.asStateFlow()
 
+    private val _typewriterDelayMs = MutableStateFlow(TYPEWRITER_DELAY_MS_DEFAULT)
+    val typewriterDelayMs: StateFlow<Long> = _typewriterDelayMs.asStateFlow()
+
+    private val _hapticFeedbackEnabled = MutableStateFlow(HAPTIC_FEEDBACK_ENABLED_DEFAULT)
+    val hapticFeedbackEnabled: StateFlow<Boolean> = _hapticFeedbackEnabled.asStateFlow()
+
     fun updateShowTokenUsage(enabled: Boolean) {
         _showTokenUsage.value = enabled
     }
 
     fun updateWalkingSpeedKmh(speedKmh: Float) {
         _walkingSpeedKmh.value = speedKmh
+    }
+
+    fun updateTypewriterDelayMs(delayMs: Long) {
+        _typewriterDelayMs.value = delayMs
+    }
+
+    fun updateHapticFeedbackEnabled(enabled: Boolean) {
+        _hapticFeedbackEnabled.value = enabled
     }
 }

@@ -21,4 +21,10 @@
     <string name="settings_walking_speed_slow">Slow · 3 km/h</string>
     <string name="settings_walking_speed_normal">Normal · 5 km/h</string>
     <string name="settings_walking_speed_fast">Fast · 7 km/h</string>
+    <string name="settings_typewriter_speed">Typewriter speed</string>
+    <string name="settings_typewriter_speed_instant">Instant</string>
+    <string name="settings_typewriter_speed_fast">Fast</string>
+    <string name="settings_typewriter_speed_normal">Normal</string>
+    <string name="settings_typewriter_speed_slow">Slow</string>
+    <string name="settings_haptic_feedback">Haptic feedback</string>
 </resources>

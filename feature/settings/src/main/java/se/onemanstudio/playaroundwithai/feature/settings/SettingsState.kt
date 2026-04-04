@@ -9,6 +9,8 @@ data class SettingsState(
     val vehicleCount: Int = DEFAULT_VEHICLE_COUNT,
     val searchRadiusKm: Float = DEFAULT_SEARCH_RADIUS_KM,
     val walkingSpeedKmh: Float = WALKING_SPEED_NORMAL,
+    val typewriterDelayMs: Long = TYPEWRITER_DELAY_NORMAL,
+    val hapticFeedbackEnabled: Boolean = true,
 ) {
     companion object {
         const val MIN_VEHICLE_COUNT = 10
@@ -20,5 +22,9 @@ data class SettingsState(
         const val WALKING_SPEED_SLOW = 3.0f
         const val WALKING_SPEED_NORMAL = 5.0f
         const val WALKING_SPEED_FAST = 7.0f
+        const val TYPEWRITER_DELAY_INSTANT = 0L
+        const val TYPEWRITER_DELAY_FAST = 5L
+        const val TYPEWRITER_DELAY_NORMAL = 10L
+        const val TYPEWRITER_DELAY_SLOW = 30L
     }
 }

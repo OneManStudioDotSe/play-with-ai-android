@@ -57,4 +57,5 @@ data class ExploreUiState(
     val pathMode: PathModeState = PathModeState(),
     val suggestions: SuggestionsState = SuggestionsState(),
     val error: ExploreError? = null,
+    val hapticFeedbackEnabled: Boolean = true,
 )

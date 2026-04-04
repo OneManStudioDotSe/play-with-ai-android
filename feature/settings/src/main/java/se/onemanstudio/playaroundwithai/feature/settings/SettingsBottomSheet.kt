@@ -64,6 +64,8 @@ fun SettingsBottomSheet(
     onVehicleCountChange: (Int) -> Unit,
     onSearchRadiusChange: (Float) -> Unit,
     onWalkingSpeedChange: (Float) -> Unit,
+    onTypewriterDelayChange: (Long) -> Unit,
+    onHapticFeedbackChange: (Boolean) -> Unit,
     onContactClick: () -> Unit,
     onLinkedInClick: () -> Unit = {},
     usageBars: List<ChartBarData> = emptyList(),
@@ -82,6 +84,8 @@ fun SettingsBottomSheet(
             onVehicleCountChange = onVehicleCountChange,
             onSearchRadiusChange = onSearchRadiusChange,
             onWalkingSpeedChange = onWalkingSpeedChange,
+            onTypewriterDelayChange = onTypewriterDelayChange,
+            onHapticFeedbackChange = onHapticFeedbackChange,
             onContactClick = onContactClick,
             onLinkedInClick = onLinkedInClick,
             usageBars = usageBars,
@@ -98,6 +102,8 @@ private fun SettingsBottomSheetContent(
     onVehicleCountChange: (Int) -> Unit,
     onSearchRadiusChange: (Float) -> Unit,
     onWalkingSpeedChange: (Float) -> Unit,
+    onTypewriterDelayChange: (Long) -> Unit,
+    onHapticFeedbackChange: (Boolean) -> Unit,
     onContactClick: () -> Unit,
     onLinkedInClick: () -> Unit,
     usageBars: List<ChartBarData>,
@@ -145,7 +151,11 @@ private fun SettingsBottomSheetContent(
                 // General section
                 GeneralSection(
                     showTokenUsage = state.showTokenUsage,
+                    typewriterDelayMs = state.typewriterDelayMs,
+                    hapticFeedbackEnabled = state.hapticFeedbackEnabled,
                     onShowTokenUsageChange = onShowTokenUsageChange,
+                    onTypewriterDelayChange = onTypewriterDelayChange,
+                    onHapticFeedbackChange = onHapticFeedbackChange,
                 )
 
                 Spacer(modifier = Modifier.height(Dimensions.paddingLarge))
@@ -191,11 +201,23 @@ private fun SectionHeader(
     MarkerText(text = text, lineColor = lineColor, modifier = modifier)
 }
 
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 private fun GeneralSection(
     showTokenUsage: Boolean,
+    typewriterDelayMs: Long,
+    hapticFeedbackEnabled: Boolean,
     onShowTokenUsageChange: (Boolean) -> Unit,
+    onTypewriterDelayChange: (Long) -> Unit,
+    onHapticFeedbackChange: (Boolean) -> Unit,
 ) {
+    val speedOptions = listOf(
+        SettingsState.TYPEWRITER_DELAY_INSTANT to stringResource(R.string.settings_typewriter_speed_instant),
+        SettingsState.TYPEWRITER_DELAY_FAST to stringResource(R.string.settings_typewriter_speed_fast),
+        SettingsState.TYPEWRITER_DELAY_NORMAL to stringResource(R.string.settings_typewriter_speed_normal),
+        SettingsState.TYPEWRITER_DELAY_SLOW to stringResource(R.string.settings_typewriter_speed_slow),
+    )
+
     Column(verticalArrangement = Arrangement.spacedBy(Dimensions.paddingMedium)) {
         SectionHeader(
             text = stringResource(R.string.settings_general),
@@ -216,6 +238,42 @@ private fun GeneralSection(
                 checked = showTokenUsage,
                 onCheckedChange = onShowTokenUsageChange,
             )
+        }
+
+        Row(
+            modifier = Modifier.fillMaxWidth(),
+            horizontalArrangement = Arrangement.SpaceBetween,
+            verticalAlignment = Alignment.CenterVertically,
+        ) {
+            Text(
+                text = stringResource(R.string.settings_haptic_feedback),
+                style = MaterialTheme.typography.bodyLarge,
+                color = MaterialTheme.colorScheme.onSurface,
+            )
+            Switch(
+                checked = hapticFeedbackEnabled,
+                onCheckedChange = onHapticFeedbackChange,
+            )
+        }
+
+        Spacer(modifier = Modifier.height(Dimensions.paddingSmall))
+
+        Text(
+            text = stringResource(R.string.settings_typewriter_speed),
+            style = MaterialTheme.typography.bodyMedium,
+            color = MaterialTheme.colorScheme.onSurface,
+        )
+
+        SingleChoiceSegmentedButtonRow(modifier = Modifier.fillMaxWidth()) {
+            speedOptions.forEachIndexed { index, (delay, label) ->
+                SegmentedButton(
+                    shape = SegmentedButtonDefaults.itemShape(index = index, count = speedOptions.size),
+                    selected = typewriterDelayMs == delay,
+                    onClick = { onTypewriterDelayChange(delay) },
+                ) {
+                    Text(text = label, style = MaterialTheme.typography.labelMedium)
+                }
+            }
         }
     }
 }
@@ -426,6 +484,8 @@ private fun SettingsContentLightPreview() {
                 onVehicleCountChange = {},
                 onSearchRadiusChange = {},
                 onWalkingSpeedChange = {},
+                onTypewriterDelayChange = {},
+                onHapticFeedbackChange = {},
                 onContactClick = {},
                 onLinkedInClick = {},
                 usageBars = sampleUsageBars,
@@ -447,6 +507,8 @@ private fun SettingsContentDarkPreview() {
                 onVehicleCountChange = {},
                 onSearchRadiusChange = {},
                 onWalkingSpeedChange = {},
+                onTypewriterDelayChange = {},
+                onHapticFeedbackChange = {},
                 onContactClick = {},
                 onLinkedInClick = {},
                 usageBars = sampleUsageBars,

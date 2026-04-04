@@ -25,6 +25,8 @@ fun SettingsBottomSheetContainer(
     val vehicleCount by viewModel.vehicleCount.collectAsStateWithLifecycle()
     val searchRadiusKm by viewModel.searchRadiusKm.collectAsStateWithLifecycle()
     val walkingSpeedKmh by viewModel.walkingSpeedKmh.collectAsStateWithLifecycle()
+    val typewriterDelayMs by viewModel.typewriterDelayMs.collectAsStateWithLifecycle()
+    val hapticFeedbackEnabled by viewModel.hapticFeedbackEnabled.collectAsStateWithLifecycle()
     val context = LocalContext.current
     val locale = LocalLocale.current.platformLocale
     val numberFormat = remember(locale) { NumberFormat.getNumberInstance(locale) }
@@ -44,12 +46,16 @@ fun SettingsBottomSheetContainer(
             vehicleCount = vehicleCount,
             searchRadiusKm = searchRadiusKm,
             walkingSpeedKmh = walkingSpeedKmh,
+            typewriterDelayMs = typewriterDelayMs,
+            hapticFeedbackEnabled = hapticFeedbackEnabled,
         ),
         onDismiss = onDismiss,
         onShowTokenUsageChange = { viewModel.onShowTokenUsageChange(it) },
         onVehicleCountChange = { viewModel.onVehicleCountChange(it) },
         onSearchRadiusChange = { viewModel.onSearchRadiusChange(it) },
         onWalkingSpeedChange = { viewModel.onWalkingSpeedChange(it) },
+        onTypewriterDelayChange = { viewModel.onTypewriterDelayChange(it) },
+        onHapticFeedbackChange = { viewModel.onHapticFeedbackChange(it) },
         onContactClick = {
             try {
                 val intent = Intent(Intent.ACTION_SENDTO).apply {

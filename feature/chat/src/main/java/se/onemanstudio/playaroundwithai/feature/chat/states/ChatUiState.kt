@@ -31,4 +31,6 @@ data class ChatScreenState(
     val isSuggestionsLoading: Boolean = false,
     val promptHistory: PersistentList<Prompt> = persistentListOf(),
     val isSyncing: Boolean = false,
+    val typewriterDelayMs: Long = 10L,
+    val hapticFeedbackEnabled: Boolean = true,
 )

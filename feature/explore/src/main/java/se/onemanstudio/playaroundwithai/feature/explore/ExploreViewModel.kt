@@ -82,6 +82,11 @@ class ExploreViewModel @Inject constructor(
                     loadMapData(lat, lng)
                 }
         }
+        viewModelScope.launch {
+            appSettingsHolder.hapticFeedbackEnabled.collect { enabled ->
+                _uiState.update { it.copy(hapticFeedbackEnabled = enabled) }
+            }
+        }
     }
 
     fun loadMapData(centerLat: Double, centerLng: Double) {

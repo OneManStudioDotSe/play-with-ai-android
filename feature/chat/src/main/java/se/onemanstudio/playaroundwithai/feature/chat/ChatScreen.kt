@@ -120,6 +120,8 @@ fun ChatScreen(
     val snackbarHostState = remember { SnackbarHostState() }
 
     LaunchedEffect(uiState) {
+        if (!screenState.hapticFeedbackEnabled) return@LaunchedEffect
+
         when (uiState) {
             is ChatUiState.Success -> view.performHapticFeedback(HapticFeedbackConstants.CONTEXT_CLICK)
             is ChatUiState.Error -> view.performHapticFeedback(HapticFeedbackConstants.LONG_PRESS)
@@ -273,7 +275,9 @@ fun ChatScreen(
                     }
                 },
                 onSendClicked = {
-                    view.performHapticFeedback(HapticFeedbackConstants.CONTEXT_CLICK)
+                    if (screenState.hapticFeedbackEnabled) {
+                        view.performHapticFeedback(HapticFeedbackConstants.CONTEXT_CLICK)
+                    }
                     val attachment = when (inputMode) {
                         InputMode.IMAGE -> selectedImageUri?.let { Attachment.Image(it, analysisType) }
                         InputMode.DOCUMENT -> selectedFileUri?.let { Attachment.Document(it) }
@@ -298,7 +302,12 @@ fun ChatScreen(
             when (uiState) {
                 is ChatUiState.Initial -> AmoebaShapeAnimation(state = AmoebaState.IDLE)
                 is ChatUiState.Loading -> AmoebaShapeAnimation(state = AmoebaState.SPIKY) //CircularProgressIndicator()
-                is ChatUiState.Success -> ContentState(uiState, onClearResponse = { viewModel.clearResponse() })
+                is ChatUiState.Success -> ContentState(
+                    state = uiState,
+                    onClearResponse = { viewModel.clearResponse() },
+                    typewriterDelayMs = screenState.typewriterDelayMs,
+                    hapticFeedbackEnabled = screenState.hapticFeedbackEnabled
+                )
                 is ChatUiState.Error -> ErrorState(uiState, onClearResponse = { viewModel.clearResponse() })
             }
         }
@@ -309,6 +318,8 @@ fun ChatScreen(
 private fun ContentState(
     state: ChatUiState.Success,
     onClearResponse: () -> Unit,
+    typewriterDelayMs: Long,
+    hapticFeedbackEnabled: Boolean,
 ) {
     val scrollState = rememberScrollState()
 
@@ -324,7 +335,9 @@ private fun ContentState(
 
             TypewriterText(
                 text = state.outputText,
-                scrollState = scrollState
+                scrollState = scrollState,
+                typewriterDelayMs = typewriterDelayMs,
+                hapticFeedbackEnabled = hapticFeedbackEnabled,
             )
         }
 
@@ -429,7 +442,9 @@ private fun ContentStateLightPreview() {
                 state = ChatUiState.Success(
                     outputText = outputText
                 ),
-                onClearResponse = {}
+                onClearResponse = {},
+                typewriterDelayMs = 10L,
+                hapticFeedbackEnabled = true,
             )
         }
     }
@@ -445,7 +460,9 @@ private fun ContentStateDarkPreview() {
                 state = ChatUiState.Success(
                     outputText = outputText
                 ),
-                onClearResponse = {}
+                onClearResponse = {},
+                typewriterDelayMs = 10L,
+                hapticFeedbackEnabled = true,
             )
         }
     }

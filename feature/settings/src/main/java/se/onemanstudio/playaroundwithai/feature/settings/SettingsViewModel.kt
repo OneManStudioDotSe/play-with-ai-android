@@ -29,6 +29,8 @@ class SettingsViewModel @Inject constructor(
     val vehicleCount: StateFlow<Int> = exploreSettingsHolder.vehicleCount
     val searchRadiusKm: StateFlow<Float> = exploreSettingsHolder.searchRadiusKm
     val walkingSpeedKmh: StateFlow<Float> = appSettingsHolder.walkingSpeedKmh
+    val typewriterDelayMs: StateFlow<Long> = appSettingsHolder.typewriterDelayMs
+    val hapticFeedbackEnabled: StateFlow<Boolean> = appSettingsHolder.hapticFeedbackEnabled
 
     private val _selectedDayIndex = MutableStateFlow<Int?>(null)
     val selectedDayIndex: StateFlow<Int?> = _selectedDayIndex
@@ -51,5 +53,13 @@ class SettingsViewModel @Inject constructor(
 
     fun onWalkingSpeedChange(speedKmh: Float) {
         appSettingsHolder.updateWalkingSpeedKmh(speedKmh)
+    }
+
+    fun onTypewriterDelayChange(delayMs: Long) {
+        appSettingsHolder.updateTypewriterDelayMs(delayMs)
+    }
+
+    fun onHapticFeedbackChange(enabled: Boolean) {
+        appSettingsHolder.updateHapticFeedbackEnabled(enabled)
     }
 }

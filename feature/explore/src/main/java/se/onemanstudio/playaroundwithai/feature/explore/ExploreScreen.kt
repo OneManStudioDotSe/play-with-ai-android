@@ -183,14 +183,16 @@ fun ExploreScreen(
     }
 
     LaunchedEffect(uiState.suggestions.places) {
-        if (uiState.suggestions.places.isNotEmpty()) {
+        if (uiState.suggestions.places.isNotEmpty() && uiState.hapticFeedbackEnabled) {
             view.performHapticFeedback(HapticFeedbackConstants.CONTEXT_CLICK)
         }
     }
 
     LaunchedEffect(uiState.pathMode.optimalRoute) {
         if (uiState.pathMode.optimalRoute.isNotEmpty()) {
-            view.performHapticFeedback(HapticFeedbackConstants.CONTEXT_CLICK)
+            if (uiState.hapticFeedbackEnabled) {
+                view.performHapticFeedback(HapticFeedbackConstants.CONTEXT_CLICK)
+            }
             val boundsBuilder = LatLngBounds.builder()
             uiState.pathMode.optimalRoute.forEach { boundsBuilder.include(it) }
             cameraPositionState.animate(

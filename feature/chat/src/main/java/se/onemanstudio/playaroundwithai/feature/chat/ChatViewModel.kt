@@ -16,6 +16,7 @@ import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import se.onemanstudio.playaroundwithai.core.auth.usecase.ObserveAuthReadyUseCase
 import se.onemanstudio.playaroundwithai.core.config.model.ApiKeyAvailability
+import se.onemanstudio.playaroundwithai.core.config.settings.AppSettingsHolder
 import se.onemanstudio.playaroundwithai.core.database.entity.SyncStatus
 import se.onemanstudio.playaroundwithai.data.chat.domain.model.Prompt
 import se.onemanstudio.playaroundwithai.data.chat.domain.usecase.AskAiUseCase
@@ -50,6 +51,7 @@ class ChatViewModel @Inject constructor(
     private val updatePromptTextUseCase: UpdatePromptTextUseCase,
     private val retryPendingSyncsUseCase: RetryPendingSyncsUseCase,
     private val observeAuthReadyUseCase: ObserveAuthReadyUseCase,
+    private val appSettingsHolder: AppSettingsHolder,
     private val apiKeyAvailability: ApiKeyAvailability,
     private val fileUtils: FileUtils,
 ) : ViewModel() {
@@ -76,6 +78,20 @@ class ChatViewModel @Inject constructor(
 
         observePromptHistory()
         observeSyncState()
+        observeAppSettings()
+    }
+
+    private fun observeAppSettings() {
+        viewModelScope.launch {
+            appSettingsHolder.typewriterDelayMs.collect { delayMs ->
+                _screenState.update { it.copy(typewriterDelayMs = delayMs) }
+            }
+        }
+        viewModelScope.launch {
+            appSettingsHolder.hapticFeedbackEnabled.collect { enabled ->
+                _screenState.update { it.copy(hapticFeedbackEnabled = enabled) }
+            }
+        }
     }
 
     private fun observePromptHistory() {
