@@ -36,7 +36,7 @@ Production-grade Android showcase app with four distinct Gemini API integration 
 
 - **AI Chat** — Gemini-powered conversation with image and document attachment support
 - **Dream Interpreter** — AI analysis with a generative visual scene and an AI-painted artwork
-- **Trip Planner** — Autonomous AI agent plans a real trip using Gemini function calling
+- **Trip Planner** — Autonomous AI agent plans a real trip using Gemini function calling; results shown on an interactive styled map with a scroll-lock toggle
 - **Map Explorer** — Discover and filter nearby vehicles, get AI place suggestions, calculate optimal routes
 - **Design System Showcase** — Interactive living style guide for the "SoFa" design system
 
@@ -151,7 +151,7 @@ One important detail: Gemini's model turns can include thinking parts (`thought:
 
 ## Future-proofing
 
-CI/CD with GitHub Actions runs Detekt, Lint, debug build, and unit tests on every PR — code quality is enforced, not optional.
+CI/CD with GitHub Actions runs Detekt, Lint, debug build, and unit tests on every PR — code quality is enforced, not optional. The workflow explicitly installs Android SDK 36 (not pre-installed on `ubuntu-latest`) and uses Gradle Actions v4 for Gradle 9.x compatibility.
 
 ## The little extra
 

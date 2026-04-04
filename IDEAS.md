@@ -33,11 +33,11 @@ assistant, creative storyteller, technical expert) or a free-text system instruc
 
 ### 4. Walking Speed
 
-Route time estimates assume 5.0 km/h in two independent places. Expose a "walking speed" setting (slow 3 / normal 5 / 
+Route time estimates assume 5.0 km/h in two places. Expose a "walking speed" setting (slow 3 / normal 5 / 
 fast 7 km/h) and feed it to both locations to keep them consistent.
 
-- **Code:** `data/plan/src/main/java/.../tools/RouteCalculator.kt` — `WALKING_SPEED_KMH = 5.0`
-- **Code:** `feature/explore/src/main/java/.../ExploreViewModel.kt` — `WALKING_SPEED_METERS_PER_MIN = 83.0` (equivalent to 5 km/h, duplicated independently)
+- **Code:** `data/plan/src/main/java/.../tools/RouteCalculator.kt` — `WALKING_SPEED_KMH = 5.0` (shared internal constant; also used by `TripPlannerRepositoryImpl`)
+- **Code:** `feature/explore/src/main/java/.../ExploreViewModel.kt` — `WALKING_SPEED_METERS_PER_MIN = 83.0` (equivalent to 5 km/h, independently defined in Explore)
 
 ### 5. Firebase Sync Toggle
 
@@ -102,8 +102,7 @@ Both Explore and Plan screens now fetch the user's real GPS location via `FusedL
 Stockholm (59.3293, 18.0686) if unavailable. A "home location" setting could let users override the fallback.
 
 - **Code:** `feature/explore/src/main/java/.../ExploreConstants.kt` — `STOCKHOLM_LAT / STOCKHOLM_LNG` (fallback)
-- **Code:** `feature/plan/src/main/java/.../PlanScreen.kt` — `DEFAULT_LAT / DEFAULT_LNG` (fallback)
-- ~~**Code:** `feature/plan/src/main/java/.../PlanViewModel.kt` — duplicated `STOCKHOLM_LAT / STOCKHOLM_LNG`~~ (removed — now passed from PlanScreen)
+- **Code:** `feature/plan/src/main/java/.../PlanConstants.kt` — `DEFAULT_LAT / DEFAULT_LNG` (fallback used by PlanScreen)
 
 ### 13. Trip Length Preset
 
@@ -122,16 +121,9 @@ reasons.
 
 ### 15. Map Theme Override
 
-The map style follows the system dark/light theme with no manual override. Add a three-way toggle (system / light / dark) 
-for the map tiles specifically.
+Both the Explore and Plan screens load a custom map style that follows the system dark/light theme with no manual override. Add a three-way toggle (system / light / dark) for the map tiles specifically.
 
-- **Code:** `feature/explore/src/main/java/.../ExploreScreen.kt` — map style follows system theme (line ~236–241)
+- **Code:** `feature/explore/src/main/java/.../ExploreScreen.kt` — map style follows system theme (`isSystemInDarkTheme()`)
+- **Code:** `feature/plan/src/main/java/.../views/states/ResultState.kt` — same pattern; `custom_map_style_light.json` / `custom_map_style_dark.json` copied into `feature/plan/res/raw/`
 
 ---
-
-## Bonus: Bug to Fix
-
-~~**Hardcoded app version** — `SettingsBottomSheetContainer.kt` passes `appVersion = "1.0"` as a string literal instead of
-reading from `BuildConfig.VERSION_NAME`.~~ **FIXED** — Now reads `BuildConfig.VERSION_NAME` dynamically.
-
-- **Code:** `app/src/main/java/.../settings/SettingsBottomSheetContainer.kt`

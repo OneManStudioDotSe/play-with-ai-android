@@ -24,13 +24,13 @@
 - **Min SDK:** 31 (Android 12)
 - **Target/Compile SDK:** 36
 - **JVM Target:** Java 17
-- **Kotlin:** 2.3.10, **AGP:** 9.0.1
+- **Kotlin:** 2.3.10, **AGP:** 9.1.0
 
 ## Module Structure
 
 ```
 :app                    → Application entry point, navigation, main activity
-:core:network           → OkHttp, Retrofit, Gson, GeminiApiService, DTOs (incl. function calling & thinking support), interceptor, NetworkMonitor
+:core:network           → OkHttp, Retrofit, Gson, GeminiApiService, DTOs (incl. function calling & thinking support), interceptor, NetworkMonitor, shared geo utils (haversineKm, coordinate constants in Algorithms.kt)
 :core:auth              → Firebase Auth, AuthRepository (interface+impl), auth use cases, AuthSession
 :core:config            → ApiKeyAvailability, AppSettingsHolder, ExploreSettingsHolder, ConfigurationModule, qualifier annotations (@GeminiApiKey, @MapsApiKey, @BaseUrl, @LoggingLevel, @AppVersion), BuildConfig
 :core:database          → Shared Room DB (v6): AppDatabase, all entities (PromptEntity, DreamEntity, TokenUsageEntity), all DAOs, SyncStatusConverter, DatabaseModule
@@ -41,7 +41,7 @@
 :data:explore           → Explore domain + data: fake API, explore items, suggested places, ExplorePrompts (depends on :core:config for ExploreSettingsHolder)
 :data:chat              → Chat domain + data: Firestore sync, prompt history, SyncWorker, ChatPrompts
 :data:dream             → Dream domain + data: interpretation, image generation, DreamPrompts
-:feature:plan           → Plan presentation: PlanViewModel, PlanScreen (trip planner UI + map)
+:feature:plan           → Plan presentation: PlanViewModel, PlanScreen (trip planner UI + native Google Map with interactive scroll-lock toggle)
 :feature:chat           → Chat presentation: ChatViewModel, ChatScreen
 :feature:explore        → Explore presentation: ExploreViewModel, ExploreScreen
 :feature:dream          → Dream presentation: DreamViewModel, DreamScreen
@@ -69,7 +69,7 @@ Exception: `:feature:showcase` is presentation-only (no ViewModel, no data layer
 - **Use cases** are suffixed with `UseCase`
 - **No hardcoded strings** — all user-facing text in per-module `strings.xml`
 - **Max line length:** 160 characters (enforced by Detekt)
-- **Detekt** runs with `maxIssues: 0` — build fails on any code quality issue
+- **Detekt** runs with `maxIssues: 0` — build fails on any code quality issue. Custom rules in `detekt.yml`: `ReturnCount.max = 5` (guard-clause use cases), `MagicNumber.ignoreLocalVariableDeclaration = true`, `LongParameterList`/`LongMethod`/`TooManyFunctions`/`FunctionNaming` ignore `@Composable`
 
 ## Key Dependencies
 
@@ -541,6 +541,6 @@ API returns HTTP 400. extractText() filters out thinking parts to get the final 
 PlanScreen
   ├─ Initial  → Text field + "Plan my trip" button + example chips
   ├─ Running  → Animated step list (thinking/tool call/result icons with pulsing indicator)
-  ├─ Result   → Summary card + GoogleMap with markers & polyline + itinerary cards + metrics
+  ├─ Result   → Summary card + native GoogleMap (styled, dark/light theme-aware) with markers & polyline + map interaction toggle (scroll-lock) + itinerary cards + metrics
   └─ Error    → NeoBrutalCard with icon + message + dismiss button
 ```
