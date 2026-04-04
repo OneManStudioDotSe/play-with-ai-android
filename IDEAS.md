@@ -9,14 +9,14 @@ Each idea below is backed by a hardcoded value or missing toggle found in the co
 
 ## Tier 1 — High Impact, Low Effort
 
-### 1. Typewriter Speed / Instant Mode
+### 1. [COMPLETED] Typewriter Speed / Instant Mode
 
 Toggle the character-by-character typing animation off entirely, or offer speed presets (slow / normal / fast / instant). 
 Power users and accessibility-minded users will want to read the full answer immediately.
 
 - **Code:** `feature/chat/src/main/java/.../views/TypewriterText.kt` — `TYPING_DELAY = 10L` (ms per character)
 
-### 2. Haptic Feedback Toggle
+### 2. [COMPLETED] Haptic Feedback Toggle
 
 The app fires `HapticFeedbackConstants.CLOCK_TICK` on every typed character in chat and on map interactions. 
 There is no way to turn this off.
@@ -31,7 +31,7 @@ assistant, creative storyteller, technical expert) or a free-text system instruc
 
 - **Code:** `data/chat/src/main/java/.../prompts/ChatPrompts.kt` — `CHAT_SYSTEM_INSTRUCTION` constant
 
-### 4. Walking Speed
+### 4. [COMPLETED] Walking Speed
 
 Route time estimates assume 5.0 km/h in two places. Expose a "walking speed" setting (slow 3 / normal 5 / 
 fast 7 km/h) and feed it to both locations to keep them consistent.
@@ -118,12 +118,5 @@ reasons.
 
 - **Code:** `core/tracking/src/main/java/.../TokenUsageTrackerImpl.kt` — tracking runs unconditionally
 - **Code:** `core/database/src/main/java/.../dao/TokenUsageDao.kt` — always written to
-
-### 15. Map Theme Override
-
-Both the Explore and Plan screens load a custom map style that follows the system dark/light theme with no manual override. Add a three-way toggle (system / light / dark) for the map tiles specifically.
-
-- **Code:** `feature/explore/src/main/java/.../ExploreScreen.kt` — map style follows system theme (`isSystemInDarkTheme()`)
-- **Code:** `feature/plan/src/main/java/.../views/states/ResultState.kt` — same pattern; `custom_map_style_light.json` / `custom_map_style_dark.json` copied into `feature/plan/res/raw/`
 
 ---
