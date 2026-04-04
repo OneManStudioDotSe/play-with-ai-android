@@ -29,6 +29,10 @@
     <string name="plan_icon_step_tool_result">Verktygsresultat</string>
     <string name="plan_load_sample_data">Ladda exempeldata</string>
 
+    <!-- Map interaction toggle -->
+    <string name="plan_map_interact">Utforska kartan</string>
+    <string name="plan_map_done">Klar</string>
+
     <!-- Result section headers -->
     <string name="plan_trip_summary">Reseöversikt</string>
     <string name="plan_your_route">Din rutt</string>

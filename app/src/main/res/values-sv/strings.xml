@@ -5,4 +5,9 @@
     <string name="auth_error_retry">Försök igen</string>
     <string name="auth_error_retries_exhausted">Inloggningen misslyckades efter flera försök. Dina frågor kommer inte att synkas till molnet.</string>
     <string name="token_usage_snackbar">Använde %s tokens</string>
+    <string name="nav_label_chat">Chatt</string>
+    <string name="nav_label_explain">Förklara</string>
+    <string name="nav_label_plan">Planera</string>
+    <string name="nav_label_explore">Utforska</string>
+    <string name="nav_label_sofa">SoFa</string>
 </resources>

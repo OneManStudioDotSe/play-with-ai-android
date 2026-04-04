@@ -34,8 +34,7 @@ import se.onemanstudio.playaroundwithai.feature.chat.R
 import java.time.Instant
 import java.time.ZoneId
 import java.time.format.DateTimeFormatter
-import androidx.compose.ui.platform.LocalConfiguration
-import java.util.Locale
+import androidx.compose.ui.platform.LocalLocale
 
 @Composable
 fun HistoryItemCard(
@@ -46,8 +45,7 @@ fun HistoryItemCard(
     val dateFormat = stringResource(R.string.date_format_history)
     val timeFormat = stringResource(R.string.time_format_history)
     val dateAtTimePattern = stringResource(R.string.history_date_at)
-    val localeList = LocalConfiguration.current.locales
-    val locale = if (!localeList.isEmpty) localeList[0] else Locale.getDefault()
+    val locale = LocalLocale.current.platformLocale
 
     NeoBrutalCard(
         modifier = modifier
