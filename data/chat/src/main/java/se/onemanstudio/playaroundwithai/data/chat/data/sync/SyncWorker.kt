@@ -42,18 +42,14 @@ class SyncWorker @AssistedInject constructor(
 
         val pendingPrompts = promptsDao.getPromptsBySyncStatus(SyncStatus.Pending)
         if (pendingPrompts.isEmpty()) {
-            Timber.d("SyncWorker - No pending prompts found, all good!")
             return Result.success()
         }
 
-        Timber.d("SyncWorker - I found ${pendingPrompts.size} pending prompts to sync. Let's do it")
         setForeground(createForegroundInfo())
 
         var allSuccessful = true
         pendingPrompts.forEach { entity ->
             val firestoreDocId = entity.firestoreDocId
-            val hasFirestoreDoc = firestoreDocId != null
-            Timber.d("SyncWorker - Syncing prompt id=${entity.id} (${if (hasFirestoreDoc) "UPDATE" else "CREATE"})...")
 
             val success = if (firestoreDocId != null) {
                 val result = firestoreDataSource.updatePrompt(firestoreDocId, entity.text)
@@ -67,12 +63,7 @@ class SyncWorker @AssistedInject constructor(
                 result.isSuccess
             }
 
-            if (success) {
-                val rowsUpdated = promptsDao.markSyncedIfTextMatches(entity.id, entity.text, SyncStatus.Synced)
-                if (rowsUpdated > 0) {
-                    Timber.d("SyncWorker - Prompt id=${entity.id} marked as Synced")
-                }
-            } else {
+            if (!success) {
                 allSuccessful = false
                 Timber.e("SyncWorker - Failed to sync prompt id=${entity.id}")
             }
@@ -80,7 +71,6 @@ class SyncWorker @AssistedInject constructor(
 
         return when {
             allSuccessful -> {
-                Timber.d("SyncWorker completed — all ${pendingPrompts.size} prompt(s) synced successfully")
                 Result.success()
             }
 

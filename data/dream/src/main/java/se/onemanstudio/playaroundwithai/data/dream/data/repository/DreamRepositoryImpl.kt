@@ -15,24 +15,20 @@ import javax.inject.Singleton
 import se.onemanstudio.playaroundwithai.data.dream.data.mapper.toDomain as toDreamDomain
 import se.onemanstudio.playaroundwithai.data.dream.data.mapper.toEntity as toDreamEntity
 
-private const val LOG_PREVIEW_LENGTH = 50
-
 @Singleton
 class DreamRepositoryImpl @Inject constructor(
     private val dreamsDao: DreamsDao,
-    @DreamImagesDir private val dreamImagesDir: File,
+    @param:DreamImagesDir private val dreamImagesDir: File,
 ) : DreamRepository {
 
     override suspend fun saveDream(dream: Dream): Long {
-        Timber.d("DreamRepo - Saving dream: '${dream.description.take(LOG_PREVIEW_LENGTH)}...'")
         val insertedId = dreamsDao.insertDream(dream.toDreamEntity())
-        Timber.d("DreamRepo - Dream saved to Room (id=$insertedId)")
+
         return insertedId
     }
 
     override fun getDreamHistory(): Flow<List<Dream>> =
         dreamsDao.getAllDreams().map { list ->
-            Timber.v("DreamRepo - Dream history updated. We now have ${list.size} entries")
             list.map { it.toDreamDomain() }
         }
 
@@ -41,20 +37,24 @@ class DreamRepositoryImpl @Inject constructor(
     }
 
     override suspend fun deleteDream(id: Long) {
-        Timber.d("DreamRepo - Deleting dream id=$id")
         val dream = dreamsDao.getDreamById(id)
+
         // Delete DB record first so the dream disappears from UI even if file deletion fails
         dreamsDao.deleteDream(id)
         dream?.imagePath?.let { path ->
             val file = File(path)
             if (file.exists()) {
                 if (!file.delete()) Timber.w("DreamRepo - Failed to delete image file: $path")
-                else Timber.d("DreamRepo - Deleted image file: $path")
             }
         }
     }
 
-    override suspend fun saveDreamImage(dreamId: Long, imageBytes: ByteArray, mimeType: String, artistName: String): String =
+    override suspend fun saveDreamImage(
+        dreamId: Long,
+        imageBytes: ByteArray,
+        mimeType: String,
+        artistName: String
+    ): String =
         withContext(Dispatchers.IO) {
             val ext = when {
                 mimeType.contains("png") -> "png"
@@ -65,7 +65,6 @@ class DreamRepositoryImpl @Inject constructor(
 
             val file = File(dreamImagesDir, "dream_${dreamId}.$ext")
             file.writeBytes(imageBytes)
-            Timber.d("DreamRepo - Saved dream image to ${file.absolutePath} (${imageBytes.size} bytes)")
 
             @Suppress("TooGenericExceptionCaught") // cleanup-and-rethrow: unknown Room exception type
             try {
@@ -75,6 +74,7 @@ class DreamRepositoryImpl @Inject constructor(
                 file.delete()
                 throw e
             }
+
             file.absolutePath
         }
 }

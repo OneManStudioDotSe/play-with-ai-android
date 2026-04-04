@@ -10,7 +10,5 @@ class GetDreamHistoryUseCase @Inject constructor(
     private val repository: DreamRepository
 ) {
     operator fun invoke(): Flow<List<Dream>> = repository.getDreamHistory()
-        .map { dreams ->
-            dreams.sortedByDescending { it.timestamp }
-        }
+        .map { dreams -> dreams.sortedByDescending { it.timestamp } }
 }

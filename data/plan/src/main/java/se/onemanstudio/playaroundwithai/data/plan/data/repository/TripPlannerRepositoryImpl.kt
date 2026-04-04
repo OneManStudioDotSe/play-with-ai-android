@@ -65,7 +65,6 @@ class TripPlannerRepositoryImpl @Inject constructor(
             while (iterations < MAX_ITERATIONS) {
                 currentCoroutineContext().ensureActive()
                 iterations++
-                Timber.d("$LOG_TAG - Iteration $iterations")
 
                 val request = GeminiRequest(contents = history, tools = tools)
                 val response = apiService.generateContent(request)
@@ -102,7 +101,9 @@ class TripPlannerRepositoryImpl @Inject constructor(
                 } else {
                     val text = modelContent.parts.firstOrNull { it.text != null && it.thought != true }?.text.orEmpty()
                     val plan = buildTripPlan(text, collectedStops, routeResult)
+
                     emit(PlanEvent.Complete(plan))
+
                     return@flow
                 }
             }
@@ -148,8 +149,6 @@ class TripPlannerRepositoryImpl @Inject constructor(
         val lng = (args["longitude"] as? Number)?.toDouble() ?: defaultLng
         val count = (args["count"] as? Number)?.toInt() ?: DEFAULT_COUNT
 
-        Timber.d("$LOG_TAG - search_places: query='$query' lat=$lat lng=$lng count=$count")
-
         val prompt = PlanPrompts.searchPlacesPrompt(query, lat, lng, count)
         val request = GeminiRequest(contents = listOf(Content(role = "user", parts = listOf(Part(text = prompt)))))
         val response = apiService.generateContent(request)
@@ -177,7 +176,6 @@ class TripPlannerRepositoryImpl @Inject constructor(
             )
         }
 
-        Timber.d("$LOG_TAG - Found ${places.size} places, total stops now: ${collectedStops.size}")
         return mapOf("places" to places, "count" to places.size)
     }
 
@@ -188,7 +186,6 @@ class TripPlannerRepositoryImpl @Inject constructor(
             return mapOf("error" to "No places to calculate route for")
         }
 
-        Timber.d("$LOG_TAG - calculate_route for ${coordinates.size} places")
         val result = RouteCalculator.findOptimalRoute(coordinates, appSettingsHolder.walkingSpeedKmh.value.toDouble())
 
         val reorderedStops = result.orderedIndices.mapIndexed { newIndex, originalIndex ->

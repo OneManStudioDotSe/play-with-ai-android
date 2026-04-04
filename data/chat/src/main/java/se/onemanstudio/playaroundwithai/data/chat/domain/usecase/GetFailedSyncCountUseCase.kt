@@ -8,6 +8,5 @@ import javax.inject.Inject
 class GetFailedSyncCountUseCase @Inject constructor(
     private val repository: PromptRepository
 ) {
-    operator fun invoke(): Flow<Int> = repository.getFailedSyncCount()
-        .distinctUntilChanged()
+    operator fun invoke(): Flow<Int> = repository.getFailedSyncCount().distinctUntilChanged()
 }

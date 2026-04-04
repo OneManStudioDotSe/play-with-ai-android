@@ -16,6 +16,7 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.Immutable
@@ -278,12 +279,14 @@ private val previewBars = listOf(
 @Composable
 private fun UsageChartLightPreview() {
     SofaAiTheme {
-        UsageChart(
-            bars = previewBars,
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(Dimensions.paddingLarge),
-        )
+        Surface {
+            UsageChart(
+                bars = previewBars,
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(Dimensions.paddingLarge),
+            )
+        }
     }
 }
 
@@ -291,12 +294,14 @@ private fun UsageChartLightPreview() {
 @Composable
 private fun UsageChartDarkPreview() {
     SofaAiTheme(darkTheme = true) {
-        UsageChart(
-            bars = previewBars,
-            selectedIndex = 2,
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(Dimensions.paddingLarge),
-        )
+        Surface {
+            UsageChart(
+                bars = previewBars,
+                selectedIndex = 2,
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(Dimensions.paddingLarge),
+            )
+        }
     }
 }

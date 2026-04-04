@@ -6,5 +6,6 @@ import se.onemanstudio.playaroundwithai.core.tracking.model.TokenUsageEvent
 
 interface TokenUsageTracker {
     val lastUsageEvent: SharedFlow<TokenUsageEvent>
+    
     suspend fun record(feature: String, usageMetadata: UsageMetadata?)
 }

@@ -10,6 +10,7 @@ import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.height
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.material3.VerticalDivider
 import androidx.compose.runtime.Composable
@@ -89,11 +90,13 @@ fun NeoBrutalSegmentedButton(
 @Composable
 private fun NeoBrutalSegmentedButtonLightPreview() {
     SofaAiTheme(darkTheme = false) {
-        NeoBrutalSegmentedButton(
-            labels = listOf("Text", "Image", "Document"),
-            selectedIndex = 0,
-            onSelected = {}
-        )
+        Surface {
+            NeoBrutalSegmentedButton(
+                labels = listOf("Text", "Image", "Document"),
+                selectedIndex = 0,
+                onSelected = {}
+            )
+        }
     }
 }
 
@@ -101,10 +104,12 @@ private fun NeoBrutalSegmentedButtonLightPreview() {
 @Composable
 private fun NeoBrutalSegmentedButtonDarkPreview() {
     SofaAiTheme(darkTheme = true) {
-        NeoBrutalSegmentedButton(
-            labels = listOf("Text", "Image", "Document"),
-            selectedIndex = 1,
-            onSelected = {}
-        )
+        Surface {
+            NeoBrutalSegmentedButton(
+                labels = listOf("Text", "Image", "Document"),
+                selectedIndex = 1,
+                onSelected = {}
+            )
+        }
     }
 }

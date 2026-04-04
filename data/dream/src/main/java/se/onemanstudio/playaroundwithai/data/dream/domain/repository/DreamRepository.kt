@@ -5,8 +5,9 @@ import se.onemanstudio.playaroundwithai.data.dream.domain.model.Dream
 
 interface DreamRepository {
     suspend fun saveDream(dream: Dream): Long
-    fun getDreamHistory(): Flow<List<Dream>>
     suspend fun getDreamById(id: Long): Dream?
     suspend fun deleteDream(id: Long)
     suspend fun saveDreamImage(dreamId: Long, imageBytes: ByteArray, mimeType: String, artistName: String): String
+
+    fun getDreamHistory(): Flow<List<Dream>>
 }

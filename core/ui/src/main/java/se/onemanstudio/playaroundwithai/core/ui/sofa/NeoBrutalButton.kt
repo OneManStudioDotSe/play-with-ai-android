@@ -17,6 +17,7 @@ import androidx.compose.material.icons.filled.Favorite
 import androidx.compose.material.icons.filled.Navigation
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
@@ -242,43 +243,45 @@ fun NeoBrutalIconButtonSmall(
 @Composable
 private fun NeoBrutalButtonLightPreview() {
     SofaAiTheme {
-        Column(
-            modifier = Modifier
-                .fillMaxWidth()
-                .wrapContentHeight()
-                .padding(Dimensions.paddingLarge),
-            horizontalAlignment = Alignment.CenterHorizontally,
-            verticalArrangement = Arrangement.spacedBy(Dimensions.paddingLarge)
-        ) {
-            NeoBrutalButton(
-                onClick = {},
-                text = "PRIMARY ACTION",
-                backgroundColor = MaterialTheme.colorScheme.primary
-            )
-            NeoBrutalButton(
-                onClick = {},
-                text = "SECONDARY ACTION",
-                backgroundColor = MaterialTheme.colorScheme.secondary
-            )
-            NeoBrutalButton(
-                onClick = {},
-                text = "DISABLED",
-                enabled = false,
-                icon = Icons.Default.Navigation,
-                iconContentDescription = "Navigation icon"
-            )
-            NeoBrutalIconButton(
-                onClick = {},
-                imageVector = Icons.Default.Favorite,
-                contentDescription = "Favorite Icon",
-                backgroundColor = MaterialTheme.colorScheme.tertiary
-            )
-            NeoBrutalIconButtonSmall(
-                onClick = {},
-                imageVector = Icons.Default.Favorite,
-                contentDescription = "Favorite Small",
-                backgroundColor = MaterialTheme.colorScheme.tertiary
-            )
+        Surface {
+            Column(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .wrapContentHeight()
+                    .padding(Dimensions.paddingLarge),
+                horizontalAlignment = Alignment.CenterHorizontally,
+                verticalArrangement = Arrangement.spacedBy(Dimensions.paddingLarge)
+            ) {
+                NeoBrutalButton(
+                    onClick = {},
+                    text = "PRIMARY ACTION",
+                    backgroundColor = MaterialTheme.colorScheme.primary
+                )
+                NeoBrutalButton(
+                    onClick = {},
+                    text = "SECONDARY ACTION",
+                    backgroundColor = MaterialTheme.colorScheme.secondary
+                )
+                NeoBrutalButton(
+                    onClick = {},
+                    text = "DISABLED",
+                    enabled = false,
+                    icon = Icons.Default.Navigation,
+                    iconContentDescription = "Navigation icon"
+                )
+                NeoBrutalIconButton(
+                    onClick = {},
+                    imageVector = Icons.Default.Favorite,
+                    contentDescription = "Favorite Icon",
+                    backgroundColor = MaterialTheme.colorScheme.tertiary
+                )
+                NeoBrutalIconButtonSmall(
+                    onClick = {},
+                    imageVector = Icons.Default.Favorite,
+                    contentDescription = "Favorite Small",
+                    backgroundColor = MaterialTheme.colorScheme.tertiary
+                )
+            }
         }
     }
 }
@@ -287,30 +290,32 @@ private fun NeoBrutalButtonLightPreview() {
 @Composable
 private fun NeoBrutalButtonDarkPreview() {
     SofaAiTheme(darkTheme = true) {
-        Column(
-            modifier = Modifier
-                .fillMaxWidth()
-                .wrapContentHeight()
-                .padding(Dimensions.paddingLarge),
-            horizontalAlignment = Alignment.CenterHorizontally,
-            verticalArrangement = Arrangement.spacedBy(Dimensions.paddingLarge)
-        ) {
-            NeoBrutalButton(
-                onClick = {},
-                text = "PRIMARY ACTION",
-                backgroundColor = MaterialTheme.colorScheme.primary
-            )
-            NeoBrutalButton(
-                onClick = {},
-                text = "SECONDARY ACTION",
-                backgroundColor = MaterialTheme.colorScheme.secondary
-            )
-            NeoBrutalIconButton(
-                onClick = {},
-                imageVector = Icons.Default.Favorite,
-                contentDescription = "Favorite Icon",
-                backgroundColor = MaterialTheme.colorScheme.tertiary
-            )
+        Surface {
+            Column(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .wrapContentHeight()
+                    .padding(Dimensions.paddingLarge),
+                horizontalAlignment = Alignment.CenterHorizontally,
+                verticalArrangement = Arrangement.spacedBy(Dimensions.paddingLarge)
+            ) {
+                NeoBrutalButton(
+                    onClick = {},
+                    text = "PRIMARY ACTION",
+                    backgroundColor = MaterialTheme.colorScheme.primary
+                )
+                NeoBrutalButton(
+                    onClick = {},
+                    text = "SECONDARY ACTION",
+                    backgroundColor = MaterialTheme.colorScheme.secondary
+                )
+                NeoBrutalIconButton(
+                    onClick = {},
+                    imageVector = Icons.Default.Favorite,
+                    contentDescription = "Favorite Icon",
+                    backgroundColor = MaterialTheme.colorScheme.tertiary
+                )
+            }
         }
     }
 }

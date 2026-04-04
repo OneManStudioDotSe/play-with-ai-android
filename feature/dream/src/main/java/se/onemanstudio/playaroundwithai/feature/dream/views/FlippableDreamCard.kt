@@ -63,7 +63,6 @@ import se.onemanstudio.playaroundwithai.data.dream.domain.model.ElementShape
 import se.onemanstudio.playaroundwithai.data.dream.domain.model.ParticleShape
 import se.onemanstudio.playaroundwithai.feature.dream.R
 import se.onemanstudio.playaroundwithai.feature.dream.states.DreamImageState
-import timber.log.Timber
 
 private const val CANVAS_HEIGHT_MAX = 280
 private const val ARTIST_LABEL_ALPHA = 0.85f
@@ -88,13 +87,6 @@ fun FlippableDreamCard(
 
     LaunchedEffect(isImageReady) {
         if (!isImageReady) isFlipped = false
-    }
-
-    LaunchedEffect(scene, imageState) {
-        Timber.d(
-            "FlippableCard - scene layers=%d, imageState=%s, isFlipped=%s",
-            scene.layers.size, imageState::class.simpleName, isFlipped,
-        )
     }
 
     val rotation by animateFloatAsState(
@@ -125,7 +117,6 @@ private fun FrontSide(
     flipIconVisible: MutableTransitionState<Boolean>,
     onFlipClick: () -> Unit,
 ) {
-    Timber.d("FrontSide - flipIconVisible: ${flipIconVisible.targetState}")
     Box {
         DreamscapeCanvas(
             scene = scene,
@@ -164,6 +155,7 @@ private fun BackSide(imageState: DreamImageState, scene: DreamScene, onFlipBack:
                     val bytes = java.util.Base64.getDecoder().decode(imageState.imageBase64)
                     BitmapFactory.decodeByteArray(bytes, 0, bytes.size)
                 }
+
                 else -> null
             }
         }
@@ -292,15 +284,43 @@ private fun previewDarkScene() = DreamScene(
         DreamLayer(
             depth = 0.8f,
             elements = listOf(
-                DreamElement(shape = ElementShape.STAR, x = 0.5f, y = 0.3f, scale = 0.8f, color = 0xFFE0E1DD, alpha = 0.9f),
-                DreamElement(shape = ElementShape.CRESCENT, x = 0.65f, y = 0.4f, scale = 1.6f, color = 0xFFE0E1DD, alpha = 0.6f),
+                DreamElement(
+                    shape = ElementShape.STAR,
+                    x = 0.5f,
+                    y = 0.3f,
+                    scale = 0.8f,
+                    color = 0xFFE0E1DD,
+                    alpha = 0.9f
+                ),
+                DreamElement(
+                    shape = ElementShape.CRESCENT,
+                    x = 0.65f,
+                    y = 0.4f,
+                    scale = 1.6f,
+                    color = 0xFFE0E1DD,
+                    alpha = 0.6f
+                ),
             ),
         ),
         DreamLayer(
             depth = 0.2f,
             elements = listOf(
-                DreamElement(shape = ElementShape.MOUNTAIN, x = 0.3f, y = 0.5f, scale = 2.5f, color = 0xFF1B263B, alpha = 0.6f),
-                DreamElement(shape = ElementShape.TREE, x = 0.2f, y = 0.5f, scale = 1.5f, color = 0xFF415A77, alpha = 0.7f),
+                DreamElement(
+                    shape = ElementShape.MOUNTAIN,
+                    x = 0.3f,
+                    y = 0.5f,
+                    scale = 2.5f,
+                    color = 0xFF1B263B,
+                    alpha = 0.6f
+                ),
+                DreamElement(
+                    shape = ElementShape.TREE,
+                    x = 0.2f,
+                    y = 0.5f,
+                    scale = 1.5f,
+                    color = 0xFF415A77,
+                    alpha = 0.7f
+                ),
             ),
         ),
     ),

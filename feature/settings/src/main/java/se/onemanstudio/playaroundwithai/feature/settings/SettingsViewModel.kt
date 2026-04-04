@@ -19,7 +19,7 @@ class SettingsViewModel @Inject constructor(
     getWeeklyTokenUsageUseCase: GetWeeklyTokenUsageUseCase,
     private val exploreSettingsHolder: ExploreSettingsHolder,
     private val appSettingsHolder: AppSettingsHolder,
-    @AppVersion val appVersion: String,
+    @param: AppVersion val appVersion: String,
 ) : ViewModel() {
 
     val weeklyUsage: StateFlow<List<DailyTokenUsage>> = getWeeklyTokenUsageUseCase()

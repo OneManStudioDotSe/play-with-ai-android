@@ -13,7 +13,6 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.material3.Surface
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
@@ -36,7 +35,6 @@ import se.onemanstudio.playaroundwithai.data.dream.domain.model.DreamParticle
 import se.onemanstudio.playaroundwithai.data.dream.domain.model.DreamScene
 import se.onemanstudio.playaroundwithai.data.dream.domain.model.ElementShape
 import se.onemanstudio.playaroundwithai.data.dream.domain.model.ParticleShape
-import timber.log.Timber
 import kotlin.math.E
 import kotlin.math.PI
 import kotlin.math.cos
@@ -80,16 +78,7 @@ fun DreamscapeCanvas(
         }.sortedWith(compareBy({ it.third.ordinal }, { it.second }))
     }
 
-    LaunchedEffect(scene) {
-        Timber.d(
-            "DreamCanvas - Scene: %d layers, %d classified elements, %d particle types",
-            scene.layers.size, classified.size, scene.particles.size,
-        )
-        Timber.d("DreamCanvas - Palette: sky=0x%08X, horizon=0x%08X", scene.palette.sky.toInt(), scene.palette.horizon.toInt())
-    }
-
     Canvas(modifier = modifier) {
-        //Timber.d("DreamCanvas - DRAW size=%.0fx%.0f", size.width, size.height)
         drawClampedGradient(scene.palette)
 
         classified.forEach { (element, layerDepth, band) ->
@@ -102,7 +91,7 @@ fun DreamscapeCanvas(
                 val range = bandYRange(band)
                 val y = (range.start + element.y * (range.endInclusive - range.start)) * size.height
                 val verticalDrift = sin(slowTime * TWO_PI + element.x * TWO_PI) *
-                    size.height * VERTICAL_DRIFT_AMPLITUDE * layerDepth
+                        size.height * VERTICAL_DRIFT_AMPLITUDE * layerDepth
                 drawNonGroundElement(element, layerOffset, y + verticalDrift, slowTime)
             }
         }
@@ -357,8 +346,22 @@ private fun DrawScope.drawLotus(color: Color, x: Float, y: Float, elementSize: F
         drawRotated(angle, x, y) {
             val path = Path().apply {
                 moveTo(x, y)
-                cubicTo(x - petalWidth, y - petalLen * LOTUS_PETAL_CURVE, x - petalWidth * LOTUS_PETAL_TIP, y - petalLen, x, y - petalLen)
-                cubicTo(x + petalWidth * LOTUS_PETAL_TIP, y - petalLen, x + petalWidth, y - petalLen * LOTUS_PETAL_CURVE, x, y)
+                cubicTo(
+                    x - petalWidth,
+                    y - petalLen * LOTUS_PETAL_CURVE,
+                    x - petalWidth * LOTUS_PETAL_TIP,
+                    y - petalLen,
+                    x,
+                    y - petalLen
+                )
+                cubicTo(
+                    x + petalWidth * LOTUS_PETAL_TIP,
+                    y - petalLen,
+                    x + petalWidth,
+                    y - petalLen * LOTUS_PETAL_CURVE,
+                    x,
+                    y
+                )
                 close()
             }
             drawPath(path, color)
@@ -376,9 +379,12 @@ private fun DrawScope.drawAurora(color: Color, x: Float, y: Float, elementSize: 
         val path = Path().apply {
             moveTo(x - elementSize, y + yOff)
             cubicTo(
-                x - elementSize * AURORA_CTRL_X, y + yOff - elementSize * AURORA_CTRL_Y + sin(phase) * elementSize * AURORA_UNDULATION,
-                x + elementSize * AURORA_CTRL_X, y + yOff + elementSize * AURORA_CTRL_Y + sin(phase + 1f) * elementSize * AURORA_UNDULATION,
-                x + elementSize, y + yOff,
+                x - elementSize * AURORA_CTRL_X,
+                y + yOff - elementSize * AURORA_CTRL_Y + sin(phase) * elementSize * AURORA_UNDULATION,
+                x + elementSize * AURORA_CTRL_X,
+                y + yOff + elementSize * AURORA_CTRL_Y + sin(phase + 1f) * elementSize * AURORA_UNDULATION,
+                x + elementSize,
+                y + yOff,
             )
         }
         drawPath(path, color.copy(alpha = alpha), style = Stroke(width = strokeW))
@@ -509,7 +515,11 @@ private fun DrawScope.drawParticles(particles: List<DreamParticle>, time: Float,
                 ParticleShape.DOT -> {
                     val xDrift = sin(timePhase) * size.width * DOT_X_DRIFT
                     val yLissajous = cos(timePhase * DOT_Y_LISSAJOUS_FREQ) * size.height * DOT_Y_LISSAJOUS_AMP
-                    drawCircle(color = color, radius = particleSize, center = Offset(baseXPos + xDrift, baseYPos + yLissajous))
+                    drawCircle(
+                        color = color,
+                        radius = particleSize,
+                        center = Offset(baseXPos + xDrift, baseYPos + yLissajous)
+                    )
                 }
 
                 ParticleShape.SPARKLE -> {
@@ -542,7 +552,8 @@ private fun DrawScope.drawParticles(particles: List<DreamParticle>, time: Float,
                 }
 
                 ParticleShape.DASH -> {
-                    val dashX = marginX + ((seed + time * particle.speed * HALF_ROTATION * DASH_SPEED_MULTIPLIER) % 1f) * usableWidth
+                    val dashX =
+                        marginX + ((seed + time * particle.speed * HALF_ROTATION * DASH_SPEED_MULTIPLIER) % 1f) * usableWidth
                     val rotation = sin(timePhase) * DASH_ROTATION_AMP
                     drawRotated(rotation, dashX, baseYPos) {
                         drawDash(color, dashX, baseYPos, particleSize)
@@ -611,38 +622,97 @@ private fun DrawScope.drawStarburst(color: Color, x: Float, y: Float, particleSi
     drawLine(color = color, start = Offset(x - len, y), end = Offset(x + len, y), strokeWidth = 1f)
     drawLine(color = color, start = Offset(x, y - len), end = Offset(x, y + len), strokeWidth = 1f)
     // Diagonals
-    drawLine(color = color, start = Offset(x - diagLen, y - diagLen), end = Offset(x + diagLen, y + diagLen), strokeWidth = 1f)
-    drawLine(color = color, start = Offset(x + diagLen, y - diagLen), end = Offset(x - diagLen, y + diagLen), strokeWidth = 1f)
+    drawLine(
+        color = color,
+        start = Offset(x - diagLen, y - diagLen),
+        end = Offset(x + diagLen, y + diagLen),
+        strokeWidth = 1f
+    )
+    drawLine(
+        color = color,
+        start = Offset(x + diagLen, y - diagLen),
+        end = Offset(x - diagLen, y + diagLen),
+        strokeWidth = 1f
+    )
 }
 
 // endregion
 
 // region Previews
 
-@Suppress("MagicNumber")
+@Suppress("MagicNumber", "LongMethod")
 private fun previewMysteriousScene() = DreamScene(
     palette = DreamPalette(sky = 0xFF0D1B2A, horizon = 0xFF1B263B, accent = 0xFF415A77),
     layers = listOf(
         DreamLayer(
             depth = 0.8f,
             elements = listOf(
-                DreamElement(shape = ElementShape.STAR, x = 0.3f, y = 0.3f, scale = 0.8f, color = 0xFFE0E1DD, alpha = 0.9f),
-                DreamElement(shape = ElementShape.STAR, x = 0.8f, y = 0.15f, scale = 0.6f, color = 0xFFE0E1DD, alpha = 0.7f),
-                DreamElement(shape = ElementShape.CRESCENT, x = 0.7f, y = 0.3f, scale = 1.8f, color = 0xFFE0E1DD, alpha = 0.6f),
+                DreamElement(
+                    shape = ElementShape.STAR,
+                    x = 0.3f,
+                    y = 0.3f,
+                    scale = 0.8f,
+                    color = 0xFFE0E1DD,
+                    alpha = 0.9f
+                ),
+                DreamElement(
+                    shape = ElementShape.STAR,
+                    x = 0.8f,
+                    y = 0.15f,
+                    scale = 0.6f,
+                    color = 0xFFE0E1DD,
+                    alpha = 0.7f
+                ),
+                DreamElement(
+                    shape = ElementShape.CRESCENT,
+                    x = 0.7f,
+                    y = 0.3f,
+                    scale = 1.8f,
+                    color = 0xFFE0E1DD,
+                    alpha = 0.6f
+                ),
             ),
         ),
         DreamLayer(
             depth = 0.5f,
             elements = listOf(
-                DreamElement(shape = ElementShape.AURORA, x = 0.5f, y = 0.5f, scale = 2.0f, color = 0xFF415A77, alpha = 0.4f),
-                DreamElement(shape = ElementShape.CRYSTAL, x = 0.75f, y = 0.5f, scale = 1.5f, color = 0xFF415A77, alpha = 0.5f),
+                DreamElement(
+                    shape = ElementShape.AURORA,
+                    x = 0.5f,
+                    y = 0.5f,
+                    scale = 2.0f,
+                    color = 0xFF415A77,
+                    alpha = 0.4f
+                ),
+                DreamElement(
+                    shape = ElementShape.CRYSTAL,
+                    x = 0.75f,
+                    y = 0.5f,
+                    scale = 1.5f,
+                    color = 0xFF415A77,
+                    alpha = 0.5f
+                ),
             ),
         ),
         DreamLayer(
             depth = 0.2f,
             elements = listOf(
-                DreamElement(shape = ElementShape.MOUNTAIN, x = 0.25f, y = 0.5f, scale = 2.5f, color = 0xFF1B263B, alpha = 0.6f),
-                DreamElement(shape = ElementShape.TREE, x = 0.15f, y = 0.5f, scale = 1.5f, color = 0xFF415A77, alpha = 0.7f),
+                DreamElement(
+                    shape = ElementShape.MOUNTAIN,
+                    x = 0.25f,
+                    y = 0.5f,
+                    scale = 2.5f,
+                    color = 0xFF1B263B,
+                    alpha = 0.6f
+                ),
+                DreamElement(
+                    shape = ElementShape.TREE,
+                    x = 0.15f,
+                    y = 0.5f,
+                    scale = 1.5f,
+                    color = 0xFF415A77,
+                    alpha = 0.7f
+                ),
             ),
         ),
     ),
@@ -652,29 +722,71 @@ private fun previewMysteriousScene() = DreamScene(
     ),
 )
 
-@Suppress("MagicNumber")
+@Suppress("MagicNumber", "LongMethod")
 private fun previewJoyfulScene() = DreamScene(
     palette = DreamPalette(sky = 0xFF87CEEB, horizon = 0xFFFFF8DC, accent = 0xFFFFD700),
     layers = listOf(
         DreamLayer(
             depth = 0.4f,
             elements = listOf(
-                DreamElement(shape = ElementShape.CIRCLE, x = 0.8f, y = 0.3f, scale = 2.0f, color = 0xFFFFD700, alpha = 0.8f),
-                DreamElement(shape = ElementShape.CLOUD, x = 0.3f, y = 0.4f, scale = 1.5f, color = 0xCCFFFFFF, alpha = 0.6f),
+                DreamElement(
+                    shape = ElementShape.CIRCLE,
+                    x = 0.8f,
+                    y = 0.3f,
+                    scale = 2.0f,
+                    color = 0xFFFFD700,
+                    alpha = 0.8f
+                ),
+                DreamElement(
+                    shape = ElementShape.CLOUD,
+                    x = 0.3f,
+                    y = 0.4f,
+                    scale = 1.5f,
+                    color = 0xCCFFFFFF,
+                    alpha = 0.6f
+                ),
             ),
         ),
         DreamLayer(
             depth = 0.7f,
             elements = listOf(
-                DreamElement(shape = ElementShape.DIAMOND, x = 0.5f, y = 0.5f, scale = 1.2f, color = 0xFFFF6347, alpha = 0.7f),
-                DreamElement(shape = ElementShape.SPIRAL, x = 0.15f, y = 0.4f, scale = 1.0f, color = 0xFFFFD700, alpha = 0.5f),
+                DreamElement(
+                    shape = ElementShape.DIAMOND,
+                    x = 0.5f,
+                    y = 0.5f,
+                    scale = 1.2f,
+                    color = 0xFFFF6347,
+                    alpha = 0.7f
+                ),
+                DreamElement(
+                    shape = ElementShape.SPIRAL,
+                    x = 0.15f,
+                    y = 0.4f,
+                    scale = 1.0f,
+                    color = 0xFFFFD700,
+                    alpha = 0.5f
+                ),
             ),
         ),
         DreamLayer(
             depth = 0.2f,
             elements = listOf(
-                DreamElement(shape = ElementShape.WAVE, x = 0.5f, y = 0.5f, scale = 3.0f, color = 0xFF4682B4, alpha = 0.5f),
-                DreamElement(shape = ElementShape.LOTUS, x = 0.3f, y = 0.4f, scale = 1.2f, color = 0xFFFF69B4, alpha = 0.6f),
+                DreamElement(
+                    shape = ElementShape.WAVE,
+                    x = 0.5f,
+                    y = 0.5f,
+                    scale = 3.0f,
+                    color = 0xFF4682B4,
+                    alpha = 0.5f
+                ),
+                DreamElement(
+                    shape = ElementShape.LOTUS,
+                    x = 0.3f,
+                    y = 0.4f,
+                    scale = 1.2f,
+                    color = 0xFFFF69B4,
+                    alpha = 0.6f
+                ),
             ),
         ),
     ),

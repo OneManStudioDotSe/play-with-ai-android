@@ -4,6 +4,7 @@ import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
@@ -73,13 +74,15 @@ fun MarkerText(
 @Composable
 private fun MarkerTextPreview() {
     SofaAiTheme {
-        Column(
-            modifier = Modifier.padding(Dimensions.paddingLarge),
-            verticalArrangement = Arrangement.spacedBy(Dimensions.paddingLarge),
-        ) {
-            MarkerText(text = "Map Controls", lineColor = electricBlue)
-            MarkerText(text = "Weekly Usage", lineColor = vividPink)
-            MarkerText(text = "About", lineColor = zestyLime)
+        Surface {
+            Column(
+                modifier = Modifier.padding(Dimensions.paddingLarge),
+                verticalArrangement = Arrangement.spacedBy(Dimensions.paddingLarge),
+            ) {
+                MarkerText(text = "Map Controls", lineColor = electricBlue)
+                MarkerText(text = "Weekly Usage", lineColor = vividPink)
+                MarkerText(text = "About", lineColor = zestyLime)
+            }
         }
     }
 }

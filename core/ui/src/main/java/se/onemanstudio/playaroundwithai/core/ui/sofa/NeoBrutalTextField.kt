@@ -5,6 +5,7 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.text.BasicTextField
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
@@ -58,11 +59,13 @@ fun NeoBrutalTextField(
 @Composable
 private fun NeoBrutalTextFieldLightPreview() {
     SofaAiTheme(darkTheme = false) {
-        NeoBrutalTextField(
-            value = TextFieldValue("User input"),
-            onValueChange = {},
-            placeholder = "Type something..."
-        )
+        Surface {
+            NeoBrutalTextField(
+                value = TextFieldValue("User input"),
+                onValueChange = {},
+                placeholder = "Type something..."
+            )
+        }
     }
 }
 
@@ -70,10 +73,12 @@ private fun NeoBrutalTextFieldLightPreview() {
 @Composable
 private fun NeoBrutalTextFieldDarkPreview() {
     SofaAiTheme(darkTheme = true) {
-        NeoBrutalTextField(
-            value = TextFieldValue("User input"),
-            onValueChange = {},
-            placeholder = "Type something..."
-        )
+        Surface {
+            NeoBrutalTextField(
+                value = TextFieldValue("User input"),
+                onValueChange = {},
+                placeholder = "Type something..."
+            )
+        }
     }
 }

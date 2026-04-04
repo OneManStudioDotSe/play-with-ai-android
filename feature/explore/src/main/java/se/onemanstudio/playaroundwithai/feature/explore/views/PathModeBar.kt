@@ -11,6 +11,7 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.PlayArrow
 import androidx.compose.material.icons.filled.Refresh
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
@@ -86,12 +87,14 @@ fun PathModeBar(
 @Composable
 private fun PathModeBarDisabledPreview() {
     SofaAiTheme {
-        PathModeBar(
-            count = 1,
-            distance = 42,
-            duration = 124,
-            onGoClick = {}
-        )
+        Surface {
+            PathModeBar(
+                count = 1,
+                distance = 42,
+                duration = 124,
+                onGoClick = {}
+            )
+        }
     }
 }
 
@@ -99,11 +102,13 @@ private fun PathModeBarDisabledPreview() {
 @Composable
 private fun PathModeBarEnabledPreview() {
     SofaAiTheme {
-        PathModeBar(
-            count = 2,
-            distance = 42,
-            duration = 124,
-            onGoClick = {}
-        )
+        Surface {
+            PathModeBar(
+                count = 2,
+                distance = 42,
+                duration = 124,
+                onGoClick = {}
+            )
+        }
     }
 }

@@ -8,6 +8,7 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.History
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.TopAppBarDefaults
@@ -54,17 +55,19 @@ fun NeoBrutalTopAppBar(
 @Composable
 private fun NeoBrutalTopAppBarLightPreview() {
     SofaAiTheme {
-        Column {
-            NeoBrutalTopAppBar(
-                title = "Some title",
-                actions = {
-                    NeoBrutalIconButtonSmall(
-                        onClick = {},
-                        imageVector = Icons.Default.History,
-                        contentDescription = "History",
-                    )
-                }
-            )
+        Surface {
+            Column {
+                NeoBrutalTopAppBar(
+                    title = "Some title",
+                    actions = {
+                        NeoBrutalIconButtonSmall(
+                            onClick = {},
+                            imageVector = Icons.Default.History,
+                            contentDescription = "History",
+                        )
+                    }
+                )
+            }
         }
     }
 }
@@ -73,23 +76,25 @@ private fun NeoBrutalTopAppBarLightPreview() {
 @Composable
 private fun NeoBrutalTopAppBarDarkPreview() {
     SofaAiTheme(darkTheme = true) {
-        Column {
-            NeoBrutalTopAppBar(
-                title = "Some title",
-                actions = {
-                    NeoBrutalIconButtonSmall(
-                        onClick = {},
-                        imageVector = Icons.Default.History,
-                        contentDescription = "History",
-                    )
+        Surface {
+            Column {
+                NeoBrutalTopAppBar(
+                    title = "Some title",
+                    actions = {
+                        NeoBrutalIconButtonSmall(
+                            onClick = {},
+                            imageVector = Icons.Default.History,
+                            contentDescription = "History",
+                        )
 
-                    NeoBrutalIconButtonSmall(
-                        onClick = {},
-                        imageVector = Icons.Default.History,
-                        contentDescription = "History",
-                    )
-                }
-            )
+                        NeoBrutalIconButtonSmall(
+                            onClick = {},
+                            imageVector = Icons.Default.History,
+                            contentDescription = "History",
+                        )
+                    }
+                )
+            }
         }
     }
 }

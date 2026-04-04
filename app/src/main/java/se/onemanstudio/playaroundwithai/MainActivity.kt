@@ -4,6 +4,8 @@ import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
+import androidx.compose.foundation.layout.PaddingValues
+import androidx.compose.foundation.layout.RowScope
 import androidx.compose.foundation.layout.consumeWindowInsets
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
@@ -29,8 +31,10 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight.Companion.Bold
 import androidx.compose.ui.text.font.FontWeight.Companion.Normal
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
+import androidx.navigation.NavDestination
 import androidx.navigation.NavDestination.Companion.hasRoute
 import androidx.navigation.NavGraph.Companion.findStartDestination
+import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.currentBackStackEntryAsState
@@ -49,6 +53,7 @@ import se.onemanstudio.playaroundwithai.navigation.Agents
 import se.onemanstudio.playaroundwithai.navigation.Chat
 import se.onemanstudio.playaroundwithai.navigation.Dreams
 import se.onemanstudio.playaroundwithai.navigation.Maps
+import se.onemanstudio.playaroundwithai.navigation.NavItem
 import se.onemanstudio.playaroundwithai.navigation.Showcase
 import se.onemanstudio.playaroundwithai.navigation.navItems
 
@@ -118,59 +123,72 @@ private fun SoFaApp() {
                     val navBackStackEntry by navController.currentBackStackEntryAsState()
                     val currentDestination = navBackStackEntry?.destination
 
-                    navItems.forEach { screen ->
-                        val isSelected = currentDestination?.hasRoute(screen.route::class) == true
+                    navItems.forEach { screen -> BottomNavigationMenuEntry(currentDestination, screen, navController) }
+                }
+            }
+        ) { innerPadding -> NavigationableContent(innerPadding, navController) }
+    }
+}
 
-                        NavigationBarItem(
-                            selected = isSelected,
-                            onClick = {
-                                navController.navigate(screen.route) {
-                                    popUpTo(navController.graph.findStartDestination().id) { saveState = true }
-                                    launchSingleTop = true
-                                    restoreState = true
-                                }
-                            },
-                            label = {
-                                val label = stringResource(screen.labelRes)
-                                Text(text = label, fontWeight = if (isSelected) Bold else Normal)
-                            },
-                            icon = { Icon(screen.icon, contentDescription = stringResource(screen.labelRes)) },
-                            colors = NavigationBarItemDefaults.colors(
-                                selectedIconColor = MaterialTheme.colorScheme.surface,
-                                selectedTextColor = MaterialTheme.colorScheme.onSurface,
-                                indicatorColor = MaterialTheme.colorScheme.onSurface,
-                                unselectedIconColor = MaterialTheme.colorScheme.onSurface.copy(alpha = Alphas.medium),
-                                unselectedTextColor = MaterialTheme.colorScheme.onSurface.copy(alpha = Alphas.medium)
-                            )
-                        )
-                    }
-                }
+@Composable
+private fun RowScope.BottomNavigationMenuEntry(
+    currentDestination: NavDestination?,
+    screen: NavItem,
+    navController: NavHostController
+) {
+    val isSelected = currentDestination?.hasRoute(screen.route::class) == true
+
+    NavigationBarItem(
+        selected = isSelected,
+        onClick = {
+            navController.navigate(screen.route) {
+                popUpTo(navController.graph.findStartDestination().id) { saveState = true }
+                launchSingleTop = true
+                restoreState = true
             }
-        ) { innerPadding ->
-            NavHost(
-                modifier = Modifier
-                    .fillMaxSize()
-                    .padding(innerPadding)
-                    .consumeWindowInsets(innerPadding),
-                navController = navController,
-                startDestination = Chat,
-            ) {
-                composable<Chat> {
-                    ChatScreen(settingsContent = { onDismiss -> SettingsBottomSheetContainer(onDismiss = onDismiss) })
-                }
-                composable<Maps> {
-                    ExploreScreen(settingsContent = { onDismiss -> SettingsBottomSheetContainer(onDismiss = onDismiss) })
-                }
-                composable<Dreams> {
-                    DreamScreen(settingsContent = { onDismiss -> SettingsBottomSheetContainer(onDismiss = onDismiss) })
-                }
-                composable<Agents> {
-                    PlanScreen(settingsContent = { onDismiss -> SettingsBottomSheetContainer(onDismiss = onDismiss) })
-                }
-                composable<Showcase> {
-                    ShowcaseScreen()
-                }
-            }
+        },
+        label = {
+            val label = stringResource(screen.labelRes)
+            Text(text = label, fontWeight = if (isSelected) Bold else Normal)
+        },
+        icon = { Icon(screen.icon, contentDescription = stringResource(screen.labelRes)) },
+        colors = NavigationBarItemDefaults.colors(
+            selectedIconColor = MaterialTheme.colorScheme.surface,
+            selectedTextColor = MaterialTheme.colorScheme.onSurface,
+            indicatorColor = MaterialTheme.colorScheme.onSurface,
+            unselectedIconColor = MaterialTheme.colorScheme.onSurface.copy(alpha = Alphas.medium),
+            unselectedTextColor = MaterialTheme.colorScheme.onSurface.copy(alpha = Alphas.medium)
+        )
+    )
+}
+
+@Composable
+private fun NavigationableContent(
+    innerPadding: PaddingValues,
+    navController: NavHostController
+) {
+    NavHost(
+        modifier = Modifier
+            .fillMaxSize()
+            .padding(innerPadding)
+            .consumeWindowInsets(innerPadding),
+        navController = navController,
+        startDestination = Chat,
+    ) {
+        composable<Chat> {
+            ChatScreen(settingsContent = { onDismiss -> SettingsBottomSheetContainer(onDismiss = onDismiss) })
+        }
+        composable<Maps> {
+            ExploreScreen(settingsContent = { onDismiss -> SettingsBottomSheetContainer(onDismiss = onDismiss) })
+        }
+        composable<Dreams> {
+            DreamScreen(settingsContent = { onDismiss -> SettingsBottomSheetContainer(onDismiss = onDismiss) })
+        }
+        composable<Agents> {
+            PlanScreen(settingsContent = { onDismiss -> SettingsBottomSheetContainer(onDismiss = onDismiss) })
+        }
+        composable<Showcase> {
+            ShowcaseScreen()
         }
     }
 }

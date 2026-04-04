@@ -57,7 +57,7 @@ fun SettingsBottomSheetContainer(
                 }
                 context.startActivity(intent)
             } catch (e: ActivityNotFoundException) {
-                Timber.w(e, "Settings - No email app available")
+                Timber.w(e, "No email app available")
             }
         },
         onLinkedInClick = {
@@ -65,7 +65,7 @@ fun SettingsBottomSheetContainer(
                 val intent = Intent(Intent.ACTION_VIEW, "https://www.linkedin.com/in/sotirisfalieris/".toUri())
                 context.startActivity(intent)
             } catch (e: ActivityNotFoundException) {
-                Timber.w(e, "Settings - No browser available")
+                Timber.w(e, "No browser available")
             }
         },
         usageBars = usageBars,

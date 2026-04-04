@@ -13,11 +13,7 @@ class ExplorePointsRepositoryImpl @Inject constructor(
     private val exploreApiService: ExploreApiService,
 ) : ExplorePointsRepository {
     override suspend fun getExploreItems(count: Int, centerLat: Double, centerLng: Double): List<ExploreItem> = withContext(Dispatchers.IO) {
-        Timber.d("ExploreRepo - Fetching $count explore items from API centered at ($centerLat, $centerLng)...")
-
         val items = exploreApiService.getExploreItems(count, centerLat, centerLng).map { it.toDomain() }
-
-        Timber.d("ExploreRepo - Received ${items.size} explore items")
 
         items
     }

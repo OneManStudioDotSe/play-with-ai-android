@@ -30,8 +30,6 @@ class ExploreSuggestionsRepositoryImpl @Inject constructor(
 
     override suspend fun getSuggestedPlaces(latitude: Double, longitude: Double): Result<List<SuggestedPlace>> = withContext(Dispatchers.IO) {
         try {
-            Timber.d("Gemini - Getting suggested places for lat=$latitude, lng=$longitude")
-
             val prompt = ExplorePrompts.suggestedPlacesPrompt(latitude, longitude)
             val parts = listOf(Part(text = prompt))
             val request = GeminiRequest(contents = listOf(Content(parts = parts)))
@@ -46,7 +44,6 @@ class ExploreSuggestionsRepositoryImpl @Inject constructor(
             val jsonText = JsonExtractor.extract(rawText)
             val dto = gson.fromJson(jsonText, SuggestedPlacesResponseDto::class.java)
 
-            Timber.d("Gemini - Received ${dto.places.size} suggested places")
             Result.success(dto.places.map { it.toSuggestedPlaceDomain() })
         } catch (e: JsonSyntaxException) {
             Timber.e(e, "Gemini - Failed to parse AI response as JSON")

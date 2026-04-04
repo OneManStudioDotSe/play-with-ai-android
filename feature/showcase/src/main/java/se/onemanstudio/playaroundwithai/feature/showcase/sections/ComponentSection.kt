@@ -47,7 +47,6 @@ import se.onemanstudio.playaroundwithai.core.ui.theme.vividPink
 import se.onemanstudio.playaroundwithai.core.ui.theme.zestyLime
 import se.onemanstudio.playaroundwithai.feature.showcase.R
 
-
 @Composable
 fun ComponentSection() {
     MarkerText(text = stringResource(R.string.section_components), lineColor = zestyLime)

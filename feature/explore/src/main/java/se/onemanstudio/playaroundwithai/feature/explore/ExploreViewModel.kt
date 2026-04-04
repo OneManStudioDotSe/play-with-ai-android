@@ -46,6 +46,7 @@ private val LOADING_MESSAGE_RES_IDS = listOf(
     R.string.loading_message_5,
 )
 
+@Suppress("LongParameterList")
 @HiltViewModel
 class ExploreViewModel @Inject constructor(
     private val getExploreItemsUseCase: GetExploreItemsUseCase,

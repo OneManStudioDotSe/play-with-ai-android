@@ -1,5 +1,6 @@
 package se.onemanstudio.playaroundwithai.feature.explore.views
 
+import android.view.HapticFeedbackConstants
 import androidx.compose.animation.core.Animatable
 import androidx.compose.animation.core.FastOutSlowInEasing
 import androidx.compose.animation.core.tween
@@ -22,25 +23,25 @@ import androidx.compose.material.icons.filled.QrCode
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
-import android.view.HapticFeedbackConstants
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.platform.LocalView
 import androidx.compose.ui.graphics.vector.ImageVector
+import androidx.compose.ui.platform.LocalView
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
-import se.onemanstudio.playaroundwithai.data.explore.domain.model.ExploreItem
-import se.onemanstudio.playaroundwithai.data.explore.domain.model.VehicleType
 import se.onemanstudio.playaroundwithai.core.ui.sofa.NeoBrutalCard
 import se.onemanstudio.playaroundwithai.core.ui.sofa.NeoBrutalIconButton
 import se.onemanstudio.playaroundwithai.core.ui.theme.Dimensions
 import se.onemanstudio.playaroundwithai.core.ui.theme.SofaAiTheme
+import se.onemanstudio.playaroundwithai.data.explore.domain.model.ExploreItem
+import se.onemanstudio.playaroundwithai.data.explore.domain.model.VehicleType
 import se.onemanstudio.playaroundwithai.feature.explore.R
 import se.onemanstudio.playaroundwithai.feature.explore.models.ExploreItemUiModel
 
@@ -91,7 +92,9 @@ fun MarkerInfoCard(
                             fontWeight = FontWeight.Bold
                         )
                         Text(
-                            text = if (marker.mapItem.type == VehicleType.Scooter) stringResource(R.string.e_scooter) else stringResource(R.string.e_bike),
+                            text = if (marker.mapItem.type == VehicleType.Scooter) stringResource(R.string.e_scooter) else stringResource(
+                                R.string.e_bike
+                            ),
                             style = MaterialTheme.typography.labelSmall
                         )
                     }
@@ -168,21 +171,23 @@ private fun InfoStat(
 @Composable
 private fun MarkerInfoCardScooterPreview() {
     SofaAiTheme {
-        MarkerInfoCard(
-            marker = ExploreItemUiModel(
-                mapItem = ExploreItem(
-                    id = "1",
-                    name = "Scooty",
-                    lat = 0.0,
-                    lng = 0.0,
-                    type = VehicleType.Scooter,
-                    batteryLevel = 87,
-                    vehicleCode = "1234",
-                    nickname = "Scooty"
-                )
-            ),
-            onClose = {}
-        )
+        Surface {
+            MarkerInfoCard(
+                marker = ExploreItemUiModel(
+                    mapItem = ExploreItem(
+                        id = "1",
+                        name = "Scooty",
+                        lat = 0.0,
+                        lng = 0.0,
+                        type = VehicleType.Scooter,
+                        batteryLevel = 87,
+                        vehicleCode = "1234",
+                        nickname = "Scooty"
+                    )
+                ),
+                onClose = {}
+            )
+        }
     }
 }
 
@@ -190,20 +195,22 @@ private fun MarkerInfoCardScooterPreview() {
 @Composable
 private fun MarkerInfoCardBicyclePreview() {
     SofaAiTheme {
-        MarkerInfoCard(
-            marker = ExploreItemUiModel(
-                mapItem = ExploreItem(
-                    id = "2",
-                    name = "Bikey",
-                    lat = 0.0,
-                    lng = 0.0,
-                    type = VehicleType.Bicycle,
-                    batteryLevel = 55,
-                    vehicleCode = "6789",
-                    nickname = "Bikey"
-                )
-            ),
-            onClose = {}
-        )
+        Surface {
+            MarkerInfoCard(
+                marker = ExploreItemUiModel(
+                    mapItem = ExploreItem(
+                        id = "2",
+                        name = "Bikey",
+                        lat = 0.0,
+                        lng = 0.0,
+                        type = VehicleType.Bicycle,
+                        batteryLevel = 55,
+                        vehicleCode = "6789",
+                        nickname = "Bikey"
+                    )
+                ),
+                onClose = {}
+            )
+        }
     }
 }

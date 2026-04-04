@@ -10,6 +10,7 @@ private const val DEFAULT_PROVIDER = "anonymous"
 
 fun AuthResult.toDomain(): AuthSession {
     val firebaseUser = requireNotNull(user) { "AuthResult.user must not be null after successful sign-in" }
+
     val creationTimestamp = firebaseUser.metadata?.creationTimestamp ?: 0L
     val lastSignInTimestamp = firebaseUser.metadata?.lastSignInTimestamp ?: 0L
     val nowMillis = System.currentTimeMillis()

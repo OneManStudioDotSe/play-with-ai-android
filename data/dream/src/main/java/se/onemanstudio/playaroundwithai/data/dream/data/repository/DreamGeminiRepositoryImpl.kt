@@ -46,11 +46,9 @@ class DreamGeminiRepositoryImpl @Inject constructor(
             val parts = listOf(Part(text = prompt))
             val request = GeminiRequest(contents = listOf(Content(parts = parts)))
 
-            Timber.d("DreamGemini - Sending request to Gemini API...")
             val response = apiService.generateContent(request)
             tokenUsageTracker.record("dream", response.usageMetadata)
             val text = response.extractText() ?: return@withContext Result.failure(Exception("No response text from Gemini"))
-            Timber.d("DreamGemini - API response received (${text.length} chars)")
 
             val cleanedJson = JsonExtractor.extract(text)
             val interpretation = parseInterpretation(cleanedJson)
@@ -86,7 +84,6 @@ class DreamGeminiRepositoryImpl @Inject constructor(
             var lastText = ""
 
             for (attempt in 1..IMAGE_GENERATION_MAX_RETRIES) {
-                Timber.d("DreamGemini - Image generation attempt %d/%d...", attempt, IMAGE_GENERATION_MAX_RETRIES)
                 val response = apiService.generateImageContent(request)
                 tokenUsageTracker.record("dream_image", response.usageMetadata)
 
@@ -94,9 +91,9 @@ class DreamGeminiRepositoryImpl @Inject constructor(
                 lastText = response.extractText().orEmpty()
 
                 if (imageData != null) {
-                    Timber.d("DreamGemini - Image data received on attempt %d", attempt)
                     break
                 }
+
                 Timber.w("DreamGemini - Attempt %d returned text only: %s", attempt, lastText.take(RETRY_LOG_PREVIEW_LENGTH))
             }
 
@@ -105,7 +102,6 @@ class DreamGeminiRepositoryImpl @Inject constructor(
             }
 
             val artistName = ARTIST_REGEX.find(lastText)?.groupValues?.get(1)?.trim()?.takeIf { it.isNotBlank() } ?: "Unknown Artist"
-            Timber.d("DreamGemini - Image generated, artist: $artistName")
 
             Result.success(DreamImage(imageBase64 = imageData.data, mimeType = imageData.mimeType, artistName = artistName))
         } catch (e: IOException) {
@@ -123,23 +119,6 @@ class DreamGeminiRepositoryImpl @Inject constructor(
     @Suppress("LongMethod")
     private fun parseInterpretation(json: String): DreamInterpretation {
         val parsed = gson.fromJson(json, GeminiDreamResponse::class.java)
-
-        Timber.d(
-            "DreamGemini - Parsed palette: sky=%d (0x%X), horizon=%d (0x%X), accent=%d (0x%X)",
-            parsed.scene.palette.sky, parsed.scene.palette.sky,
-            parsed.scene.palette.horizon, parsed.scene.palette.horizon,
-            parsed.scene.palette.accent, parsed.scene.palette.accent,
-        )
-        Timber.d("DreamGemini - Parsed %d layers, %d particle types", parsed.scene.layers.size, parsed.scene.particles.size)
-        parsed.scene.layers.forEachIndexed { i, layer ->
-            Timber.d("DreamGemini - Layer %d: %d elements, depth=%.2f", i, layer.elements.size, layer.depth)
-            layer.elements.forEach { e ->
-                Timber.d(
-                    "DreamGemini -   %s at (%.2f,%.2f) scale=%.2f color=%d (0x%X) alpha=%.2f",
-                    e.shape, e.x, e.y, e.scale, e.color, e.color, e.alpha,
-                )
-            }
-        }
 
         val mood = runCatching { DreamMood.valueOf(parsed.mood.trim().uppercase()) }.getOrDefault(DreamMood.MYSTERIOUS)
 

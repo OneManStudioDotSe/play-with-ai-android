@@ -10,6 +10,7 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Home
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Surface
 import androidx.compose.material3.contentColorFor
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
@@ -51,11 +52,13 @@ fun CustomMarkerIcon(
 @Composable
 private fun CustomMarkerIconUnselectedLightPreview() {
     SofaAiTheme(darkTheme = false) {
-        CustomMarkerIcon(
-            icon = Icons.Default.Home,
-            iconContentDescription = "Home icon",
-            isSelected = false
-        )
+        Surface {
+            CustomMarkerIcon(
+                icon = Icons.Default.Home,
+                iconContentDescription = "Home icon",
+                isSelected = false
+            )
+        }
     }
 }
 
@@ -63,11 +66,13 @@ private fun CustomMarkerIconUnselectedLightPreview() {
 @Composable
 private fun CustomMarkerIconSelectedLightPreview() {
     SofaAiTheme(darkTheme = false) {
-        CustomMarkerIcon(
-            icon = Icons.Default.Home,
-            iconContentDescription = "Home icon",
-            isSelected = true
-        )
+        Surface {
+            CustomMarkerIcon(
+                icon = Icons.Default.Home,
+                iconContentDescription = "Home icon",
+                isSelected = true
+            )
+        }
     }
 }
 
@@ -75,11 +80,13 @@ private fun CustomMarkerIconSelectedLightPreview() {
 @Composable
 private fun CustomMarkerIconUnselectedDarkPreview() {
     SofaAiTheme(darkTheme = true) {
-        CustomMarkerIcon(
-            icon = Icons.Default.Home,
-            iconContentDescription = "Home icon",
-            isSelected = false
-        )
+        Surface {
+            CustomMarkerIcon(
+                icon = Icons.Default.Home,
+                iconContentDescription = "Home icon",
+                isSelected = false
+            )
+        }
     }
 }
 
@@ -87,10 +94,12 @@ private fun CustomMarkerIconUnselectedDarkPreview() {
 @Composable
 private fun CustomMarkerIconSelectedDarkPreview() {
     SofaAiTheme(darkTheme = true) {
-        CustomMarkerIcon(
-            icon = Icons.Default.Home,
-            iconContentDescription = "Home icon",
-            isSelected = true
-        )
+        Surface {
+            CustomMarkerIcon(
+                icon = Icons.Default.Home,
+                iconContentDescription = "Home icon",
+                isSelected = true
+            )
+        }
     }
 }

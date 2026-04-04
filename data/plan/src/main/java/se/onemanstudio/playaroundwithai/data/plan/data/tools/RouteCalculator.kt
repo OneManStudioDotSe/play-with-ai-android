@@ -60,6 +60,7 @@ object RouteCalculator {
                 bestOrder = perm
             }
         }
+
         return bestOrder
     }
 
@@ -83,6 +84,7 @@ object RouteCalculator {
             visited.add(nearestIdx)
             remaining.remove(nearestIdx)
         }
+
         return visited
     }
 }

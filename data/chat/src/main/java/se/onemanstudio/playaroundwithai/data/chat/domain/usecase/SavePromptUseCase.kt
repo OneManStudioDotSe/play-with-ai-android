@@ -12,9 +12,11 @@ class SavePromptUseCase @Inject constructor(
         if (prompt.text.isBlank()) {
             return Result.failure(IllegalArgumentException("Prompt text must not be blank"))
         }
+
         if (prompt.text.length > MAX_PROMPT_LENGTH) {
             return Result.failure(IllegalArgumentException("Prompt text exceeds maximum length of $MAX_PROMPT_LENGTH"))
         }
+
         return runCatching { repository.savePrompt(prompt) }
     }
 }

@@ -12,7 +12,6 @@ import se.onemanstudio.playaroundwithai.core.database.entity.TokenUsageEntity
 import se.onemanstudio.playaroundwithai.core.network.dto.UsageMetadata
 import se.onemanstudio.playaroundwithai.core.tracking.model.DailyTokenUsage
 import se.onemanstudio.playaroundwithai.core.tracking.model.TokenUsageEvent
-import timber.log.Timber
 import java.time.LocalDate
 import java.time.ZoneId
 import java.time.format.TextStyle
@@ -54,7 +53,6 @@ class TokenUsageTrackerImpl @Inject constructor(
 
         dao.insert(entity)
         _lastUsageEvent.tryEmit(TokenUsageEvent(feature, usageMetadata.totalTokenCount))
-        Timber.d("TokenUsage - Recorded $feature: ${usageMetadata.totalTokenCount} tokens")
     }
 
     override fun getWeeklyUsage(): Flow<List<DailyTokenUsage>> {

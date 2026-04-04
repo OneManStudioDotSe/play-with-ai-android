@@ -11,11 +11,13 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.SupervisorJob
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withTimeoutOrNull
+import se.onemanstudio.playaroundwithai.data.chat.R
 import se.onemanstudio.playaroundwithai.data.chat.data.sync.SyncWorker
 import se.onemanstudio.playaroundwithai.data.chat.domain.usecase.RetryPendingSyncsUseCase
-import se.onemanstudio.playaroundwithai.data.chat.R
 import timber.log.Timber
 import javax.inject.Inject
+
+const val RETRY_SYNC_TIMEOUT_MS = 30_000L
 
 @HiltAndroidApp
 class OneManStudioApp : Application(), Configuration.Provider {
@@ -27,10 +29,6 @@ class OneManStudioApp : Application(), Configuration.Provider {
     lateinit var retryPendingSyncsUseCase: RetryPendingSyncsUseCase
 
     private val applicationScope = CoroutineScope(SupervisorJob() + Dispatchers.IO)
-
-    companion object {
-        private const val RETRY_SYNC_TIMEOUT_MS = 30_000L
-    }
 
     override val workManagerConfiguration: Configuration
         get() = Configuration.Builder()
@@ -47,8 +45,6 @@ class OneManStudioApp : Application(), Configuration.Provider {
 
         createNotificationChannel()
         retryFailedSyncs()
-
-        Timber.d("OneManStudioApp started")
     }
 
     @Suppress("TooGenericExceptionCaught")
@@ -58,13 +54,12 @@ class OneManStudioApp : Application(), Configuration.Provider {
                 val completed = withTimeoutOrNull(RETRY_SYNC_TIMEOUT_MS) {
                     retryPendingSyncsUseCase()
                 }
-                if (completed != null) {
-                    Timber.d("OneManStudioApp - Retried failed syncs on startup")
-                } else {
-                    Timber.w("OneManStudioApp - Sync retry timed out after ${RETRY_SYNC_TIMEOUT_MS}ms")
+
+                if (completed == null) {
+                    Timber.w("Sync retry timed out after ${RETRY_SYNC_TIMEOUT_MS}ms")
                 }
             } catch (e: Exception) {
-                Timber.e(e, "OneManStudioApp - Failed to retry syncs on startup")
+                Timber.e(e, "Failed to retry syncs on startup")
             }
         }
     }

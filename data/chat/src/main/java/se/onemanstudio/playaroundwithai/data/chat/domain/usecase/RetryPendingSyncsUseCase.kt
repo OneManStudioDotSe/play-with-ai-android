@@ -14,9 +14,11 @@ class RetryPendingSyncsUseCase @Inject constructor(
     suspend operator fun invoke() {
         val now = System.currentTimeMillis()
         val lastRetry = lastRetryTimestamp.get()
+
         if (now - lastRetry < MIN_RETRY_INTERVAL_MS) {
             return
         }
+
         lastRetryTimestamp.set(now)
         repository.retryPendingSyncs()
     }

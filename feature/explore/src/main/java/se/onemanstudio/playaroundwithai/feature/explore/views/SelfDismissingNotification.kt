@@ -13,10 +13,11 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.LocationDisabled
-import androidx.compose.material3.Icon
 import androidx.compose.material3.ExperimentalMaterial3ExpressiveApi
+import androidx.compose.material3.Icon
 import androidx.compose.material3.LinearWavyProgressIndicator
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
@@ -103,10 +104,12 @@ fun SelfDismissingNotification(
 @Composable
 private fun SelfDismissingNotificationDefaultPreview() {
     SofaAiTheme {
-        SelfDismissingNotification(
-            message = "Location services are disabled.",
-            onDismiss = {}
-        )
+        Surface {
+            SelfDismissingNotification(
+                message = "Location services are disabled.",
+                onDismiss = {}
+            )
+        }
     }
 }
 
@@ -114,9 +117,11 @@ private fun SelfDismissingNotificationDefaultPreview() {
 @Composable
 private fun SelfDismissingNotificationLongMessagePreview() {
     SofaAiTheme {
-        SelfDismissingNotification(
-            message = "This is a much longer notification message to see how the layout handles more text.",
-            onDismiss = {}
-        )
+        Surface {
+            SelfDismissingNotification(
+                message = "This is a much longer notification message to see how the layout handles more text.",
+                onDismiss = {}
+            )
+        }
     }
 }

@@ -220,6 +220,5 @@ class DreamViewModel @Inject constructor(
         scene.particles.forEach { p ->
             sb.appendLine("Particles: ${p.count}x ${p.shape} color=${colorHex(p.color)} speed=${p.speed} size=${p.size}")
         }
-        Timber.d(sb.toString())
     }
 }

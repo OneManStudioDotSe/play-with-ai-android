@@ -10,6 +10,7 @@ import androidx.compose.material.icons.filled.LinearScale
 import androidx.compose.material.icons.filled.MyLocation
 import androidx.compose.material.icons.filled.Remove
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Surface
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Modifier
@@ -86,12 +87,14 @@ fun SideControls(
 @Composable
 private fun SideControlsPreview() {
     SofaAiTheme {
-        SideControls(
-            uiState = ExploreUiState(pathMode = PathModeState(isActive = false)),
-            cameraPositionState = rememberCameraPositionState(),
-            onMyLocationClick = {},
-            onSetPathMode = {}
-        )
+        Surface {
+            SideControls(
+                uiState = ExploreUiState(pathMode = PathModeState(isActive = false)),
+                cameraPositionState = rememberCameraPositionState(),
+                onMyLocationClick = {},
+                onSetPathMode = {}
+            )
+        }
     }
 }
 
@@ -99,11 +102,13 @@ private fun SideControlsPreview() {
 @Composable
 private fun SideControlsPathModePreview() {
     SofaAiTheme {
-        SideControls(
-            uiState = ExploreUiState(pathMode = PathModeState(isActive = true)),
-            cameraPositionState = rememberCameraPositionState(),
-            onMyLocationClick = {},
-            onSetPathMode = {}
-        )
+        Surface {
+            SideControls(
+                uiState = ExploreUiState(pathMode = PathModeState(isActive = true)),
+                cameraPositionState = rememberCameraPositionState(),
+                onMyLocationClick = {},
+                onSetPathMode = {}
+            )
+        }
     }
 }

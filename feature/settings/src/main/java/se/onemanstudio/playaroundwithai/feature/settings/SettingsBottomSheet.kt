@@ -28,6 +28,7 @@ import androidx.compose.material3.SegmentedButtonDefaults
 import androidx.compose.material3.SingleChoiceSegmentedButtonRow
 import androidx.compose.material3.Slider
 import androidx.compose.material3.SliderDefaults
+import androidx.compose.material3.Surface
 import androidx.compose.material3.Switch
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -418,18 +419,20 @@ private val sampleUsageBars = listOf(
 @Composable
 private fun SettingsContentLightPreview() {
     SofaAiTheme {
-        SettingsBottomSheetContent(
-            state = SettingsState(appVersion = "1.0.0"),
-            onShowTokenUsageChange = {},
-            onVehicleCountChange = {},
-            onSearchRadiusChange = {},
-            onWalkingSpeedChange = {},
-            onContactClick = {},
-            onLinkedInClick = {},
-            usageBars = sampleUsageBars,
-            selectedDayIndex = 2,
-            onBarTapped = {},
-        )
+        Surface {
+            SettingsBottomSheetContent(
+                state = SettingsState(appVersion = "1.0.0"),
+                onShowTokenUsageChange = {},
+                onVehicleCountChange = {},
+                onSearchRadiusChange = {},
+                onWalkingSpeedChange = {},
+                onContactClick = {},
+                onLinkedInClick = {},
+                usageBars = sampleUsageBars,
+                selectedDayIndex = 2,
+                onBarTapped = {},
+            )
+        }
     }
 }
 
@@ -437,18 +440,20 @@ private fun SettingsContentLightPreview() {
 @Composable
 private fun SettingsContentDarkPreview() {
     SofaAiTheme(darkTheme = true) {
-        SettingsBottomSheetContent(
-            state = SettingsState(appVersion = "1.0.0"),
-            onShowTokenUsageChange = {},
-            onVehicleCountChange = {},
-            onSearchRadiusChange = {},
-            onWalkingSpeedChange = {},
-            onContactClick = {},
-            onLinkedInClick = {},
-            usageBars = sampleUsageBars,
-            selectedDayIndex = null,
-            onBarTapped = {},
-        )
+        Surface {
+            SettingsBottomSheetContent(
+                state = SettingsState(appVersion = "1.0.0"),
+                onShowTokenUsageChange = {},
+                onVehicleCountChange = {},
+                onSearchRadiusChange = {},
+                onWalkingSpeedChange = {},
+                onContactClick = {},
+                onLinkedInClick = {},
+                usageBars = sampleUsageBars,
+                selectedDayIndex = null,
+                onBarTapped = {},
+            )
+        }
     }
 }
 
@@ -456,14 +461,16 @@ private fun SettingsContentDarkPreview() {
 @Composable
 private fun SectionHeadersPreview() {
     SofaAiTheme {
-        Column(
-            modifier = Modifier.padding(Dimensions.paddingLarge),
-            verticalArrangement = Arrangement.spacedBy(Dimensions.paddingLarge),
-        ) {
-            SectionHeader(text = "General", lineColor = electricBlue)
-            SectionHeader(text = "Map Controls", lineColor = vividPink)
-            SectionHeader(text = "Weekly Usage", lineColor = energeticOrange)
-            SectionHeader(text = "About", lineColor = zestyLime)
+        Surface {
+            Column(
+                modifier = Modifier.padding(Dimensions.paddingLarge),
+                verticalArrangement = Arrangement.spacedBy(Dimensions.paddingLarge),
+            ) {
+                SectionHeader(text = "General", lineColor = electricBlue)
+                SectionHeader(text = "Map Controls", lineColor = vividPink)
+                SectionHeader(text = "Weekly Usage", lineColor = energeticOrange)
+                SectionHeader(text = "About", lineColor = zestyLime)
+            }
         }
     }
 }
@@ -472,10 +479,12 @@ private fun SectionHeadersPreview() {
 @Composable
 private fun UsageSectionEmptyPreview() {
     SofaAiTheme {
-        UsageSection(
-            usageBars = emptyList(),
-            selectedDayIndex = null,
-            onBarTapped = {},
-        )
+        Surface {
+            UsageSection(
+                usageBars = emptyList(),
+                selectedDayIndex = null,
+                onBarTapped = {},
+            )
+        }
     }
 }

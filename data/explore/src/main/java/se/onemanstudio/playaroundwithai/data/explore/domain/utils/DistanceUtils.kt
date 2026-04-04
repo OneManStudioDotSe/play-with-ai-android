@@ -13,6 +13,3 @@ fun calculatePathDistance(startLat: Double, startLng: Double, path: List<Pair<Do
     }
     return distance
 }
-
-fun distanceBetween(lat1: Double, lng1: Double, lat2: Double, lng2: Double): Double =
-    haversineKm(lat1, lng1, lat2, lng2)

@@ -24,19 +24,12 @@ class AuthRepositoryImpl @Inject constructor(
     override suspend fun signInAnonymously(): Result<AuthSession> {
         return try {
             val session = if (!isUserSignedIn()) {
-                Timber.d("Auth - User not signed in, attempting anonymous sign-in...")
                 val authResult = firebaseAuth.signInAnonymously().await()
-                Timber.d("Auth - Anonymous sign-in successful and uid is ${authResult.user?.uid}")
                 authResult.toDomain()
             } else {
-                Timber.d("Auth - User already signed in and uid is ${firebaseAuth.currentUser?.uid}")
                 requireNotNull(firebaseAuth.currentUser).toDomain()
             }
 
-            Timber.d(
-                "Auth - Session created for ${session.userId} " +
-                    "(isNew: ${session.isNewUser}, ${session.accountAgeDays} days old, from ${session.authProvider})"
-            )
             _authReady.value = true
             Result.success(session)
         } catch (e: CancellationException) {
@@ -49,7 +42,6 @@ class AuthRepositoryImpl @Inject constructor(
 
     override fun isUserSignedIn(): Boolean {
         val signedIn = firebaseAuth.currentUser != null
-        Timber.d("Auth - Auth check: isUserSignedIn: $signedIn")
         return signedIn
     }
 

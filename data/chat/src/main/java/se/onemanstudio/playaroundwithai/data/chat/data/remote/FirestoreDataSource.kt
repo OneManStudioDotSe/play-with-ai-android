@@ -10,8 +10,6 @@ import timber.log.Timber
 import javax.inject.Inject
 import javax.inject.Singleton
 
-private const val LOG_PREVIEW_LENGTH = 50
-
 @Singleton
 class FirestoreDataSource @Inject constructor(
     private val firestore: FirebaseFirestore,
@@ -22,8 +20,6 @@ class FirestoreDataSource @Inject constructor(
             ?: return Result.failure(IllegalStateException("User must be authenticated to sync prompts"))
         val userPromptsCollection = firestore.collection("users").document(userId).collection("prompts")
 
-        Timber.d("Firestore - Saving prompt at 'users/$userId/prompts' with text: '${text.take(LOG_PREVIEW_LENGTH)}...'")
-
         val dto = PromptFirestoreDto(
             text = text,
             timestamp = timestamp
@@ -31,7 +27,6 @@ class FirestoreDataSource @Inject constructor(
 
         return try {
             val docRef = userPromptsCollection.add(dto).await()
-            Timber.d("Firestore - Prompt saved at users/$userId/prompts/${docRef.id}")
             Result.success(docRef.id)
         } catch (e: CancellationException) {
             throw e
@@ -46,11 +41,8 @@ class FirestoreDataSource @Inject constructor(
             ?: return Result.failure(IllegalStateException("User must be authenticated to sync prompts"))
         val docRef = firestore.collection("users").document(userId).collection("prompts").document(docId)
 
-        Timber.d("Firestore - Updating prompt at 'users/$userId/prompts/$docId' with text: '${text.take(LOG_PREVIEW_LENGTH)}...'")
-
         return try {
             docRef.update("text", text).await()
-            Timber.d("Firestore - Prompt updated at users/$userId/prompts/$docId")
             Result.success(Unit)
         } catch (e: CancellationException) {
             throw e

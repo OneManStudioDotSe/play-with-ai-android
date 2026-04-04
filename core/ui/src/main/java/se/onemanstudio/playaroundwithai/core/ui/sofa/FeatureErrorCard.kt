@@ -12,6 +12,7 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Clear
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
@@ -21,7 +22,9 @@ import androidx.compose.ui.semantics.LiveRegionMode
 import androidx.compose.ui.semantics.liveRegion
 import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.tooling.preview.Preview
 import se.onemanstudio.playaroundwithai.core.ui.theme.Dimensions
+import se.onemanstudio.playaroundwithai.core.ui.theme.SofaAiTheme
 
 /**
  * A NeoBrutal-styled error card used by feature screens.
@@ -90,6 +93,38 @@ fun FeatureErrorCard(
                         .padding(Dimensions.paddingMedium),
                 )
             }
+        }
+    }
+}
+
+@Preview(showBackground = true)
+@Composable
+private fun FeatureErrorCardPreview() {
+    SofaAiTheme {
+        FeatureErrorCard(
+            icon = Icons.Default.Clear,
+            title = "Something went wrong",
+            message = "We couldn't load the content. Please try again later.",
+            isDismissible = true,
+            dismissContentDescription = "Dismiss",
+            onDismiss = {},
+        )
+    }
+}
+
+@Preview(showBackground = true)
+@Composable
+private fun FeatureErrorCardNonDismissiblePreview() {
+    SofaAiTheme {
+        Surface {
+            FeatureErrorCard(
+                icon = Icons.Default.Clear,
+                title = "Connection Error",
+                message = "Check your internet connection and try again.",
+                isDismissible = false,
+                dismissContentDescription = "",
+                onDismiss = {},
+            )
         }
     }
 }

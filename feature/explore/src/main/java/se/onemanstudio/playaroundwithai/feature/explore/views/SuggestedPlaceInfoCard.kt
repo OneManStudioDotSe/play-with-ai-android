@@ -18,6 +18,7 @@ import androidx.compose.material.icons.filled.Stars
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
@@ -155,15 +156,17 @@ fun SuggestedPlaceInfoCard(
 @Composable
 private fun SuggestedPlaceInfoCardPreview() {
     SofaAiTheme {
-        SuggestedPlaceInfoCard(
-            place = SuggestedPlace(
-                name = "Royal Palace",
-                lat = 59.3268,
-                lng = 18.0717,
-                description = "The official residence of the Swedish monarch. A baroque-style palace with over 600 rooms.",
-                category = "Landmark"
-            ),
-            onClose = {}
-        )
+        Surface {
+            SuggestedPlaceInfoCard(
+                place = SuggestedPlace(
+                    name = "Royal Palace",
+                    lat = 59.3268,
+                    lng = 18.0717,
+                    description = "The official residence of the Swedish monarch. A baroque-style palace with over 600 rooms.",
+                    category = "Landmark"
+                ),
+                onClose = {}
+            )
+        }
     }
 }

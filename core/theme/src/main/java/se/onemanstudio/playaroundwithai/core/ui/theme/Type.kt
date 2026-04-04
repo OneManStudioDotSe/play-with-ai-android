@@ -3,15 +3,16 @@ package se.onemanstudio.playaroundwithai.core.ui.theme
 import androidx.compose.material3.ExperimentalMaterial3ExpressiveApi
 import androidx.compose.material3.Typography
 import androidx.compose.ui.text.TextStyle
+import androidx.compose.ui.text.font.Font
 import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.sp
 
 val IbmPlexMono = FontFamily(
-    androidx.compose.ui.text.font.Font(R.font.ibm_plex_mono_regular, FontWeight.Normal),
-    androidx.compose.ui.text.font.Font(R.font.ibm_plex_mono_medium, FontWeight.Medium),
-    androidx.compose.ui.text.font.Font(R.font.ibm_plex_mono_semibold, FontWeight.SemiBold),
-    androidx.compose.ui.text.font.Font(R.font.ibm_plex_mono_bold, FontWeight.Bold)
+    Font(R.font.ibm_plex_mono_regular, FontWeight.Normal),
+    Font(R.font.ibm_plex_mono_medium, FontWeight.Medium),
+    Font(R.font.ibm_plex_mono_semibold, FontWeight.SemiBold),
+    Font(R.font.ibm_plex_mono_bold, FontWeight.Bold)
 )
 
 @OptIn(ExperimentalMaterial3ExpressiveApi::class)

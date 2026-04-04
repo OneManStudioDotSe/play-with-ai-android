@@ -7,6 +7,7 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
@@ -50,7 +51,9 @@ fun NeoBrutalChip(
 @Composable
 private fun NeoBrutalChipLightPreview() {
     SofaAiTheme(darkTheme = false) {
-        NeoBrutalChip(text = "Suggest a recipe", onClick = {})
+        Surface {
+            NeoBrutalChip(text = "Suggest a recipe", onClick = {})
+        }
     }
 }
 
@@ -58,6 +61,8 @@ private fun NeoBrutalChipLightPreview() {
 @Composable
 private fun NeoBrutalChipDarkPreview() {
     SofaAiTheme(darkTheme = true) {
-        NeoBrutalChip(text = "Summarize text", onClick = {})
+        Surface {
+            NeoBrutalChip(text = "Summarize text", onClick = {})
+        }
     }
 }

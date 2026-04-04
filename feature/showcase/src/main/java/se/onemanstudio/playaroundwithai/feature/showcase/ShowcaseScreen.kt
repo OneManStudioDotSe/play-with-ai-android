@@ -20,9 +20,7 @@ import se.onemanstudio.playaroundwithai.feature.showcase.sections.TypographySect
 @Composable
 fun ShowcaseScreen() {
     Scaffold(
-        topBar = {
-            NeoBrutalTopAppBar(title = stringResource(R.string.showcase_title))
-        }
+        topBar = { NeoBrutalTopAppBar(title = stringResource(R.string.showcase_title)) }
     ) { innerPadding ->
         Column(
             modifier = Modifier

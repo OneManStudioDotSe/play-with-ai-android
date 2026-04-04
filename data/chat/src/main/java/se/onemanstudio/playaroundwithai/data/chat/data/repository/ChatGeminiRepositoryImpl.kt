@@ -52,7 +52,6 @@ class ChatGeminiRepositoryImpl @Inject constructor(
 
             if (!fileText.isNullOrBlank()) {
                 fullPrompt += "\n\n--- DOCUMENT CONTEXT ---\n$fileText"
-                Timber.d("Appended document context (${fileText.length} chars)")
             }
 
             parts.add(Part(text = fullPrompt))
@@ -60,18 +59,16 @@ class ChatGeminiRepositoryImpl @Inject constructor(
             imageBytes?.let {
                 val inlineData = withContext(Dispatchers.Default) {
                     val bitmap = BitmapFactory.decodeByteArray(it, 0, it.size)
-                    Timber.d("Gemini - Encoding image: ${bitmap.width}x${bitmap.height} → scaled to max ${MAX_IMAGE_SIZE}px, JPEG @ $COMPRESSION_QUALITY%%")
                     bitmap.toImageData()
                 }
                 parts.add(Part(inlineData = inlineData))
             }
 
             val request = GeminiRequest(contents = listOf(Content(parts = parts)))
-            Timber.d("Gemini - Sending request to Gemini API with ${parts.size} parts...")
             val response = apiService.generateContent(request)
             tokenUsageTracker.record("chat", response.usageMetadata)
             val text = response.extractText() ?: "No response text found."
-            Timber.d("Gemini - API response received (and it is ${text.length} chars)")
+
             Result.success(text)
         } catch (e: IOException) {
             Timber.e(e, "Gemini - Network error during content generation")
@@ -100,7 +97,6 @@ class ChatGeminiRepositoryImpl @Inject constructor(
             val suggestions = text.split("|").map { it.trim() }.filter { it.isNotEmpty() }
 
             if (suggestions.isNotEmpty()) {
-                Timber.d("Generated ${suggestions.size} suggestion(s): $suggestions")
                 Result.success(suggestions.take(MAX_SUGGESTIONS))
             } else {
                 Timber.w("Failed to parse suggestions from response: '$text'")

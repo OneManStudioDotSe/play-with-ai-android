@@ -6,6 +6,7 @@ import androidx.compose.foundation.layout.defaultMinSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.wrapContentSize
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
@@ -50,11 +51,13 @@ fun FilterChip(
 @Composable
 private fun FilterChipUnselectedLightPreview() {
     SofaAiTheme(darkTheme = false) {
-        FilterChip(
-            text = stringResource(id = R.string.scooters_filter_chip_label),
-            selected = false,
-            onClick = {}
-        )
+        Surface {
+            FilterChip(
+                text = stringResource(id = R.string.scooters_filter_chip_label),
+                selected = false,
+                onClick = {}
+            )
+        }
     }
 }
 
@@ -62,11 +65,13 @@ private fun FilterChipUnselectedLightPreview() {
 @Composable
 private fun FilterChipSelectedLightPreview() {
     SofaAiTheme(darkTheme = false) {
-        FilterChip(
-            text = stringResource(id = R.string.bicycles_filter_chip_label),
-            selected = true,
-            onClick = {}
-        )
+        Surface {
+            FilterChip(
+                text = stringResource(id = R.string.bicycles_filter_chip_label),
+                selected = true,
+                onClick = {}
+            )
+        }
     }
 }
 
@@ -74,11 +79,13 @@ private fun FilterChipSelectedLightPreview() {
 @Composable
 private fun FilterChipUnselectedDarkPreview() {
     SofaAiTheme(darkTheme = true) {
-        FilterChip(
-            text = stringResource(id = R.string.scooters_filter_chip_label),
-            selected = false,
-            onClick = {}
-        )
+        Surface {
+            FilterChip(
+                text = stringResource(id = R.string.scooters_filter_chip_label),
+                selected = false,
+                onClick = {}
+            )
+        }
     }
 }
 
@@ -86,10 +93,12 @@ private fun FilterChipUnselectedDarkPreview() {
 @Composable
 private fun FilterChipSelectedDarkPreview() {
     SofaAiTheme(darkTheme = true) {
-        FilterChip(
-            text = stringResource(id = R.string.bicycles_filter_chip_label),
-            selected = true,
-            onClick = {}
-        )
+        Surface {
+            FilterChip(
+                text = stringResource(id = R.string.bicycles_filter_chip_label),
+                selected = true,
+                onClick = {}
+            )
+        }
     }
 }
