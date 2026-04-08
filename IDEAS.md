@@ -7,116 +7,70 @@ Each idea below is backed by a hardcoded value or missing toggle found in the co
 
 ---
 
-## Tier 1 — High Impact, Low Effort
-
 ### 1. [COMPLETED] Typewriter Speed / Instant Mode
-
 Toggle the character-by-character typing animation off entirely, or offer speed presets (slow / normal / fast / instant). 
 Power users and accessibility-minded users will want to read the full answer immediately.
 
-- **Code:** `feature/chat/src/main/java/.../views/TypewriterText.kt` — `TYPING_DELAY = 10L` (ms per character)
 
 ### 2. [COMPLETED] Haptic Feedback Toggle
-
 The app fires `HapticFeedbackConstants.CLOCK_TICK` on every typed character in chat and on map interactions. 
 There is no way to turn this off.
 
-- **Code:** `feature/chat/src/main/java/.../views/TypewriterText.kt` — line ~44
-- **Code:** `feature/explore/src/main/java/.../ExploreScreen.kt` — line ~198
 
 ### 3. AI Persona Selector
-
 The chat uses a hardcoded "AI Overlord" persona with a 42-word max response length. Offer preset personas (e.g., concise
 assistant, creative storyteller, technical expert) or a free-text system instruction field.
 
-- **Code:** `data/chat/src/main/java/.../prompts/ChatPrompts.kt` — `CHAT_SYSTEM_INSTRUCTION` constant
 
 ### 4. [COMPLETED] Walking Speed
-
 Route time estimates assume 5.0 km/h in two places. Expose a "walking speed" setting (slow 3 / normal 5 / 
 fast 7 km/h) and feed it to both locations to keep them consistent.
 
-- **Code:** `data/plan/src/main/java/.../tools/RouteCalculator.kt` — `WALKING_SPEED_KMH = 5.0` (shared internal constant; also used by `TripPlannerRepositoryImpl`)
-- **Code:** `feature/explore/src/main/java/.../ExploreViewModel.kt` — `WALKING_SPEED_METERS_PER_MIN = 83.0` (equivalent to 5 km/h, independently defined in Explore)
 
 ### 5. Firebase Sync Toggle
-
 Cloud sync to Firestore is always attempted when authenticated. Add an opt-out toggle so users can keep prompts 
 local-only even when signed in.
 
-- **Code:** `data/chat/src/main/java/.../sync/SyncWorker.kt` — sync is always enqueued
-- **Code:** `data/chat/src/main/java/.../repository/PromptRepositoryImpl` — calls enqueue unconditionally
-
----
-
-## Tier 2 — Medium Impact, Medium Effort
 
 ### 6. Gemini Model Picker
-
 The model name (`gemini-3-flash-preview`) is hardcoded in the Retrofit `@POST` annotation. Allow switching between models
 (e.g., Flash, Pro, Flash Preview) at runtime via a dynamic base path or query param.
 
-- **Code:** `core/network/src/main/java/.../api/GeminiApiService.kt` — `@POST("v1beta/models/gemini-3-flash-preview:generateContent")`
 
 ### 7. Agent Max Iterations
-
 The agentic trip planner loop hard-stops at 10 iterations and the system prompt says "no more than 5 tools." Let users
 pick a budget (quick 5 / standard 10 / thorough 15) to trade speed for depth.
 
-- **Code:** `data/plan/src/main/java/.../repository/TripPlannerRepositoryImpl.kt` — `MAX_ITERATIONS = 10`, `DEFAULT_COUNT = 5`
-- **Code:** `data/plan/src/main/java/.../prompts/PlanPrompts.kt` — `tripPlannerSystemPrompt()` contains `"Do NOT call more than 5 tools total"`
 
 ### 8. Image Quality / Compression
-
 Images sent to Gemini are scaled to max 768 px and compressed at JPEG quality 77. A slider or presets (low / medium / high) 
 would let users balance upload size vs. detail.
 
-- **Code:** `data/chat/src/main/java/.../repository/ChatGeminiRepositoryImpl.kt` — `MAX_IMAGE_SIZE = 768`, `COMPRESSION_QUALITY = 77`
 
 ### 9. AI Suggested Places Count
+The map feature asks Gemini for exactly 10 suggested places. A slider (5–20) would let users control how many AI suggestions appear.
 
-The map feature asks Gemini for exactly 10 suggested places. A slider (5–20) would let users control how many AI suggestions
-appear.
-
-- **Code:** `data/explore/src/main/java/.../prompts/ExplorePrompts.kt` — `SUGGESTED_PLACES_COUNT = 10`
 
 ### 10. Max Route Points
-
 Users can select up to 8 points for route calculation. Raising or lowering this (3–12) gives control over route complexity.
 
-- **Code:** `feature/explore/src/main/java/.../ExploreConstants.kt` — `MAX_SELECTABLE_POINTS = 8`
-
----
-
-## Tier 3 — Nice to Have / Power User
 
 ### 11. Network Timeout
-
 API calls time out after 30 seconds. A slider (15–120 s) would help users on slow connections or when using heavier models.
 
-- **Code:** `core/network/src/main/java/.../di/NetworkModule.kt` — `TIMEOUT_SECONDS = 30L`
 
 ### 12. Default Map Location
-
 Both Explore and Plan screens now fetch the user's real GPS location via `FusedLocationProviderClient` and fall back to
 Stockholm (59.3293, 18.0686) if unavailable. A "home location" setting could let users override the fallback.
 
-- **Code:** `feature/explore/src/main/java/.../ExploreConstants.kt` — `STOCKHOLM_LAT / STOCKHOLM_LNG` (fallback)
-- **Code:** `feature/plan/src/main/java/.../PlanConstants.kt` — `DEFAULT_LAT / DEFAULT_LNG` (fallback used by PlanScreen)
 
 ### 13. Trip Length Preset
-
 The agent system prompt targets "4–6 stops for a half-day trip." Offer presets (quick 2–3 stops / standard 4–6 / extended
 7–10) so the user can control itinerary size.
 
-- **Code:** `data/plan/src/main/java/.../prompts/PlanPrompts.kt` — `tripPlannerSystemPrompt()` contains `"Keep the itinerary to 4-6 stops for a half-day trip."`
 
 ### 14. Token Usage Tracking Toggle
-
 Token usage is always tracked to the local Room database. Some users may want to disable tracking for privacy or storage 
 reasons.
-
-- **Code:** `core/tracking/src/main/java/.../TokenUsageTrackerImpl.kt` — tracking runs unconditionally
-- **Code:** `core/database/src/main/java/.../dao/TokenUsageDao.kt` — always written to
 
 ---
