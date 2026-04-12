@@ -8,6 +8,7 @@ import javax.inject.Singleton
 
 private const val DEFAULT_VEHICLE_COUNT = 30
 private const val DEFAULT_SEARCH_RADIUS_KM = 4.0f
+private const val DEFAULT_MAX_SELECTABLE_POINTS = 8
 
 @Singleton
 class ExploreSettingsHolder @Inject constructor() {
@@ -18,11 +19,18 @@ class ExploreSettingsHolder @Inject constructor() {
     private val _searchRadiusKm = MutableStateFlow(DEFAULT_SEARCH_RADIUS_KM)
     val searchRadiusKm: StateFlow<Float> = _searchRadiusKm.asStateFlow()
 
+    private val _maxSelectablePoints = MutableStateFlow(DEFAULT_MAX_SELECTABLE_POINTS)
+    val maxSelectablePoints: StateFlow<Int> = _maxSelectablePoints.asStateFlow()
+
     fun updateVehicleCount(count: Int) {
         _vehicleCount.value = count
     }
 
     fun updateSearchRadiusKm(radius: Float) {
         _searchRadiusKm.value = radius
+    }
+
+    fun updateMaxSelectablePoints(max: Int) {
+        _maxSelectablePoints.value = max
     }
 }

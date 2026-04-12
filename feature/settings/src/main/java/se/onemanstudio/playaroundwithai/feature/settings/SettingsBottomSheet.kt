@@ -73,6 +73,7 @@ fun SettingsBottomSheet(
     onImageQualityChange: (Int) -> Unit,
     onAgentMaxIterationsChange: (Int) -> Unit,
     onSuggestedPlacesCountChange: (Int) -> Unit,
+    onMaxSelectablePointsChange: (Int) -> Unit,
     onContactClick: () -> Unit,
     onLinkedInClick: () -> Unit = {},
     usageBars: List<ChartBarData> = emptyList(),
@@ -100,6 +101,7 @@ fun SettingsBottomSheet(
             onImageQualityChange = onImageQualityChange,
             onAgentMaxIterationsChange = onAgentMaxIterationsChange,
             onSuggestedPlacesCountChange = onSuggestedPlacesCountChange,
+            onMaxSelectablePointsChange = onMaxSelectablePointsChange,
             onContactClick = onContactClick,
             onLinkedInClick = onLinkedInClick,
             usageBars = usageBars,
@@ -125,6 +127,7 @@ private fun SettingsBottomSheetContent(
     onImageQualityChange: (Int) -> Unit,
     onAgentMaxIterationsChange: (Int) -> Unit,
     onSuggestedPlacesCountChange: (Int) -> Unit,
+    onMaxSelectablePointsChange: (Int) -> Unit,
     onContactClick: () -> Unit,
     onLinkedInClick: () -> Unit,
     usageBars: List<ChartBarData>,
@@ -197,12 +200,14 @@ private fun SettingsBottomSheetContent(
                     tripLengthMinStops = state.tripLengthMinStops,
                     agentMaxIterations = state.agentMaxIterations,
                     suggestedPlacesCount = state.suggestedPlacesCount,
+                    maxSelectablePoints = state.maxSelectablePoints,
                     onVehicleCountChange = onVehicleCountChange,
                     onSearchRadiusChange = onSearchRadiusChange,
                     onWalkingSpeedChange = onWalkingSpeedChange,
                     onTripLengthChange = onTripLengthChange,
                     onAgentMaxIterationsChange = onAgentMaxIterationsChange,
                     onSuggestedPlacesCountChange = onSuggestedPlacesCountChange,
+                    onMaxSelectablePointsChange = onMaxSelectablePointsChange,
                 )
 
                 Spacer(modifier = Modifier.height(Dimensions.paddingLarge))
@@ -481,12 +486,14 @@ private fun MapControlsSection(
     tripLengthMinStops: Int,
     agentMaxIterations: Int,
     suggestedPlacesCount: Int,
+    maxSelectablePoints: Int,
     onVehicleCountChange: (Int) -> Unit,
     onSearchRadiusChange: (Float) -> Unit,
     onWalkingSpeedChange: (Float) -> Unit,
     onTripLengthChange: (Int) -> Unit,
     onAgentMaxIterationsChange: (Int) -> Unit,
     onSuggestedPlacesCountChange: (Int) -> Unit,
+    onMaxSelectablePointsChange: (Int) -> Unit,
 ) {
     val sliderColors = SliderDefaults.colors(
         thumbColor = MaterialTheme.colorScheme.onSurface,
@@ -613,6 +620,20 @@ private fun MapControlsSection(
                 SettingsState.SUGGESTED_PLACES_COUNT_STEP - 1,
             colors = sliderColors,
         )
+
+        Text(
+            text = stringResource(R.string.settings_max_route_points, maxSelectablePoints),
+            style = MaterialTheme.typography.bodyMedium,
+            color = MaterialTheme.colorScheme.onSurface,
+        )
+
+        Slider(
+            value = maxSelectablePoints.toFloat(),
+            onValueChange = { onMaxSelectablePointsChange(it.roundToInt()) },
+            valueRange = SettingsState.MIN_MAX_SELECTABLE_POINTS.toFloat()..SettingsState.MAX_MAX_SELECTABLE_POINTS.toFloat(),
+            steps = SettingsState.MAX_MAX_SELECTABLE_POINTS - SettingsState.MIN_MAX_SELECTABLE_POINTS - 1,
+            colors = sliderColors,
+        )
     }
 }
 
@@ -680,6 +701,7 @@ private fun SettingsContentLightPreview() {
                 onImageQualityChange = {},
                 onAgentMaxIterationsChange = {},
                 onSuggestedPlacesCountChange = {},
+                onMaxSelectablePointsChange = {},
                 onContactClick = {},
                 onLinkedInClick = {},
                 usageBars = sampleUsageBars,
@@ -710,6 +732,7 @@ private fun SettingsContentDarkPreview() {
                 onImageQualityChange = {},
                 onAgentMaxIterationsChange = {},
                 onSuggestedPlacesCountChange = {},
+                onMaxSelectablePointsChange = {},
                 onContactClick = {},
                 onLinkedInClick = {},
                 usageBars = sampleUsageBars,

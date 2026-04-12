@@ -34,6 +34,7 @@ fun SettingsBottomSheetContainer(
     val imageQualityJpeg by viewModel.imageQualityJpeg.collectAsStateWithLifecycle()
     val agentMaxIterations by viewModel.agentMaxIterations.collectAsStateWithLifecycle()
     val suggestedPlacesCount by viewModel.suggestedPlacesCount.collectAsStateWithLifecycle()
+    val maxSelectablePoints by viewModel.maxSelectablePoints.collectAsStateWithLifecycle()
     val context = LocalContext.current
     val locale = LocalLocale.current.platformLocale
     val numberFormat = remember(locale) { NumberFormat.getNumberInstance(locale) }
@@ -62,6 +63,7 @@ fun SettingsBottomSheetContainer(
             imageQualityJpeg = imageQualityJpeg,
             agentMaxIterations = agentMaxIterations,
             suggestedPlacesCount = suggestedPlacesCount,
+            maxSelectablePoints = maxSelectablePoints,
         ),
         onDismiss = onDismiss,
         onShowTokenUsageChange = { viewModel.onShowTokenUsageChange(it) },
@@ -77,6 +79,7 @@ fun SettingsBottomSheetContainer(
         onImageQualityChange = { viewModel.onImageQualityChange(it) },
         onAgentMaxIterationsChange = { viewModel.onAgentMaxIterationsChange(it) },
         onSuggestedPlacesCountChange = { viewModel.onSuggestedPlacesCountChange(it) },
+        onMaxSelectablePointsChange = { viewModel.onMaxSelectablePointsChange(it) },
         onContactClick = {
             try {
                 val intent = Intent(Intent.ACTION_SENDTO).apply {

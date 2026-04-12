@@ -18,6 +18,7 @@ data class SettingsState(
     val imageQualityJpeg: Int = IMAGE_QUALITY_MEDIUM,
     val agentMaxIterations: Int = AGENT_ITERATIONS_STANDARD,
     val suggestedPlacesCount: Int = DEFAULT_SUGGESTED_PLACES_COUNT,
+    val maxSelectablePoints: Int = DEFAULT_MAX_SELECTABLE_POINTS,
 ) {
     companion object {
         const val MIN_VEHICLE_COUNT = 10
@@ -50,5 +51,8 @@ data class SettingsState(
         const val MAX_SUGGESTED_PLACES_COUNT = 20
         const val DEFAULT_SUGGESTED_PLACES_COUNT = 10
         const val SUGGESTED_PLACES_COUNT_STEP = 5
+        const val MIN_MAX_SELECTABLE_POINTS = 3
+        const val MAX_MAX_SELECTABLE_POINTS = 12
+        const val DEFAULT_MAX_SELECTABLE_POINTS = 8
     }
 }

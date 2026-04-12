@@ -173,7 +173,7 @@ class ExploreViewModel @Inject constructor(
             val newSelected = if (isAlreadySelected) {
                 currentSelected.filter { it.id != location.id }.toPersistentList()
             } else {
-                if (currentSelected.size < ExploreConstants.MAX_SELECTABLE_POINTS) {
+                if (currentSelected.size < exploreSettingsHolder.maxSelectablePoints.value) {
                     (currentSelected + location.copy(isSelected = true)).toPersistentList()
                 } else {
                     currentSelected
@@ -202,7 +202,7 @@ class ExploreViewModel @Inject constructor(
             val newSelected = if (isAlreadySelected) {
                 currentSelected.filter { it.id != syntheticId }.toPersistentList()
             } else {
-                if (currentSelected.size < ExploreConstants.MAX_SELECTABLE_POINTS) {
+                if (currentSelected.size < exploreSettingsHolder.maxSelectablePoints.value) {
                     (currentSelected + syntheticUiModel).toPersistentList()
                 } else {
                     currentSelected

@@ -51,7 +51,7 @@ would let users balance upload size vs. detail.
 The map feature asks Gemini for exactly 10 suggested places. A slider (5–20) would let users control how many AI suggestions appear.
 
 
-### 10. Max Route Points
+### 10. [COMPLETED] Max Route Points
 Users can select up to 8 points for route calculation. Raising or lowering this (3–12) gives control over route complexity.
 
 

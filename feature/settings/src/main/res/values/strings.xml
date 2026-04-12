@@ -43,4 +43,5 @@
     <string name="settings_agent_iterations_standard">Standard · 10</string>
     <string name="settings_agent_iterations_thorough">Thorough · 15</string>
     <string name="settings_suggested_places_count">AI suggested places: %d</string>
+    <string name="settings_max_route_points">Max route points: %d</string>
 </resources>

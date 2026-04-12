@@ -39,6 +39,7 @@ class SettingsViewModel @Inject constructor(
     val imageQualityJpeg: StateFlow<Int> = appSettingsHolder.imageQualityJpeg
     val agentMaxIterations: StateFlow<Int> = appSettingsHolder.agentMaxIterations
     val suggestedPlacesCount: StateFlow<Int> = appSettingsHolder.suggestedPlacesCount
+    val maxSelectablePoints: StateFlow<Int> = exploreSettingsHolder.maxSelectablePoints
 
     private val _selectedDayIndex = MutableStateFlow<Int?>(null)
     val selectedDayIndex: StateFlow<Int?> = _selectedDayIndex
@@ -97,5 +98,9 @@ class SettingsViewModel @Inject constructor(
 
     fun onSuggestedPlacesCountChange(count: Int) {
         appSettingsHolder.updateSuggestedPlacesCount(count)
+    }
+
+    fun onMaxSelectablePointsChange(max: Int) {
+        exploreSettingsHolder.updateMaxSelectablePoints(max)
     }
 }
