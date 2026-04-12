@@ -10,6 +10,7 @@ import androidx.work.WorkManager
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.map
 import se.onemanstudio.playaroundwithai.core.auth.repository.AuthRepository
+import se.onemanstudio.playaroundwithai.core.config.settings.AppSettingsHolder
 import se.onemanstudio.playaroundwithai.core.database.dao.PromptsHistoryDao
 import se.onemanstudio.playaroundwithai.core.database.entity.SyncStatus
 import se.onemanstudio.playaroundwithai.data.chat.data.sync.SyncWorker
@@ -29,17 +30,18 @@ private const val BACKOFF_DELAY_SECONDS = 30L
 class PromptRepositoryImpl @Inject constructor(
     private val promptsHistoryDao: PromptsHistoryDao,
     private val workManager: WorkManager,
-    private val authRepository: AuthRepository
+    private val authRepository: AuthRepository,
+    private val appSettingsHolder: AppSettingsHolder,
 ) : PromptRepository {
 
     override suspend fun savePrompt(prompt: Prompt): Long {
         val promptWithPendingStatus = prompt.copy(syncStatus = SyncStatus.Pending)
         val insertedId = promptsHistoryDao.savePrompt(promptWithPendingStatus.toPromptEntity())
 
-        if (authRepository.isUserSignedIn()) {
+        if (authRepository.isUserSignedIn() && appSettingsHolder.firebaseSyncEnabled.value) {
             scheduleSync()
         } else {
-            Timber.w("PromptRepo - Skipping sync — user is not authenticated")
+            Timber.w("PromptRepo - Skipping sync — user is not authenticated or sync is disabled")
         }
 
         return insertedId
@@ -49,20 +51,20 @@ class PromptRepositoryImpl @Inject constructor(
         promptsHistoryDao.updatePromptText(id, text)
         promptsHistoryDao.updateSyncStatus(id, SyncStatus.Pending)
 
-        if (authRepository.isUserSignedIn()) {
+        if (authRepository.isUserSignedIn() && appSettingsHolder.firebaseSyncEnabled.value) {
             scheduleSync()
         } else {
-            Timber.w("PromptRepo - Text updated. Skipping sync — user is not authenticated")
+            Timber.w("PromptRepo - Text updated. Skipping sync — user is not authenticated or sync is disabled")
         }
     }
 
     override suspend fun retryPendingSyncs() {
         promptsHistoryDao.updateAllSyncStatuses(SyncStatus.Failed, SyncStatus.Pending)
 
-        if (authRepository.isUserSignedIn()) {
+        if (authRepository.isUserSignedIn() && appSettingsHolder.firebaseSyncEnabled.value) {
             scheduleSync()
         } else {
-            Timber.w("PromptRepo - Skipping sync retry — user is not authenticated")
+            Timber.w("PromptRepo - Skipping sync retry — user is not authenticated or sync is disabled")
         }
     }
 

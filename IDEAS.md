@@ -27,7 +27,7 @@ Route time estimates assume 5.0 km/h in two places. Expose a "walking speed" set
 fast 7 km/h) and feed it to both locations to keep them consistent.
 
 
-### 5. Firebase Sync Toggle
+### 5. [COMPLETED] Firebase Sync Toggle
 Cloud sync to Firestore is always attempted when authenticated. Add an opt-out toggle so users can keep prompts 
 local-only even when signed in.
 

@@ -33,4 +33,5 @@
     <string name="settings_trip_length_quick">Quick · 2–3</string>
     <string name="settings_trip_length_standard">Standard · 4–6</string>
     <string name="settings_trip_length_extended">Extended · 7–10</string>
+    <string name="settings_firebase_sync">Cloud sync</string>
 </resources>

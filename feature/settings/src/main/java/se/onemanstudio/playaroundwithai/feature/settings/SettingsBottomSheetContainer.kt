@@ -30,6 +30,7 @@ fun SettingsBottomSheetContainer(
     val networkTimeoutSeconds by viewModel.networkTimeoutSeconds.collectAsStateWithLifecycle()
     val tokenTrackingEnabled by viewModel.tokenTrackingEnabled.collectAsStateWithLifecycle()
     val tripLengthMinStops by viewModel.tripLengthMinStops.collectAsStateWithLifecycle()
+    val firebaseSyncEnabled by viewModel.firebaseSyncEnabled.collectAsStateWithLifecycle()
     val context = LocalContext.current
     val locale = LocalLocale.current.platformLocale
     val numberFormat = remember(locale) { NumberFormat.getNumberInstance(locale) }
@@ -54,6 +55,7 @@ fun SettingsBottomSheetContainer(
             networkTimeoutSeconds = networkTimeoutSeconds,
             tokenTrackingEnabled = tokenTrackingEnabled,
             tripLengthMinStops = tripLengthMinStops,
+            firebaseSyncEnabled = firebaseSyncEnabled,
         ),
         onDismiss = onDismiss,
         onShowTokenUsageChange = { viewModel.onShowTokenUsageChange(it) },
@@ -65,6 +67,7 @@ fun SettingsBottomSheetContainer(
         onNetworkTimeoutChange = { viewModel.onNetworkTimeoutChange(it) },
         onTokenTrackingChange = { viewModel.onTokenTrackingChange(it) },
         onTripLengthChange = { viewModel.onTripLengthChange(it) },
+        onFirebaseSyncChange = { viewModel.onFirebaseSyncChange(it) },
         onContactClick = {
             try {
                 val intent = Intent(Intent.ACTION_SENDTO).apply {

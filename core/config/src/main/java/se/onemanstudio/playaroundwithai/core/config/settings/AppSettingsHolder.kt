@@ -12,6 +12,7 @@ const val HAPTIC_FEEDBACK_ENABLED_DEFAULT = true
 const val NETWORK_TIMEOUT_SECONDS_DEFAULT = 30
 const val TOKEN_TRACKING_ENABLED_DEFAULT = true
 const val TRIP_LENGTH_MIN_STOPS_DEFAULT = 4
+const val FIREBASE_SYNC_ENABLED_DEFAULT = true
 
 @Singleton
 class AppSettingsHolder @Inject constructor() {
@@ -36,6 +37,9 @@ class AppSettingsHolder @Inject constructor() {
 
     private val _tripLengthMinStops = MutableStateFlow(TRIP_LENGTH_MIN_STOPS_DEFAULT)
     val tripLengthMinStops: StateFlow<Int> = _tripLengthMinStops.asStateFlow()
+
+    private val _firebaseSyncEnabled = MutableStateFlow(FIREBASE_SYNC_ENABLED_DEFAULT)
+    val firebaseSyncEnabled: StateFlow<Boolean> = _firebaseSyncEnabled.asStateFlow()
 
     fun updateShowTokenUsage(enabled: Boolean) {
         _showTokenUsage.value = enabled
@@ -63,5 +67,9 @@ class AppSettingsHolder @Inject constructor() {
 
     fun updateTripLengthMinStops(minStops: Int) {
         _tripLengthMinStops.value = minStops
+    }
+
+    fun updateFirebaseSyncEnabled(enabled: Boolean) {
+        _firebaseSyncEnabled.value = enabled
     }
 }

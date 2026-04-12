@@ -14,6 +14,7 @@ data class SettingsState(
     val networkTimeoutSeconds: Int = DEFAULT_NETWORK_TIMEOUT_SECONDS,
     val tokenTrackingEnabled: Boolean = true,
     val tripLengthMinStops: Int = TRIP_LENGTH_STANDARD_MIN,
+    val firebaseSyncEnabled: Boolean = true,
 ) {
     companion object {
         const val MIN_VEHICLE_COUNT = 10

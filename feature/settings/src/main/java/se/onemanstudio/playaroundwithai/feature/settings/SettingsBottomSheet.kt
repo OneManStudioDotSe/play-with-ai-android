@@ -69,6 +69,7 @@ fun SettingsBottomSheet(
     onNetworkTimeoutChange: (Int) -> Unit,
     onTokenTrackingChange: (Boolean) -> Unit,
     onTripLengthChange: (Int) -> Unit,
+    onFirebaseSyncChange: (Boolean) -> Unit,
     onContactClick: () -> Unit,
     onLinkedInClick: () -> Unit = {},
     usageBars: List<ChartBarData> = emptyList(),
@@ -92,6 +93,7 @@ fun SettingsBottomSheet(
             onNetworkTimeoutChange = onNetworkTimeoutChange,
             onTokenTrackingChange = onTokenTrackingChange,
             onTripLengthChange = onTripLengthChange,
+            onFirebaseSyncChange = onFirebaseSyncChange,
             onContactClick = onContactClick,
             onLinkedInClick = onLinkedInClick,
             usageBars = usageBars,
@@ -113,6 +115,7 @@ private fun SettingsBottomSheetContent(
     onNetworkTimeoutChange: (Int) -> Unit,
     onTokenTrackingChange: (Boolean) -> Unit,
     onTripLengthChange: (Int) -> Unit,
+    onFirebaseSyncChange: (Boolean) -> Unit,
     onContactClick: () -> Unit,
     onLinkedInClick: () -> Unit,
     usageBars: List<ChartBarData>,
@@ -164,11 +167,13 @@ private fun SettingsBottomSheetContent(
                     hapticFeedbackEnabled = state.hapticFeedbackEnabled,
                     networkTimeoutSeconds = state.networkTimeoutSeconds,
                     tokenTrackingEnabled = state.tokenTrackingEnabled,
+                    firebaseSyncEnabled = state.firebaseSyncEnabled,
                     onShowTokenUsageChange = onShowTokenUsageChange,
                     onTypewriterDelayChange = onTypewriterDelayChange,
                     onHapticFeedbackChange = onHapticFeedbackChange,
                     onNetworkTimeoutChange = onNetworkTimeoutChange,
                     onTokenTrackingChange = onTokenTrackingChange,
+                    onFirebaseSyncChange = onFirebaseSyncChange,
                 )
 
                 Spacer(modifier = Modifier.height(Dimensions.paddingLarge))
@@ -224,11 +229,13 @@ private fun GeneralSection(
     hapticFeedbackEnabled: Boolean,
     networkTimeoutSeconds: Int,
     tokenTrackingEnabled: Boolean,
+    firebaseSyncEnabled: Boolean,
     onShowTokenUsageChange: (Boolean) -> Unit,
     onTypewriterDelayChange: (Long) -> Unit,
     onHapticFeedbackChange: (Boolean) -> Unit,
     onNetworkTimeoutChange: (Int) -> Unit,
     onTokenTrackingChange: (Boolean) -> Unit,
+    onFirebaseSyncChange: (Boolean) -> Unit,
 ) {
     val speedOptions = listOf(
         SettingsState.TYPEWRITER_DELAY_INSTANT to stringResource(R.string.settings_typewriter_speed_instant),
@@ -288,6 +295,22 @@ private fun GeneralSection(
             Switch(
                 checked = tokenTrackingEnabled,
                 onCheckedChange = onTokenTrackingChange,
+            )
+        }
+
+        Row(
+            modifier = Modifier.fillMaxWidth(),
+            horizontalArrangement = Arrangement.SpaceBetween,
+            verticalAlignment = Alignment.CenterVertically,
+        ) {
+            Text(
+                text = stringResource(R.string.settings_firebase_sync),
+                style = MaterialTheme.typography.bodyLarge,
+                color = MaterialTheme.colorScheme.onSurface,
+            )
+            Switch(
+                checked = firebaseSyncEnabled,
+                onCheckedChange = onFirebaseSyncChange,
             )
         }
 
@@ -569,6 +592,7 @@ private fun SettingsContentLightPreview() {
                 onNetworkTimeoutChange = {},
                 onTokenTrackingChange = {},
                 onTripLengthChange = {},
+                onFirebaseSyncChange = {},
                 onContactClick = {},
                 onLinkedInClick = {},
                 usageBars = sampleUsageBars,
@@ -595,6 +619,7 @@ private fun SettingsContentDarkPreview() {
                 onNetworkTimeoutChange = {},
                 onTokenTrackingChange = {},
                 onTripLengthChange = {},
+                onFirebaseSyncChange = {},
                 onContactClick = {},
                 onLinkedInClick = {},
                 usageBars = sampleUsageBars,

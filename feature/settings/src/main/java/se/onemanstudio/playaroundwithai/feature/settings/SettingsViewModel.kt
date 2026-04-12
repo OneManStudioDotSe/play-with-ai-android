@@ -15,6 +15,7 @@ import se.onemanstudio.playaroundwithai.core.config.settings.ExploreSettingsHold
 import javax.inject.Inject
 
 @HiltViewModel
+@Suppress("TooManyFunctions")
 class SettingsViewModel @Inject constructor(
     getWeeklyTokenUsageUseCase: GetWeeklyTokenUsageUseCase,
     private val exploreSettingsHolder: ExploreSettingsHolder,
@@ -34,6 +35,7 @@ class SettingsViewModel @Inject constructor(
     val networkTimeoutSeconds: StateFlow<Int> = appSettingsHolder.networkTimeoutSeconds
     val tokenTrackingEnabled: StateFlow<Boolean> = appSettingsHolder.tokenTrackingEnabled
     val tripLengthMinStops: StateFlow<Int> = appSettingsHolder.tripLengthMinStops
+    val firebaseSyncEnabled: StateFlow<Boolean> = appSettingsHolder.firebaseSyncEnabled
 
     private val _selectedDayIndex = MutableStateFlow<Int?>(null)
     val selectedDayIndex: StateFlow<Int?> = _selectedDayIndex
@@ -76,5 +78,9 @@ class SettingsViewModel @Inject constructor(
 
     fun onTripLengthChange(minStops: Int) {
         appSettingsHolder.updateTripLengthMinStops(minStops)
+    }
+
+    fun onFirebaseSyncChange(enabled: Boolean) {
+        appSettingsHolder.updateFirebaseSyncEnabled(enabled)
     }
 }
