@@ -31,6 +31,7 @@ class SettingsViewModel @Inject constructor(
     val walkingSpeedKmh: StateFlow<Float> = appSettingsHolder.walkingSpeedKmh
     val typewriterDelayMs: StateFlow<Long> = appSettingsHolder.typewriterDelayMs
     val hapticFeedbackEnabled: StateFlow<Boolean> = appSettingsHolder.hapticFeedbackEnabled
+    val networkTimeoutSeconds: StateFlow<Int> = appSettingsHolder.networkTimeoutSeconds
 
     private val _selectedDayIndex = MutableStateFlow<Int?>(null)
     val selectedDayIndex: StateFlow<Int?> = _selectedDayIndex
@@ -61,5 +62,9 @@ class SettingsViewModel @Inject constructor(
 
     fun onHapticFeedbackChange(enabled: Boolean) {
         appSettingsHolder.updateHapticFeedbackEnabled(enabled)
+    }
+
+    fun onNetworkTimeoutChange(seconds: Int) {
+        appSettingsHolder.updateNetworkTimeoutSeconds(seconds)
     }
 }

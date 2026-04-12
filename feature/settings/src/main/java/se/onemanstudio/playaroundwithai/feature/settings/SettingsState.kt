@@ -11,6 +11,7 @@ data class SettingsState(
     val walkingSpeedKmh: Float = WALKING_SPEED_NORMAL,
     val typewriterDelayMs: Long = TYPEWRITER_DELAY_NORMAL,
     val hapticFeedbackEnabled: Boolean = true,
+    val networkTimeoutSeconds: Int = DEFAULT_NETWORK_TIMEOUT_SECONDS,
 ) {
     companion object {
         const val MIN_VEHICLE_COUNT = 10
@@ -26,5 +27,9 @@ data class SettingsState(
         const val TYPEWRITER_DELAY_FAST = 5L
         const val TYPEWRITER_DELAY_NORMAL = 10L
         const val TYPEWRITER_DELAY_SLOW = 30L
+        const val MIN_NETWORK_TIMEOUT_SECONDS = 15
+        const val MAX_NETWORK_TIMEOUT_SECONDS = 120
+        const val DEFAULT_NETWORK_TIMEOUT_SECONDS = 30
+        const val NETWORK_TIMEOUT_STEP_SECONDS = 15
     }
 }

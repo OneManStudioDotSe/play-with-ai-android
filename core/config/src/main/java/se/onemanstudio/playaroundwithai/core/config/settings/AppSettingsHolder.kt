@@ -9,6 +9,7 @@ import javax.inject.Singleton
 const val WALKING_SPEED_KMH_DEFAULT = 5.0f
 const val TYPEWRITER_DELAY_MS_DEFAULT = 10L
 const val HAPTIC_FEEDBACK_ENABLED_DEFAULT = true
+const val NETWORK_TIMEOUT_SECONDS_DEFAULT = 30
 
 @Singleton
 class AppSettingsHolder @Inject constructor() {
@@ -25,6 +26,9 @@ class AppSettingsHolder @Inject constructor() {
     private val _hapticFeedbackEnabled = MutableStateFlow(HAPTIC_FEEDBACK_ENABLED_DEFAULT)
     val hapticFeedbackEnabled: StateFlow<Boolean> = _hapticFeedbackEnabled.asStateFlow()
 
+    private val _networkTimeoutSeconds = MutableStateFlow(NETWORK_TIMEOUT_SECONDS_DEFAULT)
+    val networkTimeoutSeconds: StateFlow<Int> = _networkTimeoutSeconds.asStateFlow()
+
     fun updateShowTokenUsage(enabled: Boolean) {
         _showTokenUsage.value = enabled
     }
@@ -39,5 +43,9 @@ class AppSettingsHolder @Inject constructor() {
 
     fun updateHapticFeedbackEnabled(enabled: Boolean) {
         _hapticFeedbackEnabled.value = enabled
+    }
+
+    fun updateNetworkTimeoutSeconds(seconds: Int) {
+        _networkTimeoutSeconds.value = seconds
     }
 }

@@ -66,6 +66,7 @@ fun SettingsBottomSheet(
     onWalkingSpeedChange: (Float) -> Unit,
     onTypewriterDelayChange: (Long) -> Unit,
     onHapticFeedbackChange: (Boolean) -> Unit,
+    onNetworkTimeoutChange: (Int) -> Unit,
     onContactClick: () -> Unit,
     onLinkedInClick: () -> Unit = {},
     usageBars: List<ChartBarData> = emptyList(),
@@ -86,6 +87,7 @@ fun SettingsBottomSheet(
             onWalkingSpeedChange = onWalkingSpeedChange,
             onTypewriterDelayChange = onTypewriterDelayChange,
             onHapticFeedbackChange = onHapticFeedbackChange,
+            onNetworkTimeoutChange = onNetworkTimeoutChange,
             onContactClick = onContactClick,
             onLinkedInClick = onLinkedInClick,
             usageBars = usageBars,
@@ -104,6 +106,7 @@ private fun SettingsBottomSheetContent(
     onWalkingSpeedChange: (Float) -> Unit,
     onTypewriterDelayChange: (Long) -> Unit,
     onHapticFeedbackChange: (Boolean) -> Unit,
+    onNetworkTimeoutChange: (Int) -> Unit,
     onContactClick: () -> Unit,
     onLinkedInClick: () -> Unit,
     usageBars: List<ChartBarData>,
@@ -153,9 +156,11 @@ private fun SettingsBottomSheetContent(
                     showTokenUsage = state.showTokenUsage,
                     typewriterDelayMs = state.typewriterDelayMs,
                     hapticFeedbackEnabled = state.hapticFeedbackEnabled,
+                    networkTimeoutSeconds = state.networkTimeoutSeconds,
                     onShowTokenUsageChange = onShowTokenUsageChange,
                     onTypewriterDelayChange = onTypewriterDelayChange,
                     onHapticFeedbackChange = onHapticFeedbackChange,
+                    onNetworkTimeoutChange = onNetworkTimeoutChange,
                 )
 
                 Spacer(modifier = Modifier.height(Dimensions.paddingLarge))
@@ -207,9 +212,11 @@ private fun GeneralSection(
     showTokenUsage: Boolean,
     typewriterDelayMs: Long,
     hapticFeedbackEnabled: Boolean,
+    networkTimeoutSeconds: Int,
     onShowTokenUsageChange: (Boolean) -> Unit,
     onTypewriterDelayChange: (Long) -> Unit,
     onHapticFeedbackChange: (Boolean) -> Unit,
+    onNetworkTimeoutChange: (Int) -> Unit,
 ) {
     val speedOptions = listOf(
         SettingsState.TYPEWRITER_DELAY_INSTANT to stringResource(R.string.settings_typewriter_speed_instant),
@@ -275,6 +282,25 @@ private fun GeneralSection(
                 }
             }
         }
+
+        Text(
+            text = stringResource(R.string.settings_network_timeout, networkTimeoutSeconds),
+            style = MaterialTheme.typography.bodyMedium,
+            color = MaterialTheme.colorScheme.onSurface,
+        )
+
+        Slider(
+            value = networkTimeoutSeconds.toFloat(),
+            onValueChange = { onNetworkTimeoutChange(it.roundToInt()) },
+            valueRange = SettingsState.MIN_NETWORK_TIMEOUT_SECONDS.toFloat()..SettingsState.MAX_NETWORK_TIMEOUT_SECONDS.toFloat(),
+            steps = (SettingsState.MAX_NETWORK_TIMEOUT_SECONDS - SettingsState.MIN_NETWORK_TIMEOUT_SECONDS) /
+                SettingsState.NETWORK_TIMEOUT_STEP_SECONDS - 1,
+            colors = SliderDefaults.colors(
+                thumbColor = MaterialTheme.colorScheme.onSurface,
+                activeTrackColor = MaterialTheme.colorScheme.onSurface,
+                inactiveTrackColor = MaterialTheme.colorScheme.onSurface.copy(alpha = Alphas.extraLow),
+            ),
+        )
     }
 }
 
@@ -486,6 +512,7 @@ private fun SettingsContentLightPreview() {
                 onWalkingSpeedChange = {},
                 onTypewriterDelayChange = {},
                 onHapticFeedbackChange = {},
+                onNetworkTimeoutChange = {},
                 onContactClick = {},
                 onLinkedInClick = {},
                 usageBars = sampleUsageBars,
@@ -509,6 +536,7 @@ private fun SettingsContentDarkPreview() {
                 onWalkingSpeedChange = {},
                 onTypewriterDelayChange = {},
                 onHapticFeedbackChange = {},
+                onNetworkTimeoutChange = {},
                 onContactClick = {},
                 onLinkedInClick = {},
                 usageBars = sampleUsageBars,

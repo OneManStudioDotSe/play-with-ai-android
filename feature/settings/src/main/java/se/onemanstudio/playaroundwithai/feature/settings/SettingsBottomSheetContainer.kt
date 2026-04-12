@@ -27,6 +27,7 @@ fun SettingsBottomSheetContainer(
     val walkingSpeedKmh by viewModel.walkingSpeedKmh.collectAsStateWithLifecycle()
     val typewriterDelayMs by viewModel.typewriterDelayMs.collectAsStateWithLifecycle()
     val hapticFeedbackEnabled by viewModel.hapticFeedbackEnabled.collectAsStateWithLifecycle()
+    val networkTimeoutSeconds by viewModel.networkTimeoutSeconds.collectAsStateWithLifecycle()
     val context = LocalContext.current
     val locale = LocalLocale.current.platformLocale
     val numberFormat = remember(locale) { NumberFormat.getNumberInstance(locale) }
@@ -48,6 +49,7 @@ fun SettingsBottomSheetContainer(
             walkingSpeedKmh = walkingSpeedKmh,
             typewriterDelayMs = typewriterDelayMs,
             hapticFeedbackEnabled = hapticFeedbackEnabled,
+            networkTimeoutSeconds = networkTimeoutSeconds,
         ),
         onDismiss = onDismiss,
         onShowTokenUsageChange = { viewModel.onShowTokenUsageChange(it) },
@@ -56,6 +58,7 @@ fun SettingsBottomSheetContainer(
         onWalkingSpeedChange = { viewModel.onWalkingSpeedChange(it) },
         onTypewriterDelayChange = { viewModel.onTypewriterDelayChange(it) },
         onHapticFeedbackChange = { viewModel.onHapticFeedbackChange(it) },
+        onNetworkTimeoutChange = { viewModel.onNetworkTimeoutChange(it) },
         onContactClick = {
             try {
                 val intent = Intent(Intent.ACTION_SENDTO).apply {

@@ -13,11 +13,10 @@ import se.onemanstudio.playaroundwithai.core.config.di.BaseUrl
 import se.onemanstudio.playaroundwithai.core.config.di.LoggingLevel
 import se.onemanstudio.playaroundwithai.core.network.api.GeminiApiService
 import se.onemanstudio.playaroundwithai.core.network.interceptor.AuthenticationInterceptor
+import se.onemanstudio.playaroundwithai.core.network.interceptor.TimeoutInterceptor
 import timber.log.Timber
-import java.util.concurrent.TimeUnit
 import javax.inject.Singleton
 
-private const val TIMEOUT_SECONDS = 30L
 private const val MAX_LOG_LINE_LENGTH = 1800
 
 @Module
@@ -27,6 +26,7 @@ object NetworkModule {
     @Singleton
     fun provideOkHttpClient(
         authInterceptor: AuthenticationInterceptor,
+        timeoutInterceptor: TimeoutInterceptor,
         @LoggingLevel loggingLevel: HttpLoggingInterceptor.Level
     ): OkHttpClient {
         val loggingInterceptor = HttpLoggingInterceptor { message ->
@@ -41,9 +41,7 @@ object NetworkModule {
         return OkHttpClient.Builder()
             .addInterceptor(loggingInterceptor)
             .addInterceptor(authInterceptor)
-            .connectTimeout(TIMEOUT_SECONDS, TimeUnit.SECONDS)
-            .readTimeout(TIMEOUT_SECONDS, TimeUnit.SECONDS)
-            .writeTimeout(TIMEOUT_SECONDS, TimeUnit.SECONDS)
+            .addInterceptor(timeoutInterceptor)
             .build()
     }
 
