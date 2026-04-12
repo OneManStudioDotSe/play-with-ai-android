@@ -55,7 +55,7 @@ The map feature asks Gemini for exactly 10 suggested places. A slider (5–20) w
 Users can select up to 8 points for route calculation. Raising or lowering this (3–12) gives control over route complexity.
 
 
-### 11. Network Timeout
+### 11. [COMPLETED] Network Timeout
 API calls time out after 30 seconds. A slider (15–120 s) would help users on slow connections or when using heavier models.
 
 
