@@ -35,6 +35,18 @@ private const val DEFAULT_COUNT = 5
 private const val ERROR_BODY_PREVIEW_LENGTH = 200
 private const val LOG_TAG = "TripPlanner"
 
+private const val TRIP_LENGTH_QUICK_MIN = 2
+private const val TRIP_LENGTH_QUICK_MAX = 3
+private const val TRIP_LENGTH_STANDARD_MAX = 6
+private const val TRIP_LENGTH_EXTENDED_MIN = 7
+private const val TRIP_LENGTH_EXTENDED_MAX = 10
+
+private fun tripLengthMaxStops(minStops: Int): Int = when (minStops) {
+    TRIP_LENGTH_QUICK_MIN -> TRIP_LENGTH_QUICK_MAX
+    TRIP_LENGTH_EXTENDED_MIN -> TRIP_LENGTH_EXTENDED_MAX
+    else -> TRIP_LENGTH_STANDARD_MAX
+}
+
 private object ToolNames {
     const val SEARCH_PLACES = "search_places"
     const val CALCULATE_ROUTE = "calculate_route"
@@ -56,7 +68,9 @@ class TripPlannerRepositoryImpl @Inject constructor(
             val collectedStops = mutableListOf<TripStop>()
             var routeResult: RouteResult? = null
 
-            val systemPrompt = PlanPrompts.tripPlannerSystemPrompt(latitude, longitude)
+            val minStops = appSettingsHolder.tripLengthMinStops.value
+            val maxStops = tripLengthMaxStops(minStops)
+            val systemPrompt = PlanPrompts.tripPlannerSystemPrompt(latitude, longitude, minStops, maxStops)
             history.add(Content(role = "user", parts = listOf(Part(text = "$systemPrompt\n\nUser request: $goal"))))
 
             emit(PlanEvent.Thinking("Understanding your request..."))

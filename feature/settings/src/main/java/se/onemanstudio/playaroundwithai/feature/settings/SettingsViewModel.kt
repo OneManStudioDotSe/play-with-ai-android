@@ -33,6 +33,7 @@ class SettingsViewModel @Inject constructor(
     val hapticFeedbackEnabled: StateFlow<Boolean> = appSettingsHolder.hapticFeedbackEnabled
     val networkTimeoutSeconds: StateFlow<Int> = appSettingsHolder.networkTimeoutSeconds
     val tokenTrackingEnabled: StateFlow<Boolean> = appSettingsHolder.tokenTrackingEnabled
+    val tripLengthMinStops: StateFlow<Int> = appSettingsHolder.tripLengthMinStops
 
     private val _selectedDayIndex = MutableStateFlow<Int?>(null)
     val selectedDayIndex: StateFlow<Int?> = _selectedDayIndex
@@ -71,5 +72,9 @@ class SettingsViewModel @Inject constructor(
 
     fun onTokenTrackingChange(enabled: Boolean) {
         appSettingsHolder.updateTokenTrackingEnabled(enabled)
+    }
+
+    fun onTripLengthChange(minStops: Int) {
+        appSettingsHolder.updateTripLengthMinStops(minStops)
     }
 }

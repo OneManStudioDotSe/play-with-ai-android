@@ -13,6 +13,7 @@ data class SettingsState(
     val hapticFeedbackEnabled: Boolean = true,
     val networkTimeoutSeconds: Int = DEFAULT_NETWORK_TIMEOUT_SECONDS,
     val tokenTrackingEnabled: Boolean = true,
+    val tripLengthMinStops: Int = TRIP_LENGTH_STANDARD_MIN,
 ) {
     companion object {
         const val MIN_VEHICLE_COUNT = 10
@@ -32,5 +33,8 @@ data class SettingsState(
         const val MAX_NETWORK_TIMEOUT_SECONDS = 120
         const val DEFAULT_NETWORK_TIMEOUT_SECONDS = 30
         const val NETWORK_TIMEOUT_STEP_SECONDS = 15
+        const val TRIP_LENGTH_QUICK_MIN = 2
+        const val TRIP_LENGTH_STANDARD_MIN = 4
+        const val TRIP_LENGTH_EXTENDED_MIN = 7
     }
 }

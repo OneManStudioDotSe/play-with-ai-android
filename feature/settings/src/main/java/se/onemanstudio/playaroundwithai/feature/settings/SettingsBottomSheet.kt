@@ -68,6 +68,7 @@ fun SettingsBottomSheet(
     onHapticFeedbackChange: (Boolean) -> Unit,
     onNetworkTimeoutChange: (Int) -> Unit,
     onTokenTrackingChange: (Boolean) -> Unit,
+    onTripLengthChange: (Int) -> Unit,
     onContactClick: () -> Unit,
     onLinkedInClick: () -> Unit = {},
     usageBars: List<ChartBarData> = emptyList(),
@@ -90,6 +91,7 @@ fun SettingsBottomSheet(
             onHapticFeedbackChange = onHapticFeedbackChange,
             onNetworkTimeoutChange = onNetworkTimeoutChange,
             onTokenTrackingChange = onTokenTrackingChange,
+            onTripLengthChange = onTripLengthChange,
             onContactClick = onContactClick,
             onLinkedInClick = onLinkedInClick,
             usageBars = usageBars,
@@ -110,6 +112,7 @@ private fun SettingsBottomSheetContent(
     onHapticFeedbackChange: (Boolean) -> Unit,
     onNetworkTimeoutChange: (Int) -> Unit,
     onTokenTrackingChange: (Boolean) -> Unit,
+    onTripLengthChange: (Int) -> Unit,
     onContactClick: () -> Unit,
     onLinkedInClick: () -> Unit,
     usageBars: List<ChartBarData>,
@@ -175,9 +178,11 @@ private fun SettingsBottomSheetContent(
                     vehicleCount = state.vehicleCount,
                     searchRadiusKm = state.searchRadiusKm,
                     walkingSpeedKmh = state.walkingSpeedKmh,
+                    tripLengthMinStops = state.tripLengthMinStops,
                     onVehicleCountChange = onVehicleCountChange,
                     onSearchRadiusChange = onSearchRadiusChange,
                     onWalkingSpeedChange = onWalkingSpeedChange,
+                    onTripLengthChange = onTripLengthChange,
                 )
 
                 Spacer(modifier = Modifier.height(Dimensions.paddingLarge))
@@ -409,9 +414,11 @@ private fun MapControlsSection(
     vehicleCount: Int,
     searchRadiusKm: Float,
     walkingSpeedKmh: Float,
+    tripLengthMinStops: Int,
     onVehicleCountChange: (Int) -> Unit,
     onSearchRadiusChange: (Float) -> Unit,
     onWalkingSpeedChange: (Float) -> Unit,
+    onTripLengthChange: (Int) -> Unit,
 ) {
     val sliderColors = SliderDefaults.colors(
         thumbColor = MaterialTheme.colorScheme.onSurface,
@@ -470,6 +477,30 @@ private fun MapControlsSection(
                     shape = SegmentedButtonDefaults.itemShape(index = index, count = speedOptions.size),
                     selected = walkingSpeedKmh == speed,
                     onClick = { onWalkingSpeedChange(speed) },
+                ) {
+                    Text(text = label, style = MaterialTheme.typography.labelMedium)
+                }
+            }
+        }
+
+        val tripLengthOptions = listOf(
+            SettingsState.TRIP_LENGTH_QUICK_MIN to stringResource(R.string.settings_trip_length_quick),
+            SettingsState.TRIP_LENGTH_STANDARD_MIN to stringResource(R.string.settings_trip_length_standard),
+            SettingsState.TRIP_LENGTH_EXTENDED_MIN to stringResource(R.string.settings_trip_length_extended),
+        )
+
+        Text(
+            text = stringResource(R.string.settings_trip_length),
+            style = MaterialTheme.typography.bodyMedium,
+            color = MaterialTheme.colorScheme.onSurface,
+        )
+
+        SingleChoiceSegmentedButtonRow(modifier = Modifier.fillMaxWidth()) {
+            tripLengthOptions.forEachIndexed { index, (minStops, label) ->
+                SegmentedButton(
+                    shape = SegmentedButtonDefaults.itemShape(index = index, count = tripLengthOptions.size),
+                    selected = tripLengthMinStops == minStops,
+                    onClick = { onTripLengthChange(minStops) },
                 ) {
                     Text(text = label, style = MaterialTheme.typography.labelMedium)
                 }
@@ -537,6 +568,7 @@ private fun SettingsContentLightPreview() {
                 onHapticFeedbackChange = {},
                 onNetworkTimeoutChange = {},
                 onTokenTrackingChange = {},
+                onTripLengthChange = {},
                 onContactClick = {},
                 onLinkedInClick = {},
                 usageBars = sampleUsageBars,
@@ -562,6 +594,7 @@ private fun SettingsContentDarkPreview() {
                 onHapticFeedbackChange = {},
                 onNetworkTimeoutChange = {},
                 onTokenTrackingChange = {},
+                onTripLengthChange = {},
                 onContactClick = {},
                 onLinkedInClick = {},
                 usageBars = sampleUsageBars,

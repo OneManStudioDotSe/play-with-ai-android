@@ -64,7 +64,7 @@ Both Explore and Plan screens now fetch the user's real GPS location via `FusedL
 Stockholm (59.3293, 18.0686) if unavailable. A "home location" setting could let users override the fallback.
 
 
-### 13. Trip Length Preset
+### 13. [COMPLETED] Trip Length Preset
 The agent system prompt targets "4–6 stops for a half-day trip." Offer presets (quick 2–3 stops / standard 4–6 / extended
 7–10) so the user can control itinerary size.
 

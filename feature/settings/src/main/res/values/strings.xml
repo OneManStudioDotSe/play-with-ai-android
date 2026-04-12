@@ -29,4 +29,8 @@
     <string name="settings_haptic_feedback">Haptic feedback</string>
     <string name="settings_network_timeout">API timeout: %ds</string>
     <string name="settings_token_tracking">Token usage tracking</string>
+    <string name="settings_trip_length">Trip length</string>
+    <string name="settings_trip_length_quick">Quick · 2–3</string>
+    <string name="settings_trip_length_standard">Standard · 4–6</string>
+    <string name="settings_trip_length_extended">Extended · 7–10</string>
 </resources>

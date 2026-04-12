@@ -11,6 +11,7 @@ const val TYPEWRITER_DELAY_MS_DEFAULT = 10L
 const val HAPTIC_FEEDBACK_ENABLED_DEFAULT = true
 const val NETWORK_TIMEOUT_SECONDS_DEFAULT = 30
 const val TOKEN_TRACKING_ENABLED_DEFAULT = true
+const val TRIP_LENGTH_MIN_STOPS_DEFAULT = 4
 
 @Singleton
 class AppSettingsHolder @Inject constructor() {
@@ -32,6 +33,9 @@ class AppSettingsHolder @Inject constructor() {
 
     private val _tokenTrackingEnabled = MutableStateFlow(TOKEN_TRACKING_ENABLED_DEFAULT)
     val tokenTrackingEnabled: StateFlow<Boolean> = _tokenTrackingEnabled.asStateFlow()
+
+    private val _tripLengthMinStops = MutableStateFlow(TRIP_LENGTH_MIN_STOPS_DEFAULT)
+    val tripLengthMinStops: StateFlow<Int> = _tripLengthMinStops.asStateFlow()
 
     fun updateShowTokenUsage(enabled: Boolean) {
         _showTokenUsage.value = enabled
@@ -55,5 +59,9 @@ class AppSettingsHolder @Inject constructor() {
 
     fun updateTokenTrackingEnabled(enabled: Boolean) {
         _tokenTrackingEnabled.value = enabled
+    }
+
+    fun updateTripLengthMinStops(minStops: Int) {
+        _tripLengthMinStops.value = minStops
     }
 }
