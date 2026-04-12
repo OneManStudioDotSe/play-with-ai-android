@@ -10,6 +10,7 @@ const val WALKING_SPEED_KMH_DEFAULT = 5.0f
 const val TYPEWRITER_DELAY_MS_DEFAULT = 10L
 const val HAPTIC_FEEDBACK_ENABLED_DEFAULT = true
 const val NETWORK_TIMEOUT_SECONDS_DEFAULT = 30
+const val TOKEN_TRACKING_ENABLED_DEFAULT = true
 
 @Singleton
 class AppSettingsHolder @Inject constructor() {
@@ -29,6 +30,9 @@ class AppSettingsHolder @Inject constructor() {
     private val _networkTimeoutSeconds = MutableStateFlow(NETWORK_TIMEOUT_SECONDS_DEFAULT)
     val networkTimeoutSeconds: StateFlow<Int> = _networkTimeoutSeconds.asStateFlow()
 
+    private val _tokenTrackingEnabled = MutableStateFlow(TOKEN_TRACKING_ENABLED_DEFAULT)
+    val tokenTrackingEnabled: StateFlow<Boolean> = _tokenTrackingEnabled.asStateFlow()
+
     fun updateShowTokenUsage(enabled: Boolean) {
         _showTokenUsage.value = enabled
     }
@@ -47,5 +51,9 @@ class AppSettingsHolder @Inject constructor() {
 
     fun updateNetworkTimeoutSeconds(seconds: Int) {
         _networkTimeoutSeconds.value = seconds
+    }
+
+    fun updateTokenTrackingEnabled(enabled: Boolean) {
+        _tokenTrackingEnabled.value = enabled
     }
 }

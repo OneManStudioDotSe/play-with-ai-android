@@ -67,6 +67,7 @@ fun SettingsBottomSheet(
     onTypewriterDelayChange: (Long) -> Unit,
     onHapticFeedbackChange: (Boolean) -> Unit,
     onNetworkTimeoutChange: (Int) -> Unit,
+    onTokenTrackingChange: (Boolean) -> Unit,
     onContactClick: () -> Unit,
     onLinkedInClick: () -> Unit = {},
     usageBars: List<ChartBarData> = emptyList(),
@@ -88,6 +89,7 @@ fun SettingsBottomSheet(
             onTypewriterDelayChange = onTypewriterDelayChange,
             onHapticFeedbackChange = onHapticFeedbackChange,
             onNetworkTimeoutChange = onNetworkTimeoutChange,
+            onTokenTrackingChange = onTokenTrackingChange,
             onContactClick = onContactClick,
             onLinkedInClick = onLinkedInClick,
             usageBars = usageBars,
@@ -107,6 +109,7 @@ private fun SettingsBottomSheetContent(
     onTypewriterDelayChange: (Long) -> Unit,
     onHapticFeedbackChange: (Boolean) -> Unit,
     onNetworkTimeoutChange: (Int) -> Unit,
+    onTokenTrackingChange: (Boolean) -> Unit,
     onContactClick: () -> Unit,
     onLinkedInClick: () -> Unit,
     usageBars: List<ChartBarData>,
@@ -157,10 +160,12 @@ private fun SettingsBottomSheetContent(
                     typewriterDelayMs = state.typewriterDelayMs,
                     hapticFeedbackEnabled = state.hapticFeedbackEnabled,
                     networkTimeoutSeconds = state.networkTimeoutSeconds,
+                    tokenTrackingEnabled = state.tokenTrackingEnabled,
                     onShowTokenUsageChange = onShowTokenUsageChange,
                     onTypewriterDelayChange = onTypewriterDelayChange,
                     onHapticFeedbackChange = onHapticFeedbackChange,
                     onNetworkTimeoutChange = onNetworkTimeoutChange,
+                    onTokenTrackingChange = onTokenTrackingChange,
                 )
 
                 Spacer(modifier = Modifier.height(Dimensions.paddingLarge))
@@ -213,10 +218,12 @@ private fun GeneralSection(
     typewriterDelayMs: Long,
     hapticFeedbackEnabled: Boolean,
     networkTimeoutSeconds: Int,
+    tokenTrackingEnabled: Boolean,
     onShowTokenUsageChange: (Boolean) -> Unit,
     onTypewriterDelayChange: (Long) -> Unit,
     onHapticFeedbackChange: (Boolean) -> Unit,
     onNetworkTimeoutChange: (Int) -> Unit,
+    onTokenTrackingChange: (Boolean) -> Unit,
 ) {
     val speedOptions = listOf(
         SettingsState.TYPEWRITER_DELAY_INSTANT to stringResource(R.string.settings_typewriter_speed_instant),
@@ -260,6 +267,22 @@ private fun GeneralSection(
             Switch(
                 checked = hapticFeedbackEnabled,
                 onCheckedChange = onHapticFeedbackChange,
+            )
+        }
+
+        Row(
+            modifier = Modifier.fillMaxWidth(),
+            horizontalArrangement = Arrangement.SpaceBetween,
+            verticalAlignment = Alignment.CenterVertically,
+        ) {
+            Text(
+                text = stringResource(R.string.settings_token_tracking),
+                style = MaterialTheme.typography.bodyLarge,
+                color = MaterialTheme.colorScheme.onSurface,
+            )
+            Switch(
+                checked = tokenTrackingEnabled,
+                onCheckedChange = onTokenTrackingChange,
             )
         }
 
@@ -513,6 +536,7 @@ private fun SettingsContentLightPreview() {
                 onTypewriterDelayChange = {},
                 onHapticFeedbackChange = {},
                 onNetworkTimeoutChange = {},
+                onTokenTrackingChange = {},
                 onContactClick = {},
                 onLinkedInClick = {},
                 usageBars = sampleUsageBars,
@@ -537,6 +561,7 @@ private fun SettingsContentDarkPreview() {
                 onTypewriterDelayChange = {},
                 onHapticFeedbackChange = {},
                 onNetworkTimeoutChange = {},
+                onTokenTrackingChange = {},
                 onContactClick = {},
                 onLinkedInClick = {},
                 usageBars = sampleUsageBars,

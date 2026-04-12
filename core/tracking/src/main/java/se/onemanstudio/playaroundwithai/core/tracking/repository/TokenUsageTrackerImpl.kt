@@ -6,6 +6,7 @@ import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.SharedFlow
 import kotlinx.coroutines.flow.asSharedFlow
 import kotlinx.coroutines.flow.map
+import se.onemanstudio.playaroundwithai.core.config.settings.AppSettingsHolder
 import se.onemanstudio.playaroundwithai.core.database.dao.TokenUsageDao
 import se.onemanstudio.playaroundwithai.core.database.model.DailyUsageRow
 import se.onemanstudio.playaroundwithai.core.database.entity.TokenUsageEntity
@@ -24,6 +25,7 @@ private const val WEEKLY_DAYS = 7
 @Singleton
 class TokenUsageTrackerImpl @Inject constructor(
     private val dao: TokenUsageDao,
+    private val appSettingsHolder: AppSettingsHolder,
 ) : TokenUsageTracker, TokenUsageQuery {
 
     private val _lastUsageEvent = MutableSharedFlow<TokenUsageEvent>(
@@ -34,6 +36,7 @@ class TokenUsageTrackerImpl @Inject constructor(
     override val lastUsageEvent: SharedFlow<TokenUsageEvent> = _lastUsageEvent.asSharedFlow()
 
     override suspend fun record(feature: String, usageMetadata: UsageMetadata?) {
+        if (!appSettingsHolder.tokenTrackingEnabled.value) return
         if (usageMetadata == null || usageMetadata.totalTokenCount == 0) return
 
         val now = System.currentTimeMillis()

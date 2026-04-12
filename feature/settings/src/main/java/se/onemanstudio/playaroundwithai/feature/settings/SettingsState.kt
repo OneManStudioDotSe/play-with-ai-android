@@ -12,6 +12,7 @@ data class SettingsState(
     val typewriterDelayMs: Long = TYPEWRITER_DELAY_NORMAL,
     val hapticFeedbackEnabled: Boolean = true,
     val networkTimeoutSeconds: Int = DEFAULT_NETWORK_TIMEOUT_SECONDS,
+    val tokenTrackingEnabled: Boolean = true,
 ) {
     companion object {
         const val MIN_VEHICLE_COUNT = 10

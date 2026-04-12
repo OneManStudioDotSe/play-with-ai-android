@@ -28,6 +28,7 @@ fun SettingsBottomSheetContainer(
     val typewriterDelayMs by viewModel.typewriterDelayMs.collectAsStateWithLifecycle()
     val hapticFeedbackEnabled by viewModel.hapticFeedbackEnabled.collectAsStateWithLifecycle()
     val networkTimeoutSeconds by viewModel.networkTimeoutSeconds.collectAsStateWithLifecycle()
+    val tokenTrackingEnabled by viewModel.tokenTrackingEnabled.collectAsStateWithLifecycle()
     val context = LocalContext.current
     val locale = LocalLocale.current.platformLocale
     val numberFormat = remember(locale) { NumberFormat.getNumberInstance(locale) }
@@ -50,6 +51,7 @@ fun SettingsBottomSheetContainer(
             typewriterDelayMs = typewriterDelayMs,
             hapticFeedbackEnabled = hapticFeedbackEnabled,
             networkTimeoutSeconds = networkTimeoutSeconds,
+            tokenTrackingEnabled = tokenTrackingEnabled,
         ),
         onDismiss = onDismiss,
         onShowTokenUsageChange = { viewModel.onShowTokenUsageChange(it) },
@@ -59,6 +61,7 @@ fun SettingsBottomSheetContainer(
         onTypewriterDelayChange = { viewModel.onTypewriterDelayChange(it) },
         onHapticFeedbackChange = { viewModel.onHapticFeedbackChange(it) },
         onNetworkTimeoutChange = { viewModel.onNetworkTimeoutChange(it) },
+        onTokenTrackingChange = { viewModel.onTokenTrackingChange(it) },
         onContactClick = {
             try {
                 val intent = Intent(Intent.ACTION_SENDTO).apply {

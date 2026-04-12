@@ -28,4 +28,5 @@
     <string name="settings_typewriter_speed_slow">Slow</string>
     <string name="settings_haptic_feedback">Haptic feedback</string>
     <string name="settings_network_timeout">API timeout: %ds</string>
+    <string name="settings_token_tracking">Token usage tracking</string>
 </resources>

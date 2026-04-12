@@ -32,6 +32,7 @@ class SettingsViewModel @Inject constructor(
     val typewriterDelayMs: StateFlow<Long> = appSettingsHolder.typewriterDelayMs
     val hapticFeedbackEnabled: StateFlow<Boolean> = appSettingsHolder.hapticFeedbackEnabled
     val networkTimeoutSeconds: StateFlow<Int> = appSettingsHolder.networkTimeoutSeconds
+    val tokenTrackingEnabled: StateFlow<Boolean> = appSettingsHolder.tokenTrackingEnabled
 
     private val _selectedDayIndex = MutableStateFlow<Int?>(null)
     val selectedDayIndex: StateFlow<Int?> = _selectedDayIndex
@@ -66,5 +67,9 @@ class SettingsViewModel @Inject constructor(
 
     fun onNetworkTimeoutChange(seconds: Int) {
         appSettingsHolder.updateNetworkTimeoutSeconds(seconds)
+    }
+
+    fun onTokenTrackingChange(enabled: Boolean) {
+        appSettingsHolder.updateTokenTrackingEnabled(enabled)
     }
 }

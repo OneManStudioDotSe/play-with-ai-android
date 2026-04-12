@@ -69,7 +69,7 @@ The agent system prompt targets "4–6 stops for a half-day trip." Offer presets
 7–10) so the user can control itinerary size.
 
 
-### 14. Token Usage Tracking Toggle
+### 14. [COMPLETED] Token Usage Tracking Toggle
 Token usage is always tracked to the local Room database. Some users may want to disable tracking for privacy or storage 
 reasons.
 
