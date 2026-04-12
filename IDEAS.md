@@ -47,7 +47,7 @@ Images sent to Gemini are scaled to max 768 px and compressed at JPEG quality 77
 would let users balance upload size vs. detail.
 
 
-### 9. AI Suggested Places Count
+### 9. [COMPLETED] AI Suggested Places Count
 The map feature asks Gemini for exactly 10 suggested places. A slider (5–20) would let users control how many AI suggestions appear.
 
 

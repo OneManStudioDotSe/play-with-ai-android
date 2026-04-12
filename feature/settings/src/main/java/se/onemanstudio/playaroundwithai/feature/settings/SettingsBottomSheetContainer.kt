@@ -33,6 +33,7 @@ fun SettingsBottomSheetContainer(
     val firebaseSyncEnabled by viewModel.firebaseSyncEnabled.collectAsStateWithLifecycle()
     val imageQualityJpeg by viewModel.imageQualityJpeg.collectAsStateWithLifecycle()
     val agentMaxIterations by viewModel.agentMaxIterations.collectAsStateWithLifecycle()
+    val suggestedPlacesCount by viewModel.suggestedPlacesCount.collectAsStateWithLifecycle()
     val context = LocalContext.current
     val locale = LocalLocale.current.platformLocale
     val numberFormat = remember(locale) { NumberFormat.getNumberInstance(locale) }
@@ -60,6 +61,7 @@ fun SettingsBottomSheetContainer(
             firebaseSyncEnabled = firebaseSyncEnabled,
             imageQualityJpeg = imageQualityJpeg,
             agentMaxIterations = agentMaxIterations,
+            suggestedPlacesCount = suggestedPlacesCount,
         ),
         onDismiss = onDismiss,
         onShowTokenUsageChange = { viewModel.onShowTokenUsageChange(it) },
@@ -74,6 +76,7 @@ fun SettingsBottomSheetContainer(
         onFirebaseSyncChange = { viewModel.onFirebaseSyncChange(it) },
         onImageQualityChange = { viewModel.onImageQualityChange(it) },
         onAgentMaxIterationsChange = { viewModel.onAgentMaxIterationsChange(it) },
+        onSuggestedPlacesCountChange = { viewModel.onSuggestedPlacesCountChange(it) },
         onContactClick = {
             try {
                 val intent = Intent(Intent.ACTION_SENDTO).apply {

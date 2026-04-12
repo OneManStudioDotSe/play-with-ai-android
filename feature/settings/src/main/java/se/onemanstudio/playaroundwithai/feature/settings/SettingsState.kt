@@ -17,6 +17,7 @@ data class SettingsState(
     val firebaseSyncEnabled: Boolean = true,
     val imageQualityJpeg: Int = IMAGE_QUALITY_MEDIUM,
     val agentMaxIterations: Int = AGENT_ITERATIONS_STANDARD,
+    val suggestedPlacesCount: Int = DEFAULT_SUGGESTED_PLACES_COUNT,
 ) {
     companion object {
         const val MIN_VEHICLE_COUNT = 10
@@ -45,5 +46,9 @@ data class SettingsState(
         const val AGENT_ITERATIONS_QUICK = 5
         const val AGENT_ITERATIONS_STANDARD = 10
         const val AGENT_ITERATIONS_THOROUGH = 15
+        const val MIN_SUGGESTED_PLACES_COUNT = 5
+        const val MAX_SUGGESTED_PLACES_COUNT = 20
+        const val DEFAULT_SUGGESTED_PLACES_COUNT = 10
+        const val SUGGESTED_PLACES_COUNT_STEP = 5
     }
 }

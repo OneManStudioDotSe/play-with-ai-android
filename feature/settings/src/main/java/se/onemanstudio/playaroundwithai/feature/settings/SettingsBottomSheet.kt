@@ -72,6 +72,7 @@ fun SettingsBottomSheet(
     onFirebaseSyncChange: (Boolean) -> Unit,
     onImageQualityChange: (Int) -> Unit,
     onAgentMaxIterationsChange: (Int) -> Unit,
+    onSuggestedPlacesCountChange: (Int) -> Unit,
     onContactClick: () -> Unit,
     onLinkedInClick: () -> Unit = {},
     usageBars: List<ChartBarData> = emptyList(),
@@ -98,6 +99,7 @@ fun SettingsBottomSheet(
             onFirebaseSyncChange = onFirebaseSyncChange,
             onImageQualityChange = onImageQualityChange,
             onAgentMaxIterationsChange = onAgentMaxIterationsChange,
+            onSuggestedPlacesCountChange = onSuggestedPlacesCountChange,
             onContactClick = onContactClick,
             onLinkedInClick = onLinkedInClick,
             usageBars = usageBars,
@@ -122,6 +124,7 @@ private fun SettingsBottomSheetContent(
     onFirebaseSyncChange: (Boolean) -> Unit,
     onImageQualityChange: (Int) -> Unit,
     onAgentMaxIterationsChange: (Int) -> Unit,
+    onSuggestedPlacesCountChange: (Int) -> Unit,
     onContactClick: () -> Unit,
     onLinkedInClick: () -> Unit,
     usageBars: List<ChartBarData>,
@@ -193,11 +196,13 @@ private fun SettingsBottomSheetContent(
                     walkingSpeedKmh = state.walkingSpeedKmh,
                     tripLengthMinStops = state.tripLengthMinStops,
                     agentMaxIterations = state.agentMaxIterations,
+                    suggestedPlacesCount = state.suggestedPlacesCount,
                     onVehicleCountChange = onVehicleCountChange,
                     onSearchRadiusChange = onSearchRadiusChange,
                     onWalkingSpeedChange = onWalkingSpeedChange,
                     onTripLengthChange = onTripLengthChange,
                     onAgentMaxIterationsChange = onAgentMaxIterationsChange,
+                    onSuggestedPlacesCountChange = onSuggestedPlacesCountChange,
                 )
 
                 Spacer(modifier = Modifier.height(Dimensions.paddingLarge))
@@ -475,11 +480,13 @@ private fun MapControlsSection(
     walkingSpeedKmh: Float,
     tripLengthMinStops: Int,
     agentMaxIterations: Int,
+    suggestedPlacesCount: Int,
     onVehicleCountChange: (Int) -> Unit,
     onSearchRadiusChange: (Float) -> Unit,
     onWalkingSpeedChange: (Float) -> Unit,
     onTripLengthChange: (Int) -> Unit,
     onAgentMaxIterationsChange: (Int) -> Unit,
+    onSuggestedPlacesCountChange: (Int) -> Unit,
 ) {
     val sliderColors = SliderDefaults.colors(
         thumbColor = MaterialTheme.colorScheme.onSurface,
@@ -591,6 +598,21 @@ private fun MapControlsSection(
                 }
             }
         }
+
+        Text(
+            text = stringResource(R.string.settings_suggested_places_count, suggestedPlacesCount),
+            style = MaterialTheme.typography.bodyMedium,
+            color = MaterialTheme.colorScheme.onSurface,
+        )
+
+        Slider(
+            value = suggestedPlacesCount.toFloat(),
+            onValueChange = { onSuggestedPlacesCountChange(it.roundToInt()) },
+            valueRange = SettingsState.MIN_SUGGESTED_PLACES_COUNT.toFloat()..SettingsState.MAX_SUGGESTED_PLACES_COUNT.toFloat(),
+            steps = (SettingsState.MAX_SUGGESTED_PLACES_COUNT - SettingsState.MIN_SUGGESTED_PLACES_COUNT) /
+                SettingsState.SUGGESTED_PLACES_COUNT_STEP - 1,
+            colors = sliderColors,
+        )
     }
 }
 
@@ -657,6 +679,7 @@ private fun SettingsContentLightPreview() {
                 onFirebaseSyncChange = {},
                 onImageQualityChange = {},
                 onAgentMaxIterationsChange = {},
+                onSuggestedPlacesCountChange = {},
                 onContactClick = {},
                 onLinkedInClick = {},
                 usageBars = sampleUsageBars,
@@ -686,6 +709,7 @@ private fun SettingsContentDarkPreview() {
                 onFirebaseSyncChange = {},
                 onImageQualityChange = {},
                 onAgentMaxIterationsChange = {},
+                onSuggestedPlacesCountChange = {},
                 onContactClick = {},
                 onLinkedInClick = {},
                 usageBars = sampleUsageBars,

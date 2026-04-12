@@ -15,8 +15,10 @@ const val TRIP_LENGTH_MIN_STOPS_DEFAULT = 4
 const val FIREBASE_SYNC_ENABLED_DEFAULT = true
 const val IMAGE_QUALITY_JPEG_DEFAULT = 77
 const val AGENT_MAX_ITERATIONS_DEFAULT = 10
+const val SUGGESTED_PLACES_COUNT_DEFAULT = 10
 
 @Singleton
+@Suppress("TooManyFunctions")
 class AppSettingsHolder @Inject constructor() {
 
     private val _showTokenUsage = MutableStateFlow(false)
@@ -48,6 +50,9 @@ class AppSettingsHolder @Inject constructor() {
 
     private val _agentMaxIterations = MutableStateFlow(AGENT_MAX_ITERATIONS_DEFAULT)
     val agentMaxIterations: StateFlow<Int> = _agentMaxIterations.asStateFlow()
+
+    private val _suggestedPlacesCount = MutableStateFlow(SUGGESTED_PLACES_COUNT_DEFAULT)
+    val suggestedPlacesCount: StateFlow<Int> = _suggestedPlacesCount.asStateFlow()
 
     fun updateShowTokenUsage(enabled: Boolean) {
         _showTokenUsage.value = enabled
@@ -87,5 +92,9 @@ class AppSettingsHolder @Inject constructor() {
 
     fun updateAgentMaxIterations(maxIterations: Int) {
         _agentMaxIterations.value = maxIterations
+    }
+
+    fun updateSuggestedPlacesCount(count: Int) {
+        _suggestedPlacesCount.value = count
     }
 }

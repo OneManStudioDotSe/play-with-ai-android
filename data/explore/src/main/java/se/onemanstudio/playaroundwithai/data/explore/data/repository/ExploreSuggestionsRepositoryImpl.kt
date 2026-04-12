@@ -9,6 +9,7 @@ import java.io.IOException
 import se.onemanstudio.playaroundwithai.data.explore.data.dto.SuggestedPlacesResponseDto
 import se.onemanstudio.playaroundwithai.data.explore.data.dto.toSuggestedPlaceDomain
 import se.onemanstudio.playaroundwithai.data.explore.domain.model.SuggestedPlace
+import se.onemanstudio.playaroundwithai.core.config.settings.AppSettingsHolder
 import se.onemanstudio.playaroundwithai.core.network.api.GeminiApiService
 import se.onemanstudio.playaroundwithai.core.network.dto.Content
 import se.onemanstudio.playaroundwithai.core.network.dto.GeminiRequest
@@ -26,11 +27,12 @@ class ExploreSuggestionsRepositoryImpl @Inject constructor(
     private val apiService: GeminiApiService,
     private val gson: Gson,
     private val tokenUsageTracker: TokenUsageTracker,
+    private val appSettingsHolder: AppSettingsHolder,
 ) : ExploreSuggestionsRepository {
 
     override suspend fun getSuggestedPlaces(latitude: Double, longitude: Double): Result<List<SuggestedPlace>> = withContext(Dispatchers.IO) {
         try {
-            val prompt = ExplorePrompts.suggestedPlacesPrompt(latitude, longitude)
+            val prompt = ExplorePrompts.suggestedPlacesPrompt(latitude, longitude, appSettingsHolder.suggestedPlacesCount.value)
             val parts = listOf(Part(text = prompt))
             val request = GeminiRequest(contents = listOf(Content(parts = parts)))
             val response = apiService.generateContent(request)
