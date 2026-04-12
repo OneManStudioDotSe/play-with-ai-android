@@ -71,6 +71,7 @@ fun SettingsBottomSheet(
     onTripLengthChange: (Int) -> Unit,
     onFirebaseSyncChange: (Boolean) -> Unit,
     onImageQualityChange: (Int) -> Unit,
+    onAgentMaxIterationsChange: (Int) -> Unit,
     onContactClick: () -> Unit,
     onLinkedInClick: () -> Unit = {},
     usageBars: List<ChartBarData> = emptyList(),
@@ -96,6 +97,7 @@ fun SettingsBottomSheet(
             onTripLengthChange = onTripLengthChange,
             onFirebaseSyncChange = onFirebaseSyncChange,
             onImageQualityChange = onImageQualityChange,
+            onAgentMaxIterationsChange = onAgentMaxIterationsChange,
             onContactClick = onContactClick,
             onLinkedInClick = onLinkedInClick,
             usageBars = usageBars,
@@ -119,6 +121,7 @@ private fun SettingsBottomSheetContent(
     onTripLengthChange: (Int) -> Unit,
     onFirebaseSyncChange: (Boolean) -> Unit,
     onImageQualityChange: (Int) -> Unit,
+    onAgentMaxIterationsChange: (Int) -> Unit,
     onContactClick: () -> Unit,
     onLinkedInClick: () -> Unit,
     usageBars: List<ChartBarData>,
@@ -189,10 +192,12 @@ private fun SettingsBottomSheetContent(
                     searchRadiusKm = state.searchRadiusKm,
                     walkingSpeedKmh = state.walkingSpeedKmh,
                     tripLengthMinStops = state.tripLengthMinStops,
+                    agentMaxIterations = state.agentMaxIterations,
                     onVehicleCountChange = onVehicleCountChange,
                     onSearchRadiusChange = onSearchRadiusChange,
                     onWalkingSpeedChange = onWalkingSpeedChange,
                     onTripLengthChange = onTripLengthChange,
+                    onAgentMaxIterationsChange = onAgentMaxIterationsChange,
                 )
 
                 Spacer(modifier = Modifier.height(Dimensions.paddingLarge))
@@ -469,10 +474,12 @@ private fun MapControlsSection(
     searchRadiusKm: Float,
     walkingSpeedKmh: Float,
     tripLengthMinStops: Int,
+    agentMaxIterations: Int,
     onVehicleCountChange: (Int) -> Unit,
     onSearchRadiusChange: (Float) -> Unit,
     onWalkingSpeedChange: (Float) -> Unit,
     onTripLengthChange: (Int) -> Unit,
+    onAgentMaxIterationsChange: (Int) -> Unit,
 ) {
     val sliderColors = SliderDefaults.colors(
         thumbColor = MaterialTheme.colorScheme.onSurface,
@@ -560,6 +567,30 @@ private fun MapControlsSection(
                 }
             }
         }
+
+        val agentIterationOptions = listOf(
+            SettingsState.AGENT_ITERATIONS_QUICK to stringResource(R.string.settings_agent_iterations_quick),
+            SettingsState.AGENT_ITERATIONS_STANDARD to stringResource(R.string.settings_agent_iterations_standard),
+            SettingsState.AGENT_ITERATIONS_THOROUGH to stringResource(R.string.settings_agent_iterations_thorough),
+        )
+
+        Text(
+            text = stringResource(R.string.settings_agent_iterations),
+            style = MaterialTheme.typography.bodyMedium,
+            color = MaterialTheme.colorScheme.onSurface,
+        )
+
+        SingleChoiceSegmentedButtonRow(modifier = Modifier.fillMaxWidth()) {
+            agentIterationOptions.forEachIndexed { index, (iterations, label) ->
+                SegmentedButton(
+                    shape = SegmentedButtonDefaults.itemShape(index = index, count = agentIterationOptions.size),
+                    selected = agentMaxIterations == iterations,
+                    onClick = { onAgentMaxIterationsChange(iterations) },
+                ) {
+                    Text(text = label, style = MaterialTheme.typography.labelMedium)
+                }
+            }
+        }
     }
 }
 
@@ -625,6 +656,7 @@ private fun SettingsContentLightPreview() {
                 onTripLengthChange = {},
                 onFirebaseSyncChange = {},
                 onImageQualityChange = {},
+                onAgentMaxIterationsChange = {},
                 onContactClick = {},
                 onLinkedInClick = {},
                 usageBars = sampleUsageBars,
@@ -653,6 +685,7 @@ private fun SettingsContentDarkPreview() {
                 onTripLengthChange = {},
                 onFirebaseSyncChange = {},
                 onImageQualityChange = {},
+                onAgentMaxIterationsChange = {},
                 onContactClick = {},
                 onLinkedInClick = {},
                 usageBars = sampleUsageBars,

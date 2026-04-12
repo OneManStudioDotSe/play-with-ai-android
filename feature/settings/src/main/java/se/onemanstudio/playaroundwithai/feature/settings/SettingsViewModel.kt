@@ -37,6 +37,7 @@ class SettingsViewModel @Inject constructor(
     val tripLengthMinStops: StateFlow<Int> = appSettingsHolder.tripLengthMinStops
     val firebaseSyncEnabled: StateFlow<Boolean> = appSettingsHolder.firebaseSyncEnabled
     val imageQualityJpeg: StateFlow<Int> = appSettingsHolder.imageQualityJpeg
+    val agentMaxIterations: StateFlow<Int> = appSettingsHolder.agentMaxIterations
 
     private val _selectedDayIndex = MutableStateFlow<Int?>(null)
     val selectedDayIndex: StateFlow<Int?> = _selectedDayIndex
@@ -87,5 +88,9 @@ class SettingsViewModel @Inject constructor(
 
     fun onImageQualityChange(quality: Int) {
         appSettingsHolder.updateImageQualityJpeg(quality)
+    }
+
+    fun onAgentMaxIterationsChange(maxIterations: Int) {
+        appSettingsHolder.updateAgentMaxIterations(maxIterations)
     }
 }

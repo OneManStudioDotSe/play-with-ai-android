@@ -16,6 +16,7 @@ data class SettingsState(
     val tripLengthMinStops: Int = TRIP_LENGTH_STANDARD_MIN,
     val firebaseSyncEnabled: Boolean = true,
     val imageQualityJpeg: Int = IMAGE_QUALITY_MEDIUM,
+    val agentMaxIterations: Int = AGENT_ITERATIONS_STANDARD,
 ) {
     companion object {
         const val MIN_VEHICLE_COUNT = 10
@@ -41,5 +42,8 @@ data class SettingsState(
         const val IMAGE_QUALITY_LOW = 40
         const val IMAGE_QUALITY_MEDIUM = 77
         const val IMAGE_QUALITY_HIGH = 93
+        const val AGENT_ITERATIONS_QUICK = 5
+        const val AGENT_ITERATIONS_STANDARD = 10
+        const val AGENT_ITERATIONS_THOROUGH = 15
     }
 }

@@ -20,7 +20,7 @@ internal object PlanPrompts {
 
         When you have finished planning, respond with a text summary of the itinerary.
         The summary should describe each stop in order, mention what makes each place special, and include practical tips.
-        Do NOT call more than 5 tools total.
+        Do NOT call more than %d tools total.
     """
 
     private const val SEARCH_PLACES_PROMPT = """
@@ -40,8 +40,8 @@ internal object PlanPrompts {
         Use realistic coordinates near the specified location. Return ONLY valid JSON, no markdown, no backticks, no extra text.
     """
 
-    fun tripPlannerSystemPrompt(latitude: Double, longitude: Double, minStops: Int, maxStops: Int): String =
-        TRIP_PLANNER_SYSTEM_PROMPT.trimIndent().format(minStops, maxStops, minStops, maxStops, latitude, longitude)
+    fun tripPlannerSystemPrompt(latitude: Double, longitude: Double, minStops: Int, maxStops: Int, maxTools: Int): String =
+        TRIP_PLANNER_SYSTEM_PROMPT.trimIndent().format(minStops, maxStops, minStops, maxStops, latitude, longitude, maxTools)
 
     fun searchPlacesPrompt(query: String, latitude: Double, longitude: Double, count: Int): String =
         SEARCH_PLACES_PROMPT.trimIndent().format(count, query, latitude, longitude)

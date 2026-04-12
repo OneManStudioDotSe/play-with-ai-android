@@ -30,7 +30,6 @@ import timber.log.Timber
 import javax.inject.Inject
 import javax.inject.Singleton
 
-private const val MAX_ITERATIONS = 10
 private const val DEFAULT_COUNT = 5
 private const val ERROR_BODY_PREVIEW_LENGTH = 200
 private const val LOG_TAG = "TripPlanner"
@@ -41,10 +40,22 @@ private const val TRIP_LENGTH_STANDARD_MAX = 6
 private const val TRIP_LENGTH_EXTENDED_MIN = 7
 private const val TRIP_LENGTH_EXTENDED_MAX = 10
 
+private const val AGENT_ITERATIONS_QUICK = 5
+private const val AGENT_ITERATIONS_THOROUGH = 15
+private const val AGENT_TOOL_BUDGET_QUICK = 3
+private const val AGENT_TOOL_BUDGET_STANDARD = 5
+private const val AGENT_TOOL_BUDGET_THOROUGH = 8
+
 private fun tripLengthMaxStops(minStops: Int): Int = when (minStops) {
     TRIP_LENGTH_QUICK_MIN -> TRIP_LENGTH_QUICK_MAX
     TRIP_LENGTH_EXTENDED_MIN -> TRIP_LENGTH_EXTENDED_MAX
     else -> TRIP_LENGTH_STANDARD_MAX
+}
+
+private fun toolBudgetForIterations(maxIterations: Int): Int = when (maxIterations) {
+    AGENT_ITERATIONS_QUICK -> AGENT_TOOL_BUDGET_QUICK
+    AGENT_ITERATIONS_THOROUGH -> AGENT_TOOL_BUDGET_THOROUGH
+    else -> AGENT_TOOL_BUDGET_STANDARD
 }
 
 private object ToolNames {
@@ -70,13 +81,15 @@ class TripPlannerRepositoryImpl @Inject constructor(
 
             val minStops = appSettingsHolder.tripLengthMinStops.value
             val maxStops = tripLengthMaxStops(minStops)
-            val systemPrompt = PlanPrompts.tripPlannerSystemPrompt(latitude, longitude, minStops, maxStops)
+            val maxIterations = appSettingsHolder.agentMaxIterations.value
+            val maxTools = toolBudgetForIterations(maxIterations)
+            val systemPrompt = PlanPrompts.tripPlannerSystemPrompt(latitude, longitude, minStops, maxStops, maxTools)
             history.add(Content(role = "user", parts = listOf(Part(text = "$systemPrompt\n\nUser request: $goal"))))
 
             emit(PlanEvent.Thinking("Understanding your request..."))
 
             var iterations = 0
-            while (iterations < MAX_ITERATIONS) {
+            while (iterations < maxIterations) {
                 currentCoroutineContext().ensureActive()
                 iterations++
 

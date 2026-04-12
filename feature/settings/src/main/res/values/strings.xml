@@ -38,4 +38,8 @@
     <string name="settings_image_quality_low">Low</string>
     <string name="settings_image_quality_medium">Medium</string>
     <string name="settings_image_quality_high">High</string>
+    <string name="settings_agent_iterations">Agent depth</string>
+    <string name="settings_agent_iterations_quick">Quick · 5</string>
+    <string name="settings_agent_iterations_standard">Standard · 10</string>
+    <string name="settings_agent_iterations_thorough">Thorough · 15</string>
 </resources>

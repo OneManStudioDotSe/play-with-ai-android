@@ -14,6 +14,7 @@ const val TOKEN_TRACKING_ENABLED_DEFAULT = true
 const val TRIP_LENGTH_MIN_STOPS_DEFAULT = 4
 const val FIREBASE_SYNC_ENABLED_DEFAULT = true
 const val IMAGE_QUALITY_JPEG_DEFAULT = 77
+const val AGENT_MAX_ITERATIONS_DEFAULT = 10
 
 @Singleton
 class AppSettingsHolder @Inject constructor() {
@@ -44,6 +45,9 @@ class AppSettingsHolder @Inject constructor() {
 
     private val _imageQualityJpeg = MutableStateFlow(IMAGE_QUALITY_JPEG_DEFAULT)
     val imageQualityJpeg: StateFlow<Int> = _imageQualityJpeg.asStateFlow()
+
+    private val _agentMaxIterations = MutableStateFlow(AGENT_MAX_ITERATIONS_DEFAULT)
+    val agentMaxIterations: StateFlow<Int> = _agentMaxIterations.asStateFlow()
 
     fun updateShowTokenUsage(enabled: Boolean) {
         _showTokenUsage.value = enabled
@@ -79,5 +83,9 @@ class AppSettingsHolder @Inject constructor() {
 
     fun updateImageQualityJpeg(quality: Int) {
         _imageQualityJpeg.value = quality
+    }
+
+    fun updateAgentMaxIterations(maxIterations: Int) {
+        _agentMaxIterations.value = maxIterations
     }
 }

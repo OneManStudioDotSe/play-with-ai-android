@@ -37,7 +37,7 @@ The model name (`gemini-3-flash-preview`) is hardcoded in the Retrofit `@POST` a
 (e.g., Flash, Pro, Flash Preview) at runtime via a dynamic base path or query param.
 
 
-### 7. Agent Max Iterations
+### 7. [COMPLETED] Agent Max Iterations
 The agentic trip planner loop hard-stops at 10 iterations and the system prompt says "no more than 5 tools." Let users
 pick a budget (quick 5 / standard 10 / thorough 15) to trade speed for depth.
 
