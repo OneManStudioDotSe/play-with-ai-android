@@ -36,6 +36,7 @@ class SettingsViewModel @Inject constructor(
     val tokenTrackingEnabled: StateFlow<Boolean> = appSettingsHolder.tokenTrackingEnabled
     val tripLengthMinStops: StateFlow<Int> = appSettingsHolder.tripLengthMinStops
     val firebaseSyncEnabled: StateFlow<Boolean> = appSettingsHolder.firebaseSyncEnabled
+    val imageQualityJpeg: StateFlow<Int> = appSettingsHolder.imageQualityJpeg
 
     private val _selectedDayIndex = MutableStateFlow<Int?>(null)
     val selectedDayIndex: StateFlow<Int?> = _selectedDayIndex
@@ -82,5 +83,9 @@ class SettingsViewModel @Inject constructor(
 
     fun onFirebaseSyncChange(enabled: Boolean) {
         appSettingsHolder.updateFirebaseSyncEnabled(enabled)
+    }
+
+    fun onImageQualityChange(quality: Int) {
+        appSettingsHolder.updateImageQualityJpeg(quality)
     }
 }

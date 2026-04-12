@@ -70,6 +70,7 @@ fun SettingsBottomSheet(
     onTokenTrackingChange: (Boolean) -> Unit,
     onTripLengthChange: (Int) -> Unit,
     onFirebaseSyncChange: (Boolean) -> Unit,
+    onImageQualityChange: (Int) -> Unit,
     onContactClick: () -> Unit,
     onLinkedInClick: () -> Unit = {},
     usageBars: List<ChartBarData> = emptyList(),
@@ -94,6 +95,7 @@ fun SettingsBottomSheet(
             onTokenTrackingChange = onTokenTrackingChange,
             onTripLengthChange = onTripLengthChange,
             onFirebaseSyncChange = onFirebaseSyncChange,
+            onImageQualityChange = onImageQualityChange,
             onContactClick = onContactClick,
             onLinkedInClick = onLinkedInClick,
             usageBars = usageBars,
@@ -116,6 +118,7 @@ private fun SettingsBottomSheetContent(
     onTokenTrackingChange: (Boolean) -> Unit,
     onTripLengthChange: (Int) -> Unit,
     onFirebaseSyncChange: (Boolean) -> Unit,
+    onImageQualityChange: (Int) -> Unit,
     onContactClick: () -> Unit,
     onLinkedInClick: () -> Unit,
     usageBars: List<ChartBarData>,
@@ -168,12 +171,14 @@ private fun SettingsBottomSheetContent(
                     networkTimeoutSeconds = state.networkTimeoutSeconds,
                     tokenTrackingEnabled = state.tokenTrackingEnabled,
                     firebaseSyncEnabled = state.firebaseSyncEnabled,
+                    imageQualityJpeg = state.imageQualityJpeg,
                     onShowTokenUsageChange = onShowTokenUsageChange,
                     onTypewriterDelayChange = onTypewriterDelayChange,
                     onHapticFeedbackChange = onHapticFeedbackChange,
                     onNetworkTimeoutChange = onNetworkTimeoutChange,
                     onTokenTrackingChange = onTokenTrackingChange,
                     onFirebaseSyncChange = onFirebaseSyncChange,
+                    onImageQualityChange = onImageQualityChange,
                 )
 
                 Spacer(modifier = Modifier.height(Dimensions.paddingLarge))
@@ -230,12 +235,14 @@ private fun GeneralSection(
     networkTimeoutSeconds: Int,
     tokenTrackingEnabled: Boolean,
     firebaseSyncEnabled: Boolean,
+    imageQualityJpeg: Int,
     onShowTokenUsageChange: (Boolean) -> Unit,
     onTypewriterDelayChange: (Long) -> Unit,
     onHapticFeedbackChange: (Boolean) -> Unit,
     onNetworkTimeoutChange: (Int) -> Unit,
     onTokenTrackingChange: (Boolean) -> Unit,
     onFirebaseSyncChange: (Boolean) -> Unit,
+    onImageQualityChange: (Int) -> Unit,
 ) {
     val speedOptions = listOf(
         SettingsState.TYPEWRITER_DELAY_INSTANT to stringResource(R.string.settings_typewriter_speed_instant),
@@ -352,6 +359,30 @@ private fun GeneralSection(
                 inactiveTrackColor = MaterialTheme.colorScheme.onSurface.copy(alpha = Alphas.extraLow),
             ),
         )
+
+        val imageQualityOptions = listOf(
+            SettingsState.IMAGE_QUALITY_LOW to stringResource(R.string.settings_image_quality_low),
+            SettingsState.IMAGE_QUALITY_MEDIUM to stringResource(R.string.settings_image_quality_medium),
+            SettingsState.IMAGE_QUALITY_HIGH to stringResource(R.string.settings_image_quality_high),
+        )
+
+        Text(
+            text = stringResource(R.string.settings_image_quality),
+            style = MaterialTheme.typography.bodyMedium,
+            color = MaterialTheme.colorScheme.onSurface,
+        )
+
+        SingleChoiceSegmentedButtonRow(modifier = Modifier.fillMaxWidth()) {
+            imageQualityOptions.forEachIndexed { index, (quality, label) ->
+                SegmentedButton(
+                    shape = SegmentedButtonDefaults.itemShape(index = index, count = imageQualityOptions.size),
+                    selected = imageQualityJpeg == quality,
+                    onClick = { onImageQualityChange(quality) },
+                ) {
+                    Text(text = label, style = MaterialTheme.typography.labelMedium)
+                }
+            }
+        }
     }
 }
 
@@ -593,6 +624,7 @@ private fun SettingsContentLightPreview() {
                 onTokenTrackingChange = {},
                 onTripLengthChange = {},
                 onFirebaseSyncChange = {},
+                onImageQualityChange = {},
                 onContactClick = {},
                 onLinkedInClick = {},
                 usageBars = sampleUsageBars,
@@ -620,6 +652,7 @@ private fun SettingsContentDarkPreview() {
                 onTokenTrackingChange = {},
                 onTripLengthChange = {},
                 onFirebaseSyncChange = {},
+                onImageQualityChange = {},
                 onContactClick = {},
                 onLinkedInClick = {},
                 usageBars = sampleUsageBars,

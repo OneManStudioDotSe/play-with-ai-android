@@ -34,4 +34,8 @@
     <string name="settings_trip_length_standard">Standard · 4–6</string>
     <string name="settings_trip_length_extended">Extended · 7–10</string>
     <string name="settings_firebase_sync">Cloud sync</string>
+    <string name="settings_image_quality">Image quality</string>
+    <string name="settings_image_quality_low">Low</string>
+    <string name="settings_image_quality_medium">Medium</string>
+    <string name="settings_image_quality_high">High</string>
 </resources>

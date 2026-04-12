@@ -42,7 +42,7 @@ The agentic trip planner loop hard-stops at 10 iterations and the system prompt 
 pick a budget (quick 5 / standard 10 / thorough 15) to trade speed for depth.
 
 
-### 8. Image Quality / Compression
+### 8. [COMPLETED] Image Quality / Compression
 Images sent to Gemini are scaled to max 768 px and compressed at JPEG quality 77. A slider or presets (low / medium / high) 
 would let users balance upload size vs. detail.
 

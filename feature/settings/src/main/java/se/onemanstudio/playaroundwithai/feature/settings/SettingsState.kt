@@ -15,6 +15,7 @@ data class SettingsState(
     val tokenTrackingEnabled: Boolean = true,
     val tripLengthMinStops: Int = TRIP_LENGTH_STANDARD_MIN,
     val firebaseSyncEnabled: Boolean = true,
+    val imageQualityJpeg: Int = IMAGE_QUALITY_MEDIUM,
 ) {
     companion object {
         const val MIN_VEHICLE_COUNT = 10
@@ -37,5 +38,8 @@ data class SettingsState(
         const val TRIP_LENGTH_QUICK_MIN = 2
         const val TRIP_LENGTH_STANDARD_MIN = 4
         const val TRIP_LENGTH_EXTENDED_MIN = 7
+        const val IMAGE_QUALITY_LOW = 40
+        const val IMAGE_QUALITY_MEDIUM = 77
+        const val IMAGE_QUALITY_HIGH = 93
     }
 }

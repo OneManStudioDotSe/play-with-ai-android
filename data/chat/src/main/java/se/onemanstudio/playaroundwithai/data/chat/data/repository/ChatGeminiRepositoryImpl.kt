@@ -9,6 +9,7 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 import retrofit2.HttpException
 import java.io.IOException
+import se.onemanstudio.playaroundwithai.core.config.settings.AppSettingsHolder
 import se.onemanstudio.playaroundwithai.core.network.api.GeminiApiService
 import se.onemanstudio.playaroundwithai.core.network.dto.Content
 import se.onemanstudio.playaroundwithai.core.network.dto.GeminiRequest
@@ -23,14 +24,25 @@ import java.io.ByteArrayOutputStream
 import javax.inject.Inject
 import javax.inject.Singleton
 
-private const val MAX_IMAGE_SIZE = 768
 private const val MAX_SUGGESTIONS = 3
-private const val COMPRESSION_QUALITY = 77
+
+private const val IMAGE_QUALITY_LOW = 40
+private const val IMAGE_QUALITY_HIGH = 93
+private const val IMAGE_SIZE_LOW = 512
+private const val IMAGE_SIZE_MEDIUM = 768
+private const val IMAGE_SIZE_HIGH = 1024
+
+private fun imageSizeForQuality(quality: Int): Int = when (quality) {
+    IMAGE_QUALITY_LOW -> IMAGE_SIZE_LOW
+    IMAGE_QUALITY_HIGH -> IMAGE_SIZE_HIGH
+    else -> IMAGE_SIZE_MEDIUM
+}
 
 @Singleton
 class ChatGeminiRepositoryImpl @Inject constructor(
     private val apiService: GeminiApiService,
     private val tokenUsageTracker: TokenUsageTracker,
+    private val appSettingsHolder: AppSettingsHolder,
 ) : ChatGeminiRepository {
 
     override suspend fun getAiResponse(
@@ -58,8 +70,9 @@ class ChatGeminiRepositoryImpl @Inject constructor(
 
             imageBytes?.let {
                 val inlineData = withContext(Dispatchers.Default) {
+                    val quality = appSettingsHolder.imageQualityJpeg.value
                     val bitmap = BitmapFactory.decodeByteArray(it, 0, it.size)
-                    bitmap.toImageData()
+                    bitmap.toImageData(quality, imageSizeForQuality(quality))
                 }
                 parts.add(Part(inlineData = inlineData))
             }
@@ -120,10 +133,10 @@ class ChatGeminiRepositoryImpl @Inject constructor(
         return instruction
     }
 
-    private fun Bitmap.toImageData(): ImageData {
-        val scaledBitmap = this.scaleBitmap(MAX_IMAGE_SIZE)
+    private fun Bitmap.toImageData(quality: Int, maxDimension: Int): ImageData {
+        val scaledBitmap = this.scaleBitmap(maxDimension)
         val byteArrayOutputStream = ByteArrayOutputStream()
-        scaledBitmap.compress(Bitmap.CompressFormat.JPEG, COMPRESSION_QUALITY, byteArrayOutputStream)
+        scaledBitmap.compress(Bitmap.CompressFormat.JPEG, quality, byteArrayOutputStream)
         val byteArray = byteArrayOutputStream.toByteArray()
         val base64String = Base64.encodeToString(byteArray, Base64.NO_WRAP)
         return ImageData(mimeType = "image/jpeg", data = base64String)
