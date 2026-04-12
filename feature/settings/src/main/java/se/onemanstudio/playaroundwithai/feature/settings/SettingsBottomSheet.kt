@@ -47,6 +47,7 @@ import se.onemanstudio.playaroundwithai.core.ui.theme.vividPink
 import se.onemanstudio.playaroundwithai.core.ui.theme.zestyLime
 import se.onemanstudio.playaroundwithai.core.ui.sofa.ChartBarData
 import se.onemanstudio.playaroundwithai.core.ui.sofa.MarkerText
+import se.onemanstudio.playaroundwithai.core.ui.sofa.NeoBrutalButton
 import se.onemanstudio.playaroundwithai.core.ui.sofa.NeoBrutalCard
 import se.onemanstudio.playaroundwithai.core.ui.sofa.UsageChart
 import kotlin.math.roundToInt
@@ -74,6 +75,7 @@ fun SettingsBottomSheet(
     onAgentMaxIterationsChange: (Int) -> Unit,
     onSuggestedPlacesCountChange: (Int) -> Unit,
     onMaxSelectablePointsChange: (Int) -> Unit,
+    onResetToDefaults: () -> Unit,
     onContactClick: () -> Unit,
     onLinkedInClick: () -> Unit = {},
     usageBars: List<ChartBarData> = emptyList(),
@@ -102,6 +104,7 @@ fun SettingsBottomSheet(
             onAgentMaxIterationsChange = onAgentMaxIterationsChange,
             onSuggestedPlacesCountChange = onSuggestedPlacesCountChange,
             onMaxSelectablePointsChange = onMaxSelectablePointsChange,
+            onResetToDefaults = onResetToDefaults,
             onContactClick = onContactClick,
             onLinkedInClick = onLinkedInClick,
             usageBars = usageBars,
@@ -128,6 +131,7 @@ private fun SettingsBottomSheetContent(
     onAgentMaxIterationsChange: (Int) -> Unit,
     onSuggestedPlacesCountChange: (Int) -> Unit,
     onMaxSelectablePointsChange: (Int) -> Unit,
+    onResetToDefaults: () -> Unit,
     onContactClick: () -> Unit,
     onLinkedInClick: () -> Unit,
     usageBars: List<ChartBarData>,
@@ -224,6 +228,7 @@ private fun SettingsBottomSheetContent(
                 // About section
                 AboutSection(
                     appVersion = state.appVersion,
+                    onResetToDefaults = onResetToDefaults,
                     onContactClick = onContactClick,
                     onLinkedInClick = onLinkedInClick,
                 )
@@ -260,10 +265,18 @@ private fun GeneralSection(
     onImageQualityChange: (Int) -> Unit,
 ) {
     val speedOptions = listOf(
-        SettingsState.TYPEWRITER_DELAY_INSTANT to stringResource(R.string.settings_typewriter_speed_instant),
-        SettingsState.TYPEWRITER_DELAY_FAST to stringResource(R.string.settings_typewriter_speed_fast),
-        SettingsState.TYPEWRITER_DELAY_NORMAL to stringResource(R.string.settings_typewriter_speed_normal),
-        SettingsState.TYPEWRITER_DELAY_SLOW to stringResource(R.string.settings_typewriter_speed_slow),
+        Triple(SettingsState.TYPEWRITER_DELAY_INSTANT,
+            stringResource(R.string.settings_typewriter_speed_instant),
+            stringResource(R.string.settings_typewriter_speed_instant_value)),
+        Triple(SettingsState.TYPEWRITER_DELAY_FAST,
+            stringResource(R.string.settings_typewriter_speed_fast),
+            stringResource(R.string.settings_typewriter_speed_fast_value)),
+        Triple(SettingsState.TYPEWRITER_DELAY_NORMAL,
+            stringResource(R.string.settings_typewriter_speed_normal),
+            stringResource(R.string.settings_typewriter_speed_normal_value)),
+        Triple(SettingsState.TYPEWRITER_DELAY_SLOW,
+            stringResource(R.string.settings_typewriter_speed_slow),
+            stringResource(R.string.settings_typewriter_speed_slow_value)),
     )
 
     Column(verticalArrangement = Arrangement.spacedBy(Dimensions.paddingMedium)) {
@@ -294,13 +307,13 @@ private fun GeneralSection(
             verticalAlignment = Alignment.CenterVertically,
         ) {
             Text(
-                text = stringResource(R.string.settings_haptic_feedback),
+                text = stringResource(R.string.settings_token_tracking),
                 style = MaterialTheme.typography.bodyLarge,
                 color = MaterialTheme.colorScheme.onSurface,
             )
             Switch(
-                checked = hapticFeedbackEnabled,
-                onCheckedChange = onHapticFeedbackChange,
+                checked = tokenTrackingEnabled,
+                onCheckedChange = onTokenTrackingChange,
             )
         }
 
@@ -310,13 +323,13 @@ private fun GeneralSection(
             verticalAlignment = Alignment.CenterVertically,
         ) {
             Text(
-                text = stringResource(R.string.settings_token_tracking),
+                text = stringResource(R.string.settings_haptic_feedback),
                 style = MaterialTheme.typography.bodyLarge,
                 color = MaterialTheme.colorScheme.onSurface,
             )
             Switch(
-                checked = tokenTrackingEnabled,
-                onCheckedChange = onTokenTrackingChange,
+                checked = hapticFeedbackEnabled,
+                onCheckedChange = onHapticFeedbackChange,
             )
         }
 
@@ -345,13 +358,16 @@ private fun GeneralSection(
         )
 
         SingleChoiceSegmentedButtonRow(modifier = Modifier.fillMaxWidth()) {
-            speedOptions.forEachIndexed { index, (delay, label) ->
+            speedOptions.forEachIndexed { index, (delay, label, sublabel) ->
                 SegmentedButton(
                     shape = SegmentedButtonDefaults.itemShape(index = index, count = speedOptions.size),
                     selected = typewriterDelayMs == delay,
                     onClick = { onTypewriterDelayChange(delay) },
                 ) {
-                    Text(text = label, style = MaterialTheme.typography.labelMedium)
+                    Column(horizontalAlignment = Alignment.CenterHorizontally) {
+                        Text(text = label, style = MaterialTheme.typography.labelSmall)
+                        Text(text = sublabel, style = MaterialTheme.typography.labelSmall)
+                    }
                 }
             }
         }
@@ -376,9 +392,15 @@ private fun GeneralSection(
         )
 
         val imageQualityOptions = listOf(
-            SettingsState.IMAGE_QUALITY_LOW to stringResource(R.string.settings_image_quality_low),
-            SettingsState.IMAGE_QUALITY_MEDIUM to stringResource(R.string.settings_image_quality_medium),
-            SettingsState.IMAGE_QUALITY_HIGH to stringResource(R.string.settings_image_quality_high),
+            Triple(SettingsState.IMAGE_QUALITY_LOW,
+                stringResource(R.string.settings_image_quality_low),
+                stringResource(R.string.settings_image_quality_low_value)),
+            Triple(SettingsState.IMAGE_QUALITY_MEDIUM,
+                stringResource(R.string.settings_image_quality_medium),
+                stringResource(R.string.settings_image_quality_medium_value)),
+            Triple(SettingsState.IMAGE_QUALITY_HIGH,
+                stringResource(R.string.settings_image_quality_high),
+                stringResource(R.string.settings_image_quality_high_value)),
         )
 
         Text(
@@ -388,13 +410,16 @@ private fun GeneralSection(
         )
 
         SingleChoiceSegmentedButtonRow(modifier = Modifier.fillMaxWidth()) {
-            imageQualityOptions.forEachIndexed { index, (quality, label) ->
+            imageQualityOptions.forEachIndexed { index, (quality, label, sublabel) ->
                 SegmentedButton(
                     shape = SegmentedButtonDefaults.itemShape(index = index, count = imageQualityOptions.size),
                     selected = imageQualityJpeg == quality,
                     onClick = { onImageQualityChange(quality) },
                 ) {
-                    Text(text = label, style = MaterialTheme.typography.labelMedium)
+                    Column(horizontalAlignment = Alignment.CenterHorizontally) {
+                        Text(text = label, style = MaterialTheme.typography.labelSmall)
+                        Text(text = sublabel, style = MaterialTheme.typography.labelSmall)
+                    }
                 }
             }
         }
@@ -404,6 +429,7 @@ private fun GeneralSection(
 @Composable
 private fun AboutSection(
     appVersion: String,
+    onResetToDefaults: () -> Unit,
     onContactClick: () -> Unit,
     onLinkedInClick: () -> Unit,
 ) {
@@ -474,6 +500,14 @@ private fun AboutSection(
                 color = MaterialTheme.colorScheme.primary,
             )
         }
+
+        Spacer(modifier = Modifier.height(Dimensions.paddingSmall))
+
+        NeoBrutalButton(
+            text = stringResource(R.string.settings_reset_defaults),
+            onClick = onResetToDefaults,
+            modifier = Modifier.fillMaxWidth(),
+        )
     }
 }
 
@@ -502,9 +536,15 @@ private fun MapControlsSection(
     )
 
     val speedOptions = listOf(
-        SettingsState.WALKING_SPEED_SLOW to stringResource(R.string.settings_walking_speed_slow),
-        SettingsState.WALKING_SPEED_NORMAL to stringResource(R.string.settings_walking_speed_normal),
-        SettingsState.WALKING_SPEED_FAST to stringResource(R.string.settings_walking_speed_fast),
+        Triple(SettingsState.WALKING_SPEED_SLOW,
+            stringResource(R.string.settings_walking_speed_slow),
+            stringResource(R.string.settings_walking_speed_slow_value)),
+        Triple(SettingsState.WALKING_SPEED_NORMAL,
+            stringResource(R.string.settings_walking_speed_normal),
+            stringResource(R.string.settings_walking_speed_normal_value)),
+        Triple(SettingsState.WALKING_SPEED_FAST,
+            stringResource(R.string.settings_walking_speed_fast),
+            stringResource(R.string.settings_walking_speed_fast_value)),
     )
 
     Column(verticalArrangement = Arrangement.spacedBy(Dimensions.paddingMedium)) {
@@ -547,21 +587,30 @@ private fun MapControlsSection(
         )
 
         SingleChoiceSegmentedButtonRow(modifier = Modifier.fillMaxWidth()) {
-            speedOptions.forEachIndexed { index, (speed, label) ->
+            speedOptions.forEachIndexed { index, (speed, label, sublabel) ->
                 SegmentedButton(
                     shape = SegmentedButtonDefaults.itemShape(index = index, count = speedOptions.size),
                     selected = walkingSpeedKmh == speed,
                     onClick = { onWalkingSpeedChange(speed) },
                 ) {
-                    Text(text = label, style = MaterialTheme.typography.labelMedium)
+                    Column(horizontalAlignment = Alignment.CenterHorizontally) {
+                        Text(text = label, style = MaterialTheme.typography.labelSmall)
+                        Text(text = sublabel, style = MaterialTheme.typography.labelSmall)
+                    }
                 }
             }
         }
 
         val tripLengthOptions = listOf(
-            SettingsState.TRIP_LENGTH_QUICK_MIN to stringResource(R.string.settings_trip_length_quick),
-            SettingsState.TRIP_LENGTH_STANDARD_MIN to stringResource(R.string.settings_trip_length_standard),
-            SettingsState.TRIP_LENGTH_EXTENDED_MIN to stringResource(R.string.settings_trip_length_extended),
+            Triple(SettingsState.TRIP_LENGTH_QUICK_MIN,
+                stringResource(R.string.settings_trip_length_quick),
+                stringResource(R.string.settings_trip_length_quick_value)),
+            Triple(SettingsState.TRIP_LENGTH_STANDARD_MIN,
+                stringResource(R.string.settings_trip_length_standard),
+                stringResource(R.string.settings_trip_length_standard_value)),
+            Triple(SettingsState.TRIP_LENGTH_EXTENDED_MIN,
+                stringResource(R.string.settings_trip_length_extended),
+                stringResource(R.string.settings_trip_length_extended_value)),
         )
 
         Text(
@@ -571,21 +620,30 @@ private fun MapControlsSection(
         )
 
         SingleChoiceSegmentedButtonRow(modifier = Modifier.fillMaxWidth()) {
-            tripLengthOptions.forEachIndexed { index, (minStops, label) ->
+            tripLengthOptions.forEachIndexed { index, (minStops, label, sublabel) ->
                 SegmentedButton(
                     shape = SegmentedButtonDefaults.itemShape(index = index, count = tripLengthOptions.size),
                     selected = tripLengthMinStops == minStops,
                     onClick = { onTripLengthChange(minStops) },
                 ) {
-                    Text(text = label, style = MaterialTheme.typography.labelMedium)
+                    Column(horizontalAlignment = Alignment.CenterHorizontally) {
+                        Text(text = label, style = MaterialTheme.typography.labelSmall)
+                        Text(text = sublabel, style = MaterialTheme.typography.labelSmall)
+                    }
                 }
             }
         }
 
         val agentIterationOptions = listOf(
-            SettingsState.AGENT_ITERATIONS_QUICK to stringResource(R.string.settings_agent_iterations_quick),
-            SettingsState.AGENT_ITERATIONS_STANDARD to stringResource(R.string.settings_agent_iterations_standard),
-            SettingsState.AGENT_ITERATIONS_THOROUGH to stringResource(R.string.settings_agent_iterations_thorough),
+            Triple(SettingsState.AGENT_ITERATIONS_QUICK,
+                stringResource(R.string.settings_agent_iterations_quick),
+                stringResource(R.string.settings_agent_iterations_quick_value)),
+            Triple(SettingsState.AGENT_ITERATIONS_STANDARD,
+                stringResource(R.string.settings_agent_iterations_standard),
+                stringResource(R.string.settings_agent_iterations_standard_value)),
+            Triple(SettingsState.AGENT_ITERATIONS_THOROUGH,
+                stringResource(R.string.settings_agent_iterations_thorough),
+                stringResource(R.string.settings_agent_iterations_thorough_value)),
         )
 
         Text(
@@ -595,13 +653,16 @@ private fun MapControlsSection(
         )
 
         SingleChoiceSegmentedButtonRow(modifier = Modifier.fillMaxWidth()) {
-            agentIterationOptions.forEachIndexed { index, (iterations, label) ->
+            agentIterationOptions.forEachIndexed { index, (iterations, label, sublabel) ->
                 SegmentedButton(
                     shape = SegmentedButtonDefaults.itemShape(index = index, count = agentIterationOptions.size),
                     selected = agentMaxIterations == iterations,
                     onClick = { onAgentMaxIterationsChange(iterations) },
                 ) {
-                    Text(text = label, style = MaterialTheme.typography.labelMedium)
+                    Column(horizontalAlignment = Alignment.CenterHorizontally) {
+                        Text(text = label, style = MaterialTheme.typography.labelSmall)
+                        Text(text = sublabel, style = MaterialTheme.typography.labelSmall)
+                    }
                 }
             }
         }
@@ -702,6 +763,7 @@ private fun SettingsContentLightPreview() {
                 onAgentMaxIterationsChange = {},
                 onSuggestedPlacesCountChange = {},
                 onMaxSelectablePointsChange = {},
+                onResetToDefaults = {},
                 onContactClick = {},
                 onLinkedInClick = {},
                 usageBars = sampleUsageBars,
@@ -733,6 +795,7 @@ private fun SettingsContentDarkPreview() {
                 onAgentMaxIterationsChange = {},
                 onSuggestedPlacesCountChange = {},
                 onMaxSelectablePointsChange = {},
+                onResetToDefaults = {},
                 onContactClick = {},
                 onLinkedInClick = {},
                 usageBars = sampleUsageBars,

@@ -103,4 +103,21 @@ class SettingsViewModel @Inject constructor(
     fun onMaxSelectablePointsChange(max: Int) {
         exploreSettingsHolder.updateMaxSelectablePoints(max)
     }
+
+    fun onResetToDefaults() {
+        appSettingsHolder.updateShowTokenUsage(false)
+        appSettingsHolder.updateWalkingSpeedKmh(SettingsState.WALKING_SPEED_NORMAL)
+        appSettingsHolder.updateTypewriterDelayMs(SettingsState.TYPEWRITER_DELAY_NORMAL)
+        appSettingsHolder.updateHapticFeedbackEnabled(true)
+        appSettingsHolder.updateNetworkTimeoutSeconds(SettingsState.DEFAULT_NETWORK_TIMEOUT_SECONDS)
+        appSettingsHolder.updateTokenTrackingEnabled(true)
+        appSettingsHolder.updateTripLengthMinStops(SettingsState.TRIP_LENGTH_STANDARD_MIN)
+        appSettingsHolder.updateFirebaseSyncEnabled(true)
+        appSettingsHolder.updateImageQualityJpeg(SettingsState.IMAGE_QUALITY_MEDIUM)
+        appSettingsHolder.updateAgentMaxIterations(SettingsState.AGENT_ITERATIONS_STANDARD)
+        appSettingsHolder.updateSuggestedPlacesCount(SettingsState.DEFAULT_SUGGESTED_PLACES_COUNT)
+        exploreSettingsHolder.updateVehicleCount(SettingsState.DEFAULT_VEHICLE_COUNT)
+        exploreSettingsHolder.updateSearchRadiusKm(SettingsState.DEFAULT_SEARCH_RADIUS_KM)
+        exploreSettingsHolder.updateMaxSelectablePoints(SettingsState.DEFAULT_MAX_SELECTABLE_POINTS)
+    }
 }

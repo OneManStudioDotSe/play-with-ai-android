@@ -80,6 +80,7 @@ fun SettingsBottomSheetContainer(
         onAgentMaxIterationsChange = { viewModel.onAgentMaxIterationsChange(it) },
         onSuggestedPlacesCountChange = { viewModel.onSuggestedPlacesCountChange(it) },
         onMaxSelectablePointsChange = { viewModel.onMaxSelectablePointsChange(it) },
+        onResetToDefaults = { viewModel.onResetToDefaults() },
         onContactClick = {
             try {
                 val intent = Intent(Intent.ACTION_SENDTO).apply {
