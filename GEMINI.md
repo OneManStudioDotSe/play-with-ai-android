@@ -28,7 +28,7 @@ Dependency flow: `feature → data → core`.
 ## 🧭 Symbol Mapping & Navigation
 Quick reference for prompt definitions and logic ownership:
 
-- **Chat**: `ChatPrompts.kt` (`:data:chat`), `ChatGeminiRepositoryImpl.kt`.
+- **Chat**: `ChatPrompts.kt` (`:data:chat`) — conversation starters & analysis instructions. `AiPersona.kt` (`:core:config`) — persona system prompts (user-selectable in Settings). `ChatGeminiRepositoryImpl.kt`.
 - **Dream**: `DreamPrompts.kt` (`:data:dream`), `DreamGeminiRepositoryImpl.kt`.
 - **Plan (Agent)**: `PlanPrompts.kt` (`:data:plan`), `TripPlannerRepositoryImpl.kt`.
 - **Explore**: `ExplorePrompts.kt` (`:data:explore`), `ExploreGeminiRepositoryImpl.kt`.
@@ -60,10 +60,10 @@ Common logic used across AI features for spatial reasoning:
 ---
 
 ## 🤖 Gemini API Integration Patterns
-This project uses **`gemini-3-flash-preview`** for most tasks and **`gemini-2.5-flash-image`** for painting.
+Both models are **user-configurable** via Settings. Defaults: `gemini-3-flash-preview` (text/chat/plan/explore) and `gemini-2.5-flash-image` (dream image generation). The model name is injected into each API call via Retrofit `@Path` from `AppSettingsHolder`.
 
 ### 1. Simple & Multimodal (Chat)
-- Images: Scaled to 768px, JPEG 77%, Base64 `inlineData`.
+- Images: Scaled to 512/768/1024 px and JPEG-compressed at 40/77/93% — both configurable in Settings via the Image Quality setting. Base64 `inlineData`.
 - Documents: Text extracted and appended to prompt context.
 
 ### 2. Structured JSON (Dream, Explore)
@@ -106,3 +106,5 @@ This project uses **`gemini-3-flash-preview`** for most tasks and **`gemini-2.5-
 - **Java/Kotlin**: JDK 17, Kotlin 2.3.10, AGP 9.1.0.
 - **Compose**: Target SDK 36. Use `@Immutable` for all UI state classes.
 - **Firebase**: Sync is non-blocking; app must degrade gracefully if auth/sync fails.
+- **Model selection**: `AppSettingsHolder` holds the active model names in memory (no persistence across cold starts). Persona system prompts are properties of `AiPersona` enum values in `:core:config` — both `data:chat` and `feature:settings` depend on `:core:config`, so no extra Gradle dependencies are needed.
+- **Settings architecture**: `:feature:settings` depends only on `:core` modules (no `:data:*` dependency) — `AppSettingsHolder` and `ExploreSettingsHolder` are the shared state boundary.

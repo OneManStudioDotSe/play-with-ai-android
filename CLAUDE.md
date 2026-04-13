@@ -2,7 +2,7 @@
 
 ## Project Overview
 
-**Play With AI** is a showcase Android app demonstrating modern Android engineering. It features AI chat (Gemini API), smart prompt history with Firebase sync, a map exploration feature for finding/filtering vehicles and calculating optimal routes, and an AI agent trip planner using Gemini function calling. Built with Jetpack Compose, Clean Architecture, and Hilt DI.
+**Play With AI** is a showcase Android app demonstrating modern Android engineering. It features AI chat (Gemini API) with five selectable personas, smart prompt history with Firebase sync, a map exploration feature for finding/filtering vehicles and calculating optimal routes, an AI agent trip planner using Gemini function calling, a dream interpreter with AI image generation, and a deep Settings panel with 17 runtime-configurable parameters (AI persona, model selection, image quality, walking speed, agent depth, and more). Built with Jetpack Compose, Clean Architecture, and Hilt DI.
 
 ## Build & Run
 
@@ -32,7 +32,7 @@
 :app                    → Application entry point, navigation, main activity
 :core:network           → OkHttp, Retrofit, Gson, GeminiApiService, DTOs (incl. function calling & thinking support), interceptor, NetworkMonitor, shared geo utils (haversineKm, coordinate constants in Algorithms.kt)
 :core:auth              → Firebase Auth, AuthRepository (interface+impl), auth use cases, AuthSession
-:core:config            → ApiKeyAvailability, AppSettingsHolder, ExploreSettingsHolder, ConfigurationModule, qualifier annotations (@GeminiApiKey, @MapsApiKey, @BaseUrl, @LoggingLevel, @AppVersion), BuildConfig
+:core:config            → ApiKeyAvailability, AppSettingsHolder, ExploreSettingsHolder, AiPersona (enum with system prompts), ConfigurationModule, qualifier annotations (@GeminiApiKey, @MapsApiKey, @BaseUrl, @LoggingLevel, @AppVersion), BuildConfig
 :core:database          → Shared Room DB (v6): AppDatabase, all entities (PromptEntity, DreamEntity, TokenUsageEntity), all DAOs, SyncStatusConverter, DatabaseModule
 :core:tracking          → TokenUsageTracker + TokenUsageQuery interfaces, TokenUsageTrackerImpl, GetWeeklyTokenUsageUseCase, TrackingModule
 :core:theme             → Design system: colors, typography ("SoFa" design language)
@@ -61,6 +61,19 @@ Exception: `:feature:showcase` is presentation-only (no ViewModel, no data layer
 - **Use cases** — one class per operation (e.g., `AskAiUseCase`, `GetExploreItemsUseCase`)
 - **Hilt** for dependency injection across all modules
 - **Compose** with `@Immutable` UI states and `PersistentList`/`PersistentSet` for stability
+
+## Settings Architecture
+
+`:feature:settings` exposes a bottom sheet with 17 runtime-configurable parameters. State lives in two in-memory `MutableStateFlow` singletons in `:core:config`:
+
+- **`AppSettingsHolder`** — app-wide settings: AI persona (`AiPersona` enum), Gemini text model, Gemini image model, typewriter delay, haptic feedback, walking speed, network timeout, token tracking enabled, show token usage, trip length, Firebase sync enabled, image quality, agent max iterations, suggested places count.
+- **`ExploreSettingsHolder`** — map settings: vehicle count, search radius, max selectable route points.
+
+**Key design decisions:**
+- Settings are in-memory only (no DataStore / SharedPreferences) — they reset on cold start by design. This keeps the implementation simple and avoids async reads at startup.
+- `AiPersona` is an enum with a `systemPrompt: String` property — the enum is in `:core:config` so both `data:chat` (injects the prompt into API calls) and `feature:settings` (renders the picker) can read it without any new Gradle dependency.
+- `:feature:settings` depends **only** on `:core:*` modules. It has no dependency on any `:data:*` module. This is enforced by the module's `build.gradle.kts`.
+- The Gemini model name is injected into every `GeminiApiService` call via Retrofit `@Path` — `appSettingsHolder.geminiTextModel.value` / `appSettingsHolder.geminiImageModel.value`.
 
 ### Patterns & Conventions
 
@@ -229,9 +242,9 @@ service cloud.firestore {
 │  │  GeminiApiService │  │  AuthRepository  │  │  ApiKeyAvailability           │  │
 │  │  DTOs (text +     │  │  AuthSession     │  │  AppSettingsHolder            │  │
 │  │  function calling)│  │  Firebase Auth   │  │  ExploreSettingsHolder        │  │
-│  │  NetworkMonitor   │  │  Auth Use Cases  │  │  @GeminiApiKey, @AppVersion   │  │
-│  │  Interceptor      │  │                  │  │  @BaseUrl, @LoggingLevel      │  │
-│  │                   │  │                  │  │  ConfigurationModule          │  │
+│  │  NetworkMonitor   │  │  Auth Use Cases  │  │  AiPersona (enum+prompts)     │  │
+│  │  Interceptor      │  │                  │  │  @GeminiApiKey, @AppVersion   │  │
+│  │                   │  │                  │  │  @BaseUrl, @LoggingLevel      │  │
 │  └──────────────────┘  └──────────────────┘  └───────────────────────────────┘  │
 │                                                                                  │
 │  ┌──────────────────┐  ┌──────────────────┐  ┌───────────────────────────────┐  │
@@ -252,8 +265,9 @@ service cloud.firestore {
 │  ┌──────────────────────────────────────────────────────────────────────────┐    │
 │  │  Google Gemini API                                                       │    │
 │  │  Base: https://generativelanguage.googleapis.com/                        │    │
-│  │  Text: POST /v1beta/models/gemini-3-flash-preview:generateContent        │    │
-│  │  Image: POST /v1beta/models/gemini-2.5-flash-image:generateContent       │    │
+│  │  Text:  POST /v1beta/models/{model}:generateContent  (@Path, runtime)   │    │
+│  │  Image: POST /v1beta/models/{model}:generateContent  (@Path, runtime)   │    │
+│  │  Defaults: gemini-3-flash-preview (text), gemini-2.5-flash-image (img)  │    │
 │  │  Auth: ?key={GEMINI_API_KEY} (query param via AuthenticationInterceptor) │    │
 │  │                                                                          │    │
 │  │  Standard:  { contents: [{ parts: [{ text, inlineData? }] }] }           │    │
@@ -295,7 +309,7 @@ User types prompt (+ optional image/document)
   ▼
 ChatViewModel.generateContent(prompt, imageUri?, documentUri?)
   │
-  ├─ Image? → withContext(Default) → decode → scale to max 768px → JPEG @ 77% → Base64
+  ├─ Image? → withContext(Default) → decode → scale to configured max px (512/768/1024) → JPEG @ configured quality (40/77/93%) → Base64
   ├─ Document? → withContext(IO) → read text content
   │
   ▼
@@ -306,18 +320,19 @@ AskAiUseCase.invoke(prompt, imageBytes?, fileText?, analysisType?)
   ▼
 ChatGeminiRepositoryImpl.getAiResponse()
   │
-  ├─ Prepend system instruction from ChatPrompts ("AI Overlord" persona, max 42 words)
+  ├─ Prepend persona system prompt from appSettingsHolder.aiPersona.value.systemPrompt
+  │   (AiPersona enum in :core:config — AI_OVERLORD / FLATTERER / GRUMPY_OLD_MAN / KAREN / CAVEMAN)
   ├─ Append file content if present
   ├─ Build GeminiRequest { contents: [{ parts: [{ text }, { inlineData? }] }] }
   │
   ▼
-POST https://generativelanguage.googleapis.com/v1beta/models/gemini-3-flash-preview:generateContent
-     ?key={GEMINI_API_KEY}
+POST https://generativelanguage.googleapis.com/v1beta/models/{geminiTextModel}:generateContent
+     ?key={GEMINI_API_KEY}   (model read from appSettingsHolder.geminiTextModel.value)
   │
   ├── OkHttp Pipeline:
   │    AuthenticationInterceptor → adds ?key= param
   │    HttpLoggingInterceptor   → BODY (debug) / NONE (release)
-  │    Timeouts: 30s connect/read/write
+  │    Timeouts: configurable 15–120 s via Settings (default 30 s)
   │
   ▼
 GeminiResponse → candidates[0].content.parts[0].text → Result<String>

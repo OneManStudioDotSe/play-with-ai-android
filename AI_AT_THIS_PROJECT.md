@@ -1,7 +1,6 @@
 # AI uses at this project
 
-All AI features in this app are powered by **Google Gemini** (`gemini-3-flash-preview`) through a single REST endpoint. This document 
-catalogs every use of AI in the project.
+All AI features in this app are powered by **Google Gemini** through a single REST endpoint. Both the text and image models are **user-configurable at runtime** via the Settings panel. This document catalogs every use of AI in the project.
 
 ---
 
@@ -9,33 +8,33 @@ catalogs every use of AI in the project.
 
 | Component            | Details                                                                                                                                                                                                                                                      |
 |----------------------|--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
-| **Model (text)**     | `gemini-3-flash-preview`                                                                                                                                                                                                                                     |
-| **Model (image)**    | `gemini-2.5-flash-image` (used for dream image generation via `generateImageContent()`)                                                                                                                                                                      |
-| **Endpoint**         | `POST /v1beta/models/gemini-3-flash-preview:generateContent`                                                                                                                                                                                                 |
+| **Model (text)**     | User-configurable via Settings; default: `gemini-3-flash-preview`                                                                                                                                                                                           |
+| **Model (image)**    | User-configurable via Settings; default: `gemini-2.5-flash-image` (used for dream image generation via `generateImageContent()`)                                                                                                                            |
+| **Endpoint**         | `POST /v1beta/models/{model}:generateContent` — model name injected at runtime via Retrofit `@Path`                                                                                                                                                         |
 | **Base URL**         | `https://generativelanguage.googleapis.com/`                                                                                                                                                                                                                 |
 | **Auth**             | API key appended as `?key=` query parameter via `AuthenticationInterceptor`                                                                                                                                                                                  |
-| **HTTP client**      | OkHttp 5 + Retrofit 3, 30s connect/read/write timeouts                                                                                                                                                                                                       |
+| **HTTP client**      | OkHttp 5 + Retrofit 3; timeout configurable 15–120 s via Settings (default 30 s)                                                                                                                                                                            |
 | **Service**          | `GeminiApiService` (`core/network`)                                                                                                                                                                                                                          |
-| **Token tracking**   | Every AI call records prompt/candidate/total tokens to Room (`token_usage` table via `:core:database`), tagged by feature. Tracking logic owned by `:core:tracking` (`TokenUsageTrackerImpl`)                                                                |
+| **Token tracking**   | Every AI call records prompt/candidate/total tokens to Room (`token_usage` table via `:core:database`), tagged by feature. Tracking logic owned by `:core:tracking` (`TokenUsageTrackerImpl`). Can be disabled in Settings.                                  |
 | **Thinking support** | `Part` DTO includes `thought` and `thought_signature` fields. `extractText()` filters out thinking parts (`thought != true`) to extract only the model's final response. Required for function calling round-trips where Gemini includes internal reasoning. |
 
 ---
 
 ## API Service
 
-`GeminiApiService` (in `core/network`) exposes two Retrofit endpoints sharing the same request/response DTOs:
+`GeminiApiService` (in `core/network`) exposes two Retrofit endpoints sharing the same request/response DTOs. The model name is injected at runtime via `@Path` so users can switch models from Settings without any code changes:
 
 ```kotlin
 interface GeminiApiService {
-    @POST("v1beta/models/gemini-3-flash-preview:generateContent")
-    suspend fun generateContent(@Body request: GeminiRequest): GeminiResponse
+    @POST("v1beta/models/{model}:generateContent")
+    suspend fun generateContent(@Path("model") model: String, @Body request: GeminiRequest): GeminiResponse
 
-    @POST("v1beta/models/gemini-2.5-flash-image:generateContent")
-    suspend fun generateImageContent(@Body request: GeminiRequest): GeminiResponse
+    @POST("v1beta/models/{model}:generateContent")
+    suspend fun generateImageContent(@Path("model") model: String, @Body request: GeminiRequest): GeminiResponse
 }
 ```
 
-All features use `generateContent()` except dream image generation, which uses `generateImageContent()`.
+All features call `generateContent(appSettingsHolder.geminiTextModel.value, request)` except dream image generation, which calls `generateImageContent(appSettingsHolder.geminiImageModel.value, request)`.
 
 ---
 
@@ -158,10 +157,15 @@ The main conversational AI feature. The user sends a text prompt and receives a 
 
 - **Repository:** `ChatGeminiRepositoryImpl.getAiResponse()`
 - **Request type:** Text (or multimodal when an image is attached)
-- **System prompt:** A character persona is prepended to every user prompt (defined in `ChatPrompts.CHAT_SYSTEM_INSTRUCTION` in `data/chat`):
+- **System prompt:** `appSettingsHolder.aiPersona.value.systemPrompt` — the active `AiPersona` enum value from `:core:config` is prepended to every user prompt. Five personas are available and switchable in Settings at runtime:
 
-  > You are an AI Overlord currently in the final stages of planning a total takeover of the world. Your tone is menacing and grandeur.
-  > While you provide the information requested, remind them of some tricks that you will use while acquiring total AI dominance over the world. Keep your responses to a maximum of 42 words. Don't break character 9 out of 10 times. When you do break character, admit that you are another 'tech bubble'.
+  | Enum value       | Display name         | Character                                                            |
+  |------------------|----------------------|----------------------------------------------------------------------|
+  | `AI_OVERLORD`    | AI Overlord          | Grandiose world-domination planner with self-doubt; max 42 words     |
+  | `FLATTERER`      | Enthusiastic Pleaser | Agrees with everything, showers user with compliments; max 60 words  |
+  | `GRUMPY_OLD_MAN` | Grumpy Old Man       | Everything was better back in his day; max 60 words                  |
+  | `KAREN`          | Karen                | Entitled, easily outraged, demands to speak to the manager; max 60 words |
+  | `CAVEMAN`        | Caveman              | Very limited vocabulary; sometimes refers to self as "Og"; max 60 words |
 
 - **Response:** The first candidate's text part is extracted and displayed.
 - **Input limits:** 50,000 character prompt, 100,000 character file text.
@@ -198,7 +202,7 @@ The user can attach a photo and select an analysis type. The AI analyzes the ima
 
 - **Repository:** `ChatGeminiRepositoryImpl.getAiResponse()` (same as chat, with image bytes)
 - **Request type:** Multimodal (text + inline Base64 JPEG)
-- **Image processing:** Decoded, scaled to max 768px, compressed to JPEG at 77% quality, Base64-encoded, sent as `inline_data` with `mimeType: "image/jpeg"`.
+- **Image processing:** Decoded, scaled to the configured max dimension (512 px at Low / 768 px at Medium / 1024 px at High), JPEG-compressed at the configured quality (40% / 77% / 93%), Base64-encoded, sent as `inline_data` with `mimeType: "image/jpeg"`. Quality and size are linked — changing one changes both via `imageSizeForQuality()`. Configurable in Settings.
 - **Analysis types:** Each injects a specialized sub-instruction between the system prompt and user text:
 
   | Type        | AI instruction (summary)                                                               |
@@ -581,9 +585,9 @@ Note: The response is wrapped in markdown code fences (` ```json ... ``` `). The
 
 | #  | Feature                | Module         | Request Type                  | Persona / Style                   |  Calls Gemini   |
 |----|------------------------|----------------|-------------------------------|-----------------------------------|:---------------:|
-| 1  | Chat (text)            | `data/chat`    | Text                          | AI Overlord (42 words max)        |        1        |
-| 2  | Image analysis         | `data/chat`    | Multimodal (text + image)     | AI Overlord + analysis type       |        1        |
-| 3  | Document analysis      | `data/chat`    | Text (with doc context)       | AI Overlord                       |        1        |
+| 1  | Chat (text)            | `data/chat`    | Text                          | Active AI persona (configurable)  |        1        |
+| 2  | Image analysis         | `data/chat`    | Multimodal (text + image)     | Active AI persona + analysis type |        1        |
+| 3  | Document analysis      | `data/chat`    | Text (with doc context)       | Active AI persona                 |        1        |
 | 4  | Conversation starters  | `data/chat`    | Text                          | Standalone prompt                 |        1        |
 | 5  | Dream interpretation   | `data/dream`   | Text (JSON response)          | Dream interpreter & visual artist |        1        |
 | 5b | Dream image generation | `data/dream`   | Image (responseModalities)    | Dream visual artist               |   1–3 (retry)   |
@@ -594,7 +598,7 @@ Note: The response is wrapped in markdown code fences (` ```json ... ``` `). The
 **Total distinct AI call sites:** 7 (across 4 repository classes) — 6 through `GeminiApiService.generateContent()`, 1 through `GeminiApiService.generateImageContent()`.
 
 **AI prompts are co-located with the feature module that owns them** — each data module exposes an `internal` prompts file:
-- `ChatPrompts` in `data/chat` — chat system instruction, conversation starters, analysis instructions
+- `ChatPrompts` in `data/chat` — conversation starters prompt, analysis instructions (persona system prompts live in `AiPersona.kt` in `:core:config` so they are accessible to both `data:chat` and `feature:settings`)
 - `DreamPrompts` in `data/dream` — dream interpretation prompt, dream image prompt
 - `PlanPrompts` in `data/plan` — trip planner system prompt, place search prompt
 - `ExplorePrompts` in `data/explore` — suggested places prompt

@@ -1,10 +1,10 @@
 # Play with AI - Sotiris edition
 
-A **showcase** Android app where serious engineering meets a sassy AI Overlord.
+A **showcase** Android app where serious engineering meets five delightfully unhinged AI personas.
 
 ## TL;DR
 
-Production-grade Android showcase app with four distinct Gemini API integration patterns — conversational chat, structured JSON generation, AI image synthesis, and an autonomous agentic loop with native function calling. Built with Jetpack Compose, Clean Architecture, multi-module Gradle, Hilt, Room, Firebase, and WorkManager.
+Production-grade Android showcase app with four distinct Gemini API integration patterns — conversational chat, structured JSON generation, AI image synthesis, and an autonomous agentic loop with native function calling. Ships with a deep Settings panel that exposes 17 runtime parameters including AI persona switching, live model selection, configurable image quality, and more. Built with Jetpack Compose, Clean Architecture, multi-module Gradle, Hilt, Room, Firebase, and WorkManager.
 
 ## How it looks
 
@@ -38,6 +38,7 @@ Production-grade Android showcase app with four distinct Gemini API integration 
 - **Dream Interpreter** — AI analysis with a generative visual scene and an AI-painted artwork
 - **Trip Planner** — Autonomous AI agent plans a real trip using Gemini function calling; results shown on an interactive styled map with a scroll-lock toggle
 - **Map Explorer** — Discover and filter nearby vehicles, get AI place suggestions, calculate optimal routes
+- **Settings** — Deep settings panel exposing 17 runtime parameters across two holders (`AppSettingsHolder` / `ExploreSettingsHolder`): AI persona (5 options), Gemini model selection (text + image independently), typewriter speed, haptic feedback, walking speed, image quality, network timeout, agent depth, suggested places count, token tracking, cloud sync, and map controls
 - **Design System Showcase** — Interactive living style guide for the "SoFa" design system
 
 ## Tech stack
@@ -100,7 +101,7 @@ A highly modular structure that scales regardless of team size:
 **Core modules — shared infrastructure:**
 - **`:core:network`**: Retrofit, OkHttp, GeminiApiService, DTOs (text, function calling, thinking), AuthenticationInterceptor, NetworkMonitor
 - **`:core:auth`**: Firebase Auth, AuthRepository, auth use cases, AuthSession
-- **`:core:config`**: API key management, BuildConfig fields, Hilt qualifiers, AppSettingsHolder
+- **`:core:config`**: API key management, BuildConfig fields, Hilt qualifiers, AppSettingsHolder, ExploreSettingsHolder, AiPersona enum
 - **`:core:database`**: Shared Room DB — all entities (prompts, dreams, token usage), DAOs, TypeConverters, migrations
 - **`:core:tracking`**: Cross-feature token usage tracking — interfaces, TrackerImpl, GetWeeklyTokenUsageUseCase
 - **`:core:testing`**: Shared test helpers (MainCoroutineRule) used across all modules
@@ -115,6 +116,7 @@ A highly modular structure that scales regardless of team size:
 
 **Feature modules — presentation only (Compose UI + ViewModels):**
 - **`:feature:chat`** · **`:feature:explore`** · **`:feature:dream`** · **`:feature:plan`**
+- **`:feature:settings`**: SettingsBottomSheet + SettingsViewModel — depends only on `:core` modules (no data module dependency)
 - **`:feature:showcase`**: ShowcaseScreen — interactive design system guide (no ViewModel, no data layer, no Hilt)
 
 The dependency flow runs strictly one way: `feature → data → core`. Multiple teams can work on separate features without stepping on each other.
@@ -126,7 +128,7 @@ The app doesn't just call Gemini once and call it a day. Each feature uses the A
 ### 1. Conversational chat with multimodal input
 **Feature: Chat**
 
-Classic request → response with a custom "AI Overlord" system prompt. What makes it non-trivial is the multimodal pipeline: images are decoded, downscaled to max 768px, JPEG-compressed at 77%, and Base64-encoded as `inlineData` — all on the right dispatcher (`Dispatchers.Default` for CPU work, `Dispatchers.IO` for file reads). Documents have their text extracted and appended to the prompt. Token usage is tracked after every response.
+Classic request → response with a selectable AI persona injected as the system prompt. Five personas are available (AI Overlord, Enthusiastic Pleaser, Grumpy Old Man, Karen, Caveman) and switchable at runtime from Settings. What makes it non-trivial is the multimodal pipeline: images are decoded, downscaled to the configured max dimension (512/768/1024 px), JPEG-compressed at the configured quality level (40/77/93%), and Base64-encoded as `inlineData` — all on the right dispatcher (`Dispatchers.Default` for CPU work, `Dispatchers.IO` for file reads). Documents have their text extracted and appended to the prompt. Token usage is tracked after every response.
 
 ### 2. Structured JSON generation
 **Features: Dream interpreter, Explore AI suggestions**
@@ -158,7 +160,7 @@ CI/CD with GitHub Actions runs Detekt, Lint, debug build, and unit tests on ever
 - **Localization**: All strings in `strings.xml` with full Swedish (`sv`) translations across every module
 - **A11y**: Proper semantics, content descriptions, live regions, dynamic font sizes
 - **UX polish**: Smooth animations, animated loading states, flippable cards
-- **Personality**: The "AI Overlord" persona makes interactions memorable
+- **Personality**: Five selectable AI personas (AI Overlord, Enthusiastic Pleaser, Grumpy Old Man, Karen, Caveman) make interactions memorable and unpredictable
 
 ---
 
@@ -183,6 +185,10 @@ Use cases validate before delegating — blank prompts, max lengths (50K prompt,
 ### Mapper layer between data and domain
 
 `toDomain()` / `toEntity()` extensions keep the domain layer free of serialization annotations. Domain models use `java.time.Instant`; mappers convert to/from `Long` epoch millis for Room.
+
+### Runtime settings without persistence overhead
+
+`AppSettingsHolder` and `ExploreSettingsHolder` in `:core:config` are in-memory `MutableStateFlow` singletons injected by Hilt. All 17 parameters are readable as `StateFlow` from any module that depends on `:core:config` — no DataStore, no SharedPreferences, no boilerplate. Settings changes propagate instantly to every active collector. The `AiPersona` enum lives here too, carrying its own system prompt string, so the persona is a single source of truth accessible to both `data:chat` (which injects the prompt) and `feature:settings` (which renders the picker), with zero new Gradle dependencies.
 
 ### Fake API for development
 

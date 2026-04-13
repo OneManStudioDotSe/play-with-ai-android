@@ -54,9 +54,9 @@
 │  │   :core:network      │  │    :core:auth        │  │          :core:config                    │   │
 │  │  GeminiApiService    │  │  AuthRepository      │  │  ApiKeyAvailability                      │   │
 │  │  DTOs (text +        │  │  AuthSession         │  │  AppSettingsHolder                       │   │
-│  │  function calling)   │  │  Firebase Auth       │  │  @GeminiApiKey, @BaseUrl, @LoggingLevel  │   │
-│  │  NetworkMonitor      │  │  Auth Use Cases      │  │  ConfigurationModule                     │   │
-│  │  Interceptor         │  │                      │  │  BuildConfig fields                      │   │
+│  │  function calling)   │  │  Firebase Auth       │  │  ExploreSettingsHolder                   │   │
+│  │  NetworkMonitor      │  │  Auth Use Cases      │  │  AiPersona (enum + system prompts)       │   │
+│  │  Interceptor         │  │                      │  │  @GeminiApiKey, @BaseUrl, @LoggingLevel  │   │
 │  └──────────────────────┘  └──────────────────────┘  └──────────────────────────────────────────┘   │
 │                                                                                                     │
 │  ┌──────────────────────┐  ┌──────────────────────┐  ┌──────────────────────────────────────────┐   │
@@ -79,8 +79,9 @@
 │  ┌──────────────────────────────────────────────────────────────────────────────────────────────┐    │
 │  │  Google Gemini API                                                                           │    │
 │  │  Base: https://generativelanguage.googleapis.com/                                            │    │
-│  │  Text:  POST /v1beta/models/gemini-3-flash-preview:generateContent                           │    │
-│  │  Image: POST /v1beta/models/gemini-2.5-flash-image:generateContent                           │    │
+│  │  Text:  POST /v1beta/models/{model}:generateContent  (model injected via @Path)              │    │
+│  │  Image: POST /v1beta/models/{model}:generateContent  (model injected via @Path)              │    │
+│  │  Both models are user-configurable in Settings (defaults: gemini-3-flash-preview / gemini-2.5-flash-image) │    │
 │  │  Auth: ?key={GEMINI_API_KEY} (query param via AuthenticationInterceptor)                     │    │
 │  │                                                                                              │    │
 │  │  Standard:  { contents: [{ parts: [{ text, inlineData? }] }] }                               │    │
@@ -128,12 +129,12 @@ AskAiUseCase.invoke(prompt, imageBytes?, fileText?, analysisType?)
   ▼
 ChatGeminiRepositoryImpl.getAiResponse()
   │
-  ├─ Prepend system instruction ("AI Overlord" persona, max 42 words)
+  ├─ Prepend persona system prompt from AppSettingsHolder (AiPersona enum, configurable in Settings)
   ├─ Append file content if present
   ├─ Build GeminiRequest { contents: [{ parts: [{ text }, { inlineData? }] }] }
   │
   ▼
-POST https://generativelanguage.googleapis.com/v1beta/models/gemini-3-flash-preview:generateContent
+POST https://generativelanguage.googleapis.com/v1beta/models/{geminiTextModel}:generateContent
      ?key={GEMINI_API_KEY}
   │
   ├── OkHttp Pipeline:
