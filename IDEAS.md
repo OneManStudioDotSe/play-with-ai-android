@@ -32,7 +32,7 @@ Cloud sync to Firestore is always attempted when authenticated. Add an opt-out t
 local-only even when signed in.
 
 
-### 6. Gemini Model Picker
+### 6. [COMPLETED] Gemini Model Picker
 The model name (`gemini-3-flash-preview`) is hardcoded in the Retrofit `@POST` annotation. Allow switching between models
 (e.g., Flash, Pro, Flash Preview) at runtime via a dynamic base path or query param.
 

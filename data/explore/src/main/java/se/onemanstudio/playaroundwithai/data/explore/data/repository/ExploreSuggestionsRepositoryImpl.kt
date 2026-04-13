@@ -35,7 +35,7 @@ class ExploreSuggestionsRepositoryImpl @Inject constructor(
             val prompt = ExplorePrompts.suggestedPlacesPrompt(latitude, longitude, appSettingsHolder.suggestedPlacesCount.value)
             val parts = listOf(Part(text = prompt))
             val request = GeminiRequest(contents = listOf(Content(parts = parts)))
-            val response = apiService.generateContent(request)
+            val response = apiService.generateContent(appSettingsHolder.geminiTextModel.value, request)
             tokenUsageTracker.record("explore", response.usageMetadata)
 
             val rawText = response.extractText() ?: ""

@@ -19,10 +19,15 @@ import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Email
 import androidx.compose.material.icons.automirrored.filled.OpenInNew
+import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.ExposedDropdownMenuBox
+import androidx.compose.material3.ExposedDropdownMenuDefaults
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.ExposedDropdownMenuAnchorType
 import androidx.compose.material3.ModalBottomSheet
+import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.SegmentedButton
 import androidx.compose.material3.SegmentedButtonDefaults
 import androidx.compose.material3.SingleChoiceSegmentedButtonRow
@@ -32,6 +37,10 @@ import androidx.compose.material3.Surface
 import androidx.compose.material3.Switch
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -43,6 +52,7 @@ import se.onemanstudio.playaroundwithai.core.ui.theme.Dimensions
 import se.onemanstudio.playaroundwithai.core.ui.theme.SofaAiTheme
 import se.onemanstudio.playaroundwithai.core.ui.theme.electricBlue
 import se.onemanstudio.playaroundwithai.core.ui.theme.energeticOrange
+import se.onemanstudio.playaroundwithai.core.ui.theme.solarYellow
 import se.onemanstudio.playaroundwithai.core.ui.theme.vividPink
 import se.onemanstudio.playaroundwithai.core.ui.theme.zestyLime
 import se.onemanstudio.playaroundwithai.core.ui.sofa.ChartBarData
@@ -75,6 +85,8 @@ fun SettingsBottomSheet(
     onAgentMaxIterationsChange: (Int) -> Unit,
     onSuggestedPlacesCountChange: (Int) -> Unit,
     onMaxSelectablePointsChange: (Int) -> Unit,
+    onGeminiTextModelChange: (String) -> Unit,
+    onGeminiImageModelChange: (String) -> Unit,
     onResetToDefaults: () -> Unit,
     onContactClick: () -> Unit,
     onLinkedInClick: () -> Unit = {},
@@ -104,6 +116,8 @@ fun SettingsBottomSheet(
             onAgentMaxIterationsChange = onAgentMaxIterationsChange,
             onSuggestedPlacesCountChange = onSuggestedPlacesCountChange,
             onMaxSelectablePointsChange = onMaxSelectablePointsChange,
+            onGeminiTextModelChange = onGeminiTextModelChange,
+            onGeminiImageModelChange = onGeminiImageModelChange,
             onResetToDefaults = onResetToDefaults,
             onContactClick = onContactClick,
             onLinkedInClick = onLinkedInClick,
@@ -131,6 +145,8 @@ private fun SettingsBottomSheetContent(
     onAgentMaxIterationsChange: (Int) -> Unit,
     onSuggestedPlacesCountChange: (Int) -> Unit,
     onMaxSelectablePointsChange: (Int) -> Unit,
+    onGeminiTextModelChange: (String) -> Unit,
+    onGeminiImageModelChange: (String) -> Unit,
     onResetToDefaults: () -> Unit,
     onContactClick: () -> Unit,
     onLinkedInClick: () -> Unit,
@@ -174,7 +190,7 @@ private fun SettingsBottomSheetContent(
                     color = MaterialTheme.colorScheme.onBackground,
                 )
 
-                Spacer(modifier = Modifier.height(Dimensions.paddingLarge))
+                Spacer(modifier = Modifier.height(Dimensions.paddingExtraLarge))
 
                 // General section
                 GeneralSection(
@@ -194,7 +210,17 @@ private fun SettingsBottomSheetContent(
                     onImageQualityChange = onImageQualityChange,
                 )
 
-                Spacer(modifier = Modifier.height(Dimensions.paddingLarge))
+                Spacer(modifier = Modifier.height(Dimensions.paddingExtraLarge))
+
+                // AI Models section
+                AiModelsSection(
+                    geminiTextModel = state.geminiTextModel,
+                    geminiImageModel = state.geminiImageModel,
+                    onGeminiTextModelChange = onGeminiTextModelChange,
+                    onGeminiImageModelChange = onGeminiImageModelChange,
+                )
+
+                Spacer(modifier = Modifier.height(Dimensions.paddingExtraLarge))
 
                 // Map Controls section
                 MapControlsSection(
@@ -214,7 +240,7 @@ private fun SettingsBottomSheetContent(
                     onMaxSelectablePointsChange = onMaxSelectablePointsChange,
                 )
 
-                Spacer(modifier = Modifier.height(Dimensions.paddingLarge))
+                Spacer(modifier = Modifier.height(Dimensions.paddingExtraLarge))
 
                 // Usage Chart section
                 UsageSection(
@@ -223,7 +249,7 @@ private fun SettingsBottomSheetContent(
                     onBarTapped = onBarTapped,
                 )
 
-                Spacer(modifier = Modifier.height(Dimensions.paddingLarge))
+                Spacer(modifier = Modifier.height(Dimensions.paddingExtraLarge))
 
                 // About section
                 AboutSection(
@@ -279,7 +305,7 @@ private fun GeneralSection(
             stringResource(R.string.settings_typewriter_speed_slow_value)),
     )
 
-    Column(verticalArrangement = Arrangement.spacedBy(Dimensions.paddingMedium)) {
+    Column(verticalArrangement = Arrangement.spacedBy(Dimensions.paddingLarge)) {
         SectionHeader(
             text = stringResource(R.string.settings_general),
             lineColor = electricBlue,
@@ -433,7 +459,7 @@ private fun AboutSection(
     onContactClick: () -> Unit,
     onLinkedInClick: () -> Unit,
 ) {
-    Column(verticalArrangement = Arrangement.spacedBy(Dimensions.paddingMedium)) {
+    Column(verticalArrangement = Arrangement.spacedBy(Dimensions.paddingLarge)) {
         SectionHeader(
             text = stringResource(R.string.settings_about),
             lineColor = zestyLime,
@@ -547,7 +573,7 @@ private fun MapControlsSection(
             stringResource(R.string.settings_walking_speed_fast_value)),
     )
 
-    Column(verticalArrangement = Arrangement.spacedBy(Dimensions.paddingMedium)) {
+    Column(verticalArrangement = Arrangement.spacedBy(Dimensions.paddingLarge)) {
         SectionHeader(
             text = stringResource(R.string.settings_map_controls),
             lineColor = vividPink,
@@ -698,13 +724,155 @@ private fun MapControlsSection(
     }
 }
 
+@OptIn(ExperimentalMaterial3Api::class)
+@Composable
+private fun AiModelsSection(
+    geminiTextModel: String,
+    geminiImageModel: String,
+    onGeminiTextModelChange: (String) -> Unit,
+    onGeminiImageModelChange: (String) -> Unit,
+) {
+    val textModelOptions = listOf(
+        Triple(SettingsState.GEMINI_TEXT_MODEL_DEFAULT,
+            stringResource(R.string.settings_gemini_text_flash3_preview_name),
+            stringResource(R.string.settings_gemini_text_flash3_preview_desc)),
+        Triple(SettingsState.GEMINI_TEXT_MODEL_FLASH_25,
+            stringResource(R.string.settings_gemini_text_flash25_name),
+            stringResource(R.string.settings_gemini_text_flash25_desc)),
+        Triple(SettingsState.GEMINI_TEXT_MODEL_FLASH_25_LITE,
+            stringResource(R.string.settings_gemini_text_flash25_lite_name),
+            stringResource(R.string.settings_gemini_text_flash25_lite_desc)),
+        Triple(SettingsState.GEMINI_TEXT_MODEL_PRO_25,
+            stringResource(R.string.settings_gemini_text_pro25_name),
+            stringResource(R.string.settings_gemini_text_pro25_desc)),
+        Triple(SettingsState.GEMINI_TEXT_MODEL_PRO_31_PREVIEW,
+            stringResource(R.string.settings_gemini_text_pro31_preview_name),
+            stringResource(R.string.settings_gemini_text_pro31_preview_desc)),
+    )
+
+    val imageModelOptions = listOf(
+        Triple(SettingsState.GEMINI_IMAGE_MODEL_DEFAULT,
+            stringResource(R.string.settings_gemini_image_flash25_name),
+            stringResource(R.string.settings_gemini_image_flash25_desc)),
+        Triple(SettingsState.GEMINI_IMAGE_MODEL_FLASH_31_PREVIEW,
+            stringResource(R.string.settings_gemini_image_flash31_preview_name),
+            stringResource(R.string.settings_gemini_image_flash31_preview_desc)),
+        Triple(SettingsState.GEMINI_IMAGE_MODEL_PRO_3_PREVIEW,
+            stringResource(R.string.settings_gemini_image_pro3_preview_name),
+            stringResource(R.string.settings_gemini_image_pro3_preview_desc)),
+    )
+
+    var textModelExpanded by remember { mutableStateOf(false) }
+    var imageModelExpanded by remember { mutableStateOf(false) }
+
+    val currentTextModelName = textModelOptions.find { it.first == geminiTextModel }?.second ?: geminiTextModel
+    val currentImageModelName = imageModelOptions.find { it.first == geminiImageModel }?.second ?: geminiImageModel
+
+    Column(verticalArrangement = Arrangement.spacedBy(Dimensions.paddingLarge)) {
+        SectionHeader(
+            text = stringResource(R.string.settings_ai_models),
+            lineColor = solarYellow,
+        )
+
+        Text(
+            text = stringResource(R.string.settings_gemini_text_model),
+            style = MaterialTheme.typography.bodyMedium,
+            color = MaterialTheme.colorScheme.onSurface,
+        )
+
+        ExposedDropdownMenuBox(
+            expanded = textModelExpanded,
+            onExpandedChange = { textModelExpanded = it },
+        ) {
+            OutlinedTextField(
+                value = currentTextModelName,
+                onValueChange = {},
+                readOnly = true,
+                trailingIcon = { ExposedDropdownMenuDefaults.TrailingIcon(expanded = textModelExpanded) },
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .menuAnchor(type = ExposedDropdownMenuAnchorType.PrimaryNotEditable, enabled = true),
+            )
+            ExposedDropdownMenu(
+                expanded = textModelExpanded,
+                onDismissRequest = { textModelExpanded = false },
+            ) {
+                textModelOptions.forEach { (id, name, desc) ->
+                    DropdownMenuItem(
+                        text = {
+                            Column {
+                                Text(text = name, style = MaterialTheme.typography.bodyMedium)
+                                Text(
+                                    text = desc,
+                                    style = MaterialTheme.typography.labelSmall,
+                                    color = MaterialTheme.colorScheme.onSurfaceVariant,
+                                )
+                            }
+                        },
+                        onClick = {
+                            onGeminiTextModelChange(id)
+                            textModelExpanded = false
+                        },
+                        contentPadding = ExposedDropdownMenuDefaults.ItemContentPadding,
+                    )
+                }
+            }
+        }
+
+        Text(
+            text = stringResource(R.string.settings_gemini_image_model),
+            style = MaterialTheme.typography.bodyMedium,
+            color = MaterialTheme.colorScheme.onSurface,
+        )
+
+        ExposedDropdownMenuBox(
+            expanded = imageModelExpanded,
+            onExpandedChange = { imageModelExpanded = it },
+        ) {
+            OutlinedTextField(
+                value = currentImageModelName,
+                onValueChange = {},
+                readOnly = true,
+                trailingIcon = { ExposedDropdownMenuDefaults.TrailingIcon(expanded = imageModelExpanded) },
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .menuAnchor(type = ExposedDropdownMenuAnchorType.PrimaryNotEditable, enabled = true),
+            )
+            ExposedDropdownMenu(
+                expanded = imageModelExpanded,
+                onDismissRequest = { imageModelExpanded = false },
+            ) {
+                imageModelOptions.forEach { (id, name, desc) ->
+                    DropdownMenuItem(
+                        text = {
+                            Column {
+                                Text(text = name, style = MaterialTheme.typography.bodyMedium)
+                                Text(
+                                    text = desc,
+                                    style = MaterialTheme.typography.labelSmall,
+                                    color = MaterialTheme.colorScheme.onSurfaceVariant,
+                                )
+                            }
+                        },
+                        onClick = {
+                            onGeminiImageModelChange(id)
+                            imageModelExpanded = false
+                        },
+                        contentPadding = ExposedDropdownMenuDefaults.ItemContentPadding,
+                    )
+                }
+            }
+        }
+    }
+}
+
 @Composable
 private fun UsageSection(
     usageBars: List<ChartBarData>,
     selectedDayIndex: Int?,
     onBarTapped: (Int) -> Unit,
 ) {
-    Column(verticalArrangement = Arrangement.spacedBy(Dimensions.paddingMedium)) {
+    Column(verticalArrangement = Arrangement.spacedBy(Dimensions.paddingLarge)) {
         SectionHeader(
             text = stringResource(R.string.settings_weekly_usage),
             lineColor = energeticOrange,
@@ -763,6 +931,8 @@ private fun SettingsContentLightPreview() {
                 onAgentMaxIterationsChange = {},
                 onSuggestedPlacesCountChange = {},
                 onMaxSelectablePointsChange = {},
+                onGeminiTextModelChange = {},
+                onGeminiImageModelChange = {},
                 onResetToDefaults = {},
                 onContactClick = {},
                 onLinkedInClick = {},
@@ -795,6 +965,8 @@ private fun SettingsContentDarkPreview() {
                 onAgentMaxIterationsChange = {},
                 onSuggestedPlacesCountChange = {},
                 onMaxSelectablePointsChange = {},
+                onGeminiTextModelChange = {},
+                onGeminiImageModelChange = {},
                 onResetToDefaults = {},
                 onContactClick = {},
                 onLinkedInClick = {},

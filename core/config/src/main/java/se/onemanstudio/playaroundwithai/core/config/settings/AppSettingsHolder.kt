@@ -16,6 +16,8 @@ const val FIREBASE_SYNC_ENABLED_DEFAULT = true
 const val IMAGE_QUALITY_JPEG_DEFAULT = 77
 const val AGENT_MAX_ITERATIONS_DEFAULT = 10
 const val SUGGESTED_PLACES_COUNT_DEFAULT = 10
+const val GEMINI_TEXT_MODEL_DEFAULT = "gemini-3-flash-preview"
+const val GEMINI_IMAGE_MODEL_DEFAULT = "gemini-2.5-flash-image"
 
 @Singleton
 @Suppress("TooManyFunctions")
@@ -53,6 +55,12 @@ class AppSettingsHolder @Inject constructor() {
 
     private val _suggestedPlacesCount = MutableStateFlow(SUGGESTED_PLACES_COUNT_DEFAULT)
     val suggestedPlacesCount: StateFlow<Int> = _suggestedPlacesCount.asStateFlow()
+
+    private val _geminiTextModel = MutableStateFlow(GEMINI_TEXT_MODEL_DEFAULT)
+    val geminiTextModel: StateFlow<String> = _geminiTextModel.asStateFlow()
+
+    private val _geminiImageModel = MutableStateFlow(GEMINI_IMAGE_MODEL_DEFAULT)
+    val geminiImageModel: StateFlow<String> = _geminiImageModel.asStateFlow()
 
     fun updateShowTokenUsage(enabled: Boolean) {
         _showTokenUsage.value = enabled
@@ -96,5 +104,13 @@ class AppSettingsHolder @Inject constructor() {
 
     fun updateSuggestedPlacesCount(count: Int) {
         _suggestedPlacesCount.value = count
+    }
+
+    fun updateGeminiTextModel(model: String) {
+        _geminiTextModel.value = model
+    }
+
+    fun updateGeminiImageModel(model: String) {
+        _geminiImageModel.value = model
     }
 }

@@ -19,6 +19,8 @@ data class SettingsState(
     val agentMaxIterations: Int = AGENT_ITERATIONS_STANDARD,
     val suggestedPlacesCount: Int = DEFAULT_SUGGESTED_PLACES_COUNT,
     val maxSelectablePoints: Int = DEFAULT_MAX_SELECTABLE_POINTS,
+    val geminiTextModel: String = GEMINI_TEXT_MODEL_DEFAULT,
+    val geminiImageModel: String = GEMINI_IMAGE_MODEL_DEFAULT,
 ) {
     companion object {
         const val MIN_VEHICLE_COUNT = 10
@@ -54,5 +56,13 @@ data class SettingsState(
         const val MIN_MAX_SELECTABLE_POINTS = 3
         const val MAX_MAX_SELECTABLE_POINTS = 12
         const val DEFAULT_MAX_SELECTABLE_POINTS = 8
+        const val GEMINI_TEXT_MODEL_DEFAULT = "gemini-3-flash-preview"
+        const val GEMINI_TEXT_MODEL_FLASH_25 = "gemini-2.5-flash"
+        const val GEMINI_TEXT_MODEL_FLASH_25_LITE = "gemini-2.5-flash-lite"
+        const val GEMINI_TEXT_MODEL_PRO_25 = "gemini-2.5-pro"
+        const val GEMINI_TEXT_MODEL_PRO_31_PREVIEW = "gemini-3.1-pro-preview"
+        const val GEMINI_IMAGE_MODEL_DEFAULT = "gemini-2.5-flash-image"
+        const val GEMINI_IMAGE_MODEL_FLASH_31_PREVIEW = "gemini-3.1-flash-image-preview"
+        const val GEMINI_IMAGE_MODEL_PRO_3_PREVIEW = "gemini-3-pro-image-preview"
     }
 }

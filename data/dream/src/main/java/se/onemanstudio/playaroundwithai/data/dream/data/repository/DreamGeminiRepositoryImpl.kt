@@ -5,6 +5,7 @@ import com.google.gson.JsonSyntaxException
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 import retrofit2.HttpException
+import se.onemanstudio.playaroundwithai.core.config.settings.AppSettingsHolder
 import se.onemanstudio.playaroundwithai.core.network.api.GeminiApiService
 import se.onemanstudio.playaroundwithai.core.network.utils.JsonExtractor
 import se.onemanstudio.playaroundwithai.core.network.dto.Content
@@ -35,6 +36,7 @@ class DreamGeminiRepositoryImpl @Inject constructor(
     private val apiService: GeminiApiService,
     private val gson: Gson,
     private val tokenUsageTracker: TokenUsageTracker,
+    private val appSettingsHolder: AppSettingsHolder,
 ) : DreamGeminiRepository {
 
     @Suppress("TooGenericExceptionCaught")
@@ -46,7 +48,7 @@ class DreamGeminiRepositoryImpl @Inject constructor(
             val parts = listOf(Part(text = prompt))
             val request = GeminiRequest(contents = listOf(Content(parts = parts)))
 
-            val response = apiService.generateContent(request)
+            val response = apiService.generateContent(appSettingsHolder.geminiTextModel.value, request)
             tokenUsageTracker.record("dream", response.usageMetadata)
             val text = response.extractText() ?: return@withContext Result.failure(Exception("No response text from Gemini"))
 
@@ -84,7 +86,7 @@ class DreamGeminiRepositoryImpl @Inject constructor(
             var lastText = ""
 
             for (attempt in 1..IMAGE_GENERATION_MAX_RETRIES) {
-                val response = apiService.generateImageContent(request)
+                val response = apiService.generateImageContent(appSettingsHolder.geminiImageModel.value, request)
                 tokenUsageTracker.record("dream_image", response.usageMetadata)
 
                 imageData = response.extractImageData()

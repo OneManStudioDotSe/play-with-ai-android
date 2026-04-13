@@ -40,6 +40,8 @@ class SettingsViewModel @Inject constructor(
     val agentMaxIterations: StateFlow<Int> = appSettingsHolder.agentMaxIterations
     val suggestedPlacesCount: StateFlow<Int> = appSettingsHolder.suggestedPlacesCount
     val maxSelectablePoints: StateFlow<Int> = exploreSettingsHolder.maxSelectablePoints
+    val geminiTextModel: StateFlow<String> = appSettingsHolder.geminiTextModel
+    val geminiImageModel: StateFlow<String> = appSettingsHolder.geminiImageModel
 
     private val _selectedDayIndex = MutableStateFlow<Int?>(null)
     val selectedDayIndex: StateFlow<Int?> = _selectedDayIndex
@@ -104,6 +106,14 @@ class SettingsViewModel @Inject constructor(
         exploreSettingsHolder.updateMaxSelectablePoints(max)
     }
 
+    fun onGeminiTextModelChange(model: String) {
+        appSettingsHolder.updateGeminiTextModel(model)
+    }
+
+    fun onGeminiImageModelChange(model: String) {
+        appSettingsHolder.updateGeminiImageModel(model)
+    }
+
     fun onResetToDefaults() {
         appSettingsHolder.updateShowTokenUsage(false)
         appSettingsHolder.updateWalkingSpeedKmh(SettingsState.WALKING_SPEED_NORMAL)
@@ -119,5 +129,7 @@ class SettingsViewModel @Inject constructor(
         exploreSettingsHolder.updateVehicleCount(SettingsState.DEFAULT_VEHICLE_COUNT)
         exploreSettingsHolder.updateSearchRadiusKm(SettingsState.DEFAULT_SEARCH_RADIUS_KM)
         exploreSettingsHolder.updateMaxSelectablePoints(SettingsState.DEFAULT_MAX_SELECTABLE_POINTS)
+        appSettingsHolder.updateGeminiTextModel(SettingsState.GEMINI_TEXT_MODEL_DEFAULT)
+        appSettingsHolder.updateGeminiImageModel(SettingsState.GEMINI_IMAGE_MODEL_DEFAULT)
     }
 }

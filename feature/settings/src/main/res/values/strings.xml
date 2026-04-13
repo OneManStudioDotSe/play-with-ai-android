@@ -61,4 +61,23 @@
     <string name="settings_suggested_places_count">AI suggested places: %d</string>
     <string name="settings_max_route_points">Max route points: %d</string>
     <string name="settings_reset_defaults">Reset to defaults</string>
+    <string name="settings_ai_models">AI Models</string>
+    <string name="settings_gemini_text_model">Chat &amp; planning model</string>
+    <string name="settings_gemini_image_model">Image generation model</string>
+    <string name="settings_gemini_text_flash3_preview_name">Flash 3 Preview</string>
+    <string name="settings_gemini_text_flash3_preview_desc">Fast &amp; efficient · recommended for most tasks</string>
+    <string name="settings_gemini_text_flash25_name">Flash 2.5</string>
+    <string name="settings_gemini_text_flash25_desc">Stable &amp; balanced · strong everyday performance</string>
+    <string name="settings_gemini_text_flash25_lite_name">Flash 2.5 Lite</string>
+    <string name="settings_gemini_text_flash25_lite_desc">Ultra-light · fastest responses, lowest cost</string>
+    <string name="settings_gemini_text_pro25_name">Pro 2.5</string>
+    <string name="settings_gemini_text_pro25_desc">Most capable · complex reasoning &amp; analysis</string>
+    <string name="settings_gemini_text_pro31_preview_name">Pro 3.1 Preview</string>
+    <string name="settings_gemini_text_pro31_preview_desc">Latest preview · advanced reasoning</string>
+    <string name="settings_gemini_image_flash25_name">Flash 2.5 Image</string>
+    <string name="settings_gemini_image_flash25_desc">Fast generation · current default</string>
+    <string name="settings_gemini_image_flash31_preview_name">Flash 3.1 Image Preview</string>
+    <string name="settings_gemini_image_flash31_preview_desc">Improved detail &amp; accuracy</string>
+    <string name="settings_gemini_image_pro3_preview_name">Pro 3 Image Preview</string>
+    <string name="settings_gemini_image_pro3_preview_desc">Highest quality images</string>
 </resources>

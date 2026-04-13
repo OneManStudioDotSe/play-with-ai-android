@@ -35,6 +35,8 @@ fun SettingsBottomSheetContainer(
     val agentMaxIterations by viewModel.agentMaxIterations.collectAsStateWithLifecycle()
     val suggestedPlacesCount by viewModel.suggestedPlacesCount.collectAsStateWithLifecycle()
     val maxSelectablePoints by viewModel.maxSelectablePoints.collectAsStateWithLifecycle()
+    val geminiTextModel by viewModel.geminiTextModel.collectAsStateWithLifecycle()
+    val geminiImageModel by viewModel.geminiImageModel.collectAsStateWithLifecycle()
     val context = LocalContext.current
     val locale = LocalLocale.current.platformLocale
     val numberFormat = remember(locale) { NumberFormat.getNumberInstance(locale) }
@@ -64,6 +66,8 @@ fun SettingsBottomSheetContainer(
             agentMaxIterations = agentMaxIterations,
             suggestedPlacesCount = suggestedPlacesCount,
             maxSelectablePoints = maxSelectablePoints,
+            geminiTextModel = geminiTextModel,
+            geminiImageModel = geminiImageModel,
         ),
         onDismiss = onDismiss,
         onShowTokenUsageChange = { viewModel.onShowTokenUsageChange(it) },
@@ -80,6 +84,8 @@ fun SettingsBottomSheetContainer(
         onAgentMaxIterationsChange = { viewModel.onAgentMaxIterationsChange(it) },
         onSuggestedPlacesCountChange = { viewModel.onSuggestedPlacesCountChange(it) },
         onMaxSelectablePointsChange = { viewModel.onMaxSelectablePointsChange(it) },
+        onGeminiTextModelChange = { viewModel.onGeminiTextModelChange(it) },
+        onGeminiImageModelChange = { viewModel.onGeminiImageModelChange(it) },
         onResetToDefaults = { viewModel.onResetToDefaults() },
         onContactClick = {
             try {

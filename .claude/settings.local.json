@@ -35,7 +35,13 @@
       "WebFetch(domain:medium.com)",
       "WebFetch(domain:developers.googleblog.com)",
       "Bash(./gradlew assembleDebug:*)",
-      "Bash(sed:*)"
+      "Bash(sed:*)",
+      "Bash(curl -s \"https://ai.google.dev/gemini-api/docs/models\")",
+      "Bash(lynx -stdin -dump)",
+      "Read(//tmp/**)",
+      "Bash(python3 /tmp/extract_models.py)",
+      "Bash(python3 /tmp/extract_full.py)",
+      "Bash(python3 /tmp/parse_models.py)"
     ]
   }
 }

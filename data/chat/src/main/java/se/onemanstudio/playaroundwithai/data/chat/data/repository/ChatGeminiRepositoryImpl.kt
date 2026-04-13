@@ -78,7 +78,7 @@ class ChatGeminiRepositoryImpl @Inject constructor(
             }
 
             val request = GeminiRequest(contents = listOf(Content(parts = parts)))
-            val response = apiService.generateContent(request)
+            val response = apiService.generateContent(appSettingsHolder.geminiTextModel.value, request)
             tokenUsageTracker.record("chat", response.usageMetadata)
             val text = response.extractText() ?: "No response text found."
 
@@ -103,7 +103,7 @@ class ChatGeminiRepositoryImpl @Inject constructor(
 
             val parts = listOf(Part(text = suggestionPrompt))
             val request = GeminiRequest(contents = listOf(Content(parts = parts)))
-            val response = apiService.generateContent(request)
+            val response = apiService.generateContent(appSettingsHolder.geminiTextModel.value, request)
             tokenUsageTracker.record("chat", response.usageMetadata)
 
             val text = response.extractText() ?: ""

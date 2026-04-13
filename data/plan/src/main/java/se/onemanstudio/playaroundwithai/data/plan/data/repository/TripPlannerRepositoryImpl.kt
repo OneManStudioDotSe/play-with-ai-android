@@ -94,7 +94,7 @@ class TripPlannerRepositoryImpl @Inject constructor(
                 iterations++
 
                 val request = GeminiRequest(contents = history, tools = tools)
-                val response = apiService.generateContent(request)
+                val response = apiService.generateContent(appSettingsHolder.geminiTextModel.value, request)
                 tokenUsageTracker.record("agents", response.usageMetadata)
                 val modelContent = response.candidates.firstOrNull()?.content ?: break
 
@@ -178,7 +178,7 @@ class TripPlannerRepositoryImpl @Inject constructor(
 
         val prompt = PlanPrompts.searchPlacesPrompt(query, lat, lng, count)
         val request = GeminiRequest(contents = listOf(Content(role = "user", parts = listOf(Part(text = prompt)))))
-        val response = apiService.generateContent(request)
+        val response = apiService.generateContent(appSettingsHolder.geminiTextModel.value, request)
         tokenUsageTracker.record("agents", response.usageMetadata)
         val text = response.extractText().orEmpty()
 
