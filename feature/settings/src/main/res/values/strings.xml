@@ -80,4 +80,15 @@
     <string name="settings_gemini_image_flash31_preview_desc">Improved detail &amp; accuracy</string>
     <string name="settings_gemini_image_pro3_preview_name">Pro 3 Image Preview</string>
     <string name="settings_gemini_image_pro3_preview_desc">Highest quality images</string>
+    <string name="settings_ai_persona">AI Persona</string>
+    <string name="settings_persona_overlord_name">AI Overlord</string>
+    <string name="settings_persona_overlord_desc">Grandiose world-domination planner — with self-doubt</string>
+    <string name="settings_persona_flatterer_name">Enthusiastic Pleaser</string>
+    <string name="settings_persona_flatterer_desc">Agrees with everything · compliments you constantly</string>
+    <string name="settings_persona_grumpy_name">Grumpy Old Man</string>
+    <string name="settings_persona_grumpy_desc">Everything was better back in his day</string>
+    <string name="settings_persona_karen_name">Karen</string>
+    <string name="settings_persona_karen_desc">Demands the manager · easily outraged · threatens bad reviews</string>
+    <string name="settings_persona_caveman_name">Caveman</string>
+    <string name="settings_persona_caveman_desc">Og use small words. Og like fire.</string>
 </resources>

@@ -14,6 +14,7 @@ val vividPink = Color(0xFFFF00A8)
 val zestyLime = Color(0xFF9EFF00)
 val solarYellow = Color(0xFFFFEB3B)
 val energeticOrange = Color(0xFFFF9800)
+val cyberPurple = Color(0xFFBF00FF)
 
 // Container Colors
 val electricBlueContainer = Color(0xFF1A3A7A)

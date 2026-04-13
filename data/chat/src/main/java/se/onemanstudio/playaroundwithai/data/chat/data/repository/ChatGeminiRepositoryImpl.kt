@@ -56,10 +56,11 @@ class ChatGeminiRepositoryImpl @Inject constructor(
                     "${imageBytes != null}, hasFile: ${fileText != null} and analysisType: $analysisType")
 
             val parts = mutableListOf<Part>()
-            var fullPrompt = ChatPrompts.CHAT_SYSTEM_INSTRUCTION + prompt
+            val systemPrompt = appSettingsHolder.aiPersona.value.systemPrompt
+            var fullPrompt = systemPrompt + prompt
 
             if (analysisType != null) {
-                fullPrompt = ChatPrompts.CHAT_SYSTEM_INSTRUCTION + "${getAnalysisInstruction(analysisType)}\n\nUser prompt: $prompt"
+                fullPrompt = systemPrompt + "${getAnalysisInstruction(analysisType)}\n\nUser prompt: $prompt"
             }
 
             if (!fileText.isNullOrBlank()) {

@@ -18,6 +18,7 @@ const val AGENT_MAX_ITERATIONS_DEFAULT = 10
 const val SUGGESTED_PLACES_COUNT_DEFAULT = 10
 const val GEMINI_TEXT_MODEL_DEFAULT = "gemini-3-flash-preview"
 const val GEMINI_IMAGE_MODEL_DEFAULT = "gemini-2.5-flash-image"
+val AI_PERSONA_DEFAULT = AiPersona.AI_OVERLORD
 
 @Singleton
 @Suppress("TooManyFunctions")
@@ -61,6 +62,9 @@ class AppSettingsHolder @Inject constructor() {
 
     private val _geminiImageModel = MutableStateFlow(GEMINI_IMAGE_MODEL_DEFAULT)
     val geminiImageModel: StateFlow<String> = _geminiImageModel.asStateFlow()
+
+    private val _aiPersona = MutableStateFlow(AI_PERSONA_DEFAULT)
+    val aiPersona: StateFlow<AiPersona> = _aiPersona.asStateFlow()
 
     fun updateShowTokenUsage(enabled: Boolean) {
         _showTokenUsage.value = enabled
@@ -112,5 +116,9 @@ class AppSettingsHolder @Inject constructor() {
 
     fun updateGeminiImageModel(model: String) {
         _geminiImageModel.value = model
+    }
+
+    fun updateAiPersona(persona: AiPersona) {
+        _aiPersona.value = persona
     }
 }

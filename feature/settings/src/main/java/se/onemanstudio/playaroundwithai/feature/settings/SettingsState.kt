@@ -1,6 +1,7 @@
 package se.onemanstudio.playaroundwithai.feature.settings
 
 import androidx.compose.runtime.Immutable
+import se.onemanstudio.playaroundwithai.core.config.settings.AiPersona
 
 @Immutable
 data class SettingsState(
@@ -21,6 +22,7 @@ data class SettingsState(
     val maxSelectablePoints: Int = DEFAULT_MAX_SELECTABLE_POINTS,
     val geminiTextModel: String = GEMINI_TEXT_MODEL_DEFAULT,
     val geminiImageModel: String = GEMINI_IMAGE_MODEL_DEFAULT,
+    val aiPersona: AiPersona = AiPersona.AI_OVERLORD,
 ) {
     companion object {
         const val MIN_VEHICLE_COUNT = 10

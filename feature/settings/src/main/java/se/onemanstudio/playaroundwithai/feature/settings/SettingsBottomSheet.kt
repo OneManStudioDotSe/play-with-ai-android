@@ -50,6 +50,8 @@ import androidx.compose.ui.unit.dp
 import se.onemanstudio.playaroundwithai.core.ui.theme.Alphas
 import se.onemanstudio.playaroundwithai.core.ui.theme.Dimensions
 import se.onemanstudio.playaroundwithai.core.ui.theme.SofaAiTheme
+import se.onemanstudio.playaroundwithai.core.config.settings.AiPersona
+import se.onemanstudio.playaroundwithai.core.ui.theme.cyberPurple
 import se.onemanstudio.playaroundwithai.core.ui.theme.electricBlue
 import se.onemanstudio.playaroundwithai.core.ui.theme.energeticOrange
 import se.onemanstudio.playaroundwithai.core.ui.theme.solarYellow
@@ -87,6 +89,7 @@ fun SettingsBottomSheet(
     onMaxSelectablePointsChange: (Int) -> Unit,
     onGeminiTextModelChange: (String) -> Unit,
     onGeminiImageModelChange: (String) -> Unit,
+    onAiPersonaChange: (AiPersona) -> Unit,
     onResetToDefaults: () -> Unit,
     onContactClick: () -> Unit,
     onLinkedInClick: () -> Unit = {},
@@ -118,6 +121,7 @@ fun SettingsBottomSheet(
             onMaxSelectablePointsChange = onMaxSelectablePointsChange,
             onGeminiTextModelChange = onGeminiTextModelChange,
             onGeminiImageModelChange = onGeminiImageModelChange,
+            onAiPersonaChange = onAiPersonaChange,
             onResetToDefaults = onResetToDefaults,
             onContactClick = onContactClick,
             onLinkedInClick = onLinkedInClick,
@@ -147,6 +151,7 @@ private fun SettingsBottomSheetContent(
     onMaxSelectablePointsChange: (Int) -> Unit,
     onGeminiTextModelChange: (String) -> Unit,
     onGeminiImageModelChange: (String) -> Unit,
+    onAiPersonaChange: (AiPersona) -> Unit,
     onResetToDefaults: () -> Unit,
     onContactClick: () -> Unit,
     onLinkedInClick: () -> Unit,
@@ -208,6 +213,14 @@ private fun SettingsBottomSheetContent(
                     onTokenTrackingChange = onTokenTrackingChange,
                     onFirebaseSyncChange = onFirebaseSyncChange,
                     onImageQualityChange = onImageQualityChange,
+                )
+
+                Spacer(modifier = Modifier.height(Dimensions.paddingExtraLarge))
+
+                // AI Persona section
+                AiPersonaSection(
+                    aiPersona = state.aiPersona,
+                    onAiPersonaChange = onAiPersonaChange,
                 )
 
                 Spacer(modifier = Modifier.height(Dimensions.paddingExtraLarge))
@@ -726,6 +739,80 @@ private fun MapControlsSection(
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
+private fun AiPersonaSection(
+    aiPersona: AiPersona,
+    onAiPersonaChange: (AiPersona) -> Unit,
+) {
+    val personaOptions = listOf(
+        Triple(AiPersona.AI_OVERLORD,
+            stringResource(R.string.settings_persona_overlord_name),
+            stringResource(R.string.settings_persona_overlord_desc)),
+        Triple(AiPersona.FLATTERER,
+            stringResource(R.string.settings_persona_flatterer_name),
+            stringResource(R.string.settings_persona_flatterer_desc)),
+        Triple(AiPersona.GRUMPY_OLD_MAN,
+            stringResource(R.string.settings_persona_grumpy_name),
+            stringResource(R.string.settings_persona_grumpy_desc)),
+        Triple(AiPersona.KAREN,
+            stringResource(R.string.settings_persona_karen_name),
+            stringResource(R.string.settings_persona_karen_desc)),
+        Triple(AiPersona.CAVEMAN,
+            stringResource(R.string.settings_persona_caveman_name),
+            stringResource(R.string.settings_persona_caveman_desc)),
+    )
+
+    var expanded by remember { mutableStateOf(false) }
+    val currentName = personaOptions.find { it.first == aiPersona }?.second ?: aiPersona.name
+
+    Column(verticalArrangement = Arrangement.spacedBy(Dimensions.paddingLarge)) {
+        SectionHeader(
+            text = stringResource(R.string.settings_ai_persona),
+            lineColor = cyberPurple,
+        )
+
+        ExposedDropdownMenuBox(
+            expanded = expanded,
+            onExpandedChange = { expanded = it },
+        ) {
+            OutlinedTextField(
+                value = currentName,
+                onValueChange = {},
+                readOnly = true,
+                trailingIcon = { ExposedDropdownMenuDefaults.TrailingIcon(expanded = expanded) },
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .menuAnchor(type = ExposedDropdownMenuAnchorType.PrimaryNotEditable, enabled = true),
+            )
+            ExposedDropdownMenu(
+                expanded = expanded,
+                onDismissRequest = { expanded = false },
+            ) {
+                personaOptions.forEach { (persona, name, desc) ->
+                    DropdownMenuItem(
+                        text = {
+                            Column {
+                                Text(text = name, style = MaterialTheme.typography.bodyMedium)
+                                Text(
+                                    text = desc,
+                                    style = MaterialTheme.typography.labelSmall,
+                                    color = MaterialTheme.colorScheme.onSurfaceVariant,
+                                )
+                            }
+                        },
+                        onClick = {
+                            onAiPersonaChange(persona)
+                            expanded = false
+                        },
+                        contentPadding = ExposedDropdownMenuDefaults.ItemContentPadding,
+                    )
+                }
+            }
+        }
+    }
+}
+
+@OptIn(ExperimentalMaterial3Api::class)
+@Composable
 private fun AiModelsSection(
     geminiTextModel: String,
     geminiImageModel: String,
@@ -933,6 +1020,7 @@ private fun SettingsContentLightPreview() {
                 onMaxSelectablePointsChange = {},
                 onGeminiTextModelChange = {},
                 onGeminiImageModelChange = {},
+                onAiPersonaChange = {},
                 onResetToDefaults = {},
                 onContactClick = {},
                 onLinkedInClick = {},
@@ -967,6 +1055,7 @@ private fun SettingsContentDarkPreview() {
                 onMaxSelectablePointsChange = {},
                 onGeminiTextModelChange = {},
                 onGeminiImageModelChange = {},
+                onAiPersonaChange = {},
                 onResetToDefaults = {},
                 onContactClick = {},
                 onLinkedInClick = {},

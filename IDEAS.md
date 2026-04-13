@@ -17,7 +17,7 @@ The app fires `HapticFeedbackConstants.CLOCK_TICK` on every typed character in c
 There is no way to turn this off.
 
 
-### 3. AI Persona Selector
+### 3. [COMPLETED] AI Persona Selector
 The chat uses a hardcoded "AI Overlord" persona with a 42-word max response length. Offer preset personas (e.g., concise
 assistant, creative storyteller, technical expert) or a free-text system instruction field.
 

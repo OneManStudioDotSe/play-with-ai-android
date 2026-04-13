@@ -8,6 +8,7 @@ import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.stateIn
 import se.onemanstudio.playaroundwithai.core.config.di.AppVersion
+import se.onemanstudio.playaroundwithai.core.config.settings.AiPersona
 import se.onemanstudio.playaroundwithai.core.config.settings.AppSettingsHolder
 import se.onemanstudio.playaroundwithai.core.tracking.model.DailyTokenUsage
 import se.onemanstudio.playaroundwithai.core.tracking.usecase.GetWeeklyTokenUsageUseCase
@@ -42,6 +43,7 @@ class SettingsViewModel @Inject constructor(
     val maxSelectablePoints: StateFlow<Int> = exploreSettingsHolder.maxSelectablePoints
     val geminiTextModel: StateFlow<String> = appSettingsHolder.geminiTextModel
     val geminiImageModel: StateFlow<String> = appSettingsHolder.geminiImageModel
+    val aiPersona: StateFlow<AiPersona> = appSettingsHolder.aiPersona
 
     private val _selectedDayIndex = MutableStateFlow<Int?>(null)
     val selectedDayIndex: StateFlow<Int?> = _selectedDayIndex
@@ -114,6 +116,10 @@ class SettingsViewModel @Inject constructor(
         appSettingsHolder.updateGeminiImageModel(model)
     }
 
+    fun onAiPersonaChange(persona: AiPersona) {
+        appSettingsHolder.updateAiPersona(persona)
+    }
+
     fun onResetToDefaults() {
         appSettingsHolder.updateShowTokenUsage(false)
         appSettingsHolder.updateWalkingSpeedKmh(SettingsState.WALKING_SPEED_NORMAL)
@@ -131,5 +137,6 @@ class SettingsViewModel @Inject constructor(
         exploreSettingsHolder.updateMaxSelectablePoints(SettingsState.DEFAULT_MAX_SELECTABLE_POINTS)
         appSettingsHolder.updateGeminiTextModel(SettingsState.GEMINI_TEXT_MODEL_DEFAULT)
         appSettingsHolder.updateGeminiImageModel(SettingsState.GEMINI_IMAGE_MODEL_DEFAULT)
+        appSettingsHolder.updateAiPersona(AiPersona.AI_OVERLORD)
     }
 }
