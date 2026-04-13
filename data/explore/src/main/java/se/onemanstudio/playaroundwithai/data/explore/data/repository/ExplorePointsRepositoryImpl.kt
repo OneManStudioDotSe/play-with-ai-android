@@ -13,8 +13,6 @@ class ExplorePointsRepositoryImpl @Inject constructor(
     private val exploreApiService: ExploreApiService,
 ) : ExplorePointsRepository {
     override suspend fun getExploreItems(count: Int, centerLat: Double, centerLng: Double): List<ExploreItem> = withContext(Dispatchers.IO) {
-        val items = exploreApiService.getExploreItems(count, centerLat, centerLng).map { it.toDomain() }
-
-        items
+        exploreApiService.getExploreItems(count, centerLat, centerLng).map { it.toDomain() }
     }
 }

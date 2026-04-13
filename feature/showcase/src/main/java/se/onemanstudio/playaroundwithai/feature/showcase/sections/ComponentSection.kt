@@ -110,20 +110,17 @@ private fun ButtonDemo() {
         NeoBrutalButton(
             text = stringResource(R.string.demo_button_enabled),
             onClick = {},
-            modifier = Modifier.fillMaxWidth()
         )
         NeoBrutalButton(
             text = stringResource(R.string.demo_button_with_icon),
             icon = Icons.AutoMirrored.Filled.Send,
             iconContentDescription = stringResource(R.string.ic_send),
             onClick = {},
-            modifier = Modifier.fillMaxWidth()
         )
         NeoBrutalButton(
             text = stringResource(R.string.demo_button_disabled),
             enabled = false,
             onClick = {},
-            modifier = Modifier.fillMaxWidth()
         )
     }
 }

@@ -36,6 +36,7 @@
     <string name="suggested_place_category">Kategori</string>
     <string name="ai_places_location_error">Kunde inte bestämma din plats. Aktivera platstjänster.</string>
     <string name="ai_places_fetch_error">Kunde inte ladda AI-föreslagna platser. Försök igen.</string>
+    <string name="location_denied_fallback">Plats ej tillgänglig — kartdata genereras för Stockholm</string>
     <string name="dismiss">Stäng</string>
 
     <string name="path_mode_hint">Tryck på valfri markör för att lägga till den i din rutt. Planera en elskoter-pubrunda eller en scenisk cykeltur!</string>

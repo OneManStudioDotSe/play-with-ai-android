@@ -104,7 +104,7 @@ fun PromptInputSection(
                         contentPadding = PaddingValues(horizontal = Dimensions.paddingLarge),
                         horizontalArrangement = Arrangement.spacedBy(Dimensions.paddingMedium)
                     ) {
-                        items(suggestions) { prompt ->
+                        items(suggestions, key = { it }) { prompt ->
                             NeoBrutalChip(
                                 text = prompt,
                                 onClick = { onChipClicked(prompt) }

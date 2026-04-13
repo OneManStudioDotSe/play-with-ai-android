@@ -545,7 +545,6 @@ private fun AboutSection(
         NeoBrutalButton(
             text = stringResource(R.string.settings_reset_defaults),
             onClick = onResetToDefaults,
-            modifier = Modifier.fillMaxWidth(),
         )
     }
 }
