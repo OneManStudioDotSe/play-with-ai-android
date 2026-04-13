@@ -35,6 +35,7 @@
     <string name="ai_suggest_button_content_description">Get AI suggested places</string>
     <string name="ai_suggested_place_marker_content_description">AI suggested place: %s</string>
     <string name="suggested_place_category">Category</string>
+    <string name="location_denied_fallback">Location unavailable — map data will be generated for Stockholm</string>
     <string name="ai_places_location_error">Could not determine your location. Please enable location services.</string>
     <string name="ai_places_fetch_error">Failed to load AI suggested places. Please try again.</string>
     <string name="dismiss">Dismiss</string>

@@ -111,6 +111,8 @@ fun ExploreScreen(
     val hasLocationPermission = locationState !is LocationState.Pending && locationState !is LocationState.Denied
     val userLocation = (locationState as? LocationState.Ready)?.location
 
+    val locationDeniedMessage = stringResource(ExploreFeatureR.string.location_denied_fallback)
+
     val permissionLauncher = rememberLauncherForActivityResult(
         contract = ActivityResultContracts.RequestPermission()
     ) { isGranted ->
@@ -146,7 +148,10 @@ fun ExploreScreen(
                 }
             }
 
-            is LocationState.Denied -> cameraSettled = true
+            is LocationState.Denied -> {
+                cameraSettled = true
+                snackbarHostState.showSnackbar(locationDeniedMessage)
+            }
             is LocationState.Pending -> Unit
         }
     }

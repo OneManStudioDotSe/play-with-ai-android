@@ -59,7 +59,7 @@ Users can select up to 8 points for route calculation. Raising or lowering this 
 API calls time out after 30 seconds. A slider (15–120 s) would help users on slow connections or when using heavier models.
 
 
-### 12. Default Map Location
+### 12. [COMPLETED] Default Map Location
 Both Explore and Plan screens now fetch the user's real GPS location via `FusedLocationProviderClient` and fall back to
 Stockholm (59.3293, 18.0686) if unavailable. A "home location" setting could let users override the fallback.
 
