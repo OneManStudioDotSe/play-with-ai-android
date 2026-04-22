@@ -7,6 +7,7 @@ import javax.inject.Inject
 import javax.inject.Singleton
 
 const val WALKING_SPEED_KMH_DEFAULT = 5.0f
+const val TYPING_SPEED_DELAY_MS_DEFAULT = 10L
 
 @Singleton
 class AppSettingsHolder @Inject constructor() {
@@ -17,11 +18,18 @@ class AppSettingsHolder @Inject constructor() {
     private val _walkingSpeedKmh = MutableStateFlow(WALKING_SPEED_KMH_DEFAULT)
     val walkingSpeedKmh: StateFlow<Float> = _walkingSpeedKmh.asStateFlow()
 
+    private val _typingSpeedDelayMs = MutableStateFlow(TYPING_SPEED_DELAY_MS_DEFAULT)
+    val typingSpeedDelayMs: StateFlow<Long> = _typingSpeedDelayMs.asStateFlow()
+
     fun updateShowTokenUsage(enabled: Boolean) {
         _showTokenUsage.value = enabled
     }
 
     fun updateWalkingSpeedKmh(speedKmh: Float) {
         _walkingSpeedKmh.value = speedKmh
+    }
+
+    fun updateTypingSpeedDelayMs(delayMs: Long) {
+        _typingSpeedDelayMs.value = delayMs
     }
 }

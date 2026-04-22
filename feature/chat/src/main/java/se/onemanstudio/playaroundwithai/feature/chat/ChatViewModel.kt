@@ -16,6 +16,7 @@ import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import se.onemanstudio.playaroundwithai.core.auth.usecase.ObserveAuthReadyUseCase
 import se.onemanstudio.playaroundwithai.core.config.model.ApiKeyAvailability
+import se.onemanstudio.playaroundwithai.core.config.settings.AppSettingsHolder
 import se.onemanstudio.playaroundwithai.core.database.entity.SyncStatus
 import se.onemanstudio.playaroundwithai.data.chat.domain.model.Prompt
 import se.onemanstudio.playaroundwithai.data.chat.domain.usecase.AskAiUseCase
@@ -52,10 +53,13 @@ class ChatViewModel @Inject constructor(
     private val observeAuthReadyUseCase: ObserveAuthReadyUseCase,
     private val apiKeyAvailability: ApiKeyAvailability,
     private val fileUtils: FileUtils,
+    private val appSettingsHolder: AppSettingsHolder,
 ) : ViewModel() {
 
     private val _screenState = MutableStateFlow(ChatScreenState())
     val screenState = _screenState.asStateFlow()
+
+    val typingSpeedDelayMs = appSettingsHolder.typingSpeedDelayMs
 
     private var cachedSuggestions: List<String>? = null
 

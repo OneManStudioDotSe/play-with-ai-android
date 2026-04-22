@@ -29,6 +29,7 @@ class SettingsViewModel @Inject constructor(
     val vehicleCount: StateFlow<Int> = exploreSettingsHolder.vehicleCount
     val searchRadiusKm: StateFlow<Float> = exploreSettingsHolder.searchRadiusKm
     val walkingSpeedKmh: StateFlow<Float> = appSettingsHolder.walkingSpeedKmh
+    val typingSpeedDelayMs: StateFlow<Long> = appSettingsHolder.typingSpeedDelayMs
 
     private val _selectedDayIndex = MutableStateFlow<Int?>(null)
     val selectedDayIndex: StateFlow<Int?> = _selectedDayIndex
@@ -51,5 +52,9 @@ class SettingsViewModel @Inject constructor(
 
     fun onWalkingSpeedChange(speedKmh: Float) {
         appSettingsHolder.updateWalkingSpeedKmh(speedKmh)
+    }
+
+    fun onTypingSpeedChange(delayMs: Long) {
+        appSettingsHolder.updateTypingSpeedDelayMs(delayMs)
     }
 }

@@ -21,4 +21,9 @@
     <string name="settings_walking_speed_slow">Långsam · 3 km/h</string>
     <string name="settings_walking_speed_normal">Normal · 5 km/h</string>
     <string name="settings_walking_speed_fast">Snabb · 7 km/h</string>
+    <string name="settings_typing_speed">Skrivhastighet</string>
+    <string name="settings_typing_speed_slow">Långsam</string>
+    <string name="settings_typing_speed_normal">Normal</string>
+    <string name="settings_typing_speed_fast">Snabb</string>
+    <string name="settings_typing_speed_instant">Direkt</string>
 </resources>

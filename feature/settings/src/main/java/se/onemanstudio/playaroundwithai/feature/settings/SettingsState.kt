@@ -9,6 +9,7 @@ data class SettingsState(
     val vehicleCount: Int = DEFAULT_VEHICLE_COUNT,
     val searchRadiusKm: Float = DEFAULT_SEARCH_RADIUS_KM,
     val walkingSpeedKmh: Float = WALKING_SPEED_NORMAL,
+    val typingSpeedDelayMs: Long = TYPING_SPEED_NORMAL,
 ) {
     companion object {
         const val MIN_VEHICLE_COUNT = 10
@@ -20,5 +21,9 @@ data class SettingsState(
         const val WALKING_SPEED_SLOW = 3.0f
         const val WALKING_SPEED_NORMAL = 5.0f
         const val WALKING_SPEED_FAST = 7.0f
+        const val TYPING_SPEED_SLOW = 30L
+        const val TYPING_SPEED_NORMAL = 10L
+        const val TYPING_SPEED_FAST = 3L
+        const val TYPING_SPEED_INSTANT = 0L
     }
 }

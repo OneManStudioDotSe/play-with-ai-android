@@ -89,6 +89,7 @@ fun ChatScreen(
     settingsContent: @Composable (() -> Unit) -> Unit = { _ -> },
 ) {
     val screenState by viewModel.screenState.collectAsStateWithLifecycle()
+    val typingSpeedDelayMs by viewModel.typingSpeedDelayMs.collectAsStateWithLifecycle()
     val uiState = screenState.chatState
     val suggestions = if (screenState.useFallbackSuggestions) {
         listOf(
@@ -298,7 +299,7 @@ fun ChatScreen(
             when (uiState) {
                 is ChatUiState.Initial -> AmoebaShapeAnimation(state = AmoebaState.IDLE)
                 is ChatUiState.Loading -> AmoebaShapeAnimation(state = AmoebaState.SPIKY) //CircularProgressIndicator()
-                is ChatUiState.Success -> ContentState(uiState, onClearResponse = { viewModel.clearResponse() })
+                is ChatUiState.Success -> ContentState(uiState, typingDelayMs = typingSpeedDelayMs, onClearResponse = { viewModel.clearResponse() })
                 is ChatUiState.Error -> ErrorState(uiState, onClearResponse = { viewModel.clearResponse() })
             }
         }
@@ -308,6 +309,7 @@ fun ChatScreen(
 @Composable
 private fun ContentState(
     state: ChatUiState.Success,
+    typingDelayMs: Long,
     onClearResponse: () -> Unit,
 ) {
     val scrollState = rememberScrollState()
@@ -324,6 +326,7 @@ private fun ContentState(
 
             TypewriterText(
                 text = state.outputText,
+                typingDelayMs = typingDelayMs,
                 scrollState = scrollState
             )
         }
@@ -429,6 +432,7 @@ private fun ContentStateLightPreview() {
                 state = ChatUiState.Success(
                     outputText = outputText
                 ),
+                typingDelayMs = 10L,
                 onClearResponse = {}
             )
         }
@@ -445,6 +449,7 @@ private fun ContentStateDarkPreview() {
                 state = ChatUiState.Success(
                     outputText = outputText
                 ),
+                typingDelayMs = 10L,
                 onClearResponse = {}
             )
         }

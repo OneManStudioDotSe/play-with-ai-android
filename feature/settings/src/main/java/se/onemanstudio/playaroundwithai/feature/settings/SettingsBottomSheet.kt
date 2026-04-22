@@ -61,6 +61,7 @@ fun SettingsBottomSheet(
     state: SettingsState,
     onDismiss: () -> Unit,
     onShowTokenUsageChange: (Boolean) -> Unit,
+    onTypingSpeedChange: (Long) -> Unit,
     onVehicleCountChange: (Int) -> Unit,
     onSearchRadiusChange: (Float) -> Unit,
     onWalkingSpeedChange: (Float) -> Unit,
@@ -79,6 +80,7 @@ fun SettingsBottomSheet(
         SettingsBottomSheetContent(
             state = state,
             onShowTokenUsageChange = onShowTokenUsageChange,
+            onTypingSpeedChange = onTypingSpeedChange,
             onVehicleCountChange = onVehicleCountChange,
             onSearchRadiusChange = onSearchRadiusChange,
             onWalkingSpeedChange = onWalkingSpeedChange,
@@ -95,6 +97,7 @@ fun SettingsBottomSheet(
 private fun SettingsBottomSheetContent(
     state: SettingsState,
     onShowTokenUsageChange: (Boolean) -> Unit,
+    onTypingSpeedChange: (Long) -> Unit,
     onVehicleCountChange: (Int) -> Unit,
     onSearchRadiusChange: (Float) -> Unit,
     onWalkingSpeedChange: (Float) -> Unit,
@@ -145,7 +148,9 @@ private fun SettingsBottomSheetContent(
                 // General section
                 GeneralSection(
                     showTokenUsage = state.showTokenUsage,
+                    typingSpeedDelayMs = state.typingSpeedDelayMs,
                     onShowTokenUsageChange = onShowTokenUsageChange,
+                    onTypingSpeedChange = onTypingSpeedChange,
                 )
 
                 Spacer(modifier = Modifier.height(Dimensions.paddingLarge))
@@ -191,11 +196,21 @@ private fun SectionHeader(
     MarkerText(text = text, lineColor = lineColor, modifier = modifier)
 }
 
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 private fun GeneralSection(
     showTokenUsage: Boolean,
+    typingSpeedDelayMs: Long,
     onShowTokenUsageChange: (Boolean) -> Unit,
+    onTypingSpeedChange: (Long) -> Unit,
 ) {
+    val typingSpeedOptions = listOf(
+        SettingsState.TYPING_SPEED_SLOW to stringResource(R.string.settings_typing_speed_slow),
+        SettingsState.TYPING_SPEED_NORMAL to stringResource(R.string.settings_typing_speed_normal),
+        SettingsState.TYPING_SPEED_FAST to stringResource(R.string.settings_typing_speed_fast),
+        SettingsState.TYPING_SPEED_INSTANT to stringResource(R.string.settings_typing_speed_instant),
+    )
+
     Column(verticalArrangement = Arrangement.spacedBy(Dimensions.paddingMedium)) {
         SectionHeader(
             text = stringResource(R.string.settings_general),
@@ -216,6 +231,24 @@ private fun GeneralSection(
                 checked = showTokenUsage,
                 onCheckedChange = onShowTokenUsageChange,
             )
+        }
+
+        Text(
+            text = stringResource(R.string.settings_typing_speed),
+            style = MaterialTheme.typography.bodyMedium,
+            color = MaterialTheme.colorScheme.onSurface,
+        )
+
+        SingleChoiceSegmentedButtonRow(modifier = Modifier.fillMaxWidth()) {
+            typingSpeedOptions.forEachIndexed { index, (delayMs, label) ->
+                SegmentedButton(
+                    shape = SegmentedButtonDefaults.itemShape(index = index, count = typingSpeedOptions.size),
+                    selected = typingSpeedDelayMs == delayMs,
+                    onClick = { onTypingSpeedChange(delayMs) },
+                ) {
+                    Text(text = label, style = MaterialTheme.typography.labelMedium)
+                }
+            }
         }
     }
 }
@@ -423,6 +456,7 @@ private fun SettingsContentLightPreview() {
             SettingsBottomSheetContent(
                 state = SettingsState(appVersion = "1.0.0"),
                 onShowTokenUsageChange = {},
+                onTypingSpeedChange = {},
                 onVehicleCountChange = {},
                 onSearchRadiusChange = {},
                 onWalkingSpeedChange = {},
@@ -444,6 +478,7 @@ private fun SettingsContentDarkPreview() {
             SettingsBottomSheetContent(
                 state = SettingsState(appVersion = "1.0.0"),
                 onShowTokenUsageChange = {},
+                onTypingSpeedChange = {},
                 onVehicleCountChange = {},
                 onSearchRadiusChange = {},
                 onWalkingSpeedChange = {},
