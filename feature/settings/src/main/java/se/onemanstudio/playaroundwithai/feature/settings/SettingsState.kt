@@ -1,6 +1,7 @@
 package se.onemanstudio.playaroundwithai.feature.settings
 
 import androidx.compose.runtime.Immutable
+import se.onemanstudio.playaroundwithai.core.config.model.AiPersona
 
 @Immutable
 data class SettingsState(
@@ -10,6 +11,7 @@ data class SettingsState(
     val searchRadiusKm: Float = DEFAULT_SEARCH_RADIUS_KM,
     val walkingSpeedKmh: Float = WALKING_SPEED_NORMAL,
     val typingSpeedDelayMs: Long = TYPING_SPEED_NORMAL,
+    val selectedPersona: AiPersona = AiPersona.OVERLORD,
 ) {
     companion object {
         const val MIN_VEHICLE_COUNT = 10

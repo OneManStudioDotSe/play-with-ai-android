@@ -9,6 +9,7 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 import retrofit2.HttpException
 import java.io.IOException
+import se.onemanstudio.playaroundwithai.core.config.settings.AppSettingsHolder
 import se.onemanstudio.playaroundwithai.core.network.api.GeminiApiService
 import se.onemanstudio.playaroundwithai.core.network.dto.Content
 import se.onemanstudio.playaroundwithai.core.network.dto.GeminiRequest
@@ -31,6 +32,7 @@ private const val COMPRESSION_QUALITY = 77
 class ChatGeminiRepositoryImpl @Inject constructor(
     private val apiService: GeminiApiService,
     private val tokenUsageTracker: TokenUsageTracker,
+    private val appSettingsHolder: AppSettingsHolder,
 ) : ChatGeminiRepository {
 
     override suspend fun getAiResponse(
@@ -44,10 +46,11 @@ class ChatGeminiRepositoryImpl @Inject constructor(
                     "${imageBytes != null}, hasFile: ${fileText != null} and analysisType: $analysisType")
 
             val parts = mutableListOf<Part>()
-            var fullPrompt = ChatPrompts.CHAT_SYSTEM_INSTRUCTION + prompt
+            val systemInstruction = ChatPrompts.systemInstruction(appSettingsHolder.selectedPersona.value)
+            var fullPrompt = systemInstruction + prompt
 
             if (analysisType != null) {
-                fullPrompt = ChatPrompts.CHAT_SYSTEM_INSTRUCTION + "${getAnalysisInstruction(analysisType)}\n\nUser prompt: $prompt"
+                fullPrompt = systemInstruction + "${getAnalysisInstruction(analysisType)}\n\nUser prompt: $prompt"
             }
 
             if (!fileText.isNullOrBlank()) {
@@ -86,7 +89,7 @@ class ChatGeminiRepositoryImpl @Inject constructor(
         try {
             Timber.d("Gemini - Generating conversation starters from API...")
 
-            val suggestionPrompt = ChatPrompts.CONVERSATION_STARTERS_PROMPT
+            val suggestionPrompt = ChatPrompts.conversationStartersPrompt(appSettingsHolder.selectedPersona.value)
 
             val parts = listOf(Part(text = suggestionPrompt))
             val request = GeminiRequest(contents = listOf(Content(parts = parts)))

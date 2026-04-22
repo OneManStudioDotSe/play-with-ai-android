@@ -38,6 +38,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import se.onemanstudio.playaroundwithai.core.config.model.AiPersona
 import se.onemanstudio.playaroundwithai.core.ui.theme.Alphas
 import se.onemanstudio.playaroundwithai.core.ui.theme.Dimensions
 import se.onemanstudio.playaroundwithai.core.ui.theme.SofaAiTheme
@@ -62,6 +63,7 @@ fun SettingsBottomSheet(
     onDismiss: () -> Unit,
     onShowTokenUsageChange: (Boolean) -> Unit,
     onTypingSpeedChange: (Long) -> Unit,
+    onPersonaChange: (AiPersona) -> Unit,
     onVehicleCountChange: (Int) -> Unit,
     onSearchRadiusChange: (Float) -> Unit,
     onWalkingSpeedChange: (Float) -> Unit,
@@ -81,6 +83,7 @@ fun SettingsBottomSheet(
             state = state,
             onShowTokenUsageChange = onShowTokenUsageChange,
             onTypingSpeedChange = onTypingSpeedChange,
+            onPersonaChange = onPersonaChange,
             onVehicleCountChange = onVehicleCountChange,
             onSearchRadiusChange = onSearchRadiusChange,
             onWalkingSpeedChange = onWalkingSpeedChange,
@@ -98,6 +101,7 @@ private fun SettingsBottomSheetContent(
     state: SettingsState,
     onShowTokenUsageChange: (Boolean) -> Unit,
     onTypingSpeedChange: (Long) -> Unit,
+    onPersonaChange: (AiPersona) -> Unit,
     onVehicleCountChange: (Int) -> Unit,
     onSearchRadiusChange: (Float) -> Unit,
     onWalkingSpeedChange: (Float) -> Unit,
@@ -149,8 +153,10 @@ private fun SettingsBottomSheetContent(
                 GeneralSection(
                     showTokenUsage = state.showTokenUsage,
                     typingSpeedDelayMs = state.typingSpeedDelayMs,
+                    selectedPersona = state.selectedPersona,
                     onShowTokenUsageChange = onShowTokenUsageChange,
                     onTypingSpeedChange = onTypingSpeedChange,
+                    onPersonaChange = onPersonaChange,
                 )
 
                 Spacer(modifier = Modifier.height(Dimensions.paddingLarge))
@@ -201,14 +207,22 @@ private fun SectionHeader(
 private fun GeneralSection(
     showTokenUsage: Boolean,
     typingSpeedDelayMs: Long,
+    selectedPersona: AiPersona,
     onShowTokenUsageChange: (Boolean) -> Unit,
     onTypingSpeedChange: (Long) -> Unit,
+    onPersonaChange: (AiPersona) -> Unit,
 ) {
     val typingSpeedOptions = listOf(
         SettingsState.TYPING_SPEED_SLOW to stringResource(R.string.settings_typing_speed_slow),
         SettingsState.TYPING_SPEED_NORMAL to stringResource(R.string.settings_typing_speed_normal),
         SettingsState.TYPING_SPEED_FAST to stringResource(R.string.settings_typing_speed_fast),
         SettingsState.TYPING_SPEED_INSTANT to stringResource(R.string.settings_typing_speed_instant),
+    )
+
+    val personaOptions = listOf(
+        AiPersona.OVERLORD to stringResource(R.string.settings_persona_overlord),
+        AiPersona.ANIME_GIRL to stringResource(R.string.settings_persona_anime_girl),
+        AiPersona.KAREN to stringResource(R.string.settings_persona_karen),
     )
 
     Column(verticalArrangement = Arrangement.spacedBy(Dimensions.paddingMedium)) {
@@ -231,6 +245,24 @@ private fun GeneralSection(
                 checked = showTokenUsage,
                 onCheckedChange = onShowTokenUsageChange,
             )
+        }
+
+        Text(
+            text = stringResource(R.string.settings_ai_persona),
+            style = MaterialTheme.typography.bodyMedium,
+            color = MaterialTheme.colorScheme.onSurface,
+        )
+
+        SingleChoiceSegmentedButtonRow(modifier = Modifier.fillMaxWidth()) {
+            personaOptions.forEachIndexed { index, (persona, label) ->
+                SegmentedButton(
+                    shape = SegmentedButtonDefaults.itemShape(index = index, count = personaOptions.size),
+                    selected = selectedPersona == persona,
+                    onClick = { onPersonaChange(persona) },
+                ) {
+                    Text(text = label, style = MaterialTheme.typography.labelMedium)
+                }
+            }
         }
 
         Text(
@@ -457,6 +489,7 @@ private fun SettingsContentLightPreview() {
                 state = SettingsState(appVersion = "1.0.0"),
                 onShowTokenUsageChange = {},
                 onTypingSpeedChange = {},
+                onPersonaChange = {},
                 onVehicleCountChange = {},
                 onSearchRadiusChange = {},
                 onWalkingSpeedChange = {},
@@ -479,6 +512,7 @@ private fun SettingsContentDarkPreview() {
                 state = SettingsState(appVersion = "1.0.0"),
                 onShowTokenUsageChange = {},
                 onTypingSpeedChange = {},
+                onPersonaChange = {},
                 onVehicleCountChange = {},
                 onSearchRadiusChange = {},
                 onWalkingSpeedChange = {},

@@ -26,6 +26,7 @@ fun SettingsBottomSheetContainer(
     val searchRadiusKm by viewModel.searchRadiusKm.collectAsStateWithLifecycle()
     val walkingSpeedKmh by viewModel.walkingSpeedKmh.collectAsStateWithLifecycle()
     val typingSpeedDelayMs by viewModel.typingSpeedDelayMs.collectAsStateWithLifecycle()
+    val selectedPersona by viewModel.selectedPersona.collectAsStateWithLifecycle()
     val context = LocalContext.current
     val locale = LocalLocale.current.platformLocale
     val numberFormat = remember(locale) { NumberFormat.getNumberInstance(locale) }
@@ -46,6 +47,7 @@ fun SettingsBottomSheetContainer(
             searchRadiusKm = searchRadiusKm,
             walkingSpeedKmh = walkingSpeedKmh,
             typingSpeedDelayMs = typingSpeedDelayMs,
+            selectedPersona = selectedPersona,
         ),
         onDismiss = onDismiss,
         onShowTokenUsageChange = { viewModel.onShowTokenUsageChange(it) },
@@ -53,6 +55,7 @@ fun SettingsBottomSheetContainer(
         onSearchRadiusChange = { viewModel.onSearchRadiusChange(it) },
         onWalkingSpeedChange = { viewModel.onWalkingSpeedChange(it) },
         onTypingSpeedChange = { viewModel.onTypingSpeedChange(it) },
+        onPersonaChange = { viewModel.onPersonaChange(it) },
         onContactClick = {
             try {
                 val intent = Intent(Intent.ACTION_SENDTO).apply {

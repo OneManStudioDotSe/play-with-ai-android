@@ -8,6 +8,7 @@ import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.stateIn
 import se.onemanstudio.playaroundwithai.core.config.di.AppVersion
+import se.onemanstudio.playaroundwithai.core.config.model.AiPersona
 import se.onemanstudio.playaroundwithai.core.config.settings.AppSettingsHolder
 import se.onemanstudio.playaroundwithai.core.tracking.model.DailyTokenUsage
 import se.onemanstudio.playaroundwithai.core.tracking.usecase.GetWeeklyTokenUsageUseCase
@@ -30,6 +31,7 @@ class SettingsViewModel @Inject constructor(
     val searchRadiusKm: StateFlow<Float> = exploreSettingsHolder.searchRadiusKm
     val walkingSpeedKmh: StateFlow<Float> = appSettingsHolder.walkingSpeedKmh
     val typingSpeedDelayMs: StateFlow<Long> = appSettingsHolder.typingSpeedDelayMs
+    val selectedPersona: StateFlow<AiPersona> = appSettingsHolder.selectedPersona
 
     private val _selectedDayIndex = MutableStateFlow<Int?>(null)
     val selectedDayIndex: StateFlow<Int?> = _selectedDayIndex
@@ -56,5 +58,9 @@ class SettingsViewModel @Inject constructor(
 
     fun onTypingSpeedChange(delayMs: Long) {
         appSettingsHolder.updateTypingSpeedDelayMs(delayMs)
+    }
+
+    fun onPersonaChange(persona: AiPersona) {
+        appSettingsHolder.updateSelectedPersona(persona)
     }
 }

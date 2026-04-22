@@ -3,6 +3,7 @@ package se.onemanstudio.playaroundwithai.core.config.settings
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
+import se.onemanstudio.playaroundwithai.core.config.model.AiPersona
 import javax.inject.Inject
 import javax.inject.Singleton
 
@@ -21,6 +22,9 @@ class AppSettingsHolder @Inject constructor() {
     private val _typingSpeedDelayMs = MutableStateFlow(TYPING_SPEED_DELAY_MS_DEFAULT)
     val typingSpeedDelayMs: StateFlow<Long> = _typingSpeedDelayMs.asStateFlow()
 
+    private val _selectedPersona = MutableStateFlow(AiPersona.OVERLORD)
+    val selectedPersona: StateFlow<AiPersona> = _selectedPersona.asStateFlow()
+
     fun updateShowTokenUsage(enabled: Boolean) {
         _showTokenUsage.value = enabled
     }
@@ -31,5 +35,9 @@ class AppSettingsHolder @Inject constructor() {
 
     fun updateTypingSpeedDelayMs(delayMs: Long) {
         _typingSpeedDelayMs.value = delayMs
+    }
+
+    fun updateSelectedPersona(persona: AiPersona) {
+        _selectedPersona.value = persona
     }
 }
