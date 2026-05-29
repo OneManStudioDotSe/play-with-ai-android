@@ -17,6 +17,7 @@ import timber.log.Timber
 @Composable
 fun SettingsBottomSheetContainer(
     onDismiss: () -> Unit,
+    onShowcaseClick: () -> Unit = {},
     viewModel: SettingsViewModel = hiltViewModel(),
 ) {
     val weeklyUsage by viewModel.weeklyUsage.collectAsStateWithLifecycle()
@@ -72,6 +73,7 @@ fun SettingsBottomSheetContainer(
             aiPersona = aiPersona,
         ),
         onDismiss = onDismiss,
+        onShowcaseClick = onShowcaseClick,
         onShowTokenUsageChange = { viewModel.onShowTokenUsageChange(it) },
         onVehicleCountChange = { viewModel.onVehicleCountChange(it) },
         onSearchRadiusChange = { viewModel.onSearchRadiusChange(it) },

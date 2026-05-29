@@ -313,9 +313,9 @@ fun ExploreScreen(
                             }
                         ) {
                             CustomMarkerIcon(
-                                icon,
-                                stringResource(id = ExploreFeatureR.string.marker_content_description, item.name),
-                                isSelected
+                                icon = icon,
+                                iconContentDescription = stringResource(id = ExploreFeatureR.string.marker_content_description, item.name),
+                                isSelected = isSelected
                             )
                         }
                     }

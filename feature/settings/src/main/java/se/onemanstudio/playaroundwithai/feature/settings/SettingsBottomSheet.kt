@@ -18,6 +18,7 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Email
+import androidx.compose.material.icons.filled.Palette
 import androidx.compose.material.icons.automirrored.filled.OpenInNew
 import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.ExperimentalMaterial3Api
@@ -73,6 +74,7 @@ private val DragHandleCornerRadius = 2.dp
 fun SettingsBottomSheet(
     state: SettingsState,
     onDismiss: () -> Unit,
+    onShowcaseClick: () -> Unit,
     onShowTokenUsageChange: (Boolean) -> Unit,
     onVehicleCountChange: (Int) -> Unit,
     onSearchRadiusChange: (Float) -> Unit,
@@ -105,6 +107,7 @@ fun SettingsBottomSheet(
     ) {
         SettingsBottomSheetContent(
             state = state,
+            onShowcaseClick = onShowcaseClick,
             onShowTokenUsageChange = onShowTokenUsageChange,
             onVehicleCountChange = onVehicleCountChange,
             onSearchRadiusChange = onSearchRadiusChange,
@@ -135,6 +138,7 @@ fun SettingsBottomSheet(
 @Composable
 private fun SettingsBottomSheetContent(
     state: SettingsState,
+    onShowcaseClick: () -> Unit,
     onShowTokenUsageChange: (Boolean) -> Unit,
     onVehicleCountChange: (Int) -> Unit,
     onSearchRadiusChange: (Float) -> Unit,
@@ -213,6 +217,7 @@ private fun SettingsBottomSheetContent(
                     onTokenTrackingChange = onTokenTrackingChange,
                     onFirebaseSyncChange = onFirebaseSyncChange,
                     onImageQualityChange = onImageQualityChange,
+                    onShowcaseClick = onShowcaseClick,
                 )
 
                 Spacer(modifier = Modifier.height(Dimensions.paddingExtraLarge))
@@ -302,6 +307,7 @@ private fun GeneralSection(
     onTokenTrackingChange: (Boolean) -> Unit,
     onFirebaseSyncChange: (Boolean) -> Unit,
     onImageQualityChange: (Int) -> Unit,
+    onShowcaseClick: () -> Unit,
 ) {
     val speedOptions = listOf(
         Triple(SettingsState.TYPEWRITER_DELAY_INSTANT,
@@ -461,6 +467,26 @@ private fun GeneralSection(
                     }
                 }
             }
+        }
+
+        Row(
+            modifier = Modifier
+                .fillMaxWidth()
+                .clickable { onShowcaseClick() }
+                .padding(vertical = Dimensions.paddingMedium),
+            verticalAlignment = Alignment.CenterVertically,
+        ) {
+            Icon(
+                imageVector = Icons.Default.Palette,
+                contentDescription = stringResource(R.string.settings_showcase),
+                tint = MaterialTheme.colorScheme.primary,
+            )
+            Spacer(modifier = Modifier.width(Dimensions.paddingMedium))
+            Text(
+                text = stringResource(R.string.settings_showcase),
+                style = MaterialTheme.typography.bodyLarge,
+                color = MaterialTheme.colorScheme.primary,
+            )
         }
     }
 }
@@ -1003,6 +1029,7 @@ private fun SettingsContentLightPreview() {
         Surface {
             SettingsBottomSheetContent(
                 state = SettingsState(appVersion = "1.0.0"),
+                onShowcaseClick = {},
                 onShowTokenUsageChange = {},
                 onVehicleCountChange = {},
                 onSearchRadiusChange = {},
@@ -1038,6 +1065,7 @@ private fun SettingsContentDarkPreview() {
         Surface {
             SettingsBottomSheetContent(
                 state = SettingsState(appVersion = "1.0.0"),
+                onShowcaseClick = {},
                 onShowTokenUsageChange = {},
                 onVehicleCountChange = {},
                 onSearchRadiusChange = {},
