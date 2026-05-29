@@ -1,0 +1,46 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="nano_title">Nano</string>
+
+    <!-- Intro -->
+    <string name="nano_intro_title">On-device AI (Gemini Nano)</string>
+    <string name="nano_intro_body">Gemini Nano is Google\'s smallest model — it runs entirely on the device, with no
+        network round-trip. Support is checked at runtime through ML Kit\'s on-device GenAI APIs, which
+        are all powered by Gemini Nano.</string>
+
+    <!-- Supported devices -->
+    <string name="nano_supported_devices_header">Known supported devices</string>
+    <string name="nano_supported_devices_note">Devices that are known to ship with Gemini Nano on-device AI:</string>
+    <string name="nano_brand_pixel" translatable="false">Google Pixel</string>
+    <string name="nano_brand_samsung" translatable="false">Samsung Galaxy</string>
+    <string name="nano_brand_other">Other manufacturers</string>
+    <string name="nano_devices_pixel" translatable="false">Pixel 8 · 8 Pro · 8a · 9 · 9 Pro · 9 Pro XL · 9a · Pixel 10 series</string>
+    <string name="nano_devices_samsung" translatable="false">Galaxy S24 · S24+ · S24 Ultra · S24 FE · S25 · S25+ · S25 Ultra · Z Fold 6 · Z Flip 6 · Z Fold 7</string>
+    <string name="nano_devices_other" translatable="false">Xiaomi 15 · Motorola Razr 60 Ultra · Honor Magic series</string>
+
+    <!-- This device -->
+    <string name="nano_this_device_header">This device</string>
+    <string name="nano_label_manufacturer">Manufacturer</string>
+    <string name="nano_label_model">Model</string>
+    <string name="nano_label_android">Android API level</string>
+
+    <!-- Evaluation status -->
+    <string name="nano_checking">Checking on-device AI support…</string>
+    <string name="nano_status_ready_title">Ready</string>
+    <string name="nano_status_ready_detail">Gemini Nano is downloaded and ready to run on this device.</string>
+    <string name="nano_status_downloadable_title">Available to download</string>
+    <string name="nano_status_downloadable_detail">This device supports Gemini Nano. Download the model to start using on-device AI.</string>
+    <string name="nano_status_unavailable_title">Not available</string>
+    <string name="nano_status_unavailable_detail">This device doesn\'t support Gemini Nano on-device AI.</string>
+
+    <!-- Download -->
+    <string name="nano_download_button">Download model</string>
+    <string name="nano_downloading">Downloading model…</string>
+    <string name="nano_download_progress" translatable="false">%1$s / %2$s</string>
+
+    <!-- Error -->
+    <string name="nano_error_title">Couldn\'t check support</string>
+    <string name="nano_retry">Try again</string>
+
+    <string name="nano_source">Source: localaimaster.com — Gemini Nano Android guide</string>
+</resources>

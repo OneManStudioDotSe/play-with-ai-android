@@ -41,7 +41,14 @@
       "Read(//tmp/**)",
       "Bash(python3 /tmp/extract_models.py)",
       "Bash(python3 /tmp/extract_full.py)",
-      "Bash(python3 /tmp/parse_models.py)"
+      "Bash(python3 /tmp/parse_models.py)",
+      "WebFetch(domain:localaimaster.com)",
+      "Bash(curl -s \"https://repo1.maven.org/maven2/com/google/mlkit/genai-summarization/maven-metadata.xml\")",
+      "Bash(curl -s \"https://dl.google.com/dl/android/maven2/com/google/mlkit/genai-summarization/maven-metadata.xml\")",
+      "Bash(curl -s \"https://maven.google.com/web/index.html\" -o /dev/null -w \"%{http_code}\\\\n\")",
+      "Bash(mv models/NanoDeviceInfo.kt ./NanoDeviceInfo.kt)",
+      "Bash(mv states/NanoUiState.kt ./NanoUiState.kt)",
+      "Bash(rmdir models *)"
     ]
   }
 }

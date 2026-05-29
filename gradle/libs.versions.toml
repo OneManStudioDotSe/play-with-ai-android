@@ -1,6 +1,6 @@
 [versions]
 # plugins
-agp = "9.1.1"
+agp = "9.2.1"
 ksp = "2.3.6"
 hilt = "2.59.2"
 detekt = "1.23.8"
@@ -10,12 +10,12 @@ kotlinxSerialization = "1.11.0"
 
 minSdk = "31"
 mockk = "1.14.9"
-targetSdk = "36"
-compileSdk = "36"
+targetSdk = "37"
+compileSdk = "37"
 
 # libraries
-coroutines = "1.10.2"
-firebaseBom = "34.12.0"
+coroutines = "1.11.0"
+firebaseBom = "34.14.0"
 googleServices = "4.4.4"
 hiltNavigationCompose = "1.3.0"
 hiltWork = "1.3.0"
@@ -23,15 +23,16 @@ coil = "2.7.0"
 javaxInject = "1"
 junit4 = "4.13.2"
 junitExt = "1.3.0"
-kotlin = "2.3.20"
+kotlin = "2.3.21"
 kotlinTest = "2.3.20"
 kotlinxCollectionsImmutable = "0.4.0"
 lifecycle = "2.10.0"
 mapsCompose = "8.3.0"
-material = "1.13.0"
-material3 = "1.5.0-alpha17"
+material = "1.14.0"
+material3 = "1.5.0-alpha20"
 materialIconsExtended = "1.7.8"
-navigationCompose = "2.9.7"
+mlkitGenai = "1.0.0-beta1"
+navigationCompose = "2.9.8"
 okhttp = "5.3.2"
 playServicesLocation = "21.3.0"
 playServicesMaps = "20.0.0"
@@ -39,7 +40,7 @@ retrofit = "3.0.0"
 room = "2.8.4"
 timber = "5.0.1"
 truth = "1.4.5"
-uiTooling = "1.10.6"
+uiTooling = "1.11.2"
 workManager = "2.11.2"
 
 [libraries]
@@ -63,6 +64,7 @@ junit4 = { module = "junit:junit", version.ref = "junit4" }
 kotlin-test = { module = "org.jetbrains.kotlin:kotlin-test", version.ref = "kotlinTest" }
 kotlinx-collections-immutable = { module = "org.jetbrains.kotlinx:kotlinx-collections-immutable", version.ref = "kotlinxCollectionsImmutable" }
 kotlinx-coroutines-core = { module = "org.jetbrains.kotlinx:kotlinx-coroutines-core", version.ref = "coroutines" }
+kotlinx-coroutines-guava = { module = "org.jetbrains.kotlinx:kotlinx-coroutines-guava", version.ref = "coroutines" }
 kotlinx-coroutines-play-services = { module = "org.jetbrains.kotlinx:kotlinx-coroutines-play-services", version.ref = "coroutines" }
 kotlinx-coroutines-test = { module = "org.jetbrains.kotlinx:kotlinx-coroutines-test", version.ref = "coroutines" }
 kotlinx-serialization-json = { module = "org.jetbrains.kotlinx:kotlinx-serialization-json", version.ref = "kotlinxSerialization" }
@@ -70,6 +72,7 @@ maps-compose = { module = "com.google.maps.android:maps-compose", version.ref = 
 maps-compose-utils = { module = "com.google.maps.android:maps-compose-utils", version.ref = "mapsCompose" }
 material = { module = "com.google.android.material:material", version.ref = "material" }
 material3 = { module = "androidx.compose.material3:material3", version.ref = "material3" }
+mlkit-genai-summarization = { module = "com.google.mlkit:genai-summarization", version.ref = "mlkitGenai" }
 mockk = { module = "io.mockk:mockk", version.ref = "mockk" }
 mockk-android = { module = "io.mockk:mockk-android", version.ref = "mockk" }
 okhttp = { module = "com.squareup.okhttp3:okhttp", version.ref = "okhttp" }

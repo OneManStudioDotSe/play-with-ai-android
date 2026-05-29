@@ -9,5 +9,6 @@
     <string name="nav_label_explain">Förklara</string>
     <string name="nav_label_plan">Planera</string>
     <string name="nav_label_explore">Utforska</string>
+    <string name="nav_label_nano">Nano</string>
     <string name="nav_label_sofa">SoFa</string>
 </resources>

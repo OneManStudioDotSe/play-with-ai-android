@@ -1,0 +1,40 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="nano_title">Nano</string>
+
+    <!-- Intro -->
+    <string name="nano_intro_title">AI på enheten (Gemini Nano)</string>
+    <string name="nano_intro_body">Gemini Nano är Googles minsta modell — den körs helt på enheten, utan något
+        nätverksanrop. Stödet kontrolleras vid körning via ML Kits GenAI-API:er på enheten, som alla
+        drivs av Gemini Nano.</string>
+
+    <!-- Supported devices -->
+    <string name="nano_supported_devices_header">Kända enheter som stöds</string>
+    <string name="nano_supported_devices_note">Enheter som är kända för att levereras med Gemini Nano på enheten:</string>
+    <string name="nano_brand_other">Övriga tillverkare</string>
+
+    <!-- This device -->
+    <string name="nano_this_device_header">Den här enheten</string>
+    <string name="nano_label_manufacturer">Tillverkare</string>
+    <string name="nano_label_model">Modell</string>
+    <string name="nano_label_android">Android API-nivå</string>
+
+    <!-- Evaluation status -->
+    <string name="nano_checking">Kontrollerar stöd för AI på enheten…</string>
+    <string name="nano_status_ready_title">Redo</string>
+    <string name="nano_status_ready_detail">Gemini Nano är nedladdad och redo att köras på den här enheten.</string>
+    <string name="nano_status_downloadable_title">Tillgänglig att ladda ner</string>
+    <string name="nano_status_downloadable_detail">Den här enheten stöder Gemini Nano. Ladda ner modellen för att börja använda AI på enheten.</string>
+    <string name="nano_status_unavailable_title">Inte tillgänglig</string>
+    <string name="nano_status_unavailable_detail">Den här enheten stöder inte Gemini Nano AI på enheten.</string>
+
+    <!-- Download -->
+    <string name="nano_download_button">Ladda ner modell</string>
+    <string name="nano_downloading">Laddar ner modell…</string>
+
+    <!-- Error -->
+    <string name="nano_error_title">Det gick inte att kontrollera stöd</string>
+    <string name="nano_retry">Försök igen</string>
+
+    <string name="nano_source">Källa: localaimaster.com — guide för Gemini Nano på Android</string>
+</resources>

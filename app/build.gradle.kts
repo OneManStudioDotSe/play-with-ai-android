@@ -89,6 +89,7 @@ dependencies {
     implementation(project(":feature:plan"))
     implementation(project(":feature:dream"))
     implementation(project(":feature:explore"))
+    implementation(project(":feature:nano"))
     implementation(project(":feature:settings"))
     implementation(project(":feature:showcase"))
 
