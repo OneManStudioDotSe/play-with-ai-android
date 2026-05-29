@@ -78,7 +78,7 @@ class DreamViewModelTest {
     }
 
     @Test
-    fun `interpretDream success sets image state to Generated with artist name`() = runTest {
+    fun `interpretDream success persists generated image with artist name`() = runTest {
         val interpretation = createTestInterpretation()
         val dreamImage = DreamImage(imageBase64 = "AAAA", mimeType = "image/png", artistName = "Salvador Dali")
         val viewModel = createViewModel(
@@ -89,9 +89,10 @@ class DreamViewModelTest {
         viewModel.interpretDream("I was flying")
         advanceUntilIdle()
 
+        // Generation succeeds and the image is persisted, so the final state is Persisted (carrying the artist name).
         val imageState = viewModel.screenState.value.imageState
-        assert(imageState is DreamImageState.Generated)
-        assertEquals("Salvador Dali", (imageState as DreamImageState.Generated).artistName)
+        assert(imageState is DreamImageState.Persisted)
+        assertEquals("Salvador Dali", (imageState as DreamImageState.Persisted).artistName)
     }
 
     @Test
@@ -255,7 +256,7 @@ class DreamViewModelTest {
         advanceUntilIdle()
 
         assert(viewModel.screenState.value.dreamState is DreamUiState.Result)
-        assert(viewModel.screenState.value.imageState is DreamImageState.Generated)
+        assert(viewModel.screenState.value.imageState is DreamImageState.Persisted)
 
         viewModel.clearResult()
         advanceUntilIdle()

@@ -30,6 +30,7 @@ import se.onemanstudio.playaroundwithai.data.chat.domain.usecase.SavePromptUseCa
 import se.onemanstudio.playaroundwithai.data.chat.domain.usecase.UpdatePromptTextUseCase
 import se.onemanstudio.playaroundwithai.core.auth.usecase.ObserveAuthReadyUseCase
 import se.onemanstudio.playaroundwithai.core.config.model.ApiKeyAvailability
+import se.onemanstudio.playaroundwithai.core.config.settings.AppSettingsHolder
 import se.onemanstudio.playaroundwithai.feature.chat.states.SnackbarEvent
 import se.onemanstudio.playaroundwithai.feature.chat.states.ChatError
 import se.onemanstudio.playaroundwithai.feature.chat.states.ChatUiState
@@ -380,6 +381,7 @@ class ChatViewModelTest {
             UpdatePromptTextUseCase(effectivePromptRepository),
             RetryPendingSyncsUseCase(effectivePromptRepository),
             observeAuthReadyUseCase,
+            AppSettingsHolder(),
             apiKeyAvailability,
             fileUtils,
         )

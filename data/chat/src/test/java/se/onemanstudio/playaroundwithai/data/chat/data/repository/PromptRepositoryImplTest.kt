@@ -14,6 +14,7 @@ import kotlinx.coroutines.test.runTest
 import org.junit.Before
 import org.junit.Test
 import se.onemanstudio.playaroundwithai.core.auth.repository.AuthRepository
+import se.onemanstudio.playaroundwithai.core.config.settings.AppSettingsHolder
 import se.onemanstudio.playaroundwithai.core.database.dao.PromptsHistoryDao
 import se.onemanstudio.playaroundwithai.core.database.entity.PromptEntity
 import se.onemanstudio.playaroundwithai.data.chat.domain.model.Prompt
@@ -33,7 +34,7 @@ class PromptRepositoryImplTest {
         workManager = mockk(relaxed = true)
         authRepository = mockk(relaxed = true)
         every { authRepository.isUserSignedIn() } returns true
-        repository = PromptRepositoryImpl(dao, workManager, authRepository)
+        repository = PromptRepositoryImpl(dao, workManager, authRepository, AppSettingsHolder())
     }
 
     @Test

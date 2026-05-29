@@ -10,7 +10,6 @@ import org.junit.Test
 import se.onemanstudio.playaroundwithai.data.explore.domain.model.ExploreItem
 import se.onemanstudio.playaroundwithai.data.explore.domain.model.VehicleType
 import se.onemanstudio.playaroundwithai.data.explore.domain.repository.ExplorePointsRepository
-import kotlin.test.assertFailsWith
 
 class GetExploreItemsUseCaseTest {
 
@@ -37,50 +36,54 @@ class GetExploreItemsUseCaseTest {
         )
         coEvery { explorePointsRepository.getExploreItems(2, 59.3293, 18.0686) } returns expectedItems
 
-        val result = useCase(count = 2, centerLat = 59.3293, centerLng = 18.0686)
+        val items = useCase(count = 2, centerLat = 59.3293, centerLng = 18.0686).getOrThrow()
 
-        assertThat(result).hasSize(2)
-        assertThat(result.first().id).isEqualTo("id1")
-        assertThat(result.first().type).isEqualTo(VehicleType.Scooter)
-        assertThat(result.last().id).isEqualTo("id2")
-        assertThat(result.last().type).isEqualTo(VehicleType.Bicycle)
+        assertThat(items).hasSize(2)
+        assertThat(items.first().id).isEqualTo("id1")
+        assertThat(items.first().type).isEqualTo(VehicleType.Scooter)
+        assertThat(items.last().id).isEqualTo("id2")
+        assertThat(items.last().type).isEqualTo(VehicleType.Bicycle)
         coVerify(exactly = 1) { explorePointsRepository.getExploreItems(2, 59.3293, 18.0686) }
     }
 
     @Test
-    fun `invoke with count of zero throws IllegalArgumentException`() = runTest {
-        assertFailsWith<IllegalArgumentException> {
-            useCase(count = 0, centerLat = 59.3293, centerLng = 18.0686)
-        }
+    fun `invoke with count of zero returns failure with IllegalArgumentException`() = runTest {
+        val result = useCase(count = 0, centerLat = 59.3293, centerLng = 18.0686)
+
+        assertThat(result.isFailure).isTrue()
+        assertThat(result.exceptionOrNull()).isInstanceOf(IllegalArgumentException::class.java)
     }
 
     @Test
-    fun `invoke with count exceeding max throws IllegalArgumentException`() = runTest {
-        assertFailsWith<IllegalArgumentException> {
-            useCase(count = MAX_ITEM_COUNT + 1, centerLat = 59.3293, centerLng = 18.0686)
-        }
+    fun `invoke with count exceeding max returns failure with IllegalArgumentException`() = runTest {
+        val result = useCase(count = MAX_ITEM_COUNT + 1, centerLat = 59.3293, centerLng = 18.0686)
+
+        assertThat(result.isFailure).isTrue()
+        assertThat(result.exceptionOrNull()).isInstanceOf(IllegalArgumentException::class.java)
     }
 
     @Test
-    fun `invoke with invalid latitude throws IllegalArgumentException`() = runTest {
-        assertFailsWith<IllegalArgumentException> {
-            useCase(count = 10, centerLat = 91.0, centerLng = 18.0686)
-        }
+    fun `invoke with invalid latitude returns failure with IllegalArgumentException`() = runTest {
+        val result = useCase(count = 10, centerLat = 91.0, centerLng = 18.0686)
+
+        assertThat(result.isFailure).isTrue()
+        assertThat(result.exceptionOrNull()).isInstanceOf(IllegalArgumentException::class.java)
     }
 
     @Test
-    fun `invoke with invalid longitude throws IllegalArgumentException`() = runTest {
-        assertFailsWith<IllegalArgumentException> {
-            useCase(count = 10, centerLat = 59.3293, centerLng = 181.0)
-        }
+    fun `invoke with invalid longitude returns failure with IllegalArgumentException`() = runTest {
+        val result = useCase(count = 10, centerLat = 59.3293, centerLng = 181.0)
+
+        assertThat(result.isFailure).isTrue()
+        assertThat(result.exceptionOrNull()).isInstanceOf(IllegalArgumentException::class.java)
     }
 
     @Test
     fun `invoke when repository returns empty list returns empty list`() = runTest {
         coEvery { explorePointsRepository.getExploreItems(any(), any(), any()) } returns emptyList()
 
-        val result = useCase(count = 5, centerLat = 59.3293, centerLng = 18.0686)
+        val items = useCase(count = 5, centerLat = 59.3293, centerLng = 18.0686).getOrThrow()
 
-        assertThat(result).isEmpty()
+        assertThat(items).isEmpty()
     }
 }

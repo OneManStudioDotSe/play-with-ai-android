@@ -2,6 +2,9 @@ package se.onemanstudio.playaroundwithai.data.plan.data.tools
 
 import com.google.common.truth.Truth.assertThat
 import org.junit.Test
+import se.onemanstudio.playaroundwithai.core.network.utils.haversineKm
+
+private const val WALKING_SPEED_KMH = 5.0
 
 class RouteCalculatorTest {
 
@@ -12,7 +15,7 @@ class RouteCalculatorTest {
         // GIVEN: No places
 
         // WHEN
-        val result = RouteCalculator.findOptimalRoute(emptyList())
+        val result = RouteCalculator.findOptimalRoute(emptyList(), WALKING_SPEED_KMH)
 
         // THEN
         assertThat(result.orderedIndices).isEmpty()
@@ -26,7 +29,7 @@ class RouteCalculatorTest {
         val places = listOf(59.3293 to 18.0686) // Stockholm
 
         // WHEN
-        val result = RouteCalculator.findOptimalRoute(places)
+        val result = RouteCalculator.findOptimalRoute(places, WALKING_SPEED_KMH)
 
         // THEN
         assertThat(result.orderedIndices).containsExactly(0)
@@ -47,7 +50,7 @@ class RouteCalculatorTest {
         )
 
         // WHEN
-        val result = RouteCalculator.findOptimalRoute(places)
+        val result = RouteCalculator.findOptimalRoute(places, WALKING_SPEED_KMH)
 
         // THEN
         assertThat(result.orderedIndices).hasSize(2)
@@ -72,7 +75,7 @@ class RouteCalculatorTest {
         )
 
         // WHEN
-        val result = RouteCalculator.findOptimalRoute(places)
+        val result = RouteCalculator.findOptimalRoute(places, WALKING_SPEED_KMH)
 
         // THEN: The optimal route visits south-to-north or north-to-south
         assertThat(result.orderedIndices).hasSize(4)
@@ -101,7 +104,7 @@ class RouteCalculatorTest {
         val naiveDistance = RouteCalculator.pathDistanceKm(naiveOrder)
 
         // WHEN
-        val result = RouteCalculator.findOptimalRoute(places)
+        val result = RouteCalculator.findOptimalRoute(places, WALKING_SPEED_KMH)
 
         // THEN: Optimal route distance should be less than or equal to naive order
         assertThat(result.totalDistanceKm).isAtMost(naiveDistance)
@@ -121,7 +124,7 @@ class RouteCalculatorTest {
         )
 
         // WHEN
-        val result = RouteCalculator.findOptimalRoute(places)
+        val result = RouteCalculator.findOptimalRoute(places, WALKING_SPEED_KMH)
 
         // THEN: Walking minutes should be proportional to distance at 5 km/h
         val expectedMinutes = (result.totalDistanceKm / 5.0 * 60).toInt()
@@ -138,7 +141,7 @@ class RouteCalculatorTest {
         // Known distance is approximately 398 km
 
         // WHEN
-        val distance = RouteCalculator.haversineKm(59.3293, 18.0686, 57.7089, 11.9746)
+        val distance = haversineKm(59.3293, 18.0686, 57.7089, 11.9746)
 
         // THEN
         assertThat(distance).isWithin(10.0).of(398.0)
@@ -149,7 +152,7 @@ class RouteCalculatorTest {
         // GIVEN: The same coordinates
 
         // WHEN
-        val distance = RouteCalculator.haversineKm(59.3293, 18.0686, 59.3293, 18.0686)
+        val distance = haversineKm(59.3293, 18.0686, 59.3293, 18.0686)
 
         // THEN
         assertThat(distance).isEqualTo(0.0)
@@ -161,7 +164,7 @@ class RouteCalculatorTest {
         // Known distance is approximately 343 km
 
         // WHEN
-        val distance = RouteCalculator.haversineKm(51.5074, -0.1278, 48.8566, 2.3522)
+        val distance = haversineKm(51.5074, -0.1278, 48.8566, 2.3522)
 
         // THEN
         assertThat(distance).isWithin(10.0).of(343.0)
@@ -172,8 +175,8 @@ class RouteCalculatorTest {
         // GIVEN: Two points
 
         // WHEN
-        val distanceAtoB = RouteCalculator.haversineKm(59.3293, 18.0686, 57.7089, 11.9746)
-        val distanceBtoA = RouteCalculator.haversineKm(57.7089, 11.9746, 59.3293, 18.0686)
+        val distanceAtoB = haversineKm(59.3293, 18.0686, 57.7089, 11.9746)
+        val distanceBtoA = haversineKm(57.7089, 11.9746, 59.3293, 18.0686)
 
         // THEN
         assertThat(distanceAtoB).isWithin(0.001).of(distanceBtoA)
@@ -214,7 +217,7 @@ class RouteCalculatorTest {
 
         // WHEN
         val pathDistance = RouteCalculator.pathDistanceKm(listOf(pointA, pointB, pointC))
-        val directDistance = RouteCalculator.haversineKm(pointA.first, pointA.second, pointC.first, pointC.second)
+        val directDistance = haversineKm(pointA.first, pointA.second, pointC.first, pointC.second)
 
         // THEN: For collinear points, path distance should equal direct distance
         assertThat(pathDistance).isWithin(0.01).of(directDistance)
@@ -228,7 +231,7 @@ class RouteCalculatorTest {
 
         // WHEN
         val pathDistance = RouteCalculator.pathDistanceKm(listOf(pointA, pointB))
-        val haversineDistance = RouteCalculator.haversineKm(pointA.first, pointA.second, pointB.first, pointB.second)
+        val haversineDistance = haversineKm(pointA.first, pointA.second, pointB.first, pointB.second)
 
         // THEN
         assertThat(pathDistance).isWithin(0.001).of(haversineDistance)

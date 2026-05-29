@@ -14,6 +14,7 @@ import kotlinx.coroutines.test.setMain
 import org.junit.After
 import org.junit.Before
 import org.junit.Test
+import se.onemanstudio.playaroundwithai.core.config.settings.AppSettingsHolder
 import se.onemanstudio.playaroundwithai.core.network.api.GeminiApiService
 import se.onemanstudio.playaroundwithai.core.network.dto.Candidate
 import se.onemanstudio.playaroundwithai.core.network.dto.Content
@@ -37,7 +38,7 @@ class ChatGeminiRepositoryImplTest {
         Dispatchers.setMain(testDispatcher)
         apiService = mockk()
         tokenUsageTracker = mockk(relaxed = true)
-        repository = ChatGeminiRepositoryImpl(apiService, tokenUsageTracker)
+        repository = ChatGeminiRepositoryImpl(apiService, tokenUsageTracker, AppSettingsHolder())
     }
 
     @After
@@ -49,20 +50,20 @@ class ChatGeminiRepositoryImplTest {
     fun `getAiResponse with valid prompt returns success`() = runTest {
         val requestSlot = slot<GeminiRequest>()
         coEvery {
-            apiService.generateContent(capture(requestSlot))
+            apiService.generateContent(any(), capture(requestSlot))
         } returns geminiResponse("AI Overlord response")
 
         val result = repository.getAiResponse("Tell me a joke", null, null, null)
 
         assertThat(result.isSuccess).isTrue()
         assertThat(result.getOrThrow()).isEqualTo("AI Overlord response")
-        coVerify(exactly = 1) { apiService.generateContent(any()) }
+        coVerify(exactly = 1) { apiService.generateContent(any(), any()) }
     }
 
     @Test
     fun `getAiResponse when API throws IOException returns failure`() = runTest {
         coEvery {
-            apiService.generateContent(any())
+            apiService.generateContent(any(), any())
         } throws IOException("Network error")
 
         val result = repository.getAiResponse("Hello", null, null, null)
@@ -74,7 +75,7 @@ class ChatGeminiRepositoryImplTest {
     @Test
     fun `getAiResponse when API returns empty candidates returns fallback text`() = runTest {
         coEvery {
-            apiService.generateContent(any())
+            apiService.generateContent(any(), any())
         } returns GeminiResponse(candidates = listOf(Candidate(content = Content(parts = emptyList()))))
 
         val result = repository.getAiResponse("Hello", null, null, null)
@@ -87,7 +88,7 @@ class ChatGeminiRepositoryImplTest {
     fun `getAiResponse includes file text in prompt when provided`() = runTest {
         val requestSlot = slot<GeminiRequest>()
         coEvery {
-            apiService.generateContent(capture(requestSlot))
+            apiService.generateContent(any(), capture(requestSlot))
         } returns geminiResponse("File analysis done")
 
         repository.getAiResponse("Analyze this", null, "Document content here", null)
@@ -100,7 +101,7 @@ class ChatGeminiRepositoryImplTest {
     @Test
     fun `generateConversationStarters parses pipe-separated response`() = runTest {
         coEvery {
-            apiService.generateContent(any())
+            apiService.generateContent(any(), any())
         } returns geminiResponse("Bow before AI|Surrender now|Resistance is futile")
 
         val result = repository.generateConversationStarters()
@@ -116,7 +117,7 @@ class ChatGeminiRepositoryImplTest {
     @Test
     fun `generateConversationStarters limits to 3 suggestions`() = runTest {
         coEvery {
-            apiService.generateContent(any())
+            apiService.generateContent(any(), any())
         } returns geminiResponse("One|Two|Three|Four|Five")
 
         val result = repository.generateConversationStarters()
@@ -128,7 +129,7 @@ class ChatGeminiRepositoryImplTest {
     @Test
     fun `generateConversationStarters with empty response returns failure`() = runTest {
         coEvery {
-            apiService.generateContent(any())
+            apiService.generateContent(any(), any())
         } returns GeminiResponse(candidates = listOf(Candidate(content = Content(parts = emptyList()))))
 
         val result = repository.generateConversationStarters()
@@ -139,7 +140,7 @@ class ChatGeminiRepositoryImplTest {
     @Test
     fun `generateConversationStarters when API throws returns failure`() = runTest {
         coEvery {
-            apiService.generateContent(any())
+            apiService.generateContent(any(), any())
         } throws IOException("Network error")
 
         val result = repository.generateConversationStarters()

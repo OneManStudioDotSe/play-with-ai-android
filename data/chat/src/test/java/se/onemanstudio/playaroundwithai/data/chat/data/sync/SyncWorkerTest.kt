@@ -72,13 +72,11 @@ class SyncWorkerTest {
         val entity = PromptEntity(id = 1, text = "Hello", timestamp = 1000L, syncStatus = SyncStatus.Pending)
         coEvery { promptsDao.getPromptsBySyncStatus(SyncStatus.Pending) } returns listOf(entity)
         coEvery { firestoreDataSource.savePrompt("Hello", 1000L) } returns Result.success("doc123")
-        coEvery { promptsDao.markSyncedIfTextMatches(1L, "Hello", SyncStatus.Synced) } returns 1
 
         val result = createWorker().doWork()
 
         assertThat(result).isEqualTo(ListenableWorker.Result.success())
         coVerify { promptsDao.updateFirestoreDocId(1L, "doc123") }
-        coVerify { promptsDao.markSyncedIfTextMatches(1L, "Hello", SyncStatus.Synced) }
     }
 
     @Test
@@ -88,7 +86,6 @@ class SyncWorkerTest {
         )
         coEvery { promptsDao.getPromptsBySyncStatus(SyncStatus.Pending) } returns listOf(entity)
         coEvery { firestoreDataSource.updatePrompt("existingDoc", "Updated text") } returns Result.success(Unit)
-        coEvery { promptsDao.markSyncedIfTextMatches(2L, "Updated text", SyncStatus.Synced) } returns 1
 
         val result = createWorker().doWork()
 

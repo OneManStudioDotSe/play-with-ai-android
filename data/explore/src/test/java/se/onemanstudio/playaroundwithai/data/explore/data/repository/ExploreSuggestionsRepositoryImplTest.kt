@@ -18,6 +18,7 @@ import org.junit.Before
 import org.junit.Test
 import retrofit2.HttpException
 import retrofit2.Response
+import se.onemanstudio.playaroundwithai.core.config.settings.AppSettingsHolder
 import se.onemanstudio.playaroundwithai.core.network.api.GeminiApiService
 import se.onemanstudio.playaroundwithai.core.network.dto.Candidate
 import se.onemanstudio.playaroundwithai.core.network.dto.Content
@@ -42,7 +43,7 @@ class ExploreSuggestionsRepositoryImplTest {
         Dispatchers.setMain(testDispatcher)
         apiService = mockk()
         tokenUsageTracker = mockk(relaxed = true)
-        repository = ExploreSuggestionsRepositoryImpl(apiService, gson, tokenUsageTracker)
+        repository = ExploreSuggestionsRepositoryImpl(apiService, gson, tokenUsageTracker, AppSettingsHolder())
     }
 
     @After
@@ -52,7 +53,7 @@ class ExploreSuggestionsRepositoryImplTest {
 
     @Test
     fun `getSuggestedPlaces with valid response returns list of SuggestedPlace`() = runTest {
-        coEvery { apiService.generateContent(any()) } returns geminiResponse(VALID_JSON)
+        coEvery { apiService.generateContent(any(), any()) } returns geminiResponse(VALID_JSON)
 
         val result = repository.getSuggestedPlaces(TEST_LAT, TEST_LNG)
 
@@ -68,7 +69,7 @@ class ExploreSuggestionsRepositoryImplTest {
 
     @Test
     fun `getSuggestedPlaces when response text is blank returns failure with IOException`() = runTest {
-        coEvery { apiService.generateContent(any()) } returns geminiResponse("")
+        coEvery { apiService.generateContent(any(), any()) } returns geminiResponse("")
 
         val result = repository.getSuggestedPlaces(TEST_LAT, TEST_LNG)
 
@@ -79,7 +80,7 @@ class ExploreSuggestionsRepositoryImplTest {
 
     @Test
     fun `getSuggestedPlaces when response text is null returns failure with IOException`() = runTest {
-        coEvery { apiService.generateContent(any()) } returns GeminiResponse(
+        coEvery { apiService.generateContent(any(), any()) } returns GeminiResponse(
             candidates = listOf(Candidate(content = Content(parts = emptyList())))
         )
 
@@ -92,7 +93,7 @@ class ExploreSuggestionsRepositoryImplTest {
     @Test
     fun `getSuggestedPlaces with code-fenced JSON extracts and parses correctly`() = runTest {
         val codeFencedJson = "```json\n$VALID_JSON\n```"
-        coEvery { apiService.generateContent(any()) } returns geminiResponse(codeFencedJson)
+        coEvery { apiService.generateContent(any(), any()) } returns geminiResponse(codeFencedJson)
 
         val result = repository.getSuggestedPlaces(TEST_LAT, TEST_LNG)
 
@@ -104,7 +105,7 @@ class ExploreSuggestionsRepositoryImplTest {
 
     @Test
     fun `getSuggestedPlaces with malformed JSON returns failure with JsonSyntaxException`() = runTest {
-        coEvery { apiService.generateContent(any()) } returns geminiResponse("{ invalid json }")
+        coEvery { apiService.generateContent(any(), any()) } returns geminiResponse("{ invalid json }")
 
         val result = repository.getSuggestedPlaces(TEST_LAT, TEST_LNG)
 
@@ -114,7 +115,7 @@ class ExploreSuggestionsRepositoryImplTest {
 
     @Test
     fun `getSuggestedPlaces when API throws IOException returns failure`() = runTest {
-        coEvery { apiService.generateContent(any()) } throws IOException("Network error")
+        coEvery { apiService.generateContent(any(), any()) } throws IOException("Network error")
 
         val result = repository.getSuggestedPlaces(TEST_LAT, TEST_LNG)
 
@@ -126,7 +127,7 @@ class ExploreSuggestionsRepositoryImplTest {
     @Test
     fun `getSuggestedPlaces when API throws HttpException returns failure`() = runTest {
         val httpException = HttpException(Response.error<Any>(429, "Too Many Requests".toResponseBody()))
-        coEvery { apiService.generateContent(any()) } throws httpException
+        coEvery { apiService.generateContent(any(), any()) } throws httpException
 
         val result = repository.getSuggestedPlaces(TEST_LAT, TEST_LNG)
 
@@ -137,7 +138,7 @@ class ExploreSuggestionsRepositoryImplTest {
     @Test
     fun `getSuggestedPlaces records token usage on successful API call`() = runTest {
         val usageMetadata = UsageMetadata(promptTokenCount = 100, candidatesTokenCount = 200, totalTokenCount = 300)
-        coEvery { apiService.generateContent(any()) } returns geminiResponse(VALID_JSON, usageMetadata)
+        coEvery { apiService.generateContent(any(), any()) } returns geminiResponse(VALID_JSON, usageMetadata)
 
         repository.getSuggestedPlaces(TEST_LAT, TEST_LNG)
 

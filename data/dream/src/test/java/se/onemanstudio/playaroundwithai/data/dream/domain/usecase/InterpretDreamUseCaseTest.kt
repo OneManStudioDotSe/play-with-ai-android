@@ -7,6 +7,7 @@ import io.mockk.mockk
 import kotlinx.coroutines.test.runTest
 import org.junit.Before
 import org.junit.Test
+import se.onemanstudio.playaroundwithai.data.dream.domain.MAX_DREAM_LENGTH
 import se.onemanstudio.playaroundwithai.data.dream.domain.model.DreamInterpretation
 import se.onemanstudio.playaroundwithai.data.dream.domain.model.DreamMood
 import se.onemanstudio.playaroundwithai.data.dream.domain.model.DreamPalette

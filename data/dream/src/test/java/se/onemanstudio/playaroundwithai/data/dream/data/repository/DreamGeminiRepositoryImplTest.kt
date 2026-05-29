@@ -19,6 +19,7 @@ import org.junit.Before
 import org.junit.Test
 import retrofit2.HttpException
 import retrofit2.Response
+import se.onemanstudio.playaroundwithai.core.config.settings.AppSettingsHolder
 import se.onemanstudio.playaroundwithai.core.network.api.GeminiApiService
 import se.onemanstudio.playaroundwithai.core.network.dto.Candidate
 import se.onemanstudio.playaroundwithai.core.network.dto.Content
@@ -46,7 +47,7 @@ class DreamGeminiRepositoryImplTest {
         Dispatchers.setMain(testDispatcher)
         apiService = mockk()
         tokenUsageTracker = mockk(relaxed = true)
-        repository = DreamGeminiRepositoryImpl(apiService, gson, tokenUsageTracker)
+        repository = DreamGeminiRepositoryImpl(apiService, gson, tokenUsageTracker, AppSettingsHolder())
     }
 
     @After
@@ -56,7 +57,7 @@ class DreamGeminiRepositoryImplTest {
 
     @Test
     fun `interpretDream with valid JSON returns successful DreamInterpretation`() = runTest {
-        coEvery { apiService.generateContent(any()) } returns geminiResponse(VALID_JSON)
+        coEvery { apiService.generateContent(any(), any()) } returns geminiResponse(VALID_JSON)
 
         val result = repository.interpretDream("I was flying over a purple ocean")
 
@@ -78,7 +79,7 @@ class DreamGeminiRepositoryImplTest {
 
     @Test
     fun `interpretDream when API returns null text returns failure`() = runTest {
-        coEvery { apiService.generateContent(any()) } returns GeminiResponse(
+        coEvery { apiService.generateContent(any(), any()) } returns GeminiResponse(
             candidates = listOf(Candidate(content = Content(parts = emptyList())))
         )
 
@@ -91,7 +92,7 @@ class DreamGeminiRepositoryImplTest {
 
     @Test
     fun `interpretDream when API throws IOException returns failure`() = runTest {
-        coEvery { apiService.generateContent(any()) } throws IOException("Network error")
+        coEvery { apiService.generateContent(any(), any()) } throws IOException("Network error")
 
         val result = repository.interpretDream("A dream about the sea")
 
@@ -103,7 +104,7 @@ class DreamGeminiRepositoryImplTest {
     @Test
     fun `interpretDream when API throws HttpException returns failure`() = runTest {
         val httpException = HttpException(Response.error<Any>(429, "Rate limited".toResponseBody()))
-        coEvery { apiService.generateContent(any()) } throws httpException
+        coEvery { apiService.generateContent(any(), any()) } throws httpException
 
         val result = repository.interpretDream("A dream about the sky")
 
@@ -113,7 +114,7 @@ class DreamGeminiRepositoryImplTest {
 
     @Test
     fun `interpretDream with malformed JSON returns failure with JsonSyntaxException`() = runTest {
-        coEvery { apiService.generateContent(any()) } returns geminiResponse("{ not valid json !!!")
+        coEvery { apiService.generateContent(any(), any()) } returns geminiResponse("{ not valid json !!!")
 
         val result = repository.interpretDream("A dream about chaos")
 
@@ -124,7 +125,7 @@ class DreamGeminiRepositoryImplTest {
     @Test
     fun `interpretDream strips json code fences from response`() = runTest {
         val wrappedJson = "```json\n$VALID_JSON\n```"
-        coEvery { apiService.generateContent(any()) } returns geminiResponse(wrappedJson)
+        coEvery { apiService.generateContent(any(), any()) } returns geminiResponse(wrappedJson)
 
         val result = repository.interpretDream("I was swimming in clouds")
 
@@ -136,7 +137,7 @@ class DreamGeminiRepositoryImplTest {
     @Test
     fun `interpretDream with unknown mood string defaults to MYSTERIOUS`() = runTest {
         val jsonWithUnknownMood = VALID_JSON.replace("\"JOYFUL\"", "\"WHIMSICAL\"")
-        coEvery { apiService.generateContent(any()) } returns geminiResponse(jsonWithUnknownMood)
+        coEvery { apiService.generateContent(any(), any()) } returns geminiResponse(jsonWithUnknownMood)
 
         val result = repository.interpretDream("A peculiar dream")
 
@@ -147,7 +148,7 @@ class DreamGeminiRepositoryImplTest {
     @Test
     fun `interpretDream records token usage`() = runTest {
         val usageMetadata = UsageMetadata(promptTokenCount = 100, candidatesTokenCount = 200, totalTokenCount = 300)
-        coEvery { apiService.generateContent(any()) } returns geminiResponse(VALID_JSON, usageMetadata)
+        coEvery { apiService.generateContent(any(), any()) } returns geminiResponse(VALID_JSON, usageMetadata)
 
         repository.interpretDream("I was flying")
 
@@ -157,7 +158,7 @@ class DreamGeminiRepositoryImplTest {
     @Test
     fun `interpretDream sends prompt containing the dream description`() = runTest {
         val requestSlot = slot<GeminiRequest>()
-        coEvery { apiService.generateContent(capture(requestSlot)) } returns geminiResponse(VALID_JSON)
+        coEvery { apiService.generateContent(any(), capture(requestSlot)) } returns geminiResponse(VALID_JSON)
 
         repository.interpretDream("I was lost in a forest")
 
