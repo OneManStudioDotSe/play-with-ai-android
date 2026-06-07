@@ -40,22 +40,19 @@ android {
 dependencies {
     implementation(project(":core:config"))
     implementation(project(":core:network"))
-    implementation(project(":core:theme"))
-    implementation(project(":core:ui"))
+
     implementation(project(":data:explore"))
 
-    implementation(libs.material3)
-    implementation(libs.androidx.material.icons.extended)
-    implementation(libs.androidx.lifecycle.runtime.compose)
-    implementation(libs.kotlinx.collections.immutable)
+    implementation(project(":ui:components"))
+
+    implementation(libs.bundles.compose.feature)
 
     implementation(libs.timber)
     implementation(libs.coil.compose)
 
     // Hilt
-    implementation(libs.hilt.android)
+    implementation(libs.bundles.hilt)
     ksp(libs.hilt.compiler)
-    implementation(libs.hilt.navigation.compose)
 
     implementation(libs.maps.compose)
     implementation(libs.maps.compose.utils)
@@ -66,9 +63,5 @@ dependencies {
 
     // Testing
     testImplementation(project(":core:testing"))
-    testImplementation(libs.junit4)
-    testImplementation(libs.mockk)
-    testImplementation(libs.kotlinx.coroutines.test)
-    testImplementation(libs.kotlin.test)
-    testImplementation(libs.truth)
+    testImplementation(libs.bundles.unit.test)
 }

@@ -50,6 +50,7 @@ import se.onemanstudio.playaroundwithai.feature.explore.ExploreScreen
 import se.onemanstudio.playaroundwithai.feature.nano.NanoScreen
 import se.onemanstudio.playaroundwithai.feature.showcase.ShowcaseScreen
 import se.onemanstudio.playaroundwithai.feature.settings.SettingsBottomSheetContainer
+import se.onemanstudio.playaroundwithai.feature.settings.SettingsScreen
 import se.onemanstudio.playaroundwithai.navigation.Agents
 import se.onemanstudio.playaroundwithai.navigation.Chat
 import se.onemanstudio.playaroundwithai.navigation.Dreams
@@ -185,28 +186,44 @@ private fun NavigationableContent(
         composable<Chat> {
             ChatScreen(
                 settingsContent = { onDismiss ->
-                    SettingsBottomSheetContainer(onDismiss = onDismiss, onShowcaseClick = { openShowcase(onDismiss) })
+                    SettingsBottomSheetContainer(
+                        screen = SettingsScreen.CHAT,
+                        onDismiss = onDismiss,
+                        onShowcaseClick = { openShowcase(onDismiss) },
+                    )
                 }
             )
         }
         composable<Maps> {
             ExploreScreen(
                 settingsContent = { onDismiss ->
-                    SettingsBottomSheetContainer(onDismiss = onDismiss, onShowcaseClick = { openShowcase(onDismiss) })
+                    SettingsBottomSheetContainer(
+                        screen = SettingsScreen.EXPLORE,
+                        onDismiss = onDismiss,
+                        onShowcaseClick = { openShowcase(onDismiss) },
+                    )
                 }
             )
         }
         composable<Dreams> {
             DreamScreen(
                 settingsContent = { onDismiss ->
-                    SettingsBottomSheetContainer(onDismiss = onDismiss, onShowcaseClick = { openShowcase(onDismiss) })
+                    SettingsBottomSheetContainer(
+                        screen = SettingsScreen.DREAM,
+                        onDismiss = onDismiss,
+                        onShowcaseClick = { openShowcase(onDismiss) },
+                    )
                 }
             )
         }
         composable<Agents> {
             PlanScreen(
                 settingsContent = { onDismiss ->
-                    SettingsBottomSheetContainer(onDismiss = onDismiss, onShowcaseClick = { openShowcase(onDismiss) })
+                    SettingsBottomSheetContainer(
+                        screen = SettingsScreen.PLAN,
+                        onDismiss = onDismiss,
+                        onShowcaseClick = { openShowcase(onDismiss) },
+                    )
                 }
             )
         }

@@ -20,8 +20,8 @@ dependencyResolutionManagement {
 rootProject.name = "Play With AI"
 
 include(":app")
-include(":core:theme")
-include(":core:ui")
+include(":ui:theme")
+include(":ui:components")
 include(":core:auth")
 include(":core:config")
 include(":core:network")

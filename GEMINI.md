@@ -14,7 +14,8 @@ Dependency flow: `feature → data → core`.
 - **`:config`**: Centralized DI for API keys, settings, and build-time constants.
 - **`:database`**: Shared Room DB (v6) with entities for `Prompt`, `Dream`, and `TokenUsage`.
 - **`:tracking`**: Cross-feature token usage tracking (prompt/candidate/total).
-- **`:theme` / `:ui`**: "SoFa" Design System. **Prefer `:core:ui` components** (e.g., `NeoBrutalCard`) over raw Material3.
+- **`:testing`**: Shared test helpers (`MainCoroutineRule`).
+- **`:theme` / `:ui`**: "SoFa" Design System. **Prefer `:ui:components` components** (e.g., `NeoBrutalCard`) over raw Material3.
 - **`:auth`**: Firebase Anonymous Auth for Firestore sync.
 
 ### Data & Feature Modules
@@ -22,6 +23,9 @@ Dependency flow: `feature → data → core`.
 - **Dream (`:data:dream`, `:feature:dream`)**: Structured JSON generation for animated scenes + AI image synthesis (`gemini-2.5-flash-image`).
 - **Plan (`:data:plan`, `:feature:plan`)**: **Agentic Loop** using Gemini function calling with local tool execution.
 - **Explore (`:data:explore`, `:feature:explore`)**: Google Maps integration with AI-powered place suggestions.
+- **Nano (`:feature:nano`)**: **On-device AI** — checks Gemini Nano support via ML Kit GenAI. No `:data` module, no `:core:network` (no cloud call); depends only on `:ui:components` / `:ui:theme` + the ML Kit SDK.
+- **Settings (`:feature:settings`)**: Screen-aware Settings bottom sheet. **`:core`-only** (no `:data` dependency) — reads/writes the holders in `:core:config`.
+- **Showcase (`:feature:showcase`)**: Living style guide for the "SoFa" design system (no ViewModel, no Hilt).
 
 ---
 
@@ -32,13 +36,14 @@ Quick reference for prompt definitions and logic ownership:
 - **Dream**: `DreamPrompts.kt` (`:data:dream`), `DreamGeminiRepositoryImpl.kt`.
 - **Plan (Agent)**: `PlanPrompts.kt` (`:data:plan`), `TripPlannerRepositoryImpl.kt`.
 - **Explore**: `ExplorePrompts.kt` (`:data:explore`), `ExploreGeminiRepositoryImpl.kt`.
+- **Nano (On-device)**: `NanoViewModel.kt` (`:feature:nano`) — ML Kit GenAI probe; no prompt file, no repository.
 - **Sync Logic**: `SyncWorker.kt` (`:data:chat`) handles local-to-cloud history persistence.
 
 ---
 
 ## 🎨 Design System ("SoFa")
-All UI must follow the "NeoBrutalism" aesthetic defined in `:core:ui`.
-**Core Components** (in `:core:ui/.../sofa/`):
+All UI must follow the "NeoBrutalism" aesthetic defined in `:ui:components`.
+**Core Components** (in `:ui:components/.../sofa/`):
 - `NeoBrutalCard`, `NeoBrutalButton`, `NeoBrutalTextField`, `NeoBrutalChip`.
 - `NeoBrutalTopBar`: Standard header for all screens.
 - `UsageChart`: Animated token consumption visualization.
@@ -78,6 +83,11 @@ Both models are **user-configurable** via Settings. Defaults: `gemini-3-flash-pr
 - Uses `generateImageContent` endpoint.
 - Returns `inlineData` (Base64 PNG) + text (artist name).
 - Includes retry logic (up to 3x) as the model sometimes returns text-only.
+
+### 5. On-device Inference (Nano)
+- **No cloud call.** Uses ML Kit GenAI (`com.google.mlkit:genai-summarization`), backed by Gemini Nano via AICore.
+- ML Kit has no "is Nano available" call, so `NanoViewModel` uses a `Summarizer` purely as a probe: `checkFeatureStatus()` returns `AVAILABLE` / `DOWNLOADABLE` / `UNAVAILABLE`; `downloadFeature()` pulls the model with byte-progress.
+- No API key, no token tracking, no `:core:network` dependency.
 
 ---
 

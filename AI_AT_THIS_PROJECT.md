@@ -1,6 +1,6 @@
 # AI uses at this project
 
-All AI features in this app are powered by **Google Gemini** through a single REST endpoint. Both the text and image models are **user-configurable at runtime** via the Settings panel. This document catalogs every use of AI in the project.
+Almost every AI feature in this app is powered by **Google Gemini** through a single cloud REST endpoint, where both the text and image models are **user-configurable at runtime** via the Settings panel. The one exception is the **Nano** feature, which runs **on-device** through ML Kit's GenAI APIs (backed by Gemini Nano) and never touches the network. This document catalogs every use of AI in the project.
 
 ---
 
@@ -8,12 +8,12 @@ All AI features in this app are powered by **Google Gemini** through a single RE
 
 | Component            | Details                                                                                                                                                                                                                                                      |
 |----------------------|--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
-| **Model (text)**     | User-configurable via Settings; default: `gemini-3-flash-preview`                                                                                                                                                                                           |
-| **Model (image)**    | User-configurable via Settings; default: `gemini-2.5-flash-image` (used for dream image generation via `generateImageContent()`)                                                                                                                            |
-| **Endpoint**         | `POST /v1beta/models/{model}:generateContent` — model name injected at runtime via Retrofit `@Path`                                                                                                                                                         |
+| **Model (text)**     | User-configurable via Settings; default: `gemini-3-flash-preview`                                                                                                                                                                                            |
+| **Model (image)**    | User-configurable via Settings; default: `gemini-2.5-flash-image` (used for dream image generation via `generateImageContent()`)                                                                                                                             |
+| **Endpoint**         | `POST /v1beta/models/{model}:generateContent` — model name injected at runtime via Retrofit `@Path`                                                                                                                                                          |
 | **Base URL**         | `https://generativelanguage.googleapis.com/`                                                                                                                                                                                                                 |
 | **Auth**             | API key appended as `?key=` query parameter via `AuthenticationInterceptor`                                                                                                                                                                                  |
-| **HTTP client**      | OkHttp 5 + Retrofit 3; timeout configurable 15–120 s via Settings (default 30 s)                                                                                                                                                                            |
+| **HTTP client**      | OkHttp 5 + Retrofit 3; timeout configurable 15–120 s via Settings (default 30 s)                                                                                                                                                                             |
 | **Service**          | `GeminiApiService` (`core/network`)                                                                                                                                                                                                                          |
 | **Token tracking**   | Every AI call records prompt/candidate/total tokens to Room (`token_usage` table via `:core:database`), tagged by feature. Tracking logic owned by `:core:tracking` (`TokenUsageTrackerImpl`). Can be disabled in Settings.                                  |
 | **Thinking support** | `Part` DTO includes `thought` and `thought_signature` fields. `extractText()` filters out thinking parts (`thought != true`) to extract only the model's final response. Required for function calling round-trips where Gemini includes internal reasoning. |
@@ -133,7 +133,7 @@ Gemini may include `thought: true` parts with an opaque `thought_signature` in m
 
 ## AI Integration Patterns
 
-This project demonstrates five distinct levels of Gemini API integration, from a single text request up to an autonomous multi-turn agent. Each pattern builds on the one before it.
+This project demonstrates five distinct levels of cloud Gemini API integration, from a single text request up to an autonomous multi-turn agent (each pattern builds on the one before it), plus a sixth, orthogonal pattern that runs **on-device** instead of calling the network.
 
 | # | Pattern                    | Features                                                      | Key Difference                                                                                                                                                                                                                                                                                                                                       |
 |---|----------------------------|---------------------------------------------------------------|------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
@@ -142,8 +142,9 @@ This project demonstrates five distinct levels of Gemini API integration, from a
 | 3 | **Structured JSON Output** | Dream Interpretation, Suggested Places, Conversation Starters | Still a single request, but the prompt is engineered to produce a specific JSON (or delimited) format. The client must parse, validate, and apply fallback defaults for unknown enum values.                                                                                                                                                         |
 | 4 | **Image Generation**       | Dream Image                                                   | Uses a different model (`gemini-2.5-flash-image`) and endpoint (`generateImageContent`), with `generationConfig.responseModalities: ["IMAGE", "TEXT"]`. Responses contain `inlineData` (Base64 PNG) plus optional text. Requires retry logic because the model may intermittently return text-only responses.                                        |
 | 5 | **Multi-turn Agentic**     | Trip Planner                                                  | The most complex pattern. A loop sends requests with `tools` (function declarations). Gemini responds with `functionCall` parts; the app executes the tool locally, appends a `functionResponse`, and continues the conversation until Gemini returns a final text answer. Thinking parts (`thought: true`) must be preserved verbatim across turns. |
+| 6 | **On-device (Nano)**       | Nano                                                          | Orthogonal to the cloud patterns: no REST call, no API key, no token tracking. Uses ML Kit's GenAI Summarization client as a probe to detect Gemini Nano support and download the on-device model. See [section 8](#8-on-device-ai--gemini-nano-ml-kit-genai). |
 
-Each higher level inherits the techniques of the levels below it. For example, the Trip Planner's `search_places` tool internally uses Pattern 3 (structured JSON output from a standalone Gemini call) to find real places.
+Patterns 1–5 each inherit the techniques of the levels below them — e.g. the Trip Planner's `search_places` tool internally uses Pattern 3 (structured JSON output from a standalone Gemini call) to find real places. Pattern 6 stands apart: it is on-device rather than cloud.
 
 ---
 
@@ -581,6 +582,25 @@ Note: The response is wrapped in markdown code fences (` ```json ... ``` `). The
 
 ---
 
+## 8. On-device AI — Gemini Nano (ML Kit GenAI)
+
+**Module:** `feature/nano` | **No feature tag (no token tracking — runs on-device)**
+
+The only AI feature that does **not** call the cloud Gemini REST API. It evaluates whether the current device can run **Gemini Nano** on-device and lets the user download the model.
+
+### How it works
+
+- **ViewModel:** `NanoViewModel` (`:feature:nano`) — no repository / no `:data` module
+- **SDK:** ML Kit GenAI — `com.google.mlkit:genai-summarization` (`1.0.0-beta1`)
+- **The probe trick:** ML Kit has no standalone "is Nano available?" call. Every GenAI feature is backed by Gemini Nano, so the app builds a `Summarizer` (article → one-bullet, English) purely as a probe:
+  - `Summarizer.checkFeatureStatus()` returns the definitive runtime status (`AVAILABLE` / `DOWNLOADABLE` / `DOWNLOADING` / `UNAVAILABLE`)
+  - `Summarizer.downloadFeature(DownloadCallback)` pulls the model when it is only downloadable, reporting byte progress
+- **State machine** (`NanoPhase`): `Checking` → `Evaluated(support)` / `Downloading(downloaded, total)` / `Error(message)`. Status maps to a three-state verdict (`NanoSupport`): `READY`, `DOWNLOADABLE`, `NOT_AVAILABLE`.
+- **UI:** Shows the current device (manufacturer / model / Android API level), a curated list of known Nano-capable devices (Pixel 8+, Galaxy S24+, etc.), the live support verdict, and a "Download model" button that streams progress and re-checks on completion.
+- **No network, no API key, no token tracking** — inference would run entirely on-device via AICore.
+
+---
+
 ## Summary
 
 | #  | Feature                | Module         | Request Type                  | Persona / Style                   |  Calls Gemini   |
@@ -594,8 +614,9 @@ Note: The response is wrapped in markdown code fences (` ```json ... ``` `). The
 | 6  | Trip planner (agent)   | `data/plan`    | Function calling (multi-turn) | Trip planner agent                |   1 per turn    |
 | 7  | Place search (tool)    | `data/plan`    | Text (JSON response)          | Standalone prompt                 | 1 per tool call |
 | 8  | Suggested places       | `data/explore` | Text (JSON response)          | Helpful AI assistant              |        1        |
+| 9  | On-device Nano         | `feature/nano` | On-device (ML Kit GenAI probe)| —                                 | 0 (no network)  |
 
-**Total distinct AI call sites:** 7 (across 4 repository classes) — 6 through `GeminiApiService.generateContent()`, 1 through `GeminiApiService.generateImageContent()`.
+**Total distinct cloud AI call sites:** 7 (across 4 repository classes) — 6 through `GeminiApiService.generateContent()`, 1 through `GeminiApiService.generateImageContent()`. The Nano feature adds a 9th AI surface that is entirely **on-device** (ML Kit GenAI / Gemini Nano) and makes no network call.
 
 **AI prompts are co-located with the feature module that owns them** — each data module exposes an `internal` prompts file:
 - `ChatPrompts` in `data/chat` — conversation starters prompt, analysis instructions (persona system prompts live in `AiPersona.kt` in `:core:config` so they are accessible to both `data:chat` and `feature:settings`)

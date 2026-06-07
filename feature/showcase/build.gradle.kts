@@ -36,8 +36,7 @@ android {
 }
 
 dependencies {
-    implementation(project(":core:theme"))
-    implementation(project(":core:ui"))
+    implementation(project(":ui:components"))
 
     implementation(libs.material3)
     implementation(libs.androidx.material.icons.extended)

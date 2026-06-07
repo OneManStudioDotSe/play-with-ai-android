@@ -40,17 +40,14 @@ android {
 dependencies {
     implementation(project(":core:config"))
     implementation(project(":core:tracking"))
-    implementation(project(":core:ui"))
-    implementation(project(":core:theme"))
 
-    implementation(libs.material3)
-    implementation(libs.androidx.material.icons.extended)
-    implementation(libs.androidx.lifecycle.runtime.compose)
+    implementation(project(":ui:components"))
+
+    implementation(libs.bundles.compose.feature)
     implementation(libs.timber)
 
-    implementation(libs.hilt.android)
+    implementation(libs.bundles.hilt)
     ksp(libs.hilt.compiler)
-    implementation(libs.hilt.navigation.compose)
 
     debugImplementation(libs.ui.tooling)
 }

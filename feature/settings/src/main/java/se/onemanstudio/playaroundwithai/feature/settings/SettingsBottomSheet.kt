@@ -33,6 +33,7 @@ import androidx.compose.material3.SegmentedButton
 import androidx.compose.material3.SegmentedButtonDefaults
 import androidx.compose.material3.SingleChoiceSegmentedButtonRow
 import androidx.compose.material3.Slider
+import androidx.compose.material3.SliderColors
 import androidx.compose.material3.SliderDefaults
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Switch
@@ -72,6 +73,7 @@ private val DragHandleCornerRadius = 2.dp
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun SettingsBottomSheet(
+    screen: SettingsScreen,
     state: SettingsState,
     onDismiss: () -> Unit,
     onShowcaseClick: () -> Unit,
@@ -106,6 +108,7 @@ fun SettingsBottomSheet(
         dragHandle = null,
     ) {
         SettingsBottomSheetContent(
+            screen = screen,
             state = state,
             onShowcaseClick = onShowcaseClick,
             onShowTokenUsageChange = onShowTokenUsageChange,
@@ -137,6 +140,7 @@ fun SettingsBottomSheet(
 
 @Composable
 private fun SettingsBottomSheetContent(
+    screen: SettingsScreen,
     state: SettingsState,
     onShowcaseClick: () -> Unit,
     onShowTokenUsageChange: (Boolean) -> Unit,
@@ -201,7 +205,24 @@ private fun SettingsBottomSheetContent(
 
                 Spacer(modifier = Modifier.height(Dimensions.paddingExtraLarge))
 
-                // General section
+                // Screen-specific section — shown at the top, varies per originating screen
+                ScreenSpecificSection(
+                    screen = screen,
+                    state = state,
+                    onAiPersonaChange = onAiPersonaChange,
+                    onVehicleCountChange = onVehicleCountChange,
+                    onSearchRadiusChange = onSearchRadiusChange,
+                    onWalkingSpeedChange = onWalkingSpeedChange,
+                    onMaxSelectablePointsChange = onMaxSelectablePointsChange,
+                    onTripLengthChange = onTripLengthChange,
+                    onAgentMaxIterationsChange = onAgentMaxIterationsChange,
+                    onSuggestedPlacesCountChange = onSuggestedPlacesCountChange,
+                    onImageQualityChange = onImageQualityChange,
+                )
+
+                Spacer(modifier = Modifier.height(Dimensions.paddingExtraLarge))
+
+                // Common sections — always shown, at the bottom regardless of screen
                 GeneralSection(
                     showTokenUsage = state.showTokenUsage,
                     typewriterDelayMs = state.typewriterDelayMs,
@@ -209,28 +230,17 @@ private fun SettingsBottomSheetContent(
                     networkTimeoutSeconds = state.networkTimeoutSeconds,
                     tokenTrackingEnabled = state.tokenTrackingEnabled,
                     firebaseSyncEnabled = state.firebaseSyncEnabled,
-                    imageQualityJpeg = state.imageQualityJpeg,
                     onShowTokenUsageChange = onShowTokenUsageChange,
                     onTypewriterDelayChange = onTypewriterDelayChange,
                     onHapticFeedbackChange = onHapticFeedbackChange,
                     onNetworkTimeoutChange = onNetworkTimeoutChange,
                     onTokenTrackingChange = onTokenTrackingChange,
                     onFirebaseSyncChange = onFirebaseSyncChange,
-                    onImageQualityChange = onImageQualityChange,
                     onShowcaseClick = onShowcaseClick,
                 )
 
                 Spacer(modifier = Modifier.height(Dimensions.paddingExtraLarge))
 
-                // AI Persona section
-                AiPersonaSection(
-                    aiPersona = state.aiPersona,
-                    onAiPersonaChange = onAiPersonaChange,
-                )
-
-                Spacer(modifier = Modifier.height(Dimensions.paddingExtraLarge))
-
-                // AI Models section
                 AiModelsSection(
                     geminiTextModel = state.geminiTextModel,
                     geminiImageModel = state.geminiImageModel,
@@ -240,27 +250,6 @@ private fun SettingsBottomSheetContent(
 
                 Spacer(modifier = Modifier.height(Dimensions.paddingExtraLarge))
 
-                // Map Controls section
-                MapControlsSection(
-                    vehicleCount = state.vehicleCount,
-                    searchRadiusKm = state.searchRadiusKm,
-                    walkingSpeedKmh = state.walkingSpeedKmh,
-                    tripLengthMinStops = state.tripLengthMinStops,
-                    agentMaxIterations = state.agentMaxIterations,
-                    suggestedPlacesCount = state.suggestedPlacesCount,
-                    maxSelectablePoints = state.maxSelectablePoints,
-                    onVehicleCountChange = onVehicleCountChange,
-                    onSearchRadiusChange = onSearchRadiusChange,
-                    onWalkingSpeedChange = onWalkingSpeedChange,
-                    onTripLengthChange = onTripLengthChange,
-                    onAgentMaxIterationsChange = onAgentMaxIterationsChange,
-                    onSuggestedPlacesCountChange = onSuggestedPlacesCountChange,
-                    onMaxSelectablePointsChange = onMaxSelectablePointsChange,
-                )
-
-                Spacer(modifier = Modifier.height(Dimensions.paddingExtraLarge))
-
-                // Usage Chart section
                 UsageSection(
                     usageBars = usageBars,
                     selectedDayIndex = selectedDayIndex,
@@ -269,7 +258,6 @@ private fun SettingsBottomSheetContent(
 
                 Spacer(modifier = Modifier.height(Dimensions.paddingExtraLarge))
 
-                // About section
                 AboutSection(
                     appVersion = state.appVersion,
                     onResetToDefaults = onResetToDefaults,
@@ -282,6 +270,55 @@ private fun SettingsBottomSheetContent(
 }
 
 @Composable
+private fun ScreenSpecificSection(
+    screen: SettingsScreen,
+    state: SettingsState,
+    onAiPersonaChange: (AiPersona) -> Unit,
+    onVehicleCountChange: (Int) -> Unit,
+    onSearchRadiusChange: (Float) -> Unit,
+    onWalkingSpeedChange: (Float) -> Unit,
+    onMaxSelectablePointsChange: (Int) -> Unit,
+    onTripLengthChange: (Int) -> Unit,
+    onAgentMaxIterationsChange: (Int) -> Unit,
+    onSuggestedPlacesCountChange: (Int) -> Unit,
+    onImageQualityChange: (Int) -> Unit,
+) {
+    when (screen) {
+        SettingsScreen.CHAT -> AiPersonaSection(
+            aiPersona = state.aiPersona,
+            onAiPersonaChange = onAiPersonaChange,
+        )
+
+        SettingsScreen.EXPLORE -> ExploreControlsSection(
+            vehicleCount = state.vehicleCount,
+            searchRadiusKm = state.searchRadiusKm,
+            walkingSpeedKmh = state.walkingSpeedKmh,
+            maxSelectablePoints = state.maxSelectablePoints,
+            onVehicleCountChange = onVehicleCountChange,
+            onSearchRadiusChange = onSearchRadiusChange,
+            onWalkingSpeedChange = onWalkingSpeedChange,
+            onMaxSelectablePointsChange = onMaxSelectablePointsChange,
+        )
+
+        SettingsScreen.DREAM -> ImageGenerationSection(
+            imageQualityJpeg = state.imageQualityJpeg,
+            onImageQualityChange = onImageQualityChange,
+        )
+
+        SettingsScreen.PLAN -> PlanControlsSection(
+            walkingSpeedKmh = state.walkingSpeedKmh,
+            tripLengthMinStops = state.tripLengthMinStops,
+            agentMaxIterations = state.agentMaxIterations,
+            suggestedPlacesCount = state.suggestedPlacesCount,
+            onWalkingSpeedChange = onWalkingSpeedChange,
+            onTripLengthChange = onTripLengthChange,
+            onAgentMaxIterationsChange = onAgentMaxIterationsChange,
+            onSuggestedPlacesCountChange = onSuggestedPlacesCountChange,
+        )
+    }
+}
+
+@Composable
 private fun SectionHeader(
     text: String,
     lineColor: Color,
@@ -289,6 +326,13 @@ private fun SectionHeader(
 ) {
     MarkerText(text = text, lineColor = lineColor, modifier = modifier)
 }
+
+@Composable
+private fun settingsSliderColors(): SliderColors = SliderDefaults.colors(
+    thumbColor = MaterialTheme.colorScheme.onSurface,
+    activeTrackColor = MaterialTheme.colorScheme.onSurface,
+    inactiveTrackColor = MaterialTheme.colorScheme.onSurface.copy(alpha = Alphas.extraLow),
+)
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -299,14 +343,12 @@ private fun GeneralSection(
     networkTimeoutSeconds: Int,
     tokenTrackingEnabled: Boolean,
     firebaseSyncEnabled: Boolean,
-    imageQualityJpeg: Int,
     onShowTokenUsageChange: (Boolean) -> Unit,
     onTypewriterDelayChange: (Long) -> Unit,
     onHapticFeedbackChange: (Boolean) -> Unit,
     onNetworkTimeoutChange: (Int) -> Unit,
     onTokenTrackingChange: (Boolean) -> Unit,
     onFirebaseSyncChange: (Boolean) -> Unit,
-    onImageQualityChange: (Int) -> Unit,
     onShowcaseClick: () -> Unit,
 ) {
     val speedOptions = listOf(
@@ -429,45 +471,8 @@ private fun GeneralSection(
             valueRange = SettingsState.MIN_NETWORK_TIMEOUT_SECONDS.toFloat()..SettingsState.MAX_NETWORK_TIMEOUT_SECONDS.toFloat(),
             steps = (SettingsState.MAX_NETWORK_TIMEOUT_SECONDS - SettingsState.MIN_NETWORK_TIMEOUT_SECONDS) /
                 SettingsState.NETWORK_TIMEOUT_STEP_SECONDS - 1,
-            colors = SliderDefaults.colors(
-                thumbColor = MaterialTheme.colorScheme.onSurface,
-                activeTrackColor = MaterialTheme.colorScheme.onSurface,
-                inactiveTrackColor = MaterialTheme.colorScheme.onSurface.copy(alpha = Alphas.extraLow),
-            ),
+            colors = settingsSliderColors(),
         )
-
-        val imageQualityOptions = listOf(
-            Triple(SettingsState.IMAGE_QUALITY_LOW,
-                stringResource(R.string.settings_image_quality_low),
-                stringResource(R.string.settings_image_quality_low_value)),
-            Triple(SettingsState.IMAGE_QUALITY_MEDIUM,
-                stringResource(R.string.settings_image_quality_medium),
-                stringResource(R.string.settings_image_quality_medium_value)),
-            Triple(SettingsState.IMAGE_QUALITY_HIGH,
-                stringResource(R.string.settings_image_quality_high),
-                stringResource(R.string.settings_image_quality_high_value)),
-        )
-
-        Text(
-            text = stringResource(R.string.settings_image_quality),
-            style = MaterialTheme.typography.bodyMedium,
-            color = MaterialTheme.colorScheme.onSurface,
-        )
-
-        SingleChoiceSegmentedButtonRow(modifier = Modifier.fillMaxWidth()) {
-            imageQualityOptions.forEachIndexed { index, (quality, label, sublabel) ->
-                SegmentedButton(
-                    shape = SegmentedButtonDefaults.itemShape(index = index, count = imageQualityOptions.size),
-                    selected = imageQualityJpeg == quality,
-                    onClick = { onImageQualityChange(quality) },
-                ) {
-                    Column(horizontalAlignment = Alignment.CenterHorizontally) {
-                        Text(text = label, style = MaterialTheme.typography.labelSmall)
-                        Text(text = sublabel, style = MaterialTheme.typography.labelSmall)
-                    }
-                }
-            }
-        }
 
         Row(
             modifier = Modifier
@@ -577,39 +582,17 @@ private fun AboutSection(
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-private fun MapControlsSection(
+private fun ExploreControlsSection(
     vehicleCount: Int,
     searchRadiusKm: Float,
     walkingSpeedKmh: Float,
-    tripLengthMinStops: Int,
-    agentMaxIterations: Int,
-    suggestedPlacesCount: Int,
     maxSelectablePoints: Int,
     onVehicleCountChange: (Int) -> Unit,
     onSearchRadiusChange: (Float) -> Unit,
     onWalkingSpeedChange: (Float) -> Unit,
-    onTripLengthChange: (Int) -> Unit,
-    onAgentMaxIterationsChange: (Int) -> Unit,
-    onSuggestedPlacesCountChange: (Int) -> Unit,
     onMaxSelectablePointsChange: (Int) -> Unit,
 ) {
-    val sliderColors = SliderDefaults.colors(
-        thumbColor = MaterialTheme.colorScheme.onSurface,
-        activeTrackColor = MaterialTheme.colorScheme.onSurface,
-        inactiveTrackColor = MaterialTheme.colorScheme.onSurface.copy(alpha = Alphas.extraLow),
-    )
-
-    val speedOptions = listOf(
-        Triple(SettingsState.WALKING_SPEED_SLOW,
-            stringResource(R.string.settings_walking_speed_slow),
-            stringResource(R.string.settings_walking_speed_slow_value)),
-        Triple(SettingsState.WALKING_SPEED_NORMAL,
-            stringResource(R.string.settings_walking_speed_normal),
-            stringResource(R.string.settings_walking_speed_normal_value)),
-        Triple(SettingsState.WALKING_SPEED_FAST,
-            stringResource(R.string.settings_walking_speed_fast),
-            stringResource(R.string.settings_walking_speed_fast_value)),
-    )
+    val sliderColors = settingsSliderColors()
 
     Column(verticalArrangement = Arrangement.spacedBy(Dimensions.paddingLarge)) {
         SectionHeader(
@@ -644,37 +627,74 @@ private fun MapControlsSection(
             colors = sliderColors,
         )
 
+        WalkingSpeedSelector(
+            walkingSpeedKmh = walkingSpeedKmh,
+            onWalkingSpeedChange = onWalkingSpeedChange,
+        )
+
         Text(
-            text = stringResource(R.string.settings_walking_speed),
+            text = stringResource(R.string.settings_max_route_points, maxSelectablePoints),
             style = MaterialTheme.typography.bodyMedium,
             color = MaterialTheme.colorScheme.onSurface,
         )
 
-        SingleChoiceSegmentedButtonRow(modifier = Modifier.fillMaxWidth()) {
-            speedOptions.forEachIndexed { index, (speed, label, sublabel) ->
-                SegmentedButton(
-                    shape = SegmentedButtonDefaults.itemShape(index = index, count = speedOptions.size),
-                    selected = walkingSpeedKmh == speed,
-                    onClick = { onWalkingSpeedChange(speed) },
-                ) {
-                    Column(horizontalAlignment = Alignment.CenterHorizontally) {
-                        Text(text = label, style = MaterialTheme.typography.labelSmall)
-                        Text(text = sublabel, style = MaterialTheme.typography.labelSmall)
-                    }
-                }
-            }
-        }
+        Slider(
+            value = maxSelectablePoints.toFloat(),
+            onValueChange = { onMaxSelectablePointsChange(it.roundToInt()) },
+            valueRange = SettingsState.MIN_MAX_SELECTABLE_POINTS.toFloat()..SettingsState.MAX_MAX_SELECTABLE_POINTS.toFloat(),
+            steps = SettingsState.MAX_MAX_SELECTABLE_POINTS - SettingsState.MIN_MAX_SELECTABLE_POINTS - 1,
+            colors = sliderColors,
+        )
+    }
+}
 
-        val tripLengthOptions = listOf(
-            Triple(SettingsState.TRIP_LENGTH_QUICK_MIN,
-                stringResource(R.string.settings_trip_length_quick),
-                stringResource(R.string.settings_trip_length_quick_value)),
-            Triple(SettingsState.TRIP_LENGTH_STANDARD_MIN,
-                stringResource(R.string.settings_trip_length_standard),
-                stringResource(R.string.settings_trip_length_standard_value)),
-            Triple(SettingsState.TRIP_LENGTH_EXTENDED_MIN,
-                stringResource(R.string.settings_trip_length_extended),
-                stringResource(R.string.settings_trip_length_extended_value)),
+@OptIn(ExperimentalMaterial3Api::class)
+@Composable
+private fun PlanControlsSection(
+    walkingSpeedKmh: Float,
+    tripLengthMinStops: Int,
+    agentMaxIterations: Int,
+    suggestedPlacesCount: Int,
+    onWalkingSpeedChange: (Float) -> Unit,
+    onTripLengthChange: (Int) -> Unit,
+    onAgentMaxIterationsChange: (Int) -> Unit,
+    onSuggestedPlacesCountChange: (Int) -> Unit,
+) {
+    val sliderColors = settingsSliderColors()
+
+    val tripLengthOptions = listOf(
+        Triple(SettingsState.TRIP_LENGTH_QUICK_MIN,
+            stringResource(R.string.settings_trip_length_quick),
+            stringResource(R.string.settings_trip_length_quick_value)),
+        Triple(SettingsState.TRIP_LENGTH_STANDARD_MIN,
+            stringResource(R.string.settings_trip_length_standard),
+            stringResource(R.string.settings_trip_length_standard_value)),
+        Triple(SettingsState.TRIP_LENGTH_EXTENDED_MIN,
+            stringResource(R.string.settings_trip_length_extended),
+            stringResource(R.string.settings_trip_length_extended_value)),
+    )
+
+    val agentIterationOptions = listOf(
+        Triple(SettingsState.AGENT_ITERATIONS_QUICK,
+            stringResource(R.string.settings_agent_iterations_quick),
+            stringResource(R.string.settings_agent_iterations_quick_value)),
+        Triple(SettingsState.AGENT_ITERATIONS_STANDARD,
+            stringResource(R.string.settings_agent_iterations_standard),
+            stringResource(R.string.settings_agent_iterations_standard_value)),
+        Triple(SettingsState.AGENT_ITERATIONS_THOROUGH,
+            stringResource(R.string.settings_agent_iterations_thorough),
+            stringResource(R.string.settings_agent_iterations_thorough_value)),
+    )
+
+    Column(verticalArrangement = Arrangement.spacedBy(Dimensions.paddingLarge)) {
+        SectionHeader(
+            text = stringResource(R.string.settings_trip_planner),
+            lineColor = vividPink,
+        )
+
+        WalkingSpeedSelector(
+            walkingSpeedKmh = walkingSpeedKmh,
+            onWalkingSpeedChange = onWalkingSpeedChange,
         )
 
         Text(
@@ -697,18 +717,6 @@ private fun MapControlsSection(
                 }
             }
         }
-
-        val agentIterationOptions = listOf(
-            Triple(SettingsState.AGENT_ITERATIONS_QUICK,
-                stringResource(R.string.settings_agent_iterations_quick),
-                stringResource(R.string.settings_agent_iterations_quick_value)),
-            Triple(SettingsState.AGENT_ITERATIONS_STANDARD,
-                stringResource(R.string.settings_agent_iterations_standard),
-                stringResource(R.string.settings_agent_iterations_standard_value)),
-            Triple(SettingsState.AGENT_ITERATIONS_THOROUGH,
-                stringResource(R.string.settings_agent_iterations_thorough),
-                stringResource(R.string.settings_agent_iterations_thorough_value)),
-        )
 
         Text(
             text = stringResource(R.string.settings_agent_iterations),
@@ -745,20 +753,93 @@ private fun MapControlsSection(
                 SettingsState.SUGGESTED_PLACES_COUNT_STEP - 1,
             colors = sliderColors,
         )
+    }
+}
+
+@OptIn(ExperimentalMaterial3Api::class)
+@Composable
+private fun WalkingSpeedSelector(
+    walkingSpeedKmh: Float,
+    onWalkingSpeedChange: (Float) -> Unit,
+) {
+    val speedOptions = listOf(
+        Triple(SettingsState.WALKING_SPEED_SLOW,
+            stringResource(R.string.settings_walking_speed_slow),
+            stringResource(R.string.settings_walking_speed_slow_value)),
+        Triple(SettingsState.WALKING_SPEED_NORMAL,
+            stringResource(R.string.settings_walking_speed_normal),
+            stringResource(R.string.settings_walking_speed_normal_value)),
+        Triple(SettingsState.WALKING_SPEED_FAST,
+            stringResource(R.string.settings_walking_speed_fast),
+            stringResource(R.string.settings_walking_speed_fast_value)),
+    )
+
+    Text(
+        text = stringResource(R.string.settings_walking_speed),
+        style = MaterialTheme.typography.bodyMedium,
+        color = MaterialTheme.colorScheme.onSurface,
+    )
+
+    SingleChoiceSegmentedButtonRow(modifier = Modifier.fillMaxWidth()) {
+        speedOptions.forEachIndexed { index, (speed, label, sublabel) ->
+            SegmentedButton(
+                shape = SegmentedButtonDefaults.itemShape(index = index, count = speedOptions.size),
+                selected = walkingSpeedKmh == speed,
+                onClick = { onWalkingSpeedChange(speed) },
+            ) {
+                Column(horizontalAlignment = Alignment.CenterHorizontally) {
+                    Text(text = label, style = MaterialTheme.typography.labelSmall)
+                    Text(text = sublabel, style = MaterialTheme.typography.labelSmall)
+                }
+            }
+        }
+    }
+}
+
+@OptIn(ExperimentalMaterial3Api::class)
+@Composable
+private fun ImageGenerationSection(
+    imageQualityJpeg: Int,
+    onImageQualityChange: (Int) -> Unit,
+) {
+    val imageQualityOptions = listOf(
+        Triple(SettingsState.IMAGE_QUALITY_LOW,
+            stringResource(R.string.settings_image_quality_low),
+            stringResource(R.string.settings_image_quality_low_value)),
+        Triple(SettingsState.IMAGE_QUALITY_MEDIUM,
+            stringResource(R.string.settings_image_quality_medium),
+            stringResource(R.string.settings_image_quality_medium_value)),
+        Triple(SettingsState.IMAGE_QUALITY_HIGH,
+            stringResource(R.string.settings_image_quality_high),
+            stringResource(R.string.settings_image_quality_high_value)),
+    )
+
+    Column(verticalArrangement = Arrangement.spacedBy(Dimensions.paddingLarge)) {
+        SectionHeader(
+            text = stringResource(R.string.settings_image_generation),
+            lineColor = vividPink,
+        )
 
         Text(
-            text = stringResource(R.string.settings_max_route_points, maxSelectablePoints),
+            text = stringResource(R.string.settings_image_quality),
             style = MaterialTheme.typography.bodyMedium,
             color = MaterialTheme.colorScheme.onSurface,
         )
 
-        Slider(
-            value = maxSelectablePoints.toFloat(),
-            onValueChange = { onMaxSelectablePointsChange(it.roundToInt()) },
-            valueRange = SettingsState.MIN_MAX_SELECTABLE_POINTS.toFloat()..SettingsState.MAX_MAX_SELECTABLE_POINTS.toFloat(),
-            steps = SettingsState.MAX_MAX_SELECTABLE_POINTS - SettingsState.MIN_MAX_SELECTABLE_POINTS - 1,
-            colors = sliderColors,
-        )
+        SingleChoiceSegmentedButtonRow(modifier = Modifier.fillMaxWidth()) {
+            imageQualityOptions.forEachIndexed { index, (quality, label, sublabel) ->
+                SegmentedButton(
+                    shape = SegmentedButtonDefaults.itemShape(index = index, count = imageQualityOptions.size),
+                    selected = imageQualityJpeg == quality,
+                    onClick = { onImageQualityChange(quality) },
+                ) {
+                    Column(horizontalAlignment = Alignment.CenterHorizontally) {
+                        Text(text = label, style = MaterialTheme.typography.labelSmall)
+                        Text(text = sublabel, style = MaterialTheme.typography.labelSmall)
+                    }
+                }
+            }
+        }
     }
 }
 
@@ -1022,12 +1103,13 @@ private val sampleUsageBars = listOf(
     ChartBarData(label = "S", value = 90f, detailText = "90 tokens"),
 )
 
-@Preview(name = "Settings Content Light")
+@Preview(name = "Settings Content — Explore")
 @Composable
-private fun SettingsContentLightPreview() {
+private fun SettingsContentExplorePreview() {
     SofaAiTheme {
         Surface {
             SettingsBottomSheetContent(
+                screen = SettingsScreen.EXPLORE,
                 state = SettingsState(appVersion = "1.0.0"),
                 onShowcaseClick = {},
                 onShowTokenUsageChange = {},
@@ -1058,12 +1140,13 @@ private fun SettingsContentLightPreview() {
     }
 }
 
-@Preview(name = "Settings Content Dark")
+@Preview(name = "Settings Content — Plan (Dark)")
 @Composable
-private fun SettingsContentDarkPreview() {
+private fun SettingsContentPlanDarkPreview() {
     SofaAiTheme(darkTheme = true) {
         Surface {
             SettingsBottomSheetContent(
+                screen = SettingsScreen.PLAN,
                 state = SettingsState(appVersion = "1.0.0"),
                 onShowcaseClick = {},
                 onShowTokenUsageChange = {},

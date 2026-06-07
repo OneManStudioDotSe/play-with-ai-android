@@ -30,10 +30,9 @@ android {
 dependencies {
     implementation(project(":core:config"))
     implementation(project(":core:network"))
-    implementation(project(":core:database"))
     implementation(project(":core:tracking"))
+    implementation(project(":core:database"))
 
-    // Network (for Retrofit HttpException in repository)
     implementation(libs.retrofit)
     implementation(libs.retrofit.converter.gson)
 
@@ -46,9 +45,5 @@ dependencies {
     ksp(libs.hilt.compiler)
 
     // Testing
-    testImplementation(libs.junit4)
-    testImplementation(libs.mockk)
-    testImplementation(libs.kotlinx.coroutines.test)
-    testImplementation(libs.kotlin.test)
-    testImplementation(libs.truth)
+    testImplementation(libs.bundles.unit.test)
 }

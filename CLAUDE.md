@@ -2,7 +2,7 @@
 
 ## Project Overview
 
-**Play With AI** is a showcase Android app demonstrating modern Android engineering. It features AI chat (Gemini API) with five selectable personas, smart prompt history with Firebase sync, a map exploration feature for finding/filtering vehicles and calculating optimal routes, an AI agent trip planner using Gemini function calling, a dream interpreter with AI image generation, and a deep Settings panel with 17 runtime-configurable parameters (AI persona, model selection, image quality, walking speed, agent depth, and more). Built with Jetpack Compose, Clean Architecture, and Hilt DI.
+**Play With AI** is a showcase Android app demonstrating modern Android engineering. It features AI chat (Gemini API) with five selectable personas, smart prompt history with Firebase sync, a map exploration feature for finding/filtering vehicles and calculating optimal routes, an AI agent trip planner using Gemini function calling, a dream interpreter with AI image generation, an on-device AI (Gemini Nano) support checker built on ML Kit's GenAI APIs, and a deep Settings panel with 17 runtime-configurable parameters (AI persona, model selection, image quality, walking speed, agent depth, and more) that adapts its top section to the screen it was opened from. Built with Jetpack Compose, Clean Architecture, and Hilt DI.
 
 ## Build & Run
 
@@ -35,8 +35,9 @@
 :core:config            → ApiKeyAvailability, AppSettingsHolder, ExploreSettingsHolder, AiPersona (enum with system prompts), ConfigurationModule, qualifier annotations (@GeminiApiKey, @MapsApiKey, @BaseUrl, @LoggingLevel, @AppVersion), BuildConfig
 :core:database          → Shared Room DB (v6): AppDatabase, all entities (PromptEntity, DreamEntity, TokenUsageEntity), all DAOs, SyncStatusConverter, DatabaseModule
 :core:tracking          → TokenUsageTracker + TokenUsageQuery interfaces, TokenUsageTrackerImpl, GetWeeklyTokenUsageUseCase, TrackingModule
-:core:theme             → Design system: colors, typography ("SoFa" design language)
-:core:ui                → Reusable Compose UI components (NeoBrutalCard, NeoBrutalIconButton, NeoBrutalIconButtonSmall, TopAppBar, etc.)
+:core:testing           → Shared test helpers (MainCoroutineRule) used across all modules
+:ui:theme               → Design system: colors, typography ("SoFa" design language)
+:ui:components          → Reusable Compose UI components (NeoBrutalCard, NeoBrutalIconButton, NeoBrutalIconButtonSmall, TopAppBar, etc.)
 :data:plan              → Plan domain + data: agent loop, tool dispatch, route calculator, Gemini function calling, PlanPrompts
 :data:explore           → Explore domain + data: fake API, explore items, suggested places, ExplorePrompts (depends on :core:config for ExploreSettingsHolder)
 :data:chat              → Chat domain + data: Firestore sync, prompt history, SyncWorker, ChatPrompts
@@ -45,13 +46,15 @@
 :feature:chat           → Chat presentation: ChatViewModel, ChatScreen
 :feature:explore        → Explore presentation: ExploreViewModel, ExploreScreen
 :feature:dream          → Dream presentation: DreamViewModel, DreamScreen
-:feature:settings       → Settings presentation: SettingsViewModel, SettingsBottomSheet, SettingsBottomSheetContainer, SettingsState
+:feature:settings       → Settings presentation: SettingsViewModel, SettingsBottomSheet, SettingsBottomSheetContainer, SettingsState, SettingsScreen (enum: which screen opened the sheet)
 :feature:showcase       → Showcase presentation: ShowcaseScreen (design system style guide, no ViewModel)
+:feature:nano           → On-device AI presentation: NanoViewModel, NanoScreen — Gemini Nano support checker via ML Kit GenAI (no data module dependency)
 ```
 
-Dependencies flow: `feature → data → core:network + core:config + core:database + core:tracking`, `feature → core:ui → core:theme`
+Dependencies flow: `feature → data → core:network + core:config + core:database + core:tracking`, `feature → ui:components → ui:theme`
 Exception: `:feature:settings` depends only on `core` modules (no `data` module dependency) — `ExploreSettingsHolder` and `AppSettingsHolder` live in `:core:config`.
-Exception: `:feature:showcase` is presentation-only (no ViewModel, no data layer, no Hilt) — depends only on `:core:ui` and `:core:theme`.
+Exception: `:feature:showcase` is presentation-only (no ViewModel, no data layer, no Hilt) — depends only on `:ui:components` and `:ui:theme`.
+Exception: `:feature:nano` depends only on `:ui:theme`, `:ui:components`, and the ML Kit GenAI SDK directly (no `:data:*` module and no `:core:network` — on-device AI does not use the Gemini REST endpoint).
 
 ## Architecture
 
@@ -68,6 +71,17 @@ Exception: `:feature:showcase` is presentation-only (no ViewModel, no data layer
 
 - **`AppSettingsHolder`** — app-wide settings: AI persona (`AiPersona` enum), Gemini text model, Gemini image model, typewriter delay, haptic feedback, walking speed, network timeout, token tracking enabled, show token usage, trip length, Firebase sync enabled, image quality, agent max iterations, suggested places count.
 - **`ExploreSettingsHolder`** — map settings: vehicle count, search radius, max selectable route points.
+
+**Screen-aware layout:** the sheet is contextual. `SettingsBottomSheetContainer` takes a `SettingsScreen` enum (`CHAT | EXPLORE | DREAM | PLAN`) supplied by `MainActivity` based on which feature screen opened it. The top **screen-specific section** varies accordingly, while the **common sections** (General, AI Models, Weekly Usage, About) always render below it:
+
+| `SettingsScreen` | Screen-specific section | Parameters surfaced |
+|------------------|-------------------------|---------------------|
+| `CHAT`    | AI Persona        | AI persona picker |
+| `EXPLORE` | Explore Controls  | vehicle count, search radius, walking speed, max selectable route points |
+| `DREAM`   | Image Generation  | image quality (JPEG) |
+| `PLAN`    | Trip Planner      | walking speed, trip length, agent max iterations, suggested places count |
+
+(The Nano screen has no Settings entry point — it owns its own top bar and does not pass a `settingsContent`.)
 
 **Key design decisions:**
 - Settings are in-memory only (no DataStore / SharedPreferences) — they reset on cold start by design. This keeps the implementation simple and avoids async reads at startup.
@@ -96,6 +110,7 @@ Exception: `:feature:showcase` is presentation-only (no ViewModel, no data layer
 | Async      | Coroutines 1.10.2                              |
 | Images     | Coil 2.7.0                                     |
 | Maps       | Google Maps Compose 8.1.0                      |
+| On-device AI | ML Kit GenAI Summarization 1.0.0-beta1 (Gemini Nano probe) |
 | Logging    | Timber                                         |
 | Background | WorkManager                                    |
 
@@ -211,10 +226,12 @@ service cloud.firestore {
 │  │ ChatScreen   │ │ ExploreScreen│ │ DreamScreen  │ │ PlanScreen   │ │ShowcaseScreen│  │
 │  └──────┬───────┘ └──────┬───────┘ └──────┬───────┘ └──────┬───────┘ └──────┬───────┘  │
 │                                                                                          │
-│  ┌──────────────────────────────────────────┐                                           │
-│  │         :feature:settings                │                                           │
-│  │  SettingsViewModel, SettingsBottomSheet  │ (→ core only, no data module dependency)  │
-│  └──────────────────────────────────────────┘                                           │
+│  ┌──────────────────────────────────────────┐  ┌──────────────────────────────────┐    │
+│  │         :feature:settings                │  │        :feature:nano             │    │
+│  │  SettingsViewModel, SettingsBottomSheet  │  │  NanoViewModel, NanoScreen       │    │
+│  │  (screen-aware: CHAT/EXPLORE/DREAM/PLAN) │  │  (→ ML Kit GenAI, on-device)     │    │
+│  └──────────────────────────────────────────┘  └──────────────────────────────────┘    │
+│  (settings → core only, no data dependency)     (nano → ui:components/theme + ML Kit only)    │
 │         │                │               │               │               │           │
 └─────────┼────────────────┼───────────────┼───────────────┼───────────────┼───────────┘
           │                │               │               │               │
@@ -248,7 +265,7 @@ service cloud.firestore {
 │  └──────────────────┘  └──────────────────┘  └───────────────────────────────┘  │
 │                                                                                  │
 │  ┌──────────────────┐  ┌──────────────────┐  ┌───────────────────────────────┐  │
-│  │  :core:database   │  │  :core:tracking  │  │  :core:theme / :core:ui      │  │
+│  │  :core:database   │  │  :core:tracking  │  │  :ui:theme / :ui:components      │  │
 │  │  AppDatabase (v6) │  │ TokenUsageTracker│  │  Colors, Typography (theme)  │  │
 │  │  PromptEntity     │  │ TokenUsageQuery  │  │  Compose widgets (ui)        │  │
 │  │  DreamEntity      │  │ TrackerImpl      │  │                              │  │
@@ -296,6 +313,13 @@ service cloud.firestore {
 │  │  Auth: MAPS_API_KEY (manifest placeholder)                               │    │
 │  │  Services: Map tiles, markers, polylines, camera                         │    │
 │  │  Location: FusedLocationProviderClient (last known location)             │    │
+│  └──────────────────────────────────────────────────────────────────────────┘    │
+│                                                                                  │
+│  ┌──────────────────────────────────────────────────────────────────────────┐    │
+│  │  ML Kit GenAI (on-device — :feature:nano, no network)                    │    │
+│  │  Backed by Gemini Nano via AICore; Summarization client used as a probe  │    │
+│  │  Summarizer.checkFeatureStatus() → AVAILABLE / DOWNLOADABLE / UNAVAILABLE │    │
+│  │  Summarizer.downloadFeature() → pulls the on-device model with progress  │    │
 │  └──────────────────────────────────────────────────────────────────────────┘    │
 │                                                                                  │
 └──────────────────────────────────────────────────────────────────────────────────┘

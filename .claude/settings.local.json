@@ -48,7 +48,18 @@
       "Bash(curl -s \"https://maven.google.com/web/index.html\" -o /dev/null -w \"%{http_code}\\\\n\")",
       "Bash(mv models/NanoDeviceInfo.kt ./NanoDeviceInfo.kt)",
       "Bash(mv states/NanoUiState.kt ./NanoUiState.kt)",
-      "Bash(rmdir models *)"
+      "Bash(rmdir models *)",
+      "Bash(echo \"EXIT: $?\")",
+      "Bash(awk '/^dependencies/{p=1} p' __TRACKED_VAR__/build.gradle.kts)",
+      "Bash(awk '/^\\\\[bundles\\\\]/{p=1} /^\\\\[plugins\\\\]/{p=0} p' gradle/libs.versions.toml)",
+      "Bash(awk '/^dependencies/{p=1} p' data/chat/build.gradle.kts)",
+      "Bash(awk '/^dependencies/{p=1} p' app/build.gradle.kts)",
+      "Bash(perl -0pi -e 's/[ \\\\t]*testImplementation\\\\\\(libs\\\\.junit4\\\\\\)\\\\n[ \\\\t]*testImplementation\\\\\\(libs\\\\.mockk\\\\\\)\\\\n[ \\\\t]*testImplementation\\\\\\(libs\\\\.kotlinx\\\\.coroutines\\\\.test\\\\\\)\\\\n[ \\\\t]*testImplementation\\\\\\(libs\\\\.kotlin\\\\.test\\\\\\)\\\\n[ \\\\t]*testImplementation\\\\\\(libs\\\\.truth\\\\\\)/    testImplementation\\(libs.bundles.unit.test\\)/' __TRACKED_VAR__/build.gradle.kts)",
+      "Bash(perl -0pi -e 's/implementation\\\\\\(libs\\\\.hilt\\\\.android\\\\\\)/implementation\\(libs.bundles.hilt\\)/; s/[ \\\\t]*implementation\\\\\\(libs\\\\.hilt\\\\.navigation\\\\.compose\\\\\\)\\\\n//' __TRACKED_VAR__/build.gradle.kts)",
+      "Bash(cd *)",
+      "Bash(perl -0pi -e 's/[ \\\\t]*testImplementation\\\\\\(libs\\\\.junit4\\\\\\)\\\\n[ \\\\t]*testImplementation\\\\\\(libs\\\\.truth\\\\\\)\\\\n[ \\\\t]*testImplementation\\\\\\(libs\\\\.mockk\\\\\\)\\\\n[ \\\\t]*testImplementation\\\\\\(libs\\\\.kotlinx\\\\.coroutines\\\\.test\\\\\\)/    testImplementation\\(libs.bundles.unit.test\\)/' core/auth/build.gradle.kts)",
+      "Bash(perl -0pi -e 's/[ \\\\t]*implementation\\\\\\(libs\\\\.material3\\\\\\)\\\\n[ \\\\t]*implementation\\\\\\(libs\\\\.androidx\\\\.material\\\\.icons\\\\.extended\\\\\\)\\\\n[ \\\\t]*implementation\\\\\\(libs\\\\.androidx\\\\.lifecycle\\\\.runtime\\\\.compose\\\\\\)\\\\n[ \\\\t]*implementation\\\\\\(libs\\\\.kotlinx\\\\.collections\\\\.immutable\\\\\\)/    implementation\\(libs.bundles.compose.feature\\)/' __TRACKED_VAR__/build.gradle.kts)",
+      "Bash(perl -0pi -e 's/[ \\\\t]*implementation\\\\\\(libs\\\\.material3\\\\\\)\\\\n[ \\\\t]*implementation\\\\\\(libs\\\\.androidx\\\\.material\\\\.icons\\\\.extended\\\\\\)\\\\n[ \\\\t]*implementation\\\\\\(libs\\\\.androidx\\\\.lifecycle\\\\.runtime\\\\.compose\\\\\\)/    implementation\\(libs.bundles.compose.feature\\)/' __TRACKED_VAR__/build.gradle.kts)"
     ]
   }
 }

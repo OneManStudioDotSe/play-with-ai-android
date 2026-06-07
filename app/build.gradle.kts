@@ -81,9 +81,8 @@ dependencies {
     implementation(project(":core:auth"))
     implementation(project(":core:config"))
     implementation(project(":core:network"))
-    implementation(project(":core:theme"))
     implementation(project(":core:tracking"))
-    implementation(project(":core:ui"))
+    implementation(project(":ui:components"))
     implementation(project(":data:chat"))
     implementation(project(":feature:chat"))
     implementation(project(":feature:plan"))
@@ -113,17 +112,12 @@ dependencies {
     implementation(libs.androidx.hilt.work)
 
     // Hilt
-    implementation(libs.hilt.android)
-    implementation(libs.hilt.navigation.compose)
+    implementation(libs.bundles.hilt)
     implementation(libs.material)
     ksp(libs.hilt.compiler)
 
     debugImplementation(libs.ui.tooling)
 
     testImplementation(project(":core:testing"))
-    testImplementation(libs.junit4)
-    testImplementation(libs.mockk)
-    testImplementation(libs.kotlinx.coroutines.test)
-    testImplementation(libs.kotlin.test)
-    testImplementation(libs.truth)
+    testImplementation(libs.bundles.unit.test)
 }

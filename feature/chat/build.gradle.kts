@@ -42,31 +42,24 @@ dependencies {
     implementation(project(":core:auth"))
     implementation(project(":core:config"))
     implementation(project(":core:database"))
-    implementation(project(":core:theme"))
-    implementation(project(":core:ui"))
+
     implementation(project(":data:chat"))
 
-    implementation(libs.material3)
-    implementation(libs.androidx.material.icons.extended)
-    implementation(libs.androidx.lifecycle.runtime.compose)
-    implementation(libs.kotlinx.collections.immutable)
+    implementation(project(":ui:components"))
+
+    implementation(libs.bundles.compose.feature)
 
     implementation(libs.coil.compose)
 
     implementation(libs.timber)
 
     // Hilt
-    implementation(libs.hilt.android)
+    implementation(libs.bundles.hilt)
     ksp(libs.hilt.compiler)
-    implementation(libs.hilt.navigation.compose)
 
     debugImplementation(libs.ui.tooling)
 
     // Testing
     testImplementation(project(":core:testing"))
-    testImplementation(libs.junit4)
-    testImplementation(libs.mockk)
-    testImplementation(libs.kotlinx.coroutines.test)
-    testImplementation(libs.kotlin.test)
-    testImplementation(libs.truth)
+    testImplementation(libs.bundles.unit.test)
 }

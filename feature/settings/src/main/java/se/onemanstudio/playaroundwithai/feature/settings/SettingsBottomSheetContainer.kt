@@ -16,6 +16,7 @@ import timber.log.Timber
 
 @Composable
 fun SettingsBottomSheetContainer(
+    screen: SettingsScreen,
     onDismiss: () -> Unit,
     onShowcaseClick: () -> Unit = {},
     viewModel: SettingsViewModel = hiltViewModel(),
@@ -52,6 +53,7 @@ fun SettingsBottomSheetContainer(
     }
 
     SettingsBottomSheet(
+        screen = screen,
         state = SettingsState(
             appVersion = viewModel.appVersion,
             showTokenUsage = showTokenUsage,

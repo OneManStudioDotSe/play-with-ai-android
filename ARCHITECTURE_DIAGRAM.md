@@ -60,7 +60,7 @@
 │  └──────────────────────┘  └──────────────────────┘  └──────────────────────────────────────────┘   │
 │                                                                                                     │
 │  ┌──────────────────────┐  ┌──────────────────────┐  ┌──────────────────────────────────────────┐   │
-│  │   :core:database     │  │   :core:tracking     │  │          :core:theme / :core:ui          │   │
+│  │   :core:database     │  │   :core:tracking     │  │          :ui:theme / :ui:components          │   │
 │  │  AppDatabase (v6)    │  │  TokenUsageTracker   │  │  Colors, Typography (theme)              │   │
 │  │  PromptEntity        │  │  TokenUsageQuery     │  │  Compose widgets (ui)                    │   │
 │  │  DreamEntity         │  │  TokenUsageTrackerIml│  │                                          │   │
@@ -107,8 +107,15 @@
 │  │  Services: Map tiles, markers, polylines, camera, FusedLocationProviderClient                │    │
 │  └──────────────────────────────────────────────────────────────────────────────────────────────┘    │
 │                                                                                                      │
+│  ┌──────────────────────────────────────────────────────────────────────────────────────────────┐    │
+│  │  ML Kit GenAI (on-device, no network) — :feature:nano                                        │    │
+│  │  Backed by Gemini Nano via AICore. Summarizer.checkFeatureStatus() (probe) + downloadFeature()│   │
+│  └──────────────────────────────────────────────────────────────────────────────────────────────┘    │
+│                                                                                                      │
 └──────────────────────────────────────────────────────────────────────────────────────────────────────┘
 ```
+
+> **Presentation-only modules not shown above:** `:feature:settings` (screen-aware Settings bottom sheet → reads/writes `AppSettingsHolder` / `ExploreSettingsHolder` in `:core:config`, no data module) and `:feature:nano` (on-device Gemini Nano support checker → talks directly to the ML Kit GenAI SDK, no data module and no `:core:network`).
 
 ### Chat Feature — Request/Response Flow
 
@@ -118,7 +125,7 @@ User types prompt (+ optional image/document)
   ▼
 ChatViewModel.generateContent(prompt, imageUri?, documentUri?)
   │
-  ├─ Image? → withContext(Default) → decode → scale to max 768px → JPEG @ 77% → Base64
+  ├─ Image? → withContext(Default) → decode → scale to configured max px (512/768/1024) → JPEG @ configured quality (40/77/93%) → Base64
   ├─ Document? → withContext(IO) → read text content
   │
   ▼
@@ -140,7 +147,7 @@ POST https://generativelanguage.googleapis.com/v1beta/models/{geminiTextModel}:g
   ├── OkHttp Pipeline:
   │    AuthenticationInterceptor → adds ?key= param
   │    HttpLoggingInterceptor   → BODY (debug) / NONE (release)
-  │    Timeouts: 30s connect/read/write
+  │    Timeouts: configurable 15–120 s via Settings (default 30 s)
   │
   ▼
 GeminiResponse → candidates[0].content.parts[0].text → Result<String>

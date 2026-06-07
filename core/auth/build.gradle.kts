@@ -45,8 +45,5 @@ dependencies {
     implementation(libs.timber)
 
     // Testing
-    testImplementation(libs.junit4)
-    testImplementation(libs.truth)
-    testImplementation(libs.mockk)
-    testImplementation(libs.kotlinx.coroutines.test)
+    testImplementation(libs.bundles.unit.test)
 }

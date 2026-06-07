@@ -4,7 +4,7 @@ A **showcase** Android app where serious engineering meets five delightfully unh
 
 ## TL;DR
 
-Production-grade Android showcase app with four distinct Gemini API integration patterns — conversational chat, structured JSON generation, AI image synthesis, and an autonomous agentic loop with native function calling. Ships with a deep Settings panel that exposes 17 runtime parameters including AI persona switching, live model selection, configurable image quality, and more. Built with Jetpack Compose, Clean Architecture, multi-module Gradle, Hilt, Room, Firebase, and WorkManager.
+Production-grade Android showcase app with four distinct cloud Gemini API integration patterns — conversational chat, structured JSON generation, AI image synthesis, and an autonomous agentic loop with native function calling — plus an on-device AI path that probes Gemini Nano through ML Kit's GenAI APIs. Ships with a deep, screen-aware Settings panel that exposes 17 runtime parameters including AI persona switching, live model selection, configurable image quality, and more. Built with Jetpack Compose, Clean Architecture, multi-module Gradle, Hilt, Room, Firebase, and WorkManager.
 
 ## How it looks
 
@@ -38,7 +38,8 @@ Production-grade Android showcase app with four distinct Gemini API integration 
 - **Dream Interpreter** — AI analysis with a generative visual scene and an AI-painted artwork
 - **Trip Planner** — Autonomous AI agent plans a real trip using Gemini function calling; results shown on an interactive styled map with a scroll-lock toggle
 - **Map Explorer** — Discover and filter nearby vehicles, get AI place suggestions, calculate optimal routes
-- **Settings** — Deep settings panel exposing 17 runtime parameters across two holders (`AppSettingsHolder` / `ExploreSettingsHolder`): AI persona (5 options), Gemini model selection (text + image independently), typewriter speed, haptic feedback, walking speed, image quality, network timeout, agent depth, suggested places count, token tracking, cloud sync, and map controls
+- **On-device AI (Gemini Nano)** — Checks whether the device supports on-device Gemini Nano through ML Kit's GenAI APIs (no network round-trip), shows device info and known supported devices, and downloads the model on demand with live progress
+- **Settings** — Deep, screen-aware settings panel exposing 17 runtime parameters across two holders (`AppSettingsHolder` / `ExploreSettingsHolder`): AI persona (5 options), Gemini model selection (text + image independently), typewriter speed, haptic feedback, walking speed, image quality, network timeout, agent depth, suggested places count, token tracking, cloud sync, and map controls. The top section adapts to the screen it was opened from (Chat → persona, Explore → map controls, Dream → image quality, Plan → trip planner)
 - **Design System Showcase** — Interactive living style guide for the "SoFa" design system
 
 ## Tech stack
@@ -105,8 +106,8 @@ A highly modular structure that scales regardless of team size:
 - **`:core:database`**: Shared Room DB — all entities (prompts, dreams, token usage), DAOs, TypeConverters, migrations
 - **`:core:tracking`**: Cross-feature token usage tracking — interfaces, TrackerImpl, GetWeeklyTokenUsageUseCase
 - **`:core:testing`**: Shared test helpers (MainCoroutineRule) used across all modules
-- **`:core:theme`**: Centralized design system (colors, typography)
-- **`:core:ui`**: Reusable Compose components
+- **`:ui:theme`**: Centralized design system (colors, typography)
+- **`:ui:components`**: Reusable Compose components
 
 **Data modules — domain models, repositories, use cases:**
 - **`:data:chat`**: Chat use cases, ChatGeminiRepository, PromptRepository, Firestore sync, SyncWorker
@@ -116,14 +117,15 @@ A highly modular structure that scales regardless of team size:
 
 **Feature modules — presentation only (Compose UI + ViewModels):**
 - **`:feature:chat`** · **`:feature:explore`** · **`:feature:dream`** · **`:feature:plan`**
-- **`:feature:settings`**: SettingsBottomSheet + SettingsViewModel — depends only on `:core` modules (no data module dependency)
+- **`:feature:settings`**: screen-aware SettingsBottomSheet + SettingsViewModel — depends only on `:core` modules (no data module dependency)
+- **`:feature:nano`**: NanoScreen + NanoViewModel — on-device Gemini Nano support checker via ML Kit GenAI; depends only on `:ui:components` / `:ui:theme` + the ML Kit SDK (no data module, no `:core:network`)
 - **`:feature:showcase`**: ShowcaseScreen — interactive design system guide (no ViewModel, no data layer, no Hilt)
 
 The dependency flow runs strictly one way: `feature → data → core`. Multiple teams can work on separate features without stepping on each other.
 
-## Gemini AI — four distinct integration patterns
+## Gemini AI — five distinct integration patterns
 
-The app doesn't just call Gemini once and call it a day. Each feature uses the API in a fundamentally different way.
+The app doesn't just call Gemini once and call it a day. Each feature uses the API in a fundamentally different way — four of them hit the cloud Gemini REST API, and one runs entirely on-device.
 
 ### 1. Conversational chat with multimodal input
 **Feature: Chat**
@@ -150,6 +152,11 @@ Two tools are declared as `functionDeclarations`:
 - **`calculate_route`** — runs a local TSP solver (brute-force for ≤8 points, nearest-neighbour for more) using the Haversine formula
 
 One important detail: Gemini's model turns can include thinking parts (`thought: true` + `thought_signature`). These **must be preserved verbatim** when replaying conversation history — omitting them causes the API to return HTTP 400.
+
+### 5. On-device inference with Gemini Nano
+**Feature: Nano**
+
+The only pattern that never touches the network. ML Kit's GenAI APIs are all backed by Gemini Nano running on-device via AICore, but there's no standalone "is Nano available" call — so the app uses the Summarization client purely as a **probe**. `Summarizer.checkFeatureStatus()` returns the definitive runtime verdict (`AVAILABLE` / `DOWNLOADABLE` / `UNAVAILABLE`), mapped to a three-state UI (Ready / Available to download / Not available). When the model is only downloadable, `Summarizer.downloadFeature()` streams it down with live byte-progress, then re-checks support. The screen also surfaces the current device's manufacturer/model/API level and a curated list of known Nano-capable devices. This module depends on no `:data` layer and no `:core:network` — just `:ui:components`/`:ui:theme` and the ML Kit SDK.
 
 ## Future-proofing
 

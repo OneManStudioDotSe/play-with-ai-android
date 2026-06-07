@@ -32,7 +32,6 @@ dependencies {
     implementation(project(":core:network"))
     implementation(project(":core:tracking"))
 
-    // Network (for Retrofit HttpException in repository)
     implementation(libs.retrofit)
     implementation(libs.retrofit.converter.gson)
 
@@ -45,9 +44,5 @@ dependencies {
     ksp(libs.hilt.compiler)
 
     // Testing
-    testImplementation(libs.junit4)
-    testImplementation(libs.mockk)
-    testImplementation(libs.kotlinx.coroutines.test)
-    testImplementation(libs.kotlin.test)
-    testImplementation(libs.truth)
+    testImplementation(libs.bundles.unit.test)
 }

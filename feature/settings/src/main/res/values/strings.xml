@@ -10,6 +10,8 @@
     <string name="settings_app_description">A showcase Android app exploring modern AI engineering with Gemini.</string>
     <string name="settings_token_suffix">tokens</string>
     <string name="settings_map_controls">Map Controls</string>
+    <string name="settings_trip_planner">Trip Planner</string>
+    <string name="settings_image_generation">Image Generation</string>
     <string name="settings_vehicle_count">Number of vehicles: %d</string>
     <string name="settings_search_radius">Search radius: %.1f km</string>
     <string name="settings_weekly_usage">Weekly AI Usage</string>

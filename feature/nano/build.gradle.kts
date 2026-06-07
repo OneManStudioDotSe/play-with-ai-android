@@ -38,12 +38,9 @@ android {
 }
 
 dependencies {
-    implementation(project(":core:theme"))
-    implementation(project(":core:ui"))
+    implementation(project(":ui:components"))
 
-    implementation(libs.material3)
-    implementation(libs.androidx.material.icons.extended)
-    implementation(libs.androidx.lifecycle.runtime.compose)
+    implementation(libs.bundles.compose.feature)
 
     // On-device GenAI (Gemini Nano) availability + download
     implementation(libs.mlkit.genai.summarization)
@@ -53,9 +50,8 @@ dependencies {
     implementation(libs.timber)
 
     // Hilt
-    implementation(libs.hilt.android)
+    implementation(libs.bundles.hilt)
     ksp(libs.hilt.compiler)
-    implementation(libs.hilt.navigation.compose)
 
     debugImplementation(libs.ui.tooling)
 }

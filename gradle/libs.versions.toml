@@ -89,6 +89,14 @@ timber = { module = "com.jakewharton.timber:timber", version.ref = "timber" }
 truth = { module = "com.google.truth:truth", version.ref = "truth" }
 ui-tooling = { module = "androidx.compose.ui:ui-tooling", version.ref = "uiTooling" }
 
+[bundles]
+# Common Compose UI dependencies for feature modules
+compose-feature = ["material3", "androidx-material-icons-extended", "androidx-lifecycle-runtime-compose", "kotlinx-collections-immutable"]
+# Hilt runtime for feature modules (the ksp compiler is applied separately)
+hilt = ["hilt-android", "hilt-navigation-compose"]
+# Shared JVM unit-testing stack
+unit-test = ["junit4", "mockk", "kotlinx-coroutines-test", "kotlin-test", "truth"]
+
 [plugins]
 android-application = { id = "com.android.application", version.ref = "agp" }
 android-library = { id = "com.android.library", version.ref = "agp" }

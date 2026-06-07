@@ -37,7 +37,8 @@ kotlin {
 }
 
 dependencies {
-    implementation(project(":core:theme"))
+    // Exposed transitively: any module that depends on :ui:components also gets the theme
+    api(project(":ui:theme"))
 
     implementation(libs.material3)
     implementation(libs.androidx.material.icons.extended)

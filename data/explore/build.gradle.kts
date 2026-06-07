@@ -34,6 +34,7 @@ dependencies {
 
     implementation(libs.retrofit)
     implementation(libs.retrofit.converter.gson)
+
     implementation(libs.javax.inject)
 
     implementation(libs.timber)
@@ -43,9 +44,5 @@ dependencies {
     ksp(libs.hilt.compiler)
 
     // Testing
-    testImplementation(libs.junit4)
-    testImplementation(libs.mockk)
-    testImplementation(libs.kotlinx.coroutines.test)
-    testImplementation(libs.kotlin.test)
-    testImplementation(libs.truth)
+    testImplementation(libs.bundles.unit.test)
 }

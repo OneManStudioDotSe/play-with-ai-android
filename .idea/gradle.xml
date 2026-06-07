@@ -16,9 +16,7 @@
             <option value="$PROJECT_DIR$/core/database" />
             <option value="$PROJECT_DIR$/core/network" />
             <option value="$PROJECT_DIR$/core/testing" />
-            <option value="$PROJECT_DIR$/core/theme" />
             <option value="$PROJECT_DIR$/core/tracking" />
-            <option value="$PROJECT_DIR$/core/ui" />
             <option value="$PROJECT_DIR$/data" />
             <option value="$PROJECT_DIR$/data/chat" />
             <option value="$PROJECT_DIR$/data/dream" />
@@ -32,6 +30,9 @@
             <option value="$PROJECT_DIR$/feature/plan" />
             <option value="$PROJECT_DIR$/feature/settings" />
             <option value="$PROJECT_DIR$/feature/showcase" />
+            <option value="$PROJECT_DIR$/ui" />
+            <option value="$PROJECT_DIR$/ui/components" />
+            <option value="$PROJECT_DIR$/ui/theme" />
           </set>
         </option>
       </GradleProjectSettings>

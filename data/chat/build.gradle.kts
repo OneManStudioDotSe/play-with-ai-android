@@ -28,11 +28,11 @@ android {
 }
 
 dependencies {
-    implementation(project(":core:auth"))
     implementation(project(":core:config"))
     implementation(project(":core:network"))
-    implementation(project(":core:database"))
     implementation(project(":core:tracking"))
+    implementation(project(":core:database"))
+    implementation(project(":core:auth"))
 
     // Firebase
     implementation(platform(libs.firebase.bom))
@@ -43,12 +43,12 @@ dependencies {
     implementation(libs.androidx.hilt.work)
     ksp(libs.androidx.hilt.compiler)
 
-    // Network (for Retrofit HttpException in repository)
     implementation(libs.retrofit)
     implementation(libs.retrofit.converter.gson)
 
-    implementation(libs.kotlinx.coroutines.play.services)
     implementation(libs.javax.inject)
+
+    implementation(libs.kotlinx.coroutines.play.services)
 
     implementation(libs.timber)
 
@@ -57,9 +57,5 @@ dependencies {
     ksp(libs.hilt.compiler)
 
     // Testing
-    testImplementation(libs.junit4)
-    testImplementation(libs.mockk)
-    testImplementation(libs.kotlinx.coroutines.test)
-    testImplementation(libs.kotlin.test)
-    testImplementation(libs.truth)
+    testImplementation(libs.bundles.unit.test)
 }
